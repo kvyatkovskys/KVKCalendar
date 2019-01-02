@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'KVKCalendar_Example' do
+  pod 'KVKCalendar', :path => '../'
+
+  target 'KVKCalendar_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
