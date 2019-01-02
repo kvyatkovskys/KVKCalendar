@@ -1,0 +1,63 @@
+disabled_rules: # rule identifiers to exclude from running
+  - trailing_whitespace
+  - variable_name
+  - type_body_length
+  - valid_docs
+  - vertical_parameter_alignment
+  - unused_closure_parameter
+  - closure_parameter_position
+  - empty_enum_arguments
+opt_in_rules: # some rules are only opt-in
+included: # paths to include during linting. `--path` is ignored if present.
+excluded: # paths to ignore during linting. Takes precedence over `included`.
+  - Pods
+  # - Source/ExcludedFolder
+  # - Source/ExcludedFile.swift
+
+# configurable rules can be customized from this configuration file
+# binary rules can set their severity level
+cyclomatic_complexity: 15
+force_cast: warning # implicitly
+force_try:
+  severity: warning # explicitly
+# rules that have both warning and error levels, can set just the warning level
+# implicitly
+line_length: 500
+large_tuple:
+  warning: 3
+  error: 5
+# they can set both implicitly with an array
+type_body_length:
+  - 300 # warning
+  - 400 # error
+# or they can set both explicitly
+file_length:
+  warning: 1000
+  error: 1200
+# naming rules can set warnings/errors for min_length and max_length
+# additionally they can set excluded names
+function_body_length: 150
+function_parameter_count:
+  warning: 8
+  error: 10
+type_name:
+  min_length: 2 # only warning
+  max_length: # warning and error
+    warning: 50
+    error: 70
+  excluded: iPhone # excluded via string
+variable_name:
+  min_length: # only min_length
+    error: 2 # only error
+  excluded: # excluded via string array
+    - id
+    - URL
+    - GlobalAPIKey
+reporter: "xcode" # reporter type (xcode, json, csv, checkstyle)
+
+custom_rules:
+  explicit_failure_calls:
+    name: "Avoid asserting 'false'"
+    regex: "((assert|precondition)\\(false)"
+    message: "Use assertionFailure() or preconditionFailure() instead."
+    severity: warning

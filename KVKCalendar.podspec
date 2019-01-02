@@ -24,19 +24,20 @@ TODO: Add long description of the pod here.
   s.homepage         = 'https://github.com/kvyatkovskys/KVKCalendar'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'kvyatkovskys' => 'sergejkvyatkovskij@gmail.com' }
+  s.author           = { 'Sergei Kviatkovskii' => 'sergejkvyatkovskij@gmail.com' }
   s.source           = { :git => 'https://github.com/kvyatkovskys/KVKCalendar.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '9.0'
 
-  s.source_files = 'KVKCalendar/Classes/**/*'
+  s.source_files = 'KVKCalendar/Classes/*.swift'
+  s.frameworks = 'UIKit'
+  s.swift_version = '4.2'
   
   # s.resource_bundles = {
   #   'KVKCalendar' => ['KVKCalendar/Assets/*.png']
   # }
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.frameworks = 'UIKit', 'MapKit'
-  # s.dependency 'AFNetworking', '~> 2.3'
+
 end
