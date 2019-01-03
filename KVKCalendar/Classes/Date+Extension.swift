@@ -7,8 +7,6 @@
 
 import Foundation
 
-import Foundation
-
 extension Date {
     var minute: Int {
         let calendar = Calendar.current

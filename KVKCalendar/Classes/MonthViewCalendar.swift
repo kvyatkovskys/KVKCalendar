@@ -37,7 +37,7 @@ final class MonthViewCalendar: UIView, MonthCellDelegate {
         self.style = style
         super.init(frame: frame)
         addSubview(headerView)
-
+        
         var collectionFrame = frame
         collectionFrame.origin.y = headerView.frame.height
         collectionFrame.size.height = collectionFrame.height - headerView.frame.height
@@ -137,7 +137,7 @@ extension MonthViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateF
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let widht: CGFloat
         let height: CGFloat
-
+        
         switch style.monthStyle.scrollDirection {
         case .horizontal:
             widht = collectionView.frame.width / 7
