@@ -66,7 +66,7 @@ final class WeekHeaderView: UIView {
             label.tag = value.shiftDay
             addSubview(label)
         }
-        if !style.monthStyle.isHiddenTitleDate {
+        if !style.monthStyle.isHiddenTitleDate && !fromYear {
             titleLabel.frame = CGRect(x: 0,
                                       y: style.monthStyle.heightHeaderWeek,
                                       width: frame.width,

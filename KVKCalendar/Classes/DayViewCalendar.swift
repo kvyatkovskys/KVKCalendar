@@ -34,6 +34,7 @@ final class DayViewCalendar: UIView, ScrollDayHeaderProtocol, TimelineDelegate {
     fileprivate lazy var timelineView: TimelineView = {
         var timelineFrame = frame
         timelineFrame.origin.y = scrollHeaderDay.frame.height
+        timelineFrame.size.height -= scrollHeaderDay.frame.height
         timelineFrame.size.width -= style.timelineStyle.widthEventViewer
         let view = TimelineView(hours: data.timeSystem.hours, style: style, frame: timelineFrame)
         view.delegate = self

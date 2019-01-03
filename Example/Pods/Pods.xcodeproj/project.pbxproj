@@ -37,6 +37,7 @@
 		F91321A221DE1A500076B714 /* Array+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91321A121DE1A500076B714 /* Array+Extension.swift */; };
 		F91321A421DE1A670076B714 /* AllDayEventView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91321A321DE1A670076B714 /* AllDayEventView.swift */; };
 		F91321A621DE24D60076B714 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91321A521DE24D60076B714 /* CalendarView.swift */; };
+		F91321A821DE40590076B714 /* YearHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91321A721DE40590076B714 /* YearHeaderView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -108,6 +109,7 @@
 		F91321A121DE1A500076B714 /* Array+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Array+Extension.swift"; path = "KVKCalendar/Classes/Array+Extension.swift"; sourceTree = "<group>"; };
 		F91321A321DE1A670076B714 /* AllDayEventView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AllDayEventView.swift; path = KVKCalendar/Classes/AllDayEventView.swift; sourceTree = "<group>"; };
 		F91321A521DE24D60076B714 /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CalendarView.swift; path = KVKCalendar/Classes/CalendarView.swift; sourceTree = "<group>"; };
+		F91321A721DE40590076B714 /* YearHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = YearHeaderView.swift; path = KVKCalendar/Classes/YearHeaderView.swift; sourceTree = "<group>"; };
 		FA2CDFE87246C08EF83AEEA2FA5D1E0A /* Pods-KVKCalendar_Example-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-KVKCalendar_Example-acknowledgements.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -173,6 +175,7 @@
 				F913217B21DE185E0076B714 /* YearViewCalendar.swift */,
 				F913217D21DE18740076B714 /* YearData.swift */,
 				F913217F21DE18980076B714 /* YearCollectionViewCell.swift */,
+				F91321A721DE40590076B714 /* YearHeaderView.swift */,
 				F913218121DE18BF0076B714 /* WeekViewCalendar.swift */,
 				F913218521DE18EC0076B714 /* WeekData.swift */,
 				F913219121DE19940076B714 /* MonthViewCalendar.swift */,
@@ -451,6 +454,7 @@
 				F91321A221DE1A500076B714 /* Array+Extension.swift in Sources */,
 				F913219E21DE1A1F0076B714 /* Date+Extension.swift in Sources */,
 				F913218C21DE193A0076B714 /* Style.swift in Sources */,
+				F91321A821DE40590076B714 /* YearHeaderView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

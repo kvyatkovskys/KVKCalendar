@@ -22,8 +22,15 @@ final class YearViewCalendar: UIView {
         collection.isPagingEnabled = true
         collection.dataSource = self
         collection.delegate = self
-        collection.register(YearCollectionViewCell.self, forCellWithReuseIdentifier: YearCollectionViewCell.cellIdentifier)
+        collection.register(YearCollectionViewCell.self,
+                            forCellWithReuseIdentifier: YearCollectionViewCell.cellIdentifier)
         return collection
+    }()
+    
+    fileprivate lazy var headerView: YearHeaderView = {
+        let view = YearHeaderView(frame: CGRect(x: 0, y: 0, width: frame.width, height: style.yearStyle.heightTitleHeader))
+        view.style = style
+        return view
     }()
     
     init(data: YearData, frame: CGRect, style: Style) {
@@ -31,12 +38,16 @@ final class YearViewCalendar: UIView {
         self.style = style
         super.init(frame: frame)
         collectionView.frame = frame
+        collectionView.frame.origin.y = style.yearStyle.heightTitleHeader
+        collectionView.frame.size.height -= style.yearStyle.heightTitleHeader
         addSubview(collectionView)
+        addSubview(headerView)
         
         scrollToDate(date: data.moveDate, animation: false)
     }
     
     func setDate(date: Date) {
+        headerView.date = date
         data.moveDate = date
         scrollToDate(date: date, animation: true)
         collectionView.reloadData()
@@ -92,6 +103,7 @@ extension YearViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFl
             .compactMap({ $0 })
             .first
         data.moveDate = newMoveDate ?? Date()
+        headerView.date = newMoveDate
         delegate?.didSelectCalendarDate(newMoveDate, type: .year)
         collectionView.reloadData()
     }
@@ -102,6 +114,7 @@ extension YearViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFl
         formatter.dateFormat = "dd.MM.yyyy"
         let newDate = formatter.date(from: "\(data.moveDate.day).\(date.month).\(date.year)")
         data.moveDate = newDate ?? Date()
+        headerView.date = newDate
         delegate?.didSelectCalendarDate(newDate, type: .month)
         collectionView.reloadData()
     }

@@ -38,7 +38,7 @@ final class YearCollectionViewCell: UICollectionViewCell {
     
     var days: [Day] = [] {
         didSet {
-            subviews.filter({ 1...2 ~= $0.tag }).forEach({ $0.removeFromSuperview() })
+            subviews.filter({ $0.tag == 1 }).forEach({ $0.removeFromSuperview() })
             var step = 0
             let weekCount = ceil((CGFloat(days.count) / CGFloat(daysInWeek)))
             for idx in 1...Int(weekCount) {
@@ -76,25 +76,24 @@ final class YearCollectionViewCell: UICollectionViewCell {
                                y: newY + (CGFloat(step - 1) * height),
                                width: width,
                                height: height)
-            let label = UILabel(frame: frame)
-            label.tag = 1
+            
+            let view = UIView(frame: frame)
+            let label = UILabel(frame: CGRect(x: (frame.width - frame.height) / 2,
+                                              y: 0,
+                                              width: frame.height,
+                                              height: frame.height))
             label.textAlignment = .center
-            label.font = .systemFont(ofSize: 15)
+            label.font = style.yearStyle.fontDayTitle
+            label.textColor = style.yearStyle.colorDayTitle
             
             if let day = day.date?.day {
                 label.text = "\(day)"
             }
             
-            var newFrame = frame
-            newFrame.size.width = (frame.width + frame.height) / 2
-            newFrame.size.height = newFrame.width
-            
-            let view = UIView(frame: newFrame)
-            view.tag = 2
-            view.center = label.center
+            view.tag = 1
             weekendsDays(day: day, label: label, view: view)
             addSubview(view)
-            addSubview(label)
+            view.addSubview(label)
         }
     }
     
@@ -111,36 +110,48 @@ final class YearCollectionViewCell: UICollectionViewCell {
         
         if weekend {
             label.textColor = style.yearStyle.colorWeekendDate
-            label.backgroundColor = style.yearStyle.colorBackgroundWeekendDate
-        } else {
-            label.backgroundColor = .clear
+            view.backgroundColor = style.yearStyle.colorBackgroundWeekendDate
         }
         
-        if date?.year == nowDate.year && date?.month == nowDate.month {
-            if date?.day == nowDate.day && selectDate.day == nowDate.day {
-                label.textColor = style.yearStyle.colorCurrentDate
-                view.backgroundColor = style.yearStyle.colorBackgroundCurrentDate
-                view.layer.cornerRadius = view.frame.height / 2
-                view.clipsToBounds = true
-                label.backgroundColor = .clear
-            } else if date?.day == nowDate.day {
-                label.textColor = style.yearStyle.colorBackgroundCurrentDate
-                view.backgroundColor = .clear
-            } else if selectDate.day == date?.day && selectDate.month == date?.month {
-                label.textColor = style.yearStyle.colorSelectDate
-                view.backgroundColor = style.yearStyle.colorBackgroundSelectDate
-                view.layer.cornerRadius = view.frame.height / 2
-                view.clipsToBounds = true
-                label.backgroundColor = .clear
-            }
-        } else {
+        guard date?.year == nowDate.year else {
             if date?.year == selectDate.year && date?.month == selectDate.month && date?.day == selectDate.day {
                 label.textColor = style.yearStyle.colorSelectDate
-                view.backgroundColor = style.yearStyle.colorBackgroundSelectDate
-                view.layer.cornerRadius = view.frame.height / 2
-                view.clipsToBounds = true
+                label.backgroundColor = style.yearStyle.colorBackgroundSelectDate
+                label.layer.cornerRadius = label.frame.height / 2
+                label.clipsToBounds = true
+            }
+            return
+        }
+        
+        guard date?.month == nowDate.month else {
+            if selectDate.day == date?.day && selectDate.month == date?.month {
+                label.textColor = style.yearStyle.colorSelectDate
+                label.backgroundColor = style.yearStyle.colorBackgroundSelectDate
+                label.layer.cornerRadius = label.frame.height / 2
+                label.clipsToBounds = true
+            }
+            return
+        }
+        
+        guard date?.day == nowDate.day else {
+            if selectDate.day == date?.day && date?.month == selectDate.month {
+                label.textColor = style.yearStyle.colorSelectDate
+                label.backgroundColor = style.yearStyle.colorBackgroundSelectDate
+                label.layer.cornerRadius = label.frame.height / 2
+                label.clipsToBounds = true
+            }
+            return
+        }
+        guard selectDate.day == date?.day && selectDate.month == date?.month else {
+            if date?.day == nowDate.day {
+                label.textColor = style.yearStyle.colorBackgroundCurrentDate
                 label.backgroundColor = .clear
             }
+            return
         }
+        label.textColor = style.yearStyle.colorCurrentDate
+        label.backgroundColor = style.yearStyle.colorBackgroundCurrentDate
+        label.layer.cornerRadius = label.frame.height / 2
+        label.clipsToBounds = true
     }
 }

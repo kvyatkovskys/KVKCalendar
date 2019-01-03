@@ -22,7 +22,7 @@ final class MonthCollectionViewCell: UICollectionViewCell {
     fileprivate lazy var dateLabel: UILabel = {
         let label = UILabel()
         label.tag = 1
-        label.font = style.colorFontNameDate
+        label.font = style.fontNameDate
         label.textColor = style.colorNameDay
         label.textAlignment = .center
         label.clipsToBounds = true

@@ -23,7 +23,7 @@ public struct Style {
     public init() {}
 }
 
-public struct HeaderScrollStyle: DateStyle {
+public struct HeaderScrollStyle {
     fileprivate let format: DateFormatter = {
         let format = DateFormatter()
         format.dateStyle = .full
@@ -63,7 +63,7 @@ public struct TimelineStyle {
     public var widthEventViewer: CGFloat = 0
 }
 
-public struct WeekStyle: DateStyle {
+public struct WeekStyle {
     public var colorBackground: UIColor = gainsboro.withAlphaComponent(0.4)
     public var colorDate: UIColor = .black
     public var colorNameDay: UIColor = .black
@@ -75,7 +75,7 @@ public struct WeekStyle: DateStyle {
     public var colorBackgroundWeekendDate: UIColor = gainsboro.withAlphaComponent(0.4)
 }
 
-public struct MonthStyle: DateStyle {
+public struct MonthStyle {
     fileprivate let format: DateFormatter = {
         let format = DateFormatter()
         format.dateStyle = .full
@@ -88,7 +88,7 @@ public struct MonthStyle: DateStyle {
     public var isHiddenTitleDate: Bool = false
     public var colorDate: UIColor = .black
     public var colorNameDay: UIColor = .black
-    public var colorFontNameDate: UIFont = .boldSystemFont(ofSize: 16)
+    public var fontNameDate: UIFont = .boldSystemFont(ofSize: 16)
     public var colorCurrentDate: UIColor = .white
     public var colorBackgroundCurrentDate: UIColor = .red
     public var colorBackgroundSelectDate: UIColor = .black
@@ -106,10 +106,14 @@ public struct MonthStyle: DateStyle {
     public var scrollDirection: UICollectionView.ScrollDirection = .vertical
 }
 
-public struct YearStyle: DateStyle {
-    public var colorDate: UIColor = .black
-    public var colorNameDay: UIColor = .black
-    public var colorFontNameDate: UIFont = .boldSystemFont(ofSize: 16)
+public struct YearStyle {
+    fileprivate let format: DateFormatter = {
+        let format = DateFormatter()
+        format.dateStyle = .full
+        return format
+    }()
+    
+    public lazy var formatter: DateFormatter = format
     public var colorCurrentDate: UIColor = .white
     public var colorBackgroundCurrentDate: UIColor = .red
     public var colorBackgroundSelectDate: UIColor = .black
@@ -119,6 +123,13 @@ public struct YearStyle: DateStyle {
     public var weekFont: UIFont = .boldSystemFont(ofSize: 14)
     public var fontTitle: UIFont = .systemFont(ofSize: 19)
     public var colorTitle: UIColor = .black
+    public var colorBackgroundHeader: UIColor = gainsboro.withAlphaComponent(0.4)
+    public var fontTitleHeader: UIFont = .boldSystemFont(ofSize: 20)
+    public var colorTitleHeader: UIColor = .black
+    public var heightTitleHeader: CGFloat = 50
+    public var aligmentTitleHeader: NSTextAlignment = .center
+    public var fontDayTitle: UIFont = .systemFont(ofSize: 15)
+    public var colorDayTitle: UIColor = .black
 }
 
 public struct AllDayStyle {
@@ -132,14 +143,4 @@ public struct AllDayStyle {
     public var height: CGFloat = 25
     public var fontTitle: UIFont = .systemFont(ofSize: 10)
     public var isPinned: Bool = false
-}
-
-protocol DateStyle {
-    var colorDate: UIColor { get }
-    var colorNameDay: UIColor { get }
-    var colorCurrentDate: UIColor { get }
-    var colorBackgroundCurrentDate: UIColor { get }
-    var colorBackgroundSelectDate: UIColor { get }
-    var colorSelectDate: UIColor { get }
-    var colorWeekendDate: UIColor { get }
 }
