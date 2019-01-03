@@ -12,6 +12,12 @@ import KVKCalendar
 final class ViewController: UIViewController, CalendarDelegate {
     var selectDate = Date()
     
+    lazy var todayButton: UIBarButtonItem = {
+        let button = UIBarButtonItem(title: "Today", style: .done, target: self, action: #selector(today))
+        button.tintColor = .red
+        return button
+    }()
+    
     lazy var calendarView: CalendarView = {
         var frame = view.frame
         frame.size.height -= (navigationController?.navigationBar.frame.height ?? 0) + UIApplication.shared.statusBarFrame.height
@@ -36,6 +42,11 @@ final class ViewController: UIViewController, CalendarDelegate {
         view.addSubview(calendarView)
         calendarView.set(type: .day, date: Date())
         navigationItem.titleView = segmentedControl
+        navigationItem.rightBarButtonItem = todayButton
+    }
+    
+    @objc func today(sender: UIBarButtonItem) {
+        calendarView.scrollToDate(date: Date())
     }
     
     @objc func switchCalendar(sender: UISegmentedControl) {

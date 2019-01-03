@@ -28,10 +28,12 @@ public extension CalendarDelegate {
 
 public final class CalendarView: UIView, CalendarSelectDateDelegate {
     public weak var delegate: CalendarDelegate?
-    var timeHourSystem: TimeHourSystem = .twentyFourHour
+    public var selectedType: CalendarType {
+        return type
+    }
     
-    public let style: Style
-    fileprivate var calendarType = CalendarType.day
+    fileprivate let style: Style
+    fileprivate var type = CalendarType.day
     fileprivate var yearData: YearData
     fileprivate var weekData: WeekData
     fileprivate let monthData: MonthData
@@ -61,7 +63,7 @@ public final class CalendarView: UIView, CalendarSelectDateDelegate {
         return year
     }()
     
-    public init(date: Date = Date(), frame: CGRect, style: Style = Style(), years: Int = 4) {
+    public init(frame: CGRect, date: Date = Date(), style: Style = Style(), years: Int = 4, timeHourSystem: TimeHourSystem = .twentyFourHour) {
         self.style = style
         self.yearData = YearData(date: date, years: years, style: style)
         self.dayData = DayData(yearData: yearData, timeSystem: timeHourSystem)
@@ -75,7 +77,7 @@ public final class CalendarView: UIView, CalendarSelectDateDelegate {
     }
     
     fileprivate func switchTypeCalendar(type: CalendarType) {
-        calendarType = type
+        self.type = type
         subviews.filter({ $0 is DayViewCalendar
             || $0 is WeekViewCalendar
             || $0 is MonthViewCalendar
@@ -98,7 +100,7 @@ public final class CalendarView: UIView, CalendarSelectDateDelegate {
     }
     
     public func set(type: CalendarType, date: Date) {
-        calendarType = type
+        self.type = type
         switchTypeCalendar(type: type)
         
         switch type {
@@ -114,7 +116,7 @@ public final class CalendarView: UIView, CalendarSelectDateDelegate {
     }
     
     public func reloadData() {
-        switch calendarType {
+        switch type {
         case .day:
             dayCalendar.reloadData(events: delegate?.eventsForCalendar() ?? [])
         case .week:
@@ -127,7 +129,7 @@ public final class CalendarView: UIView, CalendarSelectDateDelegate {
     }
     
     public func scrollToDate(date: Date) {
-        switch calendarType {
+        switch type {
         case .day:
             dayCalendar.setDate(date: date)
         case .week:
@@ -149,11 +151,11 @@ public final class CalendarView: UIView, CalendarSelectDateDelegate {
     }
     
     func didSelectCalendarEvent(_ event: Event) {
-        delegate?.didSelectEvent(event, type: calendarType)
+        delegate?.didSelectEvent(event, type: type)
     }
 }
 
-enum TimeHourSystem: Int {
+public enum TimeHourSystem: Int {
     case twelveHour = 12
     case twentyFourHour = 24
     

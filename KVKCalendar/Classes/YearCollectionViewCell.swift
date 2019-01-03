@@ -14,7 +14,6 @@ final class YearCollectionViewCell: UICollectionViewCell {
     
     fileprivate let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 19)
         return label
     }()
     
@@ -26,8 +25,12 @@ final class YearCollectionViewCell: UICollectionViewCell {
     
     var style: Style = Style() {
         didSet {
-            let view = WeekHeaderView(frame: CGRect(x: 0, y: 40, width: frame.width, height: 30), style: style)
-            view.font = .boldSystemFont(ofSize: 14)
+            titleLabel.font = style.yearStyle.fontTitle
+            titleLabel.textColor = style.yearStyle.colorTitle
+            
+            subviews.filter({ $0 is WeekHeaderView }).forEach({ $0.removeFromSuperview() })
+            let view = WeekHeaderView(frame: CGRect(x: 0, y: 40, width: frame.width, height: 30), style: style, fromYear: true)
+            view.font = style.yearStyle.weekFont
             view.backgroundColorWeekends = style.weekStyle.colorBackgroundWeekendDate
             addSubview(view)
         }
@@ -107,33 +110,33 @@ final class YearCollectionViewCell: UICollectionViewCell {
         let nowDate = Date()
         
         if weekend {
-            label.textColor = .gray
-            label.backgroundColor = gainsboro.withAlphaComponent(0.4)
+            label.textColor = style.yearStyle.colorWeekendDate
+            label.backgroundColor = style.yearStyle.colorBackgroundWeekendDate
         } else {
             label.backgroundColor = .clear
         }
         
         if date?.year == nowDate.year && date?.month == nowDate.month {
             if date?.day == nowDate.day && selectDate.day == nowDate.day {
-                label.textColor = .white
-                view.backgroundColor = .red
+                label.textColor = style.yearStyle.colorCurrentDate
+                view.backgroundColor = style.yearStyle.colorBackgroundCurrentDate
                 view.layer.cornerRadius = view.frame.height / 2
                 view.clipsToBounds = true
                 label.backgroundColor = .clear
             } else if date?.day == nowDate.day {
-                label.textColor = .red
+                label.textColor = style.yearStyle.colorBackgroundCurrentDate
                 view.backgroundColor = .clear
             } else if selectDate.day == date?.day && selectDate.month == date?.month {
-                label.textColor = .white
-                view.backgroundColor = .black
+                label.textColor = style.yearStyle.colorSelectDate
+                view.backgroundColor = style.yearStyle.colorBackgroundSelectDate
                 view.layer.cornerRadius = view.frame.height / 2
                 view.clipsToBounds = true
                 label.backgroundColor = .clear
             }
         } else {
             if date?.year == selectDate.year && date?.month == selectDate.month && date?.day == selectDate.day {
-                label.textColor = .white
-                view.backgroundColor = .black
+                label.textColor = style.yearStyle.colorSelectDate
+                view.backgroundColor = style.yearStyle.colorBackgroundSelectDate
                 view.layer.cornerRadius = view.frame.height / 2
                 view.clipsToBounds = true
                 label.backgroundColor = .clear

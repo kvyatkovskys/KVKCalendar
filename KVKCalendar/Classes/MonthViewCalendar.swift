@@ -14,8 +14,14 @@ final class MonthViewCalendar: UIView, MonthCellDelegate {
     weak var delegate: CalendarSelectDateDelegate?
     
     fileprivate lazy var headerView: WeekHeaderView = {
-        let view = WeekHeaderView(frame: CGRect(x: 0, y: 0, width: frame.width, height: 50), style: style)
-        view.backgroundColor = style.weekStyle.colorBackgroundWeekendDate
+        let height: CGFloat
+        if style.monthStyle.isHiddenTitleDate {
+            height = style.monthStyle.heightHeaderWeek
+        } else {
+            height = style.monthStyle.heightHeaderWeek + style.monthStyle.heightTitleDate
+        }
+        let view = WeekHeaderView(frame: CGRect(x: 0, y: 0, width: frame.width, height: height), style: style)
+        view.backgroundColor = style.weekStyle.colorBackground
         return view
     }()
     
@@ -29,6 +35,8 @@ final class MonthViewCalendar: UIView, MonthCellDelegate {
         collection.isPagingEnabled = true
         collection.dataSource = self
         collection.delegate = self
+        collection.register(MonthCollectionViewCell.self,
+                            forCellWithReuseIdentifier: MonthCollectionViewCell.cellIdentifier)
         return collection
     }()
     
@@ -44,12 +52,11 @@ final class MonthViewCalendar: UIView, MonthCellDelegate {
         collectionView.frame = collectionFrame
         addSubview(collectionView)
         
-        collectionView.register(MonthCollectionViewCell.self,
-                                forCellWithReuseIdentifier: MonthCollectionViewCell.cellIdentifier)
         scrollToDate(date: data.moveDate)
     }
     
     func setDate(date: Date) {
+        headerView.date = date
         data.moveDate = date
         scrollToDate(date: date)
         collectionView.reloadData()
@@ -112,7 +119,16 @@ extension MonthViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateF
         let cellDays = cells.filter({ $0.day.type != .empty })
         guard let newMoveDate = cellDays.filter({ $0.day.date?.day == data.moveDate.day }).first?.day.date else { return }
         data.moveDate = newMoveDate
+        headerView.date = newMoveDate
         delegate?.didSelectCalendarDate(newMoveDate, type: .month)
+        collectionView.reloadData()
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let date = data.days[indexPath.row].date
+        data.moveDate = date ?? data.moveDate
+        headerView.date = date
+        delegate?.didSelectCalendarDate(date, type: .month)
         collectionView.reloadData()
     }
     

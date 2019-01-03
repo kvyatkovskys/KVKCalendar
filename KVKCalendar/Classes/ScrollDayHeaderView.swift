@@ -37,6 +37,8 @@ final class ScrollDayHeaderView: UIView {
         collection.backgroundColor = .clear
         collection.delegate = self
         collection.dataSource = self
+        collection.register(ScrollHeaderDayCollectionViewCell.self,
+                            forCellWithReuseIdentifier: ScrollHeaderDayCollectionViewCell.cellIdentifier)
         return collection
     }()
     
@@ -61,8 +63,6 @@ final class ScrollDayHeaderView: UIView {
             addSubview(titleLabel)
         }
         addSubview(collectionView)
-        collectionView.register(ScrollHeaderDayCollectionViewCell.self,
-                                forCellWithReuseIdentifier: ScrollHeaderDayCollectionViewCell.cellIdentifier)
     }
     
     func setDate(date: Date) {

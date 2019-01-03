@@ -22,6 +22,7 @@ final class YearViewCalendar: UIView {
         collection.isPagingEnabled = true
         collection.dataSource = self
         collection.delegate = self
+        collection.register(YearCollectionViewCell.self, forCellWithReuseIdentifier: YearCollectionViewCell.cellIdentifier)
         return collection
     }()
     
@@ -32,7 +33,6 @@ final class YearViewCalendar: UIView {
         collectionView.frame = frame
         addSubview(collectionView)
         
-        collectionView.register(YearCollectionViewCell.self, forCellWithReuseIdentifier: YearCollectionViewCell.cellIdentifier)
         scrollToDate(date: data.moveDate, animation: false)
     }
     
@@ -101,7 +101,9 @@ extension YearViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFl
         let formatter = DateFormatter()
         formatter.dateFormat = "dd.MM.yyyy"
         let newDate = formatter.date(from: "\(data.moveDate.day).\(date.month).\(date.year)")
+        data.moveDate = newDate ?? Date()
         delegate?.didSelectCalendarDate(newDate, type: .month)
+        collectionView.reloadData()
     }
     
     func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {

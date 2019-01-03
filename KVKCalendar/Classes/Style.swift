@@ -15,6 +15,7 @@ public struct Style {
     public var allDayStyle = AllDayStyle()
     public var headerScrollStyle = HeaderScrollStyle()
     public var monthStyle = MonthStyle()
+    public var yearStyle = YearStyle()
     public var locale = Locale.autoupdatingCurrent
     public var calendar = Calendar.autoupdatingCurrent
     public var timezone = TimeZone.autoupdatingCurrent
@@ -28,6 +29,7 @@ public struct HeaderScrollStyle: DateStyle {
         format.dateStyle = .full
         return format
     }()
+    
     public var titleDays: [String] = []
     public var heightHeaderWeek: CGFloat = 70
     public var heightTitleDate: CGFloat = 30
@@ -62,6 +64,7 @@ public struct TimelineStyle {
 }
 
 public struct WeekStyle: DateStyle {
+    public var colorBackground: UIColor = gainsboro.withAlphaComponent(0.4)
     public var colorDate: UIColor = .black
     public var colorNameDay: UIColor = .black
     public var colorCurrentDate: UIColor = .white
@@ -73,6 +76,16 @@ public struct WeekStyle: DateStyle {
 }
 
 public struct MonthStyle: DateStyle {
+    fileprivate let format: DateFormatter = {
+        let format = DateFormatter()
+        format.dateStyle = .full
+        return format
+    }()
+    
+    public lazy var formatter: DateFormatter = format
+    public var heightHeaderWeek: CGFloat = 50
+    public var heightTitleDate: CGFloat = 30
+    public var isHiddenTitleDate: Bool = false
     public var colorDate: UIColor = .black
     public var colorNameDay: UIColor = .black
     public var colorFontNameDate: UIFont = .boldSystemFont(ofSize: 16)
@@ -85,12 +98,27 @@ public struct MonthStyle: DateStyle {
     public var colorMoreTitle: UIColor = .gray
     public var colorEventTitle: UIColor = .black
     public var fontEventTitle: UIFont = .systemFont(ofSize: 14)
-    public var isHiddenSeporator: Bool = true
+    public var isHiddenSeporator: Bool = false
     public var widthSeporator: CGFloat = 0.7
     public var colorSeporator: UIColor = gainsboro.withAlphaComponent(0.9)
     public var colorBackgroundWeekendDate: UIColor = gainsboro.withAlphaComponent(0.4)
     public var colorBackgroundDate: UIColor = .white
     public var scrollDirection: UICollectionView.ScrollDirection = .vertical
+}
+
+public struct YearStyle: DateStyle {
+    public var colorDate: UIColor = .black
+    public var colorNameDay: UIColor = .black
+    public var colorFontNameDate: UIFont = .boldSystemFont(ofSize: 16)
+    public var colorCurrentDate: UIColor = .white
+    public var colorBackgroundCurrentDate: UIColor = .red
+    public var colorBackgroundSelectDate: UIColor = .black
+    public var colorSelectDate: UIColor = .white
+    public var colorWeekendDate: UIColor = .gray
+    public var colorBackgroundWeekendDate: UIColor = gainsboro.withAlphaComponent(0.4)
+    public var weekFont: UIFont = .boldSystemFont(ofSize: 14)
+    public var fontTitle: UIFont = .systemFont(ofSize: 19)
+    public var colorTitle: UIColor = .black
 }
 
 public struct AllDayStyle {

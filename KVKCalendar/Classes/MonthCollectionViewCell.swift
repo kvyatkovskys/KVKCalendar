@@ -80,12 +80,12 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         didSet {
             let nowDate = Date()
             guard nowDate.month != day.date?.month else {
-                // снимаем выделение, если текущая дата (на день) не совпадает с выбранной
+                // remove the selection if the current date (for the day) does not match the selected one
                 if selectDate.day != nowDate.day && day.date?.day == nowDate.day {
-                    dateLabel.textColor = style.colorCurrentDate
+                    dateLabel.textColor = style.colorBackgroundCurrentDate
                     dateLabel.backgroundColor = .clear
                 }
-                // отмечаем выделенную дату, которая не совпадает с текущей (на день)
+                // mark the selected date, which is not the same as the current one
                 if day.date?.month == selectDate.month && day.date?.day == selectDate.day && selectDate.day != nowDate.day {
                     dateLabel.textColor = style.colorSelectDate
                     dateLabel.backgroundColor = style.colorBackgroundSelectDate
@@ -94,7 +94,7 @@ final class MonthCollectionViewCell: UICollectionViewCell {
                 return
             }
             
-            // отмечаем даты не в текущем месяце
+            // select date not in the current month
             guard day.date?.month == selectDate.month && day.date?.day == selectDate.day else {
                 weekendsDays(day: day)
                 return
