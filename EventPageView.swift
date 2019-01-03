@@ -52,7 +52,7 @@ final class EventPageView: UIView {
     }
 }
 
-struct Event {
+public struct Event {
     var id: Any = 0
     var text: String = ""
     var start: Date = Date()

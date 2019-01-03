@@ -9,18 +9,57 @@
 import UIKit
 import KVKCalendar
 
-final class ViewController: UIViewController {
+final class ViewController: UIViewController, CalendarDelegate {
+    var selectDate = Date()
     
-    fileprivate let calendarView: CalendarView = {
-        let calendar = CalendarView()
+    lazy var calendarView: CalendarView = {
+        var frame = view.frame
+        frame.size.height -= (navigationController?.navigationBar.frame.height ?? 0) + UIApplication.shared.statusBarFrame.height
+        var style = Style()
+        style.monthStyle.isHiddenSeporator = false
+        let calendar = CalendarView(frame: frame, style: style)
+        calendar.delegate = self
         return calendar
+    }()
+    
+    lazy var segmentedControl: UISegmentedControl = {
+        let control = UISegmentedControl(items: CalendarType.allCases.map({ $0.rawValue.capitalized }))
+        control.tintColor = .red
+        control.selectedSegmentIndex = 0
+        control.addTarget(self, action: #selector(switchCalendar), for: .valueChanged)
+        return control
     }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .red
+        view.backgroundColor = .white
+        view.addSubview(calendarView)
+        calendarView.set(type: .day, date: Date())
+        navigationItem.titleView = segmentedControl
+    }
+    
+    @objc func switchCalendar(sender: UISegmentedControl) {
+        guard let type = CalendarType(rawValue: CalendarType.allCases[sender.selectedSegmentIndex].rawValue) else { return }
+        switch type {
+        case .day:
+            calendarView.set(type: .day, date: selectDate)
+        case .week:
+            calendarView.set(type: .week, date: selectDate)
+        case .month:
+            calendarView.set(type: .month, date: selectDate)
+        case .year:
+            calendarView.set(type: .year, date: selectDate)
+        }
     }
 
+    func didSelectDate(date: Date?, type: CalendarType) {
+        selectDate = date ?? Date()
+    }
+    
+    func eventsForCalendar() -> [Event] {
+        return []
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.

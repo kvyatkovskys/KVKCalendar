@@ -9,7 +9,7 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  KVKCalendar: ed50bfcee322dacf015c3aae7a859c82d9fd4387
+  KVKCalendar: 792cc6354116ef345809baf927d8047cbf8e344e
 
 PODFILE CHECKSUM: 6cdcbea7a0ace2862d5f6d4bf2b87c4fc4ead4e4
 

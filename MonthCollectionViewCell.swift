@@ -138,8 +138,8 @@ final class MonthCollectionViewCell: UICollectionViewCell {
             isNowDate(date: day.date, colorText: style.colorDate)
             return
         }
-        isNowDate(date: day.date, colorText: style.colorWeekdayDate)
-        backgroundColor = style.colorBackgroundWeekdayDate
+        isNowDate(date: day.date, colorText: style.colorWeekendDate)
+        backgroundColor = style.colorBackgroundWeekendDate
     }
     
     fileprivate func isNowDate(date: Date?, colorText: UIColor) {

@@ -13,24 +13,24 @@ protocol CalendarSelectDateDelegate: AnyObject {
     func didSelectCalendarEvent(_ event: Event)
 }
 
-protocol CalendarDelegate: AnyObject {
+public protocol CalendarDelegate: AnyObject {
     func didSelectDate(date: Date?, type: CalendarType)
     func eventsForCalendar() -> [Event]
     func didSelectEvents(_ events: [Event])
     func didSelectEvent(_ event: Event, type: CalendarType)
 }
 
-extension CalendarDelegate {
+public extension CalendarDelegate {
     func didSelectDate(date: Date?, type: CalendarType) {}
     func didSelectEvents(_ events: [Event]) {}
     func didSelectEvent(_ event: Event, type: CalendarType) {}
 }
 
-final class CalendarView: UIView, CalendarSelectDateDelegate {
-    weak var delegate: CalendarDelegate?
+public final class CalendarView: UIView, CalendarSelectDateDelegate {
+    public weak var delegate: CalendarDelegate?
     var timeHourSystem: TimeHourSystem = .twentyFourHour
     
-    let style: Style
+    public let style: Style
     fileprivate var calendarType = CalendarType.day
     fileprivate var yearData: YearData
     fileprivate var weekData: WeekData
@@ -56,14 +56,14 @@ final class CalendarView: UIView, CalendarSelectDateDelegate {
     }()
     
     fileprivate lazy var yearCalendar: YearViewCalendar = {
-        let year = YearViewCalendar(data: yearData, frame: frame)
+        let year = YearViewCalendar(data: yearData, frame: frame, style: style)
         year.delegate = self
         return year
     }()
     
-    init(date: Date = Date(), frame: CGRect, style: Style = Style(), years: Int = 4) {
+    public init(date: Date = Date(), frame: CGRect, style: Style = Style(), years: Int = 4) {
         self.style = style
-        self.yearData = YearData(date: date, years: years)
+        self.yearData = YearData(date: date, years: years, style: style)
         self.dayData = DayData(yearData: yearData, timeSystem: timeHourSystem)
         self.weekData = WeekData(yearData: yearData, timeSystem: timeHourSystem)
         self.monthData = MonthData(yearData: yearData)
@@ -93,11 +93,11 @@ final class CalendarView: UIView, CalendarSelectDateDelegate {
         }
     }
     
-    func addEventViewToDay(view: UIView) {
+    public func addEventViewToDay(view: UIView) {
         dayCalendar.addEventView(view: view)
     }
     
-    func set(type: CalendarType, date: Date) {
+    public func set(type: CalendarType, date: Date) {
         calendarType = type
         switchTypeCalendar(type: type)
         
@@ -113,7 +113,7 @@ final class CalendarView: UIView, CalendarSelectDateDelegate {
         }
     }
     
-    func reloadData() {
+    public func reloadData() {
         switch calendarType {
         case .day:
             dayCalendar.reloadData(events: delegate?.eventsForCalendar() ?? [])
@@ -123,6 +123,19 @@ final class CalendarView: UIView, CalendarSelectDateDelegate {
             monthCalendar.reloadData(events: delegate?.eventsForCalendar() ?? [])
         case .year:
             break
+        }
+    }
+    
+    public func scrollToDate(date: Date) {
+        switch calendarType {
+        case .day:
+            dayCalendar.setDate(date: date)
+        case .week:
+            weekCalendar.setDate(date: date)
+        case .month:
+            monthCalendar.setDate(date: date)
+        case .year:
+            yearCalendar.setDate(date: date)
         }
     }
     
@@ -137,19 +150,6 @@ final class CalendarView: UIView, CalendarSelectDateDelegate {
     
     func didSelectCalendarEvent(_ event: Event) {
         delegate?.didSelectEvent(event, type: calendarType)
-    }
-    
-    func scrollToDate(date: Date) {
-        switch calendarType {
-        case .day:
-            dayCalendar.setDate(date: date)
-        case .week:
-            weekCalendar.setDate(date: date)
-        case .month:
-            monthCalendar.setDate(date: date)
-        case .year:
-            yearCalendar.setDate(date: date)
-        }
     }
 }
 
@@ -197,7 +197,7 @@ enum TimeHourSystem: Int {
     }
 }
 
-enum CalendarType: String {
+public enum CalendarType: String, CaseIterable {
     case day, week, month, year
 }
 

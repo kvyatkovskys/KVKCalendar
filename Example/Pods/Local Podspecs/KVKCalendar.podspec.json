@@ -1,22 +1,24 @@
 {
   "name": "KVKCalendar",
   "version": "0.1.0",
-  "summary": "A short description of KVKCalendar.",
-  "description": "TODO: Add long description of the pod here.",
+  "summary": "Fully customized calendar with weekly timeline and day.",
+  "description": "Fully customized calendar with timeline for the week and day. Display appointments for a month, view the calendar for a year.",
   "homepage": "https://github.com/kvyatkovskys/KVKCalendar",
   "license": {
     "type": "MIT",
     "file": "LICENSE"
   },
   "authors": {
-    "kvyatkovskys": "sergejkvyatkovskij@gmail.com"
+    "Sergei Kviatkovskii": "sergejkvyatkovskij@gmail.com"
   },
   "source": {
     "git": "https://github.com/kvyatkovskys/KVKCalendar.git",
     "tag": "0.1.0"
   },
   "platforms": {
-    "ios": "8.0"
+    "ios": "9.0"
   },
-  "source_files": "KVKCalendar/Classes/**/*"
+  "source_files": "KVKCalendar/Classes/*.swift",
+  "frameworks": "UIKit",
+  "swift_version": "4.2"
 }

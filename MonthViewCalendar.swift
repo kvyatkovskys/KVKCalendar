@@ -14,12 +14,8 @@ final class MonthViewCalendar: UIView, MonthCellDelegate {
     weak var delegate: CalendarSelectDateDelegate?
     
     fileprivate lazy var headerView: WeekHeaderView = {
-        var newWidth = UIScreen.main.bounds.width
-        if let window = UIApplication.shared.delegate?.window as? UIWindow {
-            newWidth = window.frame.width
-        }
-        let view = WeekHeaderView(frame: CGRect(x: 0, y: 0, width: newWidth, height: 50))
-        view.backgroundColor = style.weekStyle.colorBackgroundWeekdayDate
+        let view = WeekHeaderView(frame: CGRect(x: 0, y: 0, width: frame.width, height: 50), style: style)
+        view.backgroundColor = style.weekStyle.colorBackgroundWeekendDate
         return view
     }()
     
@@ -27,7 +23,7 @@ final class MonthViewCalendar: UIView, MonthCellDelegate {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 0
-        layout.scrollDirection = style.weekStyle.scrollDirection
+        layout.scrollDirection = style.monthStyle.scrollDirection
         let collection = UICollectionView(frame: frame, collectionViewLayout: layout)
         collection.backgroundColor = .clear
         collection.isPagingEnabled = true
@@ -41,7 +37,7 @@ final class MonthViewCalendar: UIView, MonthCellDelegate {
         self.style = style
         super.init(frame: frame)
         addSubview(headerView)
-        
+
         var collectionFrame = frame
         collectionFrame.origin.y = headerView.frame.height
         collectionFrame.size.height = collectionFrame.height - headerView.frame.height
@@ -141,13 +137,13 @@ extension MonthViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateF
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let widht: CGFloat
         let height: CGFloat
-        
-        switch style.weekStyle.scrollDirection {
+
+        switch style.monthStyle.scrollDirection {
         case .horizontal:
             widht = collectionView.frame.width / 7
             height = collectionView.frame.height / 6
         case .vertical:
-            widht = collectionView.frame.width / 7
+            widht = (collectionView.frame.width / 7) - 0.2
             height = collectionView.frame.height / 6
         }
         

@@ -9,7 +9,7 @@ import UIKit
 
 final class YearViewCalendar: UIView {
     fileprivate var data: YearData
-    
+    fileprivate let style: Style
     weak var delegate: CalendarSelectDateDelegate?
     
     fileprivate lazy var collectionView: UICollectionView = {
@@ -25,8 +25,9 @@ final class YearViewCalendar: UIView {
         return collection
     }()
     
-    init(data: YearData, frame: CGRect) {
+    init(data: YearData, frame: CGRect, style: Style) {
         self.data = data
+        self.style = style
         super.init(frame: frame)
         collectionView.frame = frame
         addSubview(collectionView)
@@ -70,6 +71,7 @@ extension YearViewCalendar: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: YearCollectionViewCell.cellIdentifier,
                                                       for: indexPath) as? YearCollectionViewCell ?? YearCollectionViewCell()
         let month = data.months[indexPath.row]
+        cell.style = style
         cell.selectDate = data.moveDate
         cell.title = month.name
         cell.days = data.addStartEmptyDay(days: month.days)
@@ -86,7 +88,9 @@ extension YearViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFl
                 resultDate = [day.date]
             }
             return resultDate
-            }.compactMap({ $0 }).first
+            }
+            .compactMap({ $0 })
+            .first
         data.moveDate = newMoveDate ?? Date()
         delegate?.didSelectCalendarDate(newMoveDate, type: .year)
         collectionView.reloadData()

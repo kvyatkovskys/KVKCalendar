@@ -10,10 +10,12 @@ import Foundation
 private let boxCount = 42
 
 struct YearData {
+    fileprivate let style: Style
     var months = [Month]()
     var moveDate: Date
     
-    init(date: Date, years: Int) {
+    init(date: Date, years: Int, style: Style) {
+        self.style = style
         self.moveDate = date
         // определяем количество лет для календаря
         let indexsYear = [Int](repeating: 0, count: years).split(half: years / 2)
@@ -33,10 +35,10 @@ struct YearData {
         }
         
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "ru_RU")
+        formatter.locale = style.locale
         let nameMonths = (formatter.standaloneMonthSymbols ?? [""]).map({ $0.capitalized })
         
-        let calendar = Calendar(identifier: .gregorian)
+        let calendar = style.calendar
         var monthsTemp = [Month]()
         
         yearsCount.forEach { (idx) in
@@ -63,7 +65,7 @@ struct YearData {
                 var days = getDaysInMonth(month: idx + 1, date: month.date)
                 if days.count < boxCount {
                     for _ in 1...boxCount - days.count {
-                        days.append(Day(day: "", shortName: "", type: .empty, date: nil, data: []))
+                        days.append(Day(day: "", type: .empty, date: nil, data: []))
                     }
                 }
                 months[idx].days = days
@@ -74,7 +76,7 @@ struct YearData {
     }
     
     func getDaysInMonth(month: Int, date: Date) -> [Day] {
-        let calendar = Calendar(identifier: .gregorian)
+        let calendar = Calendar.current
         let components = calendar.dateComponents([.year], from: date)
         let formatter = DateFormatter()
         var dateComponents = DateComponents(year: components.year ?? 0, month: month)
@@ -84,7 +86,7 @@ struct YearData {
         let range = calendar.range(of: .day, in: .month, for: dateMonth)!
         let numDays = range.count
         formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = TimeZone(abbreviation: "GMT+0:00")
+        formatter.timeZone = self.style.timezone
         
         var arrDates = [Date]()
         for day in 1...numDays {
@@ -100,7 +102,6 @@ struct YearData {
         
         let days = arrDates.map({ (date) -> Day in
             return Day(day: formatter.string(from: date),
-                       shortName: formatterDay.string(from: date).uppercased(),
                        type: DayType(rawValue: formatterDay.string(from: date).uppercased()),
                        date: date,
                        data: [])
@@ -134,4 +135,66 @@ struct Month {
     let date: Date
     let week: [DayType]
     var days: [Day]
+}
+
+struct Day {
+    let day: String
+    let type: DayType
+    let date: Date?
+    var events: [Event]
+    
+    static func empty() -> Day {
+        return self.init()
+    }
+    
+    private init() {
+        self.day = ""
+        self.date = nil
+        self.events = []
+        self.type = .empty
+    }
+    
+    init(day: String, type: DayType, date: Date?, data: [Event]) {
+        self.day = day
+        self.type = type
+        self.events = data
+        self.date = date
+    }
+}
+
+enum DayType: String, CaseIterable {
+    case monday = "MON"
+    case tuesday = "TUE"
+    case wednesday = "WED"
+    case thursday = "THU"
+    case friday = "FRI"
+    case saturday = "SAT"
+    case sunday = "SUN"
+    case empty
+    
+    init(rawValue: String) {
+        switch rawValue {
+        case "MON": self = .monday
+        case "TUE": self = .tuesday
+        case "WED": self = .wednesday
+        case "THU": self = .thursday
+        case "FRI": self = .friday
+        case "SAT": self = .saturday
+        case "SUN": self = .sunday
+        default: self = .empty
+        }
+    }
+    
+    var shiftDay: Int {
+        switch self {
+        case .monday: return 0
+        case .tuesday: return 1
+        case .wednesday: return 2
+        case .thursday: return 3
+        case .friday: return 4
+        case .saturday: return 5
+        case .sunday: return 6
+        case .empty: return -1
+        }
+    }
 }

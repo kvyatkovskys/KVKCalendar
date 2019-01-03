@@ -24,6 +24,15 @@ final class YearCollectionViewCell: UICollectionViewCell {
         }
     }
     
+    var style: Style = Style() {
+        didSet {
+            let view = WeekHeaderView(frame: CGRect(x: 0, y: 40, width: frame.width, height: 30), style: style)
+            view.font = .boldSystemFont(ofSize: 14)
+            view.backgroundColorWeekends = style.weekStyle.colorBackgroundWeekendDate
+            addSubview(view)
+        }
+    }
+    
     var days: [Day] = [] {
         didSet {
             subviews.filter({ 1...2 ~= $0.tag }).forEach({ $0.removeFromSuperview() })
@@ -46,10 +55,6 @@ final class YearCollectionViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        let view = WeekHeaderView(frame: CGRect(x: 0, y: 40, width: frame.width, height: 30))
-        view.font = .boldSystemFont(ofSize: 14)
-        view.backgroundColorWeekends = gainsboro.withAlphaComponent(0.4)
-        addSubview(view)
         titleLabel.frame = CGRect(x: 3, y: 3, width: frame.width, height: 30)
         addSubview(titleLabel)
     }

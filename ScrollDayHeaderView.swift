@@ -52,8 +52,10 @@ final class ScrollDayHeaderView: UIView {
         if !style.isHiddenTitleDate {
             collectionView.frame.size.height = frame.height - style.heightTitleDate
             titleLabel.frame = frame
+            titleLabel.frame.origin.x = 0
+            titleLabel.frame.size.width -= frame.origin.x
             titleLabel.frame.origin.y = collectionView.frame.size.height
-            titleLabel.frame.size.height -= titleLabel.frame.origin.y
+            titleLabel.frame.size.height -= (titleLabel.frame.origin.y + 5)
             
             setDateToTitle(date: date)
             addSubview(titleLabel)

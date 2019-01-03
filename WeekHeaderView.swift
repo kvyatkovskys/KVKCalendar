@@ -22,7 +22,7 @@ final class WeekHeaderView: UIView {
         didSet {
             subviews.filter({ $0 is UILabel }).forEach { (label) in
                 if let label = label as? UILabel {
-                    if label.text == DayType.sunday.rawValue.capitalized || label.text == DayType.saturday.rawValue.capitalized {
+                    if label.tag == DayType.sunday.shiftDay || label.tag == DayType.saturday.shiftDay {
                         label.backgroundColor = backgroundColorWeekends
                     } else {
                         label.backgroundColor = .clear
@@ -32,7 +32,7 @@ final class WeekHeaderView: UIView {
         }
     }
     
-    override init(frame: CGRect) {
+    init(frame: CGRect, style: Style) {
         super.init(frame: frame)
         
         let days = DayType.allCases.filter({ $0 != .empty })
@@ -41,7 +41,12 @@ final class WeekHeaderView: UIView {
             let label = UILabel(frame: CGRect(x: width * CGFloat(idx), y: 0, width: width, height: frame.height))
             label.textAlignment = .center
             label.textColor = (value == .sunday || value == .saturday) ? .gray : .black
-            label.text = value.rawValue.capitalized
+            if !style.headerScrollStyle.titleDays.isEmpty {
+                label.text = style.headerScrollStyle.titleDays[value.shiftDay]
+            } else {
+                label.text = value.rawValue.capitalized
+            }
+            label.tag = value.shiftDay
             addSubview(label)
         }
     }
