@@ -11,6 +11,7 @@ import KVKCalendar
 
 final class ViewController: UIViewController, CalendarDelegate {
     var selectDate = Date()
+    var events = [Event]()
     
     lazy var todayButton: UIBarButtonItem = {
         let button = UIBarButtonItem(title: "Today", style: .done, target: self, action: #selector(today))
@@ -23,6 +24,8 @@ final class ViewController: UIViewController, CalendarDelegate {
         frame.size.height -= (navigationController?.navigationBar.frame.height ?? 0) + UIApplication.shared.statusBarFrame.height
         var style = Style()
         style.monthStyle.isHiddenSeporator = false
+        style.timelineStyle.offsetTimeY = 80
+        style.timelineStyle.offsetEvent = 3
         let calendar = CalendarView(frame: frame, style: style)
         calendar.delegate = self
         return calendar
@@ -40,9 +43,15 @@ final class ViewController: UIViewController, CalendarDelegate {
         super.viewDidLoad()
         view.backgroundColor = .white
         view.addSubview(calendarView)
-        calendarView.set(type: .day, date: Date())
         navigationItem.titleView = segmentedControl
         navigationItem.rightBarButtonItem = todayButton
+        
+        calendarView.set(type: .week, date: Date())
+        
+        loadEvents { [unowned self] (events) in
+            self.events = events
+            self.calendarView.reloadData()
+        }
     }
     
     @objc func today(sender: UIBarButtonItem) {
@@ -68,11 +77,127 @@ final class ViewController: UIViewController, CalendarDelegate {
     }
     
     func eventsForCalendar() -> [Event] {
-        return []
+        return events
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    func loadEvents(completion: ([Event]) -> Void) {
+        var events = [Event]()
+        
+        let path = Bundle.main.path(forResource: "events", ofType: "json")!
+        let data = try! Data(contentsOf: URL(fileURLWithPath: path), options: .mappedIfSafe)
+        let decoder = JSONDecoder()
+        let result = try! decoder.decode(ItemData.self, from: data)
+        
+        for (idx, item) in result.data.enumerated() {
+            let startDate = self.formatter(date: item.start)
+            let endDate = self.formatter(date: item.end)
+            let startTime = self.timeFormatter(date: startDate)
+            let endTime = self.timeFormatter(date: endDate)
+            
+            var event = Event()
+            event.id = idx
+            event.text = item.title
+            event.start = startDate
+            event.end = endDate
+            event.color = item.color
+            event.isAllDay = item.allDay
+            event.isContainsFile = !item.files.isEmpty
+            event.textForMonth = item.title
+            
+            if item.allDay {
+                event.text = "\(item.title)"
+            } else {
+                event.text = "\(startTime) - \(endTime)\n\(item.title)"
+            }
+            events.append(event)
+        }
+        completion(events)
+    }
+    
+    func timeFormatter(date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        return formatter.string(from: date)
+    }
+    
+    func formatter(date: String) -> Date {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        return formatter.date(from: date) ?? Date()
+    }
+}
+
+struct ItemData: Decodable {
+    let data: [Item]
+    
+    enum CodingKeys: String, CodingKey {
+        case data
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        data = try container.decode([Item].self, forKey: CodingKeys.data)
+    }
+}
+struct Item: Decodable {
+    let id: String
+    let title: String
+    let start: String
+    let end: String
+    let color: UIColor
+    let colorText: UIColor
+    let files: [String]
+    let allDay: Bool
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case title
+        case start
+        case end
+        case color
+        case colorText = "text_color"
+        case files
+        case allDay = "all_day"
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: CodingKeys.id)
+        title = try container.decode(String.self, forKey: CodingKeys.title)
+        start = try container.decode(String.self, forKey: CodingKeys.start)
+        end = try container.decode(String.self, forKey: CodingKeys.end)
+        allDay = try container.decode(Int.self, forKey: CodingKeys.allDay) != 0
+        files = try container.decode([String].self, forKey: CodingKeys.files)
+        let strColor = try container.decode(String.self, forKey: CodingKeys.color)
+        color = UIColor.hexStringToColor(hex: strColor)
+        let strColorText = try container.decode(String.self, forKey: CodingKeys.colorText)
+        colorText = UIColor.hexStringToColor(hex: strColorText)
+    }
+}
+
+extension UIColor {
+    static func hexStringToColor(hex: String) -> UIColor {
+        var cString = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        
+        if cString.hasPrefix("#") {
+            cString.remove(at: cString.startIndex)
+        }
+        
+        if cString.count != 6 {
+            return UIColor.gray
+        }
+        var rgbValue: UInt32 = 0
+        Scanner(string: cString).scanHexInt32(&rgbValue)
+        
+        return UIColor(red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
+                       green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
+                       blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
+                       alpha: CGFloat(1.0)
+        )
     }
 }

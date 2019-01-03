@@ -203,3 +203,17 @@ public enum CalendarType: String, CaseIterable {
     case day, week, month, year
 }
 
+public struct Event {
+    public var id: Any = 0
+    public var text: String = ""
+    public var start: Date = Date()
+    public var end: Date = Date()
+    public var color: UIColor = .clear
+    public var colorText: UIColor = .black
+    public var isAllDay: Bool = false
+    public var isContainsFile: Bool = false
+    public var textForMonth: String = ""
+    
+    public init() {}
+}
+

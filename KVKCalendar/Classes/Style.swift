@@ -61,6 +61,8 @@ public struct TimelineStyle {
     public var timeFont: UIFont = .systemFont(ofSize: 12)
     public var scrollToCurrentHour: Bool = true
     public var widthEventViewer: CGFloat = 0
+    public var iconFile: UIImage = UIImage()
+    public var colorIconFile: UIColor = .black
 }
 
 public struct WeekStyle {
