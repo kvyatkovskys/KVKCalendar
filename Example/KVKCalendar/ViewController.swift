@@ -26,6 +26,7 @@ final class ViewController: UIViewController, CalendarDelegate {
         style.monthStyle.isHiddenSeporator = false
         style.timelineStyle.offsetTimeY = 80
         style.timelineStyle.offsetEvent = 3
+        style.allDayStyle.isPinned = true
         let calendar = CalendarView(frame: frame, style: style)
         calendar.delegate = self
         return calendar
@@ -34,7 +35,7 @@ final class ViewController: UIViewController, CalendarDelegate {
     lazy var segmentedControl: UISegmentedControl = {
         let control = UISegmentedControl(items: CalendarType.allCases.map({ $0.rawValue.capitalized }))
         control.tintColor = .red
-        control.selectedSegmentIndex = 0
+        control.selectedSegmentIndex = 1
         control.addTarget(self, action: #selector(switchCalendar), for: .valueChanged)
         return control
     }()
@@ -70,10 +71,12 @@ final class ViewController: UIViewController, CalendarDelegate {
         case .year:
             calendarView.set(type: .year, date: selectDate)
         }
+        calendarView.reloadData()
     }
 
     func didSelectDate(date: Date?, type: CalendarType) {
         selectDate = date ?? Date()
+        calendarView.reloadData()
     }
     
     func eventsForCalendar() -> [Event] {

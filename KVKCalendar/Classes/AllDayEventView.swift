@@ -46,7 +46,7 @@ final class AllDayEventView: UIView {
         let endEvents = events.map({ AllDayEvent(id: $0.id, text: $0.text, date: $0.end, color: $0.color) })
         let result = startEvents + endEvents
         let distinct = result.reduce([]) { (acc, event) -> [AllDayEvent] in
-            if !acc.contains(where: { $0.date.day == event.date.day && "\($0.id)".hashValue != "\(event.id)".hashValue }) {
+            guard acc.contains(where: { $0.date.day == event.date.day && "\($0.id)".hashValue == "\(event.id)".hashValue }) else {
                 return acc + [event]
             }
             return acc
@@ -62,8 +62,8 @@ final class AllDayEventView: UIView {
             label.textColor = style.textColor
             label.isUserInteractionEnabled = true
             label.font = style.font
-            label.text = event.text
-            label.backgroundColor = event.color
+            label.text = " \(event.text)"
+            label.backgroundColor = event.color.withAlphaComponent(1)
             label.tag = "\(event.id)".hashValue
             let tap = UITapGestureRecognizer(target: self, action: #selector(tapOnEvent))
             label.addGestureRecognizer(tap)

@@ -208,7 +208,15 @@ public struct Event {
     public var text: String = ""
     public var start: Date = Date()
     public var end: Date = Date()
-    public var color: UIColor = .clear
+    public var color: UIColor = .clear {
+        didSet {
+            backgroundColor = color.withAlphaComponent(0.3)
+            var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 0
+            color.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
+            colorText = UIColor(hue: hue, saturation: saturation, brightness: brightness * 0.4, alpha: alpha)
+        }
+    }
+    public var backgroundColor: UIColor = UIColor.blue.withAlphaComponent(0.3)
     public var colorText: UIColor = .black
     public var isAllDay: Bool = false
     public var isContainsFile: Bool = false

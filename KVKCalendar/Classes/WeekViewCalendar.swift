@@ -78,8 +78,8 @@ final class WeekViewCalendar: UIView, ScrollDayHeaderProtocol, TimelineDelegate 
     func didSelectDateScrollHeader(_ date: Date?, type: CalendarType) {
         guard let selectDate = date else { return }
         data.date = selectDate
-        delegate?.didSelectCalendarDate(selectDate, type: type)
         getVisibleDates(date: selectDate)
+        delegate?.didSelectCalendarDate(selectDate, type: type)
     }
     
     func didSelectEventInTimeline(_ event: Event) {
@@ -91,8 +91,9 @@ final class WeekViewCalendar: UIView, ScrollDayHeaderProtocol, TimelineDelegate 
         guard let idx = data.days.index(where: { $0.date?.year == scrollDate.year
             && $0.date?.month == scrollDate.month
             && $0.date?.day == scrollDate.day })
-            else {
-                return
+            else
+        {
+            return
         }
         
         let endIdx: Int

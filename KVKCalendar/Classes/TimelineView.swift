@@ -190,9 +190,13 @@ final class TimelineView: UIView, AllDayEventDelegate {
         subviews.filter({ $0 is AllDayEventView || $0 is AllDayTitleView }).forEach({ $0.removeFromSuperview() })
         scrollView.subviews.forEach({ $0.removeFromSuperview() })
         
-        let filteredEvents = events.filter({ !$0.isAllDay })
-        let filteredAllDayEvents = events.filter({ $0.isAllDay })
-        
+        let eventsByDates = events.filter { (event) -> Bool in
+            let date = event.start
+            return dates.contains(where: { $0?.day == date.day && $0?.month == date.month && $0?.year == date.year })
+        }
+        let filteredEvents = eventsByDates.filter({ !$0.isAllDay })
+        let filteredAllDayEvents = eventsByDates.filter({ $0.isAllDay })
+
         let start: Int
         if dates.count > 1 {
             start = filteredEvents.sorted(by: { $0.start.hour < $1.start.hour }).first?.start.hour ?? 0

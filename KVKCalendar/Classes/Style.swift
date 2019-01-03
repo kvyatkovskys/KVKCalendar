@@ -47,6 +47,7 @@ public struct HeaderScrollStyle {
 }
 
 public struct TimelineStyle {
+    public var eventFont: UIFont = .boldSystemFont(ofSize: 12)
     public var offsetEvent: CGFloat = 1
     public var startHour: Int = 0
     public var heightLine: CGFloat = 0.5

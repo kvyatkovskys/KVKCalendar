@@ -7,8 +7,11 @@
 
 import UIKit
 
+fileprivate let pointX: CGFloat = 5
+
 final class EventPageView: UIView {
     fileprivate let style: TimelineStyle
+    fileprivate let color: UIColor
     
     fileprivate let textView: UITextView = {
         let text = UITextView()
@@ -29,23 +32,25 @@ final class EventPageView: UIView {
     
     init(event: Event, style: TimelineStyle, frame: CGRect) {
         self.style = style
+        self.color = event.color
         super.init(frame: frame)
-        backgroundColor = event.color
+        backgroundColor = event.backgroundColor
         
         var textFrame = frame
-        textFrame.origin.x = 2
+        textFrame.origin.x = pointX
         textFrame.origin.y = 0
         
         if event.isContainsFile {
-            textFrame.size.width = frame.width - iconFileImageView.frame.width - 2
-            iconFileImageView.frame.origin.x = frame.width - iconFileImageView.frame.width - 2
+            textFrame.size.width = frame.width - iconFileImageView.frame.width - pointX
+            iconFileImageView.frame.origin.x = frame.width - iconFileImageView.frame.width - pointX
             addSubview(iconFileImageView)
         }
         
         textFrame.size.height = textFrame.height
-        textFrame.size.width = textFrame.width - 2
+        textFrame.size.width = textFrame.width - pointX
         textView.frame = textFrame
         addSubview(textView)
+        textView.font = style.eventFont
         textView.textColor = event.colorText
         textView.text = event.text
         tag = "\(event.id)".hashValue
@@ -53,5 +58,20 @@ final class EventPageView: UIView {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func draw(_ rect: CGRect) {
+        guard let context = UIGraphicsGetCurrentContext() else { return }
+        context.interpolationQuality = .none
+        context.saveGState()
+        context.setStrokeColor(color.cgColor)
+        context.setLineWidth(2)
+        let x: CGFloat = 1
+        let y: CGFloat = 0
+        context.beginPath()
+        context.move(to: CGPoint(x: x, y: y))
+        context.addLine(to: CGPoint(x: x, y: bounds.height))
+        context.strokePath()
+        context.restoreGState()
     }
 }
