@@ -4,7 +4,7 @@ Pod::Spec.new do |s|
   s.summary          = 'Is a most fully customization calendar library for iOS.'
   
   s.description      = <<-DESC
-  KVKCalendar is a most fully customization calendar library. Library consists of four modules for displaying various types of calendar (day, week, month, year). It is designed based on a standard iOS calendar, but with additional features. Timeline displays the schedule for the day and week.
+  KVKCalendar is a most fully customization calendar library. Library consists of four modules for displaying various types of calendar (*day*, *week*, *month*, *year*). You can choose any module or use all. It is designed based on a standard iOS calendar, but with additional features. Timeline displays the schedule for the day and week.
                        DESC
 
   s.homepage         = 'https://github.com/kvyatkovskys/KVKCalendar'
