@@ -85,12 +85,15 @@ public final class CalendarView: UIView, CalendarSelectDateDelegate {
     
     fileprivate func switchTypeCalendar(type: CalendarType) {
         self.type = type
+        if UIDevice.current.userInterfaceIdiom == .phone && type == .year {
+            self.type = .month
+        }
         subviews.filter({ $0 is DayViewCalendar
             || $0 is WeekViewCalendar
             || $0 is MonthViewCalendar
             || $0 is YearViewCalendar }).forEach({ $0.removeFromSuperview() })
         
-        switch type {
+        switch self.type {
         case .day:
             addSubview(dayCalendar)
         case .week:
