@@ -10,16 +10,16 @@ import UIKit
 import KVKCalendar
 
 final class ViewController: UIViewController {
-    var selectDate = Date()
-    var events = [Event]()
+    fileprivate var selectDate = Date()
+    fileprivate var events = [Event]()
     
-    lazy var todayButton: UIBarButtonItem = {
+    fileprivate lazy var todayButton: UIBarButtonItem = {
         let button = UIBarButtonItem(title: "Today", style: .done, target: self, action: #selector(today))
         button.tintColor = .red
         return button
     }()
     
-    lazy var calendarView: CalendarView = {
+    fileprivate lazy var calendarView: CalendarView = {
         var frame = view.frame
         frame.size.height -= (navigationController?.navigationBar.frame.height ?? 0) + UIApplication.shared.statusBarFrame.height
         var style = Style()
@@ -27,19 +27,25 @@ final class ViewController: UIViewController {
         style.timelineStyle.offsetTimeY = 80
         style.timelineStyle.offsetEvent = 3
         style.allDayStyle.isPinned = true
+        style.timelineStyle.widthEventViewer = 500
         let calendar = CalendarView(frame: frame, style: style)
         calendar.delegate = self
         return calendar
     }()
     
-    lazy var segmentedControl: UISegmentedControl = {
+    fileprivate lazy var segmentedControl: UISegmentedControl = {
         let control = UISegmentedControl(items: CalendarType.allCases.map({ $0.rawValue.capitalized }))
         control.tintColor = .red
         control.selectedSegmentIndex = 1
         control.addTarget(self, action: #selector(switchCalendar), for: .valueChanged)
         return control
     }()
-
+    
+    fileprivate lazy var eventViewer: EventViewer = {
+        let view = EventViewer(frame: CGRect(x: 0, y: 0, width: 500, height: calendarView.frame.height))
+        return view
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
@@ -47,7 +53,11 @@ final class ViewController: UIViewController {
         navigationItem.titleView = segmentedControl
         navigationItem.rightBarButtonItem = todayButton
         
-        calendarView.set(type: .week, date: Date())
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd.MM.yyyy"
+        let date = formatter.date(from: "14.12.2018")
+        calendarView.set(type: .week, date: date ?? Date())
+        calendarView.addEventViewToDay(view: eventViewer)
         
         loadEvents { [unowned self] (events) in
             self.events = events
@@ -87,11 +97,15 @@ extension ViewController: CalendarDelegate {
     }
     
     func didSelectMore(_ date: Date, frame: CGRect?) {
-        print(date, frame)
     }
     
     func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?) {
-        print(event, type, frame)
+        switch type {
+        case .day:
+            eventViewer.text = event.text
+        default:
+            break
+        }
     }
     
     func eventsForCalendar() -> [Event] {
@@ -145,6 +159,10 @@ extension ViewController {
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
         return formatter.date(from: date) ?? Date()
     }
+}
+
+extension ViewController: UIPopoverPresentationControllerDelegate {
+    
 }
 
 struct ItemData: Decodable {

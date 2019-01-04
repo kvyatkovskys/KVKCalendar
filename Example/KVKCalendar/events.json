@@ -30,7 +30,7 @@
             "id": "1",
             "start": "2018-12-09T09:00:00+03:00",
             "text_color": "#000000",
-            "title": "Event number 2",
+            "title": "Event number 2-6",
             "files": ["file"]
         },
         {
@@ -96,7 +96,7 @@
             "end": "2018-12-11T18:00:00+03:00",
             "start": "2018-12-11T13:00:00+03:00",
             "text_color": "#000000",
-            "title": "Event number 4",
+            "title": "Event number 4-1",
             "files": []
         },
         {
@@ -151,7 +151,7 @@
             "end": "2018-12-14T14:00:00+03:00",
             "start": "2018-12-14T13:30:00+03:00",
             "text_color": "#000000",
-            "title": "Event number 9",
+            "title": "Event number 9-1",
             "files": []
         },
         {
@@ -162,7 +162,7 @@
             "end": "2018-12-14T14:00:00+03:00",
             "start": "2018-12-14T13:30:00+03:00",
             "text_color": "#000000",
-            "title": "Event number 9",
+            "title": "Event number 9-2",
             "files": []
         },
         {
@@ -173,7 +173,7 @@
             "end": "2018-12-14T17:00:00+03:00",
             "start": "2018-12-14T13:30:00+03:00",
             "text_color": "#000000",
-            "title": "Event number 9",
+            "title": "Event number 9-3",
             "files": []
         },
         {
