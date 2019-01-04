@@ -78,10 +78,19 @@ final class YearCollectionViewCell: UICollectionViewCell {
                                height: height)
             
             let view = UIView(frame: frame)
-            let label = UILabel(frame: CGRect(x: (frame.width - frame.height) / 2,
+            let size: CGFloat
+            let pointX: CGFloat
+            if frame.height > frame.width {
+                size = frame.width
+                pointX = 0
+            } else {
+                pointX = (frame.width - frame.height) / 2
+                size = frame.height
+            }
+            let label = UILabel(frame: CGRect(x: pointX,
                                               y: 0,
-                                              width: frame.height,
-                                              height: frame.height))
+                                              width: size,
+                                              height: size))
             label.textAlignment = .center
             label.font = style.yearStyle.fontDayTitle
             label.textColor = style.yearStyle.colorDayTitle

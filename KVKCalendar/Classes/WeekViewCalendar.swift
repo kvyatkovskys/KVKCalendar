@@ -82,8 +82,8 @@ final class WeekViewCalendar: UIView, ScrollDayHeaderProtocol, TimelineDelegate 
         delegate?.didSelectCalendarDate(selectDate, type: type)
     }
     
-    func didSelectEventInTimeline(_ event: Event) {
-        delegate?.didSelectCalendarEvent(event)
+    func didSelectEventInTimeline(_ event: Event, frame: CGRect?) {
+        delegate?.didSelectCalendarEvent(event, frame: frame)
     }
     
     fileprivate func getVisibleDates(date: Date) {

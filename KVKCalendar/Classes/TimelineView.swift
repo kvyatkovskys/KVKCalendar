@@ -8,7 +8,7 @@
 import UIKit
 
 protocol TimelineDelegate: AnyObject {
-    func didSelectEventInTimeline(_ event: Event)
+    func didSelectEventInTimeline(_ event: Event, frame: CGRect?)
 }
 
 final class TimelineView: UIView, AllDayEventDelegate {
@@ -135,8 +135,8 @@ final class TimelineView: UIView, AllDayEventDelegate {
         }
     }
     
-    func didSelectAllDayEvent(_ event: Event) {
-        delegate?.didSelectEventInTimeline(event)
+    func didSelectAllDayEvent(_ event: Event, frame: CGRect?) {
+        delegate?.didSelectEventInTimeline(event, frame: frame)
     }
     
     fileprivate func setOffsetScrollView() {
@@ -151,7 +151,7 @@ final class TimelineView: UIView, AllDayEventDelegate {
         guard let hashValue = gesture.view?.tag else { return }
         if let idx = allEvents.index(where: { "\($0.id)".hashValue == hashValue }) {
             let event = allEvents[idx]
-            delegate?.didSelectEventInTimeline(event)
+            delegate?.didSelectEventInTimeline(event, frame: gesture.view?.frame)
         }
     }
     
@@ -186,16 +186,15 @@ final class TimelineView: UIView, AllDayEventDelegate {
     }
     
     func createTimelinePage(dates: [Date?], events: [Event], selectedDate: Date?) {
-        allEvents = events
         subviews.filter({ $0 is AllDayEventView || $0 is AllDayTitleView }).forEach({ $0.removeFromSuperview() })
         scrollView.subviews.forEach({ $0.removeFromSuperview() })
         
-        let eventsByDates = events.filter { (event) -> Bool in
+        allEvents = events.filter { (event) -> Bool in
             let date = event.start
             return dates.contains(where: { $0?.day == date.day && $0?.month == date.month && $0?.year == date.year })
         }
-        let filteredEvents = eventsByDates.filter({ !$0.isAllDay })
-        let filteredAllDayEvents = eventsByDates.filter({ $0.isAllDay })
+        let filteredEvents = allEvents.filter({ !$0.isAllDay })
+        let filteredAllDayEvents = allEvents.filter({ $0.isAllDay })
 
         let start: Int
         if dates.count > 1 {

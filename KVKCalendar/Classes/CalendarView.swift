@@ -10,20 +10,23 @@ import UIKit
 protocol CalendarSelectDateDelegate: AnyObject {
     func didSelectCalendarDate(_ date: Date?, type: CalendarType)
     func didSelectCalendarEvents(_ events: [Event])
-    func didSelectCalendarEvent(_ event: Event)
+    func didSelectCalendarEvent(_ event: Event, frame: CGRect?)
+    func didSelectCalendarMore(_ date: Date, frame: CGRect?)
 }
 
 public protocol CalendarDelegate: AnyObject {
     func didSelectDate(date: Date?, type: CalendarType)
     func eventsForCalendar() -> [Event]
     func didSelectEvents(_ events: [Event])
-    func didSelectEvent(_ event: Event, type: CalendarType)
+    func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?)
+    func didSelectMore(_ date: Date, frame: CGRect?)
 }
 
 public extension CalendarDelegate {
     func didSelectDate(date: Date?, type: CalendarType) {}
     func didSelectEvents(_ events: [Event]) {}
-    func didSelectEvent(_ event: Event, type: CalendarType) {}
+    func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?) {}
+    func didSelectMore(_ date: Date, frame: CGRect?) {}
 }
 
 public final class CalendarView: UIView, CalendarSelectDateDelegate {
@@ -150,8 +153,12 @@ public final class CalendarView: UIView, CalendarSelectDateDelegate {
         delegate?.didSelectEvents(events)
     }
     
-    func didSelectCalendarEvent(_ event: Event) {
-        delegate?.didSelectEvent(event, type: type)
+    func didSelectCalendarEvent(_ event: Event, frame: CGRect?) {
+        delegate?.didSelectEvent(event, type: type, frame: frame)
+    }
+    
+    func didSelectCalendarMore(_ date: Date, frame: CGRect?) {
+        delegate?.didSelectMore(date, frame: frame)
     }
 }
 

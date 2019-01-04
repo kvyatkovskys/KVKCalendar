@@ -9,7 +9,7 @@
 import UIKit
 import KVKCalendar
 
-final class ViewController: UIViewController, CalendarDelegate {
+final class ViewController: UIViewController {
     var selectDate = Date()
     var events = [Event]()
     
@@ -73,21 +73,33 @@ final class ViewController: UIViewController, CalendarDelegate {
         }
         calendarView.reloadData()
     }
-
-    func didSelectDate(date: Date?, type: CalendarType) {
-        selectDate = date ?? Date()
-        calendarView.reloadData()
-    }
-    
-    func eventsForCalendar() -> [Event] {
-        return events
-    }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+}
+
+extension ViewController: CalendarDelegate {
+    func didSelectDate(date: Date?, type: CalendarType) {
+        selectDate = date ?? Date()
+        calendarView.reloadData()
+    }
     
+    func didSelectMore(_ date: Date, frame: CGRect?) {
+        print(date, frame)
+    }
+    
+    func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?) {
+        print(event, type, frame)
+    }
+    
+    func eventsForCalendar() -> [Event] {
+        return events
+    }
+}
+
+extension ViewController {
     func loadEvents(completion: ([Event]) -> Void) {
         var events = [Event]()
         

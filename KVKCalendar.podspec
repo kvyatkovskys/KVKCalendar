@@ -9,7 +9,7 @@
 Pod::Spec.new do |s|
   s.name             = 'KVKCalendar'
   s.version          = '0.1.0'
-  s.summary          = 'Fully customized calendar with weekly timeline and day.'
+  s.summary          = 'Fully customized calendar with weekly timeline and day for iOS.'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -22,22 +22,11 @@ Pod::Spec.new do |s|
                        DESC
 
   s.homepage         = 'https://github.com/kvyatkovskys/KVKCalendar'
-  # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE.md' }
   s.author           = { 'Sergei Kviatkovskii' => 'sergejkvyatkovskij@gmail.com' }
   s.source           = { :git => 'https://github.com/kvyatkovskys/KVKCalendar.git', :tag => s.version.to_s }
-  # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
-
+  s.social_media_url = 'https://github.com/kvyatkovskys'
   s.ios.deployment_target = '9.0'
-
   s.source_files = 'KVKCalendar/Classes/*.swift'
-  s.frameworks = 'UIKit'
   s.swift_version = '4.2'
-  
-  # s.resource_bundles = {
-  #   'KVKCalendar' => ['KVKCalendar/Assets/*.png']
-  # }
-
-  # s.public_header_files = 'Pod/Classes/**/*.h'
-
 end

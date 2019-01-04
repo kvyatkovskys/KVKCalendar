@@ -56,6 +56,7 @@ final class WeekHeaderView: UIView {
                                               y: 0,
                                               width: width,
                                               height: fromYear ? frame.height : style.monthStyle.heightHeaderWeek))
+            label.adjustsFontSizeToFitWidth = true
             label.textAlignment = .center
             label.textColor = (value == .sunday || value == .saturday) ? .gray : .black
             if !style.headerScrollStyle.titleDays.isEmpty {

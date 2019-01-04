@@ -82,12 +82,12 @@ final class MonthViewCalendar: UIView, MonthCellDelegate {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func didSelectEvent(_ event: Event, bounds: CGRect?) {
-        delegate?.didSelectCalendarEvent(event)
+    func didSelectEvent(_ event: Event, frame: CGRect?) {
+        delegate?.didSelectCalendarEvent(event, frame: frame)
     }
     
-    func didSelectMore(_ date: Date, bounds: CGRect?) {
-        delegate?.didSelectCalendarDate(date, type: .day)
+    func didSelectMore(_ date: Date, frame: CGRect?) {
+        delegate?.didSelectCalendarMore(date, frame: frame)
     }
 }
 

@@ -11,8 +11,8 @@ private let countInCell: CGFloat = 4
 private let offset: CGFloat = 5
 
 protocol MonthCellDelegate: AnyObject {
-    func didSelectEvent(_ event: Event, bounds: CGRect?)
-    func didSelectMore(_ date: Date, bounds: CGRect?)
+    func didSelectEvent(_ event: Event, frame: CGRect?)
+    func didSelectMore(_ date: Date, frame: CGRect?)
 }
 
 final class MonthCollectionViewCell: UICollectionViewCell {
@@ -107,13 +107,13 @@ final class MonthCollectionViewCell: UICollectionViewCell {
     
     @objc fileprivate func tapOneEvent(gesture: UITapGestureRecognizer) {
         if let idx = events.index(where: { "\($0.id)".hashValue == gesture.view?.tag }) {
-            delegate?.didSelectEvent(events[idx], bounds: gesture.view?.bounds)
+            delegate?.didSelectEvent(events[idx], frame: gesture.view?.frame)
         }
     }
     
     @objc fileprivate func tapOnMore(gesture: UITapGestureRecognizer) {
         if let idx = events.index(where: { $0.start.day == gesture.view?.tag }) {
-            delegate?.didSelectMore(events[idx].start, bounds: gesture.view?.bounds)
+            delegate?.didSelectMore(events[idx].start, frame: gesture.view?.frame)
         }
     }
     

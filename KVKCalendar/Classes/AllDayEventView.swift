@@ -30,7 +30,7 @@ final class AllDayTitleView: UIView {
 }
 
 protocol AllDayEventDelegate: AnyObject {
-    func didSelectAllDayEvent(_ event: Event)
+    func didSelectAllDayEvent(_ event: Event, frame: CGRect?)
 }
 
 final class AllDayEventView: UIView {
@@ -75,7 +75,7 @@ final class AllDayEventView: UIView {
         guard let hashValue = gesture.view?.tag else { return }
         if let idx = events.index(where: { "\($0.id)".hashValue == hashValue }) {
             let event = events[idx]
-            delegate?.didSelectAllDayEvent(event)
+            delegate?.didSelectAllDayEvent(event, frame: gesture.view?.frame)
         }
     }
     
