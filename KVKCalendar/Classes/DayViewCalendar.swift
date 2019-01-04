@@ -35,7 +35,9 @@ final class DayViewCalendar: UIView, ScrollDayHeaderProtocol, TimelineDelegate {
         var timelineFrame = frame
         timelineFrame.origin.y = scrollHeaderDay.frame.height
         timelineFrame.size.height -= scrollHeaderDay.frame.height
-        timelineFrame.size.width -= style.timelineStyle.widthEventViewer
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            timelineFrame.size.width -= style.timelineStyle.widthEventViewer
+        }
         let view = TimelineView(hours: data.timeSystem.hours, style: style, frame: timelineFrame)
         view.delegate = self
         return view
@@ -67,6 +69,7 @@ final class DayViewCalendar: UIView, ScrollDayHeaderProtocol, TimelineDelegate {
     }
     
     func addEventView(view: UIView) {
+        guard UIDevice.current.userInterfaceIdiom == .pad else { return }
         var timlineFrame = timelineView.frame
         timlineFrame.origin.x = timlineFrame.width
         timlineFrame.size.width = style.timelineStyle.widthEventViewer

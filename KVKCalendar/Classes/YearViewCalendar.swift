@@ -56,6 +56,14 @@ final class YearViewCalendar: UIView {
     fileprivate func scrollToDate(date: Date, animation: Bool) {
         delegate?.didSelectCalendarDate(date, type: .year)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            guard UIDevice.current.userInterfaceIdiom == .pad else {
+                if let idx = self.data.months.index(where: { $0.date.year == self.data.moveDate.year && $0.date.month == self.data.moveDate.month }) {
+                    self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
+                                                     at: .top,
+                                                     animated: animation)
+                }
+                return
+            }
             if let idx = self.data.months.index(where: { $0.date.year == self.data.moveDate.year }) {
                 self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
                                                  at: .top,
@@ -95,6 +103,12 @@ extension YearViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFl
         let cells = collectionView.visibleCells as? [YearCollectionViewCell] ?? [YearCollectionViewCell()]
         let newMoveDate = cells.reduce([]) { (acc, month) -> [Date?] in
             var resultDate = acc
+            guard UIDevice.current.userInterfaceIdiom == .pad else {
+                if let day = month.days.filter({ $0.date?.day == data.moveDate.day }).first {
+                    resultDate = [day.date]
+                }
+                return resultDate
+            }
             if let day = month.days.filter({ $0.date?.month == data.moveDate.month && $0.date?.day == data.moveDate.day }).first {
                 resultDate = [day.date]
             }
@@ -109,6 +123,7 @@ extension YearViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFl
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard UIDevice.current.userInterfaceIdiom == .pad else { return }
         let date = data.months[indexPath.row].date
         let formatter = DateFormatter()
         formatter.dateFormat = "dd.MM.yyyy"
@@ -120,6 +135,7 @@ extension YearViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFl
     }
     
     func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
+        guard UIDevice.current.userInterfaceIdiom == .pad else { return }
         let cell = collectionView.cellForItem(at: indexPath)
         UIView.animate(withDuration: 0.4,
                        delay: 0,
@@ -131,6 +147,7 @@ extension YearViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFl
     }
     
     func collectionView(_ collectionView: UICollectionView, didUnhighlightItemAt indexPath: IndexPath) {
+        guard UIDevice.current.userInterfaceIdiom == .pad else { return }
         let cell = collectionView.cellForItem(at: indexPath)
         UIView.animate(withDuration: 0.1) {
             cell?.transform = CGAffineTransform(scaleX: 1, y: 1)
@@ -138,8 +155,15 @@ extension YearViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFl
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let widht = collectionView.frame.width / 4
-        let height = collectionView.frame.height / 3
+        let widht: CGFloat
+        let height: CGFloat
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            widht = collectionView.frame.width / 4
+            height = collectionView.frame.height / 3
+        } else {
+            widht = collectionView.frame.width
+            height = collectionView.frame.height
+        }
         return CGSize(width: widht - 10, height: height - 10)
     }
 }

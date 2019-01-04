@@ -23,11 +23,17 @@ final class ViewController: UIViewController {
         var frame = view.frame
         frame.size.height -= (navigationController?.navigationBar.frame.height ?? 0) + UIApplication.shared.statusBarFrame.height
         var style = Style()
-        style.monthStyle.isHiddenSeporator = false
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            style.monthStyle.isHiddenSeporator = true
+            style.timelineStyle.widthTime = 40
+            style.timelineStyle.offsetTimeX = 2
+            style.timelineStyle.offsetLineLeft = 2
+        } else {
+            style.timelineStyle.widthEventViewer = 500
+        }
         style.timelineStyle.offsetTimeY = 80
         style.timelineStyle.offsetEvent = 3
         style.allDayStyle.isPinned = true
-        style.timelineStyle.widthEventViewer = 500
         let calendar = CalendarView(frame: frame, style: style)
         calendar.delegate = self
         calendar.dataSource = self
@@ -35,9 +41,15 @@ final class ViewController: UIViewController {
     }()
     
     fileprivate lazy var segmentedControl: UISegmentedControl = {
-        let control = UISegmentedControl(items: CalendarType.allCases.map({ $0.rawValue.capitalized }))
+        let array: [CalendarType]
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            array = CalendarType.allCases
+        } else {
+            array = CalendarType.allCases.filter({ $0 != .year })
+        }
+        let control = UISegmentedControl(items: array.map({ $0.rawValue.capitalized }))
         control.tintColor = .red
-        control.selectedSegmentIndex = 1
+        control.selectedSegmentIndex = 0
         control.addTarget(self, action: #selector(switchCalendar), for: .valueChanged)
         return control
     }()
@@ -57,7 +69,7 @@ final class ViewController: UIViewController {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd.MM.yyyy"
         let date = formatter.date(from: "14.12.2018")
-        calendarView.set(type: .week, date: date ?? Date())
+        calendarView.set(type: .day, date: date ?? Date())
         calendarView.addEventViewToDay(view: eventViewer)
         
         loadEvents { [unowned self] (events) in
