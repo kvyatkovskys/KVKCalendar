@@ -14,9 +14,12 @@ protocol CalendarSelectDateDelegate: AnyObject {
     func didSelectCalendarMore(_ date: Date, frame: CGRect?)
 }
 
+public protocol CalendarDataSource: AnyObject {
+    func eventsForCalendar() -> [Event]
+}
+
 public protocol CalendarDelegate: AnyObject {
     func didSelectDate(date: Date?, type: CalendarType)
-    func eventsForCalendar() -> [Event]
     func didSelectEvents(_ events: [Event])
     func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?)
     func didSelectMore(_ date: Date, frame: CGRect?)
@@ -31,6 +34,7 @@ public extension CalendarDelegate {
 
 public final class CalendarView: UIView, CalendarSelectDateDelegate {
     public weak var delegate: CalendarDelegate?
+    public weak var dataSource: CalendarDataSource?
     public var selectedType: CalendarType {
         return type
     }
@@ -121,11 +125,11 @@ public final class CalendarView: UIView, CalendarSelectDateDelegate {
     public func reloadData() {
         switch type {
         case .day:
-            dayCalendar.reloadData(events: delegate?.eventsForCalendar() ?? [])
+            dayCalendar.reloadData(events: dataSource?.eventsForCalendar() ?? [])
         case .week:
-            weekCalendar.reloadData(events: delegate?.eventsForCalendar() ?? [])
+            weekCalendar.reloadData(events: dataSource?.eventsForCalendar() ?? [])
         case .month:
-            monthCalendar.reloadData(events: delegate?.eventsForCalendar() ?? [])
+            monthCalendar.reloadData(events: dataSource?.eventsForCalendar() ?? [])
         case .year:
             break
         }

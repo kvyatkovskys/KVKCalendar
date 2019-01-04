@@ -24,8 +24,92 @@ pod 'KVKCalendar'
 ```
 
 ## Usage
+Create a subclass view `CalendarView` and implement `CalendarDataSource` protocol. Create an array of class `[Event]` and return this array in the function.
+
+```swift
+final class ViewController: UIViewController {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        let calendar = CalendarView(frame: frame)
+        calendar.dataSource = self
+        view.addSubview(calendar)
+        
+        var events = [Event]()
+        
+        createEvents { (events) in
+            self.events = events
+            self.calendarView.reloadData()
+        }
+    }
+}
+
+extension ViewController {
+    func createEvents(completion: ([Event]) -> Void) {
+        let models = // Get events from storage / API
+        var events = [Event]()
+        
+        for model in models {
+            var event = Event()
+            event.id = model.id
+            event.start = model.startDate // start date event
+            event.end = model.endDate // end date event
+            event.color = model.color
+            event.isAllDay = model.allDay
+            event.isContainsFile = !model.files.isEmpty
+        
+            // Add text event (title, info, location, time)
+            if model.allDay {
+                event.text = "\(model.title)"
+            } else {
+                event.text = "\(startTime) - \(endTime)\n\(model.title)"
+            }
+            completion(event)
+        }
+    }
+}
+
+extension ViewController: CalendarDataSource {
+    func eventsForCalendar() -> [Event] {
+        return events
+    }
+}
+```
+
+Implement `CalendarDelegate` to handle user action.
+
+```swift
+calendar.delegate = self
+
+extension ViewController: CalendarDelegate {
+    func didSelectDate(date: Date?, type: CalendarType) {
+        print(date, type)
+    }
+
+    func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?) {
+        print(event)
+    }
+}
+```
 
 ## Styles
+To customize calendar create an object `Style` and add to `init` class `CalendarView`.
+
+```swift
+var style = Style()
+style.monthStyle.isHiddenSeporator = false
+style.timelineStyle.offsetTimeY = 80
+style.timelineStyle.offsetEvent = 3
+style.allDayStyle.isPinned = true
+style.timelineStyle.widthEventViewer = 500
+let calendar = CalendarView(frame: frame, style: style)
+```
+If needed to customize `Locale`, `TimeZone`.
+
+```swift
+style.locale = Locale // create any
+style.timezone = TimeZone //create any
+```
 
 ## Author
 

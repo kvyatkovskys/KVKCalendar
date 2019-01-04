@@ -30,6 +30,7 @@ final class ViewController: UIViewController {
         style.timelineStyle.widthEventViewer = 500
         let calendar = CalendarView(frame: frame, style: style)
         calendar.delegate = self
+        calendar.dataSource = self
         return calendar
     }()
     
@@ -96,9 +97,6 @@ extension ViewController: CalendarDelegate {
         calendarView.reloadData()
     }
     
-    func didSelectMore(_ date: Date, frame: CGRect?) {
-    }
-    
     func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?) {
         switch type {
         case .day:
@@ -107,7 +105,9 @@ extension ViewController: CalendarDelegate {
             break
         }
     }
-    
+}
+
+extension ViewController: CalendarDataSource {
     func eventsForCalendar() -> [Event] {
         return events
     }
@@ -130,7 +130,6 @@ extension ViewController {
             
             var event = Event()
             event.id = idx
-            event.text = item.title
             event.start = startDate
             event.end = endDate
             event.color = item.color
