@@ -27,15 +27,15 @@ pod 'KVKCalendar'
 Create a subclass view `CalendarView` and implement `CalendarDataSource` protocol. Create an array of class `[Event]` and return this array in the function.
 
 ```swift
-final class ViewController: UIViewController {
+class ViewController: UIViewController {
+    var events = [Event]()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
         let calendar = CalendarView(frame: frame)
         calendar.dataSource = self
         view.addSubview(calendar)
-        
-        var events = [Event]()
         
         createEvents { (events) in
             self.events = events
@@ -64,8 +64,9 @@ extension ViewController {
             } else {
                 event.text = "\(startTime) - \(endTime)\n\(model.title)"
             }
-            completion(event)
+            events.append(event)
         }
+        completion(events)
     }
 }
 
