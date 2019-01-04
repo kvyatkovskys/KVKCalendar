@@ -5,11 +5,12 @@
 [![License](https://img.shields.io/cocoapods/l/KVKCalendar.svg?style=flat)](https://cocoapods.org/pods/KVKCalendar)
 [![Platform](https://img.shields.io/cocoapods/p/KVKCalendar.svg?style=flat)](https://cocoapods.org/pods/KVKCalendar)
 
-## Example
-
-To run the example project, clone the repo, and run `pod install` from the Example directory first.
+**KVKCalendar** is a most fully customization calendar library. Library consists of four modules for displaying various types of calendar (*day*, *week*, *month*, *year*). It is designed based on a standard iOS calendar, but with additional features. Timeline displays the schedule for the day and week.
 
 ## Requirements
+
+- iOS 9.0+
+- Swift 4.2
 
 ## Installation
 
@@ -22,7 +23,7 @@ pod 'KVKCalendar'
 
 ## Author
 
-Sergei Kviatkovskii, sergejkvyatkovskij@gmail.com
+Sergei Kviatkovskii
 
 ## License
 
