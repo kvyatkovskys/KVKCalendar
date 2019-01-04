@@ -72,7 +72,7 @@
 		770E8B60A1A93AD558546C8253642030 /* Pods-KVKCalendar_Tests-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-KVKCalendar_Tests-Info.plist"; sourceTree = "<group>"; };
 		7977BFC149C59C6F99E682A36F9825B7 /* KVKCalendar-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "KVKCalendar-dummy.m"; sourceTree = "<group>"; };
 		98BA7BAAE824ACEA66EB7A08DFB3C96E /* Pods-KVKCalendar_Example-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-KVKCalendar_Example-acknowledgements.markdown"; sourceTree = "<group>"; };
-		A7A02EA32E13A2FFC8E6469F79694C9C /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		A7A02EA32E13A2FFC8E6469F79694C9C /* LICENSE.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = "<group>"; };
 		A8AD94DC57E6FF9F469B74EABFA78FE8 /* KVKCalendar-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "KVKCalendar-Info.plist"; sourceTree = "<group>"; };
 		B19C252F05B25F564A2653A4A9D0387B /* Pods-KVKCalendar_Example-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-KVKCalendar_Example-umbrella.h"; sourceTree = "<group>"; };
 		B36AB396275697EEE1A5B13BA8A38FE3 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
@@ -161,7 +161,7 @@
 			isa = PBXGroup;
 			children = (
 				5CD550D0D7DF8976D2D7FCE8867C445A /* KVKCalendar.podspec */,
-				A7A02EA32E13A2FFC8E6469F79694C9C /* LICENSE */,
+				A7A02EA32E13A2FFC8E6469F79694C9C /* LICENSE.md */,
 				35346E0C402A0CC63166A957C48080A9 /* README.md */,
 			);
 			name = Pod;

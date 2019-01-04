@@ -24,9 +24,12 @@ pod 'KVKCalendar'
 ```
 
 ## Usage
+Import `KVKCalendar`.
 Create a subclass view `CalendarView` and implement `CalendarDataSource` protocol. Create an array of class `[Event]` and return this array in the function.
 
 ```swift
+import KVKCalendar
+
 class ViewController: UIViewController {
     var events = [Event]()
 
