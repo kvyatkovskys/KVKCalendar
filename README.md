@@ -1,4 +1,5 @@
-# KVKCalendar
+![phone](https://i.postimg.cc/KvJWG3kG/Screenshot-1.png?raw=true)
+![pad](https://i.postimg.cc/6pqmy6nd/Screenshot-2.png?raw=true)
 
 [![CI Status](https://img.shields.io/travis/kvyatkovskys/KVKCalendar.svg?style=flat)](https://travis-ci.org/kvyatkovskys/KVKCalendar)
 [![Version](https://img.shields.io/cocoapods/v/KVKCalendar.svg?style=flat)](https://cocoapods.org/pods/KVKCalendar)
@@ -6,6 +7,8 @@
 [![Platform](https://img.shields.io/cocoapods/p/KVKCalendar.svg?style=flat)](https://cocoapods.org/pods/KVKCalendar)
 [![Apps Using](https://img.shields.io/cocoapods/at/KVKCalendar.svg?label=Apps%20Using%20KVKCalendar)](https://cocoapods.org/pods/KVKCalendar)
 [![Downloads](https://img.shields.io/cocoapods/dt/KVKCalendar.svg?label=Total%20Downloads)](https://cocoapods.org/pods/KVKCalendar)
+
+# KVKCalendar
 
 **KVKCalendar** is a most fully customization calendar library. Library consists of four modules for displaying various types of calendar (*day*, *week*, *month*, *year*). You can choose any module or use all. It is designed based on a standard iOS calendar, but with additional features. Timeline displays the schedule for the day and week.
 
