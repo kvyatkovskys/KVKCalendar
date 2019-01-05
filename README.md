@@ -1,4 +1,6 @@
-<img src="https://i.postimg.cc/KvJWG3kG/Screenshot-1.png" height="400" width="200"> <img src="https://i.postimg.cc/6pqmy6nd/Screenshot-2.png" height="450" width="600">
+<pre>
+<img src="https://i.postimg.cc/KvJWG3kG/Screenshot-1.png" height="400" width="200">     <img src="https://i.postimg.cc/6pqmy6nd/Screenshot-2.png" height="450" width="600">
+</pre>
 
 [![CI Status](https://img.shields.io/travis/kvyatkovskys/KVKCalendar.svg?style=flat)](https://travis-ci.org/kvyatkovskys/KVKCalendar)
 [![Version](https://img.shields.io/cocoapods/v/KVKCalendar.svg?style=flat)](https://cocoapods.org/pods/KVKCalendar)
