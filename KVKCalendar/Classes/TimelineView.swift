@@ -79,31 +79,35 @@ final class TimelineView: UIView, AllDayEventDelegate {
     
     fileprivate func countEventsInHour(events: [Event]) -> [CrossPage] {
         var countEvents = [CrossPage]()
-        events.forEach { (item) in
+        events.forEach({ (item) in
             let cross = CrossPage(start: item.start.timeIntervalSince1970,
                                   end: item.end.timeIntervalSince1970,
                                   count: 1)
             countEvents.append(cross)
             
-            let count = events.filter({ $0.start.timeIntervalSince1970..<$0.end.timeIntervalSince1970 ~= cross.start }).count
-            for (idx, crossPage) in countEvents.enumerated()
-                where count > 1 && crossPage.start..<crossPage.end ~= cross.start && countEvents[idx].count < count {
+            let includes = events.filter({ $0.start.timeIntervalSince1970..<$0.end.timeIntervalSince1970 ~= cross.start })
+            let count = includes.count
+            for (idx, crossPage) in countEvents.enumerated() where count > 1 && crossPage.count < count {
+                if crossPage.start..<crossPage.end ~= cross.start {
                     countEvents[idx].count = count
-            }
-        }
-        if let maxCross = countEvents.sorted(by: { $0.count > $1.count }).first {
-            countEvents = countEvents.reduce([], { (acc, cross) -> [CrossPage] in
-                var newCross = cross
-                guard maxCross.start..<maxCross.end ~= newCross.start else {
-                    if let idx = acc.index(where: { $0.start..<$0.end ~= newCross.start }) {
-                        newCross.count = acc[idx].count
-                    }
-                    return acc + [newCross]
                 }
-                newCross.count = maxCross.count
-                return acc + [newCross]
-            })
-        }
+            }
+        })
+        //if let maxCross = countEvents.sorted(by: { $0.count > $1.count }).first {
+//        countEvents.forEach { (crossPage) in
+//            countEvents = countEvents.reduce([], { (acc, cross) -> [CrossPage] in
+//                var newCross = cross
+//                guard crossPage.start..<crossPage.end ~= newCross.start else {
+//                    if let idx = acc.index(where: { $0.start..<$0.end ~= newCross.start }) {
+//                        newCross.count = acc[idx].count
+//                    }
+//                    return acc + [newCross]
+//                }
+//                newCross.count = crossPage.count
+//                return acc + [newCross]
+//            })
+//        }
+        
         return countEvents
     }
     
@@ -194,7 +198,7 @@ final class TimelineView: UIView, AllDayEventDelegate {
             return dates.contains(where: { $0?.day == date.day && $0?.month == date.month && $0?.year == date.year })
         }
         let filteredEvents = allEvents.filter({ !$0.isAllDay })
-        let filteredAllDayEvents = allEvents.filter({ $0.isAllDay })
+        let filteredAllDayEvents = events.filter({ $0.isAllDay })
 
         let start: Int
         if dates.count > 1 {
@@ -233,7 +237,7 @@ final class TimelineView: UIView, AllDayEventDelegate {
             // сортируем время событий по порядку, самые длинные в начале
             let eventsByDate = filteredEvents
                 .filter({ compareStartDate(event: $0, date: date) })
-                .sorted(by: { ($0.end.hour - $0.start.hour) > ($1.end.hour - $1.start.hour) })
+                //.sorted(by: { ($0.end.hour - $0.start.hour) > ($1.end.hour - $1.start.hour) })
             
             createAlldayEvents(events: filteredAllDayEvents.filter({ compareStartDate(event: $0, date: date)
                 || compareEndDate(event: $0, date: date) }),

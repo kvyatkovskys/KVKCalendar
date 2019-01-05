@@ -5,7 +5,7 @@
             "border_color": "#FFFFFF",
             "color": "#93c47d",
             "end": "2018-12-10T09:00:00+03:00",
-            "id": "0",
+            "id": "40",
             "start": "2018-12-10T08:30:00+03:00",
             "text_color": "#000000",
             "title": "Event number 1",
@@ -26,9 +26,9 @@
             "all_day": 0,
             "border_color": "#FFFFFF",
             "color": "#93c47d",
-            "end": "2018-12-09T09:30:00+03:00",
+            "end": "2018-12-10T16:30:00+03:00",
             "id": "1",
-            "start": "2018-12-09T09:00:00+03:00",
+            "start": "2018-12-10T16:00:00+03:00",
             "text_color": "#000000",
             "title": "Event number 2-6",
             "files": ["file"]
@@ -37,9 +37,9 @@
             "all_day": 0,
             "border_color": "#FFFFFF",
             "color": "#ed6160",
-            "end": "2018-12-08T09:30:00+03:00",
+            "end": "2018-12-10T14:30:00+03:00",
             "id": "2",
-            "start": "2018-12-08T09:00:00+03:00",
+            "start": "2018-12-10T13:00:00+03:00",
             "text_color": "#000000",
             "title": "Event number 2-1",
             "files": ["file"]
@@ -97,6 +97,28 @@
             "start": "2018-12-11T13:00:00+03:00",
             "text_color": "#000000",
             "title": "Event number 4-1",
+            "files": []
+        },
+        {
+            "all_day": 0,
+            "id": "7",
+            "border_color": "#FFFFFF",
+            "color": "#ed6160",
+            "end": "2018-12-11T19:00:00+03:00",
+            "start": "2018-12-11T18:00:00+03:00",
+            "text_color": "#000000",
+            "title": "Event number 4-3",
+            "files": []
+        },
+        {
+            "all_day": 0,
+            "id": "77",
+            "border_color": "#FFFFFF",
+            "color": "#ff4040",
+            "end": "2018-12-11T18:30:00+03:00",
+            "start": "2018-12-11T18:00:00+03:00",
+            "text_color": "#000000",
+            "title": "Event number 4-3",
             "files": []
         },
         {
