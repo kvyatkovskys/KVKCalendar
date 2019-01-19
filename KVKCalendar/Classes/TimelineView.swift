@@ -164,6 +164,7 @@ final class TimelineView: UIView, AllDayEventDelegate {
         
         scrollView.subviews.filter({ $0 is TimelineLabel }).forEach { (view) in
             guard let time = view as? TimelineLabel, time.valueHash == Date().hour.hashValue else {
+                scrollView.setContentOffset(.zero, animated: true)
                 return
             }
             
