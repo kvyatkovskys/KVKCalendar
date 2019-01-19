@@ -17,19 +17,19 @@ struct YearData {
     init(date: Date, years: Int, style: Style) {
         self.style = style
         self.moveDate = date
-        // определяем количество лет для календаря
+        // count years for calendar
         let indexsYear = [Int](repeating: 0, count: years).split(half: years / 2)
         let lastYear = indexsYear.left
         let nextYear = indexsYear.right
         
         var yearsCount = [Int]()
         
-        // заполняем прошлыми годами
+        // last years
         for lastIdx in lastYear.indices.reversed() {
             yearsCount.append(-(lastIdx + 1))
         }
         
-        // заполняем текущим и следующими годами
+        // next years
         for nextIdx in nextYear.indices {
             yearsCount.append(nextIdx)
         }

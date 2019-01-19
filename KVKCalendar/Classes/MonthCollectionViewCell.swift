@@ -21,7 +21,7 @@ final class MonthCollectionViewCell: UICollectionViewCell {
     
     fileprivate lazy var dateLabel: UILabel = {
         let label = UILabel()
-        label.tag = 1
+        label.tag = -1
         label.font = style.fontNameDate
         label.textColor = style.colorNameDay
         label.textAlignment = .center
@@ -34,11 +34,12 @@ final class MonthCollectionViewCell: UICollectionViewCell {
     
     var events: [Event] = [] {
         didSet {
-            subviews.filter({ $0.tag != 1 }).forEach({ $0.removeFromSuperview() })
+            subviews.filter({ $0.tag != -1 }).forEach({ $0.removeFromSuperview() })
             let height = (frame.height - dateLabel.bounds.height - offset) / countInCell
             for (idx, event) in events.enumerated() {
                 let count = idx + 1
-                let label = UILabel(frame: CGRect(x: 5, y: offset + dateLabel.bounds.height + height * CGFloat(idx),
+                let label = UILabel(frame: CGRect(x: 5,
+                                                  y: offset + dateLabel.bounds.height + height * CGFloat(idx),
                                                   width: frame.width - 10,
                                                   height: height))
                 label.isUserInteractionEnabled = true

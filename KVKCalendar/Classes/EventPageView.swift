@@ -32,7 +32,7 @@ final class EventPageView: UIView {
     
     init(event: Event, style: TimelineStyle, frame: CGRect) {
         self.style = style
-        self.color = event.color
+        self.color = event.color ?? event.backgroundColor
         super.init(frame: frame)
         backgroundColor = event.backgroundColor
         

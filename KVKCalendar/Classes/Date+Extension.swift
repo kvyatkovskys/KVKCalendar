@@ -45,13 +45,13 @@ extension Date {
     }
     
     var startOfDay: Date? {
-        var gregorian = Calendar.current
+        var gregorian = Calendar(identifier: .gregorian)
         gregorian.timeZone = TimeZone(abbreviation: "UTC")!
         return gregorian.startOfDay(for: self)
     }
     
     var endOfDay: Date? {
-        var gregorian = Calendar.current
+        var gregorian = Calendar(identifier: .gregorian)
         gregorian.timeZone = TimeZone(abbreviation: "UTC")!
         var components = DateComponents()
         components.day = 1
@@ -60,26 +60,26 @@ extension Date {
     }
     
     var startOfWeek: Date? {
-        var gregorian = Calendar.current
+        var gregorian = Calendar(identifier: .gregorian)
         gregorian.timeZone = TimeZone(abbreviation: "UTC")!
         let sunday = gregorian.date(from: gregorian.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))
         return gregorian.date(byAdding: .day, value: 1, to: sunday!)
     }
     
     var endOfWeek: Date? {
-        var gregorian = Calendar.current
+        var gregorian = Calendar(identifier: .gregorian)
         gregorian.timeZone = TimeZone(abbreviation: "UTC")!
         return gregorian.date(byAdding: .day, value: 6, to: startOfWeek ?? self)
     }
     
     var startOfMonth: Date? {
-        var gregorian = Calendar.current
+        var gregorian = Calendar(identifier: .gregorian)
         gregorian.timeZone = TimeZone(abbreviation: "UTC")!
         return gregorian.date(from: gregorian.dateComponents([.year, .month], from: self))
     }
     
     var endOfMonth: Date? {
-        var gregorian = Calendar.current
+        var gregorian = Calendar(identifier: .gregorian)
         gregorian.timeZone = TimeZone(abbreviation: "UTC")!
         var components = DateComponents()
         components.month = 1
@@ -87,7 +87,7 @@ extension Date {
         return gregorian.date(byAdding: components, to: startOfMonth ?? self)
     }
     
-    func toGlobalTime() -> Date {
+    func toGlobalTime() -> Date { 
         let timezone = TimeZone.autoupdatingCurrent
         let seconds = -TimeInterval(timezone.secondsFromGMT(for: self))
         return Date(timeInterval: seconds, since: self)
