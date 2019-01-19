@@ -222,8 +222,9 @@ public struct Event {
     public var text: String = ""
     public var start: Date = Date()
     public var end: Date = Date()
-    public var color: UIColor = .clear {
+    public var color: UIColor? = nil {
         didSet {
+            guard let color = color else { return }
             backgroundColor = color.withAlphaComponent(0.3)
             var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 0
             color.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)

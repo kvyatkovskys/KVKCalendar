@@ -164,6 +164,7 @@ final class TimelineView: UIView, AllDayEventDelegate {
         
         scrollView.subviews.filter({ $0 is TimelineLabel }).forEach { (view) in
             guard let time = view as? TimelineLabel, time.valueHash == Date().hour.hashValue else {
+                scrollView.setContentOffset(.zero, animated: true)
                 return
             }
             
@@ -209,13 +210,13 @@ final class TimelineView: UIView, AllDayEventDelegate {
                 .first?.start.hour ?? style.timelineStyle.startHour
         }
         
-        // добавляем время на таймлайн
+        // add time label to timline
         let times = createTimesLabel(start: start)
         
-        // добавляем линиии разделительные
+        // add seporator line
         let lines = createLines(times: times)
         
-        // считаем всю высоту по лэйблам времени
+        // calculate all height by time label
         let heightAllTimes = times.reduce(0, { $0 + ($1.frame.height + style.timelineStyle.offsetTimeY) })
         scrollView.contentSize = CGSize(width: frame.width, height: heightAllTimes + 20)
         times.forEach({ scrollView.addSubview($0) })
@@ -225,7 +226,7 @@ final class TimelineView: UIView, AllDayEventDelegate {
         let widthPage = (frame.width - offset) / CGFloat(dates.count)
         let heightPage = (CGFloat(times.count) * (style.timelineStyle.heightTime + style.timelineStyle.offsetTimeY)) - 75
         
-        // самое страшное
+        // horror
         for (idx, date) in dates.enumerated() {
             let pointX: CGFloat
             if idx == 0 {
@@ -234,7 +235,6 @@ final class TimelineView: UIView, AllDayEventDelegate {
                 pointX = CGFloat(idx) * widthPage + offset
             }
             
-            // сортируем время событий по порядку, самые длинные в начале
             let eventsByDate = filteredEvents
                 .filter({ compareStartDate(event: $0, date: date) })
                 //.sorted(by: { ($0.end.hour - $0.start.hour) > ($1.end.hour - $1.start.hour) })
@@ -245,16 +245,16 @@ final class TimelineView: UIView, AllDayEventDelegate {
                                width: widthPage,
                                originX: pointX)
             
-            // считаем, если события имеют пересекающее время
+            // count event cross in one hour
             let countEventsOneHour = countEventsInHour(events: eventsByDate)
             var pagesCached = [CachedPage]()
             
             if !eventsByDate.isEmpty {
-                // создаём сами события
+                // create event
                 var newFrame = CGRect(x: 0, y: 0, width: 0, height: heightPage)
                 eventsByDate.forEach { (event) in
                     times.forEach({ (time) in
-                        // определяем начало события и указываем 'y'
+                        // detect position 'y'
                         if event.start.hour.hashValue == time.valueHash {
                             if event.start.minute > 0 && event.start.minute < 59 {
                                 let minutePercent = 59.0 / CGFloat(event.start.minute)
@@ -269,7 +269,7 @@ final class TimelineView: UIView, AllDayEventDelegate {
                                 newFrame.origin.y = (CGFloat(time.tag) * (style.timelineStyle.offsetTimeY + time.frame.height)) + (time.frame.height / 2)
                             }
                         }
-                        // определяем конец события и указываем высоту
+                        // detect height event
                         if event.end.hour.hashValue == time.valueHash {
                             let summHeight = (CGFloat(time.tag) * (style.timelineStyle.offsetTimeY + time.frame.height)) - newFrame.origin.y + (time.frame.height / 2)
                             if event.end.minute > 0 && event.end.minute < 59 {
