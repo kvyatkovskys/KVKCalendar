@@ -78,6 +78,12 @@ final class ViewController: UIViewController {
         }
     }
     
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        var frame = calendarView.frame
+        frame.size = size
+        calendarView.reloadFrame(frame: frame)
+    }
+    
     @objc func today(sender: UIBarButtonItem) {
         calendarView.scrollToDate(date: Date())
     }

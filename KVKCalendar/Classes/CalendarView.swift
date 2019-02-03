@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol CalendarFrame {
+    func reloadFrame(frame: CGRect)
+}
+
 protocol CalendarSelectDateDelegate: AnyObject {
     func didSelectCalendarDate(_ date: Date?, type: CalendarType)
     func didSelectCalendarEvents(_ events: [Event])
@@ -32,7 +36,7 @@ public extension CalendarDelegate {
     func didSelectMore(_ date: Date, frame: CGRect?) {}
 }
 
-public final class CalendarView: UIView, CalendarSelectDateDelegate {
+public final class CalendarView: UIView, CalendarSelectDateDelegate, CalendarFrame {
     public weak var delegate: CalendarDelegate?
     public weak var dataSource: CalendarDataSource?
     public var selectedType: CalendarType {
@@ -149,6 +153,12 @@ public final class CalendarView: UIView, CalendarSelectDateDelegate {
         case .year:
             yearCalendar.setDate(date: date)
         }
+    }
+    
+    public func reloadFrame(frame: CGRect) {
+        self.frame = frame
+        dayCalendar.reloadFrame(frame: frame)
+        weekCalendar.reloadFrame(frame: frame)
     }
     
     // MARK: delegate selected calendar
