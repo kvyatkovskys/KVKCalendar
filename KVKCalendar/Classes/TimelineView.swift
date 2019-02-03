@@ -162,24 +162,15 @@ final class TimelineView: UIView, AllDayEventDelegate {
     func scrollToCurrentTimeEvent(startHour: Int) {
         guard style.timelineStyle.scrollToCurrentHour else { return }
         
-        scrollView.subviews.filter({ $0 is TimelineLabel }).forEach { (view) in
-            guard let time = view as? TimelineLabel, time.valueHash == Date().hour.hashValue else {
+        guard let time = scrollView.subviews
+            .filter({ (view) -> Bool in
+                guard let time = view as? TimelineLabel else { return false }
+                return time.valueHash == Date().hour.hashValue
+            }).first else {
                 scrollView.setContentOffset(.zero, animated: true)
                 return
-            }
-            
-            let pointY: CGFloat
-            let position = scrollView.contentSize.height - (CGFloat(startHour) * style.timelineStyle.offsetTimeY)
-            if position > time.frame.origin.y {
-                pointY = time.frame.origin.y
-            } else {
-                pointY = scrollView.contentSize.height - scrollView.bounds.height + scrollView.contentInset.bottom
-            }
-            scrollView.setContentOffset(CGPoint(x: 0,
-                                                y: pointY),
-                                        animated: true)
-            return
         }
+        scrollView.setContentOffset(CGPoint(x: 0, y: time.frame.origin.y), animated: true)
     }
     
     fileprivate func compareStartDate(event: Event, date: Date?) -> Bool {

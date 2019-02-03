@@ -117,7 +117,16 @@ extension MonthViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateF
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         let cells = collectionView.visibleCells as? [MonthCollectionViewCell] ?? [MonthCollectionViewCell()]
         let cellDays = cells.filter({ $0.day.type != .empty })
-        guard let newMoveDate = cellDays.filter({ $0.day.date?.day == data.moveDate.day }).first?.day.date else { return }
+        guard let newMoveDate = cellDays.filter({ $0.day.date?.day == data.moveDate.day }).first?.day.date else {
+            let sorted = cellDays.sorted(by: { ($0.day.date?.day ?? 0) < ($1.day.date?.day ?? 0) })
+            if let lastDate = sorted.last?.day.date, lastDate.day < data.moveDate.day {
+                data.moveDate = lastDate
+                headerView.date = lastDate
+                delegate?.didSelectCalendarDate(lastDate, type: .month)
+                collectionView.reloadData()
+            }
+            return
+        }
         data.moveDate = newMoveDate
         headerView.date = newMoveDate
         delegate?.didSelectCalendarDate(newMoveDate, type: .month)
