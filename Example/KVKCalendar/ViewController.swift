@@ -10,8 +10,13 @@ import UIKit
 import KVKCalendar
 
 final class ViewController: UIViewController {
-    fileprivate var selectDate = Date()
     fileprivate var events = [Event]()
+    
+    fileprivate var selectDate: Date = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd.MM.yyyy"
+        return formatter.date(from: "14.12.2018") ?? Date()
+    }()
     
     fileprivate lazy var todayButton: UIBarButtonItem = {
         let button = UIBarButtonItem(title: "Today", style: .done, target: self, action: #selector(today))
@@ -34,7 +39,8 @@ final class ViewController: UIViewController {
         style.timelineStyle.offsetTimeY = 80
         style.timelineStyle.offsetEvent = 3
         style.allDayStyle.isPinned = true
-        let calendar = CalendarView(frame: frame, style: style)
+        
+        let calendar = CalendarView(frame: frame, date: selectDate, style: style)
         calendar.delegate = self
         calendar.dataSource = self
         return calendar
@@ -66,10 +72,6 @@ final class ViewController: UIViewController {
         navigationItem.titleView = segmentedControl
         navigationItem.rightBarButtonItem = todayButton
         
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd.MM.yyyy"
-        let date = formatter.date(from: "14.12.2018")
-        calendarView.set(type: .day, date: date ?? Date())
         calendarView.addEventViewToDay(view: eventViewer)
         
         loadEvents { [unowned self] (events) in
@@ -101,11 +103,6 @@ final class ViewController: UIViewController {
             calendarView.set(type: .year, date: selectDate)
         }
         calendarView.reloadData()
-    }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
 }
 

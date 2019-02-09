@@ -7,9 +7,11 @@
 
 import UIKit
 
-final class MonthViewCalendar: UIView, MonthCellDelegate {
+final class MonthViewCalendar: UIView, MonthCellDelegate, CalendarFrame {
     fileprivate var data: MonthData
     fileprivate let style: Style
+    fileprivate var collectionView: UICollectionView!
+    fileprivate var animated: Bool = false
     
     weak var delegate: CalendarSelectDateDelegate?
     
@@ -25,19 +27,12 @@ final class MonthViewCalendar: UIView, MonthCellDelegate {
         return view
     }()
     
-    fileprivate lazy var collectionView: UICollectionView = {
+    fileprivate lazy var layout: UICollectionViewLayout = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 0
         layout.scrollDirection = style.monthStyle.scrollDirection
-        let collection = UICollectionView(frame: frame, collectionViewLayout: layout)
-        collection.backgroundColor = .clear
-        collection.isPagingEnabled = true
-        collection.dataSource = self
-        collection.delegate = self
-        collection.register(MonthCollectionViewCell.self,
-                            forCellWithReuseIdentifier: MonthCollectionViewCell.cellIdentifier)
-        return collection
+        return layout
     }()
     
     init(data: MonthData, frame: CGRect, style: Style) {
@@ -46,19 +41,41 @@ final class MonthViewCalendar: UIView, MonthCellDelegate {
         super.init(frame: frame)
         addSubview(headerView)
         
+        collectionView = createCollectionView(frame: frame)
+        var collectionFrame = frame
+        collectionFrame.origin.y = headerView.frame.height
+        collectionFrame.size.height = collectionFrame.height - headerView.frame.height
+        collectionView.frame = collectionFrame
+        addSubview(collectionView)        
+    }
+    
+    func reloadFrame(frame: CGRect) {
+        self.frame = frame
+        headerView.reloadFrame(frame: frame)
+        
+        collectionView.removeFromSuperview()
+        collectionView = createCollectionView(frame: self.frame)
+        
         var collectionFrame = frame
         collectionFrame.origin.y = headerView.frame.height
         collectionFrame.size.height = collectionFrame.height - headerView.frame.height
         collectionView.frame = collectionFrame
         addSubview(collectionView)
         
-        scrollToDate(date: data.moveDate)
+        if let idx = data.days.index(where: { $0.date?.month == data.moveDate.month && $0.date?.year == data.moveDate.year }) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
+                                                 at: .top,
+                                                 animated: false)
+            }
+        }
+        collectionView.reloadData()
     }
     
     func setDate(date: Date) {
         headerView.date = date
         data.moveDate = date
-        scrollToDate(date: date)
+        scrollToDate(date: date, animated: animated)
         collectionView.reloadData()
     }
     
@@ -67,14 +84,28 @@ final class MonthViewCalendar: UIView, MonthCellDelegate {
         collectionView.reloadData()
     }
     
-    fileprivate func scrollToDate(date: Date) {
+    fileprivate func createCollectionView(frame: CGRect) -> UICollectionView {
+        let collection = UICollectionView(frame: frame, collectionViewLayout: layout)
+        collection.backgroundColor = .clear
+        collection.isPagingEnabled = true
+        collection.dataSource = self
+        collection.delegate = self
+        collection.register(MonthCollectionViewCell.self,
+                            forCellWithReuseIdentifier: MonthCollectionViewCell.cellIdentifier)
+        return collection
+    }
+    
+    fileprivate func scrollToDate(date: Date, animated: Bool) {
         delegate?.didSelectCalendarDate(date, type: .month)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            if let idx = self.data.days.index(where: { $0.date?.month == date.month && $0.date?.year == date.year }) {
+        if let idx = data.days.index(where: { $0.date?.month == date.month && $0.date?.year == date.year }) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
                                                  at: .top,
-                                                 animated: true)
+                                                 animated: animated)
             }
+        }
+        if !self.animated {
+            self.animated = true
         }
     }
     
