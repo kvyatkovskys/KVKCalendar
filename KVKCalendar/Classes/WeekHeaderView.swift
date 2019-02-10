@@ -7,8 +7,9 @@
 
 import UIKit
 
-final class WeekHeaderView: UIView {
+final class WeekHeaderView: UIView, CalendarFrame {
     fileprivate let style: Style
+    fileprivate let fromYear: Bool
     
     fileprivate let titleLabel: UILabel = {
         let label = UILabel()
@@ -48,7 +49,21 @@ final class WeekHeaderView: UIView {
     
     init(frame: CGRect, style: Style, fromYear: Bool = false) {
         self.style = style
+        self.fromYear = fromYear
         super.init(frame: frame)
+        addViews(frame: frame, fromYear: fromYear)
+    }
+    
+    func reloadFrame(frame: CGRect) {
+        self.frame.size.width = frame.width
+        titleLabel.removeFromSuperview()
+        DayType.allCases.filter({ $0 != .empty }).forEach { (day) in
+            subviews.filter({ $0.tag == day.shiftDay }).forEach({ $0.removeFromSuperview() })
+        }
+        addViews(frame: self.frame, fromYear: fromYear)
+    }
+    
+    fileprivate func addViews(frame: CGRect, fromYear: Bool) {
         let days = DayType.allCases.filter({ $0 != .empty })
         let width = frame.width / CGFloat(days.count)
         for (idx, value) in days.enumerated() {

@@ -7,24 +7,19 @@
 
 import UIKit
 
-final class YearViewCalendar: UIView {
+final class YearViewCalendar: UIView, CalendarFrame {
     fileprivate var data: YearData
     fileprivate let style: Style
+    fileprivate var animated: Bool = false
+    fileprivate var collectionView: UICollectionView!
+    
     weak var delegate: CalendarSelectDateDelegate?
     
-    fileprivate lazy var collectionView: UICollectionView = {
+    fileprivate let layout: UICollectionViewLayout = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 10
         layout.minimumInteritemSpacing = 10
-        
-        let collection = UICollectionView(frame: frame, collectionViewLayout: layout)
-        collection.backgroundColor = .clear
-        collection.isPagingEnabled = true
-        collection.dataSource = self
-        collection.delegate = self
-        collection.register(YearCollectionViewCell.self,
-                            forCellWithReuseIdentifier: YearCollectionViewCell.cellIdentifier)
-        return collection
+        return layout
     }()
     
     fileprivate lazy var headerView: YearHeaderView = {
@@ -37,38 +32,80 @@ final class YearViewCalendar: UIView {
         self.data = data
         self.style = style
         super.init(frame: frame)
-        collectionView.frame = frame
+        
+        collectionView = createCollectionView(frame: frame)
         collectionView.frame.origin.y = style.yearStyle.heightTitleHeader
         collectionView.frame.size.height -= style.yearStyle.heightTitleHeader
         addSubview(collectionView)
-        addSubview(headerView)
+        addSubview(headerView)        
+    }
+    
+    func reloadFrame(frame: CGRect) {
+        self.frame = frame
+        headerView.reloadFrame(frame: self.frame)
         
-        scrollToDate(date: data.moveDate, animation: false)
-    }
-    
-    func setDate(date: Date) {
-        headerView.date = date
-        data.moveDate = date
-        scrollToDate(date: date, animation: true)
-        collectionView.reloadData()
-    }
-    
-    fileprivate func scrollToDate(date: Date, animation: Bool) {
-        delegate?.didSelectCalendarDate(date, type: .year)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+        collectionView.removeFromSuperview()
+        collectionView = createCollectionView(frame: self.frame)
+        collectionView.frame.origin.y = style.yearStyle.heightTitleHeader
+        collectionView.frame.size.height -= style.yearStyle.heightTitleHeader
+        addSubview(collectionView)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             guard UIDevice.current.userInterfaceIdiom == .pad else {
                 if let idx = self.data.months.index(where: { $0.date.year == self.data.moveDate.year && $0.date.month == self.data.moveDate.month }) {
                     self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
                                                      at: .top,
-                                                     animated: animation)
+                                                     animated: false)
                 }
                 return
             }
             if let idx = self.data.months.index(where: { $0.date.year == self.data.moveDate.year }) {
                 self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
                                                  at: .top,
-                                                 animated: animation)
+                                                 animated: false)
             }
+        }
+        
+        collectionView.reloadData()
+    }
+    
+    func setDate(date: Date) {
+        headerView.date = date
+        data.moveDate = date
+        scrollToDate(date: date, animated: animated)
+        collectionView.reloadData()
+    }
+    
+    fileprivate func createCollectionView(frame: CGRect)  -> UICollectionView {
+        let collection = UICollectionView(frame: frame, collectionViewLayout: layout)
+        collection.backgroundColor = .clear
+        collection.isPagingEnabled = true
+        collection.dataSource = self
+        collection.delegate = self
+        collection.register(YearCollectionViewCell.self,
+                            forCellWithReuseIdentifier: YearCollectionViewCell.cellIdentifier)
+        return collection
+    }
+    
+    fileprivate func scrollToDate(date: Date, animated: Bool) {
+        delegate?.didSelectCalendarDate(date, type: .year)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            guard UIDevice.current.userInterfaceIdiom == .pad else {
+                if let idx = self.data.months.index(where: { $0.date.year == date.year && $0.date.month == date.month }) {
+                    self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
+                                                     at: .top,
+                                                     animated: animated)
+                }
+                return
+            }
+            if let idx = self.data.months.index(where: { $0.date.year == date.year }) {
+                self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
+                                                 at: .top,
+                                                 animated: animated)
+            }
+        }
+        if !self.animated {
+            self.animated = true
         }
     }
     

@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol CalendarFrame {
+    func reloadFrame(frame: CGRect)
+}
+
 protocol CalendarSelectDateDelegate: AnyObject {
     func didSelectCalendarDate(_ date: Date?, type: CalendarType)
     func didSelectCalendarEvents(_ events: [Event])
@@ -32,7 +36,7 @@ public extension CalendarDelegate {
     func didSelectMore(_ date: Date, frame: CGRect?) {}
 }
 
-public final class CalendarView: UIView, CalendarSelectDateDelegate {
+public final class CalendarView: UIView, CalendarSelectDateDelegate, CalendarFrame {
     public weak var delegate: CalendarDelegate?
     public weak var dataSource: CalendarDataSource?
     public var selectedType: CalendarType {
@@ -77,6 +81,13 @@ public final class CalendarView: UIView, CalendarSelectDateDelegate {
         self.weekData = WeekData(yearData: yearData, timeSystem: timeHourSystem)
         self.monthData = MonthData(yearData: yearData)
         super.init(frame: frame)
+        
+        if let defaultType = style.defaultType {
+            type = defaultType
+            set(type: type, date: date)
+        } else {
+            set(type: type, date: date)
+        }
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -120,7 +131,7 @@ public final class CalendarView: UIView, CalendarSelectDateDelegate {
             weekCalendar.setDate(date: date)
         case .month:
             monthCalendar.setDate(date: date)
-        default:
+        case .year:
             yearCalendar.setDate(date: date)
         }
     }
@@ -149,6 +160,14 @@ public final class CalendarView: UIView, CalendarSelectDateDelegate {
         case .year:
             yearCalendar.setDate(date: date)
         }
+    }
+    
+    public func reloadFrame(frame: CGRect) {
+        self.frame = frame
+        dayCalendar.reloadFrame(frame: frame)
+        weekCalendar.reloadFrame(frame: frame)
+        monthCalendar.reloadFrame(frame: frame)
+        yearCalendar.reloadFrame(frame: frame)
     }
     
     // MARK: delegate selected calendar

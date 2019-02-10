@@ -11,7 +11,7 @@ protocol TimelineDelegate: AnyObject {
     func didSelectEventInTimeline(_ event: Event, frame: CGRect?)
 }
 
-final class TimelineView: UIView, AllDayEventDelegate {
+final class TimelineView: UIView, AllDayEventDelegate, CalendarFrame {
     weak var delegate: TimelineDelegate?
     
     fileprivate var style: Style
@@ -37,6 +37,12 @@ final class TimelineView: UIView, AllDayEventDelegate {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func reloadFrame(frame: CGRect) {
+        self.frame.size = frame.size
+        scrollView.frame.size = frame.size
+        scrollView.contentSize.width = frame.size.width
     }
     
     fileprivate func createTimesLabel(start: Int) -> [TimelineLabel] {
@@ -162,24 +168,21 @@ final class TimelineView: UIView, AllDayEventDelegate {
     func scrollToCurrentTimeEvent(startHour: Int) {
         guard style.timelineStyle.scrollToCurrentHour else { return }
         
-        scrollView.subviews.filter({ $0 is TimelineLabel }).forEach { (view) in
-            guard let time = view as? TimelineLabel, time.valueHash == Date().hour.hashValue else {
+        guard let time = scrollView.subviews
+            .filter({ (view) -> Bool in
+                guard let time = view as? TimelineLabel else { return false }
+                return time.valueHash == Date().hour.hashValue
+            }).first else {
                 scrollView.setContentOffset(.zero, animated: true)
                 return
-            }
-            
-            let pointY: CGFloat
-            let position = scrollView.contentSize.height - (CGFloat(startHour) * style.timelineStyle.offsetTimeY)
-            if position > time.frame.origin.y {
-                pointY = time.frame.origin.y
-            } else {
-                pointY = scrollView.contentSize.height - scrollView.bounds.height + scrollView.contentInset.bottom
-            }
-            scrollView.setContentOffset(CGPoint(x: 0,
-                                                y: pointY),
-                                        animated: true)
-            return
         }
+        var pointY = time.frame.origin.y
+        if !subviews.filter({ $0 is AllDayTitleView }).isEmpty {
+            if style.allDayStyle.isPinned {
+                pointY -= style.allDayStyle.height
+            }
+        }
+        scrollView.setContentOffset(CGPoint(x: 0, y: pointY), animated: true)
     }
     
     fileprivate func compareStartDate(event: Event, date: Date?) -> Bool {

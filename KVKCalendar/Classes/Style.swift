@@ -19,6 +19,7 @@ public struct Style {
     public var locale = Locale.autoupdatingCurrent
     public var calendar = Calendar.autoupdatingCurrent
     public var timezone = TimeZone.autoupdatingCurrent
+    public var defaultType: CalendarType?
     
     public init() {}
 }

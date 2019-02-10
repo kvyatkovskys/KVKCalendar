@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class DayViewCalendar: UIView, ScrollDayHeaderProtocol, TimelineDelegate {
+final class DayViewCalendar: UIView, ScrollDayHeaderProtocol, TimelineDelegate, CalendarFrame {
     fileprivate let style: Style
     weak var delegate: CalendarSelectDateDelegate?
     fileprivate var data: DayData
@@ -68,12 +68,34 @@ final class DayViewCalendar: UIView, ScrollDayHeaderProtocol, TimelineDelegate {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func reloadFrame(frame: CGRect) {
+        self.frame = frame
+        topBackgroundView.frame.size.width = frame.size.width
+        scrollHeaderDay.reloadFrame(frame: frame)
+        
+        var timelineFrame = timelineView.frame
+        timelineFrame.size.height = frame.size.height - scrollHeaderDay.frame.height
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            timelineFrame.size.width = frame.size.width - style.timelineStyle.widthEventViewer
+            if let idx = subviews.index(where: { $0.tag == -1 }) {
+                let eventView = subviews[idx]
+                var eventFrame = timelineFrame
+                eventFrame.origin.x = eventFrame.width
+                eventFrame.size.width = style.timelineStyle.widthEventViewer
+                eventView.frame = eventFrame
+            }
+        }
+        timelineView.reloadFrame(frame: timelineFrame)
+        timelineView.createTimelinePage(dates: [data.date], events: data.events, selectedDate: data.date)
+    }
+    
     func addEventView(view: UIView) {
         guard UIDevice.current.userInterfaceIdiom == .pad else { return }
         var timlineFrame = timelineView.frame
         timlineFrame.origin.x = timlineFrame.width
         timlineFrame.size.width = style.timelineStyle.widthEventViewer
         view.frame = timlineFrame
+        view.tag = -1
         addSubview(view)
     }
     

@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class YearHeaderView: UIView {
+final class YearHeaderView: UIView, CalendarFrame {
     static let identifier = #file
     
     fileprivate let titleLabel: UILabel = {
@@ -38,6 +38,11 @@ final class YearHeaderView: UIView {
         super.init(frame: frame)
         titleLabel.frame = frame
         addSubview(titleLabel)
+    }
+    
+    func reloadFrame(frame: CGRect) {
+        self.frame.size.width = frame.width
+        titleLabel.frame.size.width = frame.width
     }
     
     required init?(coder aDecoder: NSCoder) {
