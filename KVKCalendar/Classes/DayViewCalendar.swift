@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class DayViewCalendar: UIView, ScrollDayHeaderProtocol, TimelineDelegate, CalendarFrame {
+final class DayViewCalendar: UIView {
     fileprivate let style: Style
     weak var delegate: CalendarSelectDateDelegate?
     fileprivate var data: DayData
@@ -26,7 +26,8 @@ final class DayViewCalendar: UIView, ScrollDayHeaderProtocol, TimelineDelegate, 
                                        days: data.days,
                                        date: data.date,
                                        type: .day,
-                                       style: style.headerScrollStyle)
+                                       style: style.headerScrollStyle,
+                                       calendar: style.calendar)
         view.delegate = self
         return view
     }()
@@ -68,27 +69,6 @@ final class DayViewCalendar: UIView, ScrollDayHeaderProtocol, TimelineDelegate, 
         fatalError("init(coder:) has not been implemented")
     }
     
-    func reloadFrame(frame: CGRect) {
-        self.frame = frame
-        topBackgroundView.frame.size.width = frame.size.width
-        scrollHeaderDay.reloadFrame(frame: frame)
-        
-        var timelineFrame = timelineView.frame
-        timelineFrame.size.height = frame.size.height - scrollHeaderDay.frame.height
-        if UIDevice.current.userInterfaceIdiom == .pad {
-            timelineFrame.size.width = frame.size.width - style.timelineStyle.widthEventViewer
-            if let idx = subviews.index(where: { $0.tag == -1 }) {
-                let eventView = subviews[idx]
-                var eventFrame = timelineFrame
-                eventFrame.origin.x = eventFrame.width
-                eventFrame.size.width = style.timelineStyle.widthEventViewer
-                eventView.frame = eventFrame
-            }
-        }
-        timelineView.reloadFrame(frame: timelineFrame)
-        timelineView.createTimelinePage(dates: [data.date], events: data.events, selectedDate: data.date)
-    }
-    
     func addEventView(view: UIView) {
         guard UIDevice.current.userInterfaceIdiom == .pad else { return }
         var timlineFrame = timelineView.frame
@@ -109,14 +89,49 @@ final class DayViewCalendar: UIView, ScrollDayHeaderProtocol, TimelineDelegate, 
         data.events = events
         timelineView.createTimelinePage(dates: [data.date], events: events, selectedDate: data.date)
     }
-    
+}
+
+extension DayViewCalendar: ScrollDayHeaderProtocol {
     func didSelectDateScrollHeader(_ date: Date?, type: CalendarType) {
         guard let selectDate = date else { return }
         data.date = selectDate
         delegate?.didSelectCalendarDate(selectDate, type: type)
     }
-    
+}
+
+extension DayViewCalendar: TimelineDelegate {
     func didSelectEventInTimeline(_ event: Event, frame: CGRect?) {
         delegate?.didSelectCalendarEvent(event, frame: frame)
+    }
+    
+    func nextDate() {
+        scrollHeaderDay.selectDate(offset: 1)
+    }
+    
+    func previousDate() {
+        scrollHeaderDay.selectDate(offset: -1)
+    }
+}
+
+extension DayViewCalendar: CalendarFrameDelegate {
+    func reloadFrame(frame: CGRect) {
+        self.frame = frame
+        topBackgroundView.frame.size.width = frame.size.width
+        scrollHeaderDay.reloadFrame(frame: frame)
+        
+        var timelineFrame = timelineView.frame
+        timelineFrame.size.height = frame.size.height - scrollHeaderDay.frame.height
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            timelineFrame.size.width = frame.size.width - style.timelineStyle.widthEventViewer
+            if let idx = subviews.index(where: { $0.tag == -1 }) {
+                let eventView = subviews[idx]
+                var eventFrame = timelineFrame
+                eventFrame.origin.x = eventFrame.width
+                eventFrame.size.width = style.timelineStyle.widthEventViewer
+                eventView.frame = eventFrame
+            }
+        }
+        timelineView.reloadFrame(frame: timelineFrame)
+        timelineView.createTimelinePage(dates: [data.date], events: data.events, selectedDate: data.date)
     }
 }

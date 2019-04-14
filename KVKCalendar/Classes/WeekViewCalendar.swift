@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class WeekViewCalendar: UIView, ScrollDayHeaderProtocol, TimelineDelegate, CalendarFrame {
+final class WeekViewCalendar: UIView {
     var visibleDates: [Date?] = []
     weak var delegate: CalendarSelectDateDelegate?
     
@@ -29,7 +29,8 @@ final class WeekViewCalendar: UIView, ScrollDayHeaderProtocol, TimelineDelegate,
                                        days: data.days,
                                        date: data.date,
                                        type: .week,
-                                       style: style.headerScrollStyle)
+                                       style: style.headerScrollStyle,
+                                       calendar: style.calendar)
         view.delegate = self
         return view
     }()
@@ -64,18 +65,6 @@ final class WeekViewCalendar: UIView, ScrollDayHeaderProtocol, TimelineDelegate,
         addSubview(timelineView)
     }
     
-    func reloadFrame(frame: CGRect) {
-        self.frame = frame
-        topBackgroundView.frame.size.width = frame.size.width
-        scrollHeaderDay.reloadFrame(frame: frame)
-        
-        var timelineFrame = timelineView.frame
-        timelineFrame.size.width = frame.size.width
-        timelineFrame.size.height = frame.size.height - scrollHeaderDay.frame.height
-        timelineView.reloadFrame(frame: timelineFrame)
-        timelineView.createTimelinePage(dates: visibleDates, events: data.events, selectedDate: data.date)
-    }
-    
     func setDate(date: Date) {
         data.date = date
         scrollHeaderDay.setDate(date: date)
@@ -85,17 +74,6 @@ final class WeekViewCalendar: UIView, ScrollDayHeaderProtocol, TimelineDelegate,
     func reloadData(events: [Event]) {
         data.events = events
         timelineView.createTimelinePage(dates: visibleDates, events: events, selectedDate: data.date)
-    }
-    
-    func didSelectDateScrollHeader(_ date: Date?, type: CalendarType) {
-        guard let selectDate = date else { return }
-        data.date = selectDate
-        getVisibleDates(date: selectDate)
-        delegate?.didSelectCalendarDate(selectDate, type: type)
-    }
-    
-    func didSelectEventInTimeline(_ event: Event, frame: CGRect?) {
-        delegate?.didSelectCalendarEvent(event, frame: frame)
     }
     
     fileprivate func getVisibleDates(date: Date) {
@@ -122,5 +100,42 @@ final class WeekViewCalendar: UIView, ScrollDayHeaderProtocol, TimelineDelegate,
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension WeekViewCalendar: ScrollDayHeaderProtocol {
+    func didSelectDateScrollHeader(_ date: Date?, type: CalendarType) {
+        guard let selectDate = date else { return }
+        data.date = selectDate
+        getVisibleDates(date: selectDate)
+        delegate?.didSelectCalendarDate(selectDate, type: type)
+    }
+}
+
+extension WeekViewCalendar: CalendarFrameDelegate {
+    func reloadFrame(frame: CGRect) {
+        self.frame = frame
+        topBackgroundView.frame.size.width = frame.size.width
+        scrollHeaderDay.reloadFrame(frame: frame)
+        
+        var timelineFrame = timelineView.frame
+        timelineFrame.size.width = frame.size.width
+        timelineFrame.size.height = frame.size.height - scrollHeaderDay.frame.height
+        timelineView.reloadFrame(frame: timelineFrame)
+        timelineView.createTimelinePage(dates: visibleDates, events: data.events, selectedDate: data.date)
+    }
+}
+
+extension WeekViewCalendar: TimelineDelegate {
+    func didSelectEventInTimeline(_ event: Event, frame: CGRect?) {
+        delegate?.didSelectCalendarEvent(event, frame: frame)
+    }
+    
+    func nextDate() {
+        scrollHeaderDay.selectDate(offset: 7)
+    }
+    
+    func previousDate() {
+        scrollHeaderDay.selectDate(offset: -7)
     }
 }

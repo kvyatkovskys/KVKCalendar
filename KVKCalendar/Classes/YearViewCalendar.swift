@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class YearViewCalendar: UIView, CalendarFrame {
+final class YearViewCalendar: UIView {
     fileprivate var data: YearData
     fileprivate let style: Style
     fileprivate var animated: Bool = false
@@ -38,35 +38,6 @@ final class YearViewCalendar: UIView, CalendarFrame {
         collectionView.frame.size.height -= style.yearStyle.heightTitleHeader
         addSubview(collectionView)
         addSubview(headerView)        
-    }
-    
-    func reloadFrame(frame: CGRect) {
-        self.frame = frame
-        headerView.reloadFrame(frame: self.frame)
-        
-        collectionView.removeFromSuperview()
-        collectionView = createCollectionView(frame: self.frame)
-        collectionView.frame.origin.y = style.yearStyle.heightTitleHeader
-        collectionView.frame.size.height -= style.yearStyle.heightTitleHeader
-        addSubview(collectionView)
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            guard UIDevice.current.userInterfaceIdiom == .pad else {
-                if let idx = self.data.months.index(where: { $0.date.year == self.data.moveDate.year && $0.date.month == self.data.moveDate.month }) {
-                    self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
-                                                     at: .top,
-                                                     animated: false)
-                }
-                return
-            }
-            if let idx = self.data.months.index(where: { $0.date.year == self.data.moveDate.year }) {
-                self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
-                                                 at: .top,
-                                                 animated: false)
-            }
-        }
-        
-        collectionView.reloadData()
     }
     
     func setDate(date: Date) {
@@ -111,6 +82,37 @@ final class YearViewCalendar: UIView, CalendarFrame {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension YearViewCalendar: CalendarFrameDelegate {
+    func reloadFrame(frame: CGRect) {
+        self.frame = frame
+        headerView.reloadFrame(frame: self.frame)
+        
+        collectionView.removeFromSuperview()
+        collectionView = createCollectionView(frame: self.frame)
+        collectionView.frame.origin.y = style.yearStyle.heightTitleHeader
+        collectionView.frame.size.height -= style.yearStyle.heightTitleHeader
+        addSubview(collectionView)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            guard UIDevice.current.userInterfaceIdiom == .pad else {
+                if let idx = self.data.months.index(where: { $0.date.year == self.data.moveDate.year && $0.date.month == self.data.moveDate.month }) {
+                    self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
+                                                     at: .top,
+                                                     animated: false)
+                }
+                return
+            }
+            if let idx = self.data.months.index(where: { $0.date.year == self.data.moveDate.year }) {
+                self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
+                                                 at: .top,
+                                                 animated: false)
+            }
+        }
+        
+        collectionView.reloadData()
     }
 }
 

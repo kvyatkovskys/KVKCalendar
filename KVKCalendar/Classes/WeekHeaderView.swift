@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class WeekHeaderView: UIView, CalendarFrame {
+final class WeekHeaderView: UIView {
     fileprivate let style: Style
     fileprivate let fromYear: Bool
     
@@ -54,15 +54,6 @@ final class WeekHeaderView: UIView, CalendarFrame {
         addViews(frame: frame, fromYear: fromYear)
     }
     
-    func reloadFrame(frame: CGRect) {
-        self.frame.size.width = frame.width
-        titleLabel.removeFromSuperview()
-        DayType.allCases.filter({ $0 != .empty }).forEach { (day) in
-            subviews.filter({ $0.tag == day.shiftDay }).forEach({ $0.removeFromSuperview() })
-        }
-        addViews(frame: self.frame, fromYear: fromYear)
-    }
-    
     fileprivate func addViews(frame: CGRect, fromYear: Bool) {
         let days = DayType.allCases.filter({ $0 != .empty })
         let width = frame.width / CGFloat(days.count)
@@ -100,5 +91,16 @@ final class WeekHeaderView: UIView, CalendarFrame {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension WeekHeaderView: CalendarFrameDelegate {
+    func reloadFrame(frame: CGRect) {
+        self.frame.size.width = frame.width
+        titleLabel.removeFromSuperview()
+        DayType.allCases.filter({ $0 != .empty }).forEach { (day) in
+            subviews.filter({ $0.tag == day.shiftDay }).forEach({ $0.removeFromSuperview() })
+        }
+        addViews(frame: self.frame, fromYear: fromYear)
     }
 }

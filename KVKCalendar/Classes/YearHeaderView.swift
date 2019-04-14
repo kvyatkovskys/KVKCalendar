@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class YearHeaderView: UIView, CalendarFrame {
+final class YearHeaderView: UIView {
     static let identifier = #file
     
     fileprivate let titleLabel: UILabel = {
@@ -40,12 +40,15 @@ final class YearHeaderView: UIView, CalendarFrame {
         addSubview(titleLabel)
     }
     
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension YearHeaderView: CalendarFrameDelegate {
     func reloadFrame(frame: CGRect) {
         self.frame.size.width = frame.width
         titleLabel.frame.size.width = frame.width
     }
     
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
 }
