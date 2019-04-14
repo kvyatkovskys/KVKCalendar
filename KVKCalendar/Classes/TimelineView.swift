@@ -37,8 +37,7 @@ final class TimelineView: UIView {
         addSubview(scrollView)
         
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(swipeGesure))
-        panGesture.delegate = self
-        scrollView.addGestureRecognizer(panGesture)
+        addGestureRecognizer(panGesture)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -46,9 +45,9 @@ final class TimelineView: UIView {
     }
     
     @objc fileprivate func swipeGesure(gesture: UIPanGestureRecognizer) {
-        let translation = gesture.translation(in: scrollView)
-        let velocity = gesture.velocity(in: scrollView)
-        let endGesure = abs(translation.x) > (scrollView.frame.width / 3.5)
+        let translation = gesture.translation(in: self)
+        let velocity = gesture.velocity(in: self)
+        let endGesure = abs(translation.x) > (frame.width / 3.5)
         
         switch gesture.state {
         case .began, .changed:
@@ -80,18 +79,18 @@ final class TimelineView: UIView {
             }
             
             let previousDay = translation.x > 0
-            let translationX = previousDay ? scrollView.frame.width : -scrollView.frame.width
+            let translationX = previousDay ? frame.width : -frame.width
             
             UIView.animate(withDuration: 0.3, animations: {
                 self.scrollView.subviews.filter({ $0.tag == 100 }).forEach { (view) in
                     view.transform = CGAffineTransform(translationX: translationX, y: 0)
                 }
-            }, completion: { _ in
+            }, completion: { [weak delegate = self.delegate] _ in
                 guard previousDay else {
-                    self.delegate?.nextDate()
+                    delegate?.nextDate()
                     return
                 }
-                self.delegate?.previousDate()
+                delegate?.previousDate()
             })
         case .possible:
             break
@@ -370,12 +369,6 @@ final class TimelineView: UIView {
         }
         setOffsetScrollView()
         scrollToCurrentTimeEvent(startHour: start)
-    }
-}
-
-extension TimelineView: UIGestureRecognizerDelegate {
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        return true
     }
 }
 
