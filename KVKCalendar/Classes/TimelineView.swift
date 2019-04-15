@@ -254,7 +254,7 @@ final class TimelineView: UIView {
 
         let start: Int
         if dates.count > 1 {
-            start = filteredEvents.sorted(by: { $0.start.hour < $1.start.hour }).first?.start.hour ?? 0
+            start = filteredEvents.sorted(by: { $0.start.hour < $1.start.hour }).first?.start.hour ?? style.timelineStyle.startHour
         } else {
             start = filteredEvents.filter({ compareStartDate(event: $0, date: selectedDate) })
                 .sorted(by: { $0.start.hour < $1.start.hour })
