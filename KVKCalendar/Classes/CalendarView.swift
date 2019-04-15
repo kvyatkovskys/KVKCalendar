@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol CalendarFrame {
+protocol CalendarFrameDelegate {
     func reloadFrame(frame: CGRect)
 }
 
@@ -36,7 +36,7 @@ public extension CalendarDelegate {
     func didSelectMore(_ date: Date, frame: CGRect?) {}
 }
 
-public final class CalendarView: UIView, CalendarSelectDateDelegate, CalendarFrame {
+public final class CalendarView: UIView {
     public weak var delegate: CalendarDelegate?
     public weak var dataSource: CalendarDataSource?
     public var selectedType: CalendarType {
@@ -161,16 +161,9 @@ public final class CalendarView: UIView, CalendarSelectDateDelegate, CalendarFra
             yearCalendar.setDate(date: date)
         }
     }
-    
-    public func reloadFrame(frame: CGRect) {
-        self.frame = frame
-        dayCalendar.reloadFrame(frame: frame)
-        weekCalendar.reloadFrame(frame: frame)
-        monthCalendar.reloadFrame(frame: frame)
-        yearCalendar.reloadFrame(frame: frame)
-    }
-    
-    // MARK: delegate selected calendar
+}
+
+extension CalendarView: CalendarSelectDateDelegate {
     func didSelectCalendarDate(_ date: Date?, type: CalendarType) {
         delegate?.didSelectDate(date: date, type: type)
     }
@@ -185,6 +178,16 @@ public final class CalendarView: UIView, CalendarSelectDateDelegate, CalendarFra
     
     func didSelectCalendarMore(_ date: Date, frame: CGRect?) {
         delegate?.didSelectMore(date, frame: frame)
+    }
+}
+
+extension CalendarView: CalendarFrameDelegate {
+    public func reloadFrame(frame: CGRect) {
+        self.frame = frame
+        dayCalendar.reloadFrame(frame: frame)
+        weekCalendar.reloadFrame(frame: frame)
+        monthCalendar.reloadFrame(frame: frame)
+        yearCalendar.reloadFrame(frame: frame)
     }
 }
 
@@ -255,6 +258,7 @@ public struct Event {
     public var isAllDay: Bool = false
     public var isContainsFile: Bool = false
     public var textForMonth: String = ""
+    public var eventData: Any?
     
     public init() {}
 }

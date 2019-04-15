@@ -11,13 +11,14 @@ protocol ScrollDayHeaderProtocol: class {
     func didSelectDateScrollHeader(_ date: Date?, type: CalendarType)
 }
 
-final class ScrollDayHeaderView: UIView, CalendarFrame {
+final class ScrollDayHeaderView: UIView {
     fileprivate let days: [Day]
     fileprivate var moveDate: Date?
     fileprivate var style: HeaderScrollStyle
     fileprivate var collectionView: UICollectionView!
     fileprivate var animated: Bool = false
     fileprivate let type: CalendarType
+    fileprivate let calendar: Calendar
     
     weak var delegate: ScrollDayHeaderProtocol?
     var visibleDates: [Date?] = []
@@ -36,11 +37,12 @@ final class ScrollDayHeaderView: UIView, CalendarFrame {
         return layout
     }()
     
-    init(frame: CGRect, days: [Day], date: Date, type: CalendarType, style: HeaderScrollStyle) {
+    init(frame: CGRect, days: [Day], date: Date, type: CalendarType, style: HeaderScrollStyle, calendar: Calendar) {
         self.days = days
         self.moveDate = date
         self.type = type
         self.style = style
+        self.calendar = calendar
         super.init(frame: frame)
         
         collectionView = createCollectionView(frame: frame)
@@ -59,41 +61,15 @@ final class ScrollDayHeaderView: UIView, CalendarFrame {
         addSubview(collectionView)
     }
     
-    func reloadFrame(frame: CGRect) {
-        self.frame.size.width = frame.size.width - self.frame.origin.x
-        titleLabel.frame.size.width = self.frame.size.width
-        
-        collectionView.removeFromSuperview()
-        collectionView = createCollectionView(frame: self.frame)
-        collectionView.frame.origin.x = 0
-        if !style.isHiddenTitleDate {
-            collectionView.frame.size.height = frame.height - style.heightTitleDate
-        }
-        
-        addSubview(collectionView)
-        
-        if let date = moveDate {
-            guard let scrollDate = date.startOfWeek,
-                let idx = days.index(where: { $0.date?.year == scrollDate.year
-                    && $0.date?.month == scrollDate.month
-                    && $0.date?.day == scrollDate.day })
-                else {
-                    return
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
-                                            at: .left,
-                                            animated: false)
-            }
-            
-        }
-        collectionView.reloadData()
-    }
-    
     func setDate(date: Date) {
         moveDate = date
         scrollToDate(date: date, animated: animated)
         collectionView.reloadData()
+    }
+    
+    func selectDate(offset: Int) {
+        guard let date = moveDate, let nextDate = calendar.date(byAdding: .day, value: offset, to: date) else { return }
+        setDate(date: nextDate)
     }
     
     fileprivate func setDateToTitle(date: Date?) {
@@ -137,6 +113,39 @@ final class ScrollDayHeaderView: UIView, CalendarFrame {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension ScrollDayHeaderView: CalendarFrameDelegate {
+    func reloadFrame(frame: CGRect) {
+        self.frame.size.width = frame.size.width - self.frame.origin.x
+        titleLabel.frame.size.width = self.frame.size.width
+        
+        collectionView.removeFromSuperview()
+        collectionView = createCollectionView(frame: self.frame)
+        collectionView.frame.origin.x = 0
+        if !style.isHiddenTitleDate {
+            collectionView.frame.size.height = frame.height - style.heightTitleDate
+        }
+        
+        addSubview(collectionView)
+        
+        if let date = moveDate {
+            guard let scrollDate = date.startOfWeek,
+                let idx = days.index(where: { $0.date?.year == scrollDate.year
+                    && $0.date?.month == scrollDate.month
+                    && $0.date?.day == scrollDate.day })
+                else {
+                    return
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
+                                                 at: .left,
+                                                 animated: false)
+            }
+            
+        }
+        collectionView.reloadData()
     }
 }
 

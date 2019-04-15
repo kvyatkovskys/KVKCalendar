@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class MonthViewCalendar: UIView, MonthCellDelegate, CalendarFrame {
+final class MonthViewCalendar: UIView {
     fileprivate var data: MonthData
     fileprivate let style: Style
     fileprivate var collectionView: UICollectionView!
@@ -47,29 +47,6 @@ final class MonthViewCalendar: UIView, MonthCellDelegate, CalendarFrame {
         collectionFrame.size.height = collectionFrame.height - headerView.frame.height
         collectionView.frame = collectionFrame
         addSubview(collectionView)        
-    }
-    
-    func reloadFrame(frame: CGRect) {
-        self.frame = frame
-        headerView.reloadFrame(frame: frame)
-        
-        collectionView.removeFromSuperview()
-        collectionView = createCollectionView(frame: self.frame)
-        
-        var collectionFrame = frame
-        collectionFrame.origin.y = headerView.frame.height
-        collectionFrame.size.height = collectionFrame.height - headerView.frame.height
-        collectionView.frame = collectionFrame
-        addSubview(collectionView)
-        
-        if let idx = data.days.index(where: { $0.date?.month == data.moveDate.month && $0.date?.year == data.moveDate.year }) {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
-                                                 at: .top,
-                                                 animated: false)
-            }
-        }
-        collectionView.reloadData()
     }
     
     func setDate(date: Date) {
@@ -112,13 +89,40 @@ final class MonthViewCalendar: UIView, MonthCellDelegate, CalendarFrame {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+}
+
+extension MonthViewCalendar: MonthCellDelegate {
     func didSelectEvent(_ event: Event, frame: CGRect?) {
         delegate?.didSelectCalendarEvent(event, frame: frame)
     }
     
     func didSelectMore(_ date: Date, frame: CGRect?) {
         delegate?.didSelectCalendarMore(date, frame: frame)
+    }
+}
+
+extension MonthViewCalendar: CalendarFrameDelegate {
+    func reloadFrame(frame: CGRect) {
+        self.frame = frame
+        headerView.reloadFrame(frame: frame)
+        
+        collectionView.removeFromSuperview()
+        collectionView = createCollectionView(frame: self.frame)
+        
+        var collectionFrame = frame
+        collectionFrame.origin.y = headerView.frame.height
+        collectionFrame.size.height = collectionFrame.height - headerView.frame.height
+        collectionView.frame = collectionFrame
+        addSubview(collectionView)
+        
+        if let idx = data.days.index(where: { $0.date?.month == data.moveDate.month && $0.date?.year == data.moveDate.year }) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
+                                                 at: .top,
+                                                 animated: false)
+            }
+        }
+        collectionView.reloadData()
     }
 }
 

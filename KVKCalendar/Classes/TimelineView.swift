@@ -9,9 +9,11 @@ import UIKit
 
 protocol TimelineDelegate: AnyObject {
     func didSelectEventInTimeline(_ event: Event, frame: CGRect?)
+    func nextDate()
+    func previousDate()
 }
 
-final class TimelineView: UIView, AllDayEventDelegate, CalendarFrame {
+final class TimelineView: UIView {
     weak var delegate: TimelineDelegate?
     
     fileprivate var style: Style
@@ -33,16 +35,66 @@ final class TimelineView: UIView, AllDayEventDelegate, CalendarFrame {
         scrollFrame.origin.y = 0
         scrollView.frame = scrollFrame
         addSubview(scrollView)
+        
+        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(swipeGesure))
+        addGestureRecognizer(panGesture)
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func reloadFrame(frame: CGRect) {
-        self.frame.size = frame.size
-        scrollView.frame.size = frame.size
-        scrollView.contentSize.width = frame.size.width
+    @objc fileprivate func swipeGesure(gesture: UIPanGestureRecognizer) {
+        let translation = gesture.translation(in: self)
+        let velocity = gesture.velocity(in: self)
+        let endGesure = abs(translation.x) > (frame.width / 3.5)
+        
+        switch gesture.state {
+        case .began, .changed:
+            guard abs(velocity.y) < abs(velocity.x) else {
+                break
+            }
+            
+            guard endGesure else {
+                scrollView.subviews.filter({ $0.tag == 100 }).forEach { (view) in
+                    view.transform = CGAffineTransform(translationX: translation.x, y: 0)
+                }
+                break
+            }
+            gesture.state = .ended
+        case .failed:
+            UIView.animate(withDuration: 0.3) {
+                self.scrollView.subviews.filter({ $0.tag == 100 }).forEach { (view) in
+                    view.transform = .identity
+                }
+            }
+        case .cancelled, .ended:
+            guard endGesure else {
+                UIView.animate(withDuration: 0.3) {
+                    self.scrollView.subviews.filter({ $0.tag == 100 }).forEach { (view) in
+                        view.transform = .identity
+                    }
+                }
+                break
+            }
+            
+            let previousDay = translation.x > 0
+            let translationX = previousDay ? frame.width : -frame.width
+            
+            UIView.animate(withDuration: 0.3, animations: {
+                self.scrollView.subviews.filter({ $0.tag == 100 }).forEach { (view) in
+                    view.transform = CGAffineTransform(translationX: translationX, y: 0)
+                }
+            }, completion: { [weak delegate = self.delegate] _ in
+                guard previousDay else {
+                    delegate?.nextDate()
+                    return
+                }
+                delegate?.previousDate()
+            })
+        case .possible:
+            break
+        }
     }
     
     fileprivate func createTimesLabel(start: Int) -> [TimelineLabel] {
@@ -145,10 +197,6 @@ final class TimelineView: UIView, AllDayEventDelegate, CalendarFrame {
         }
     }
     
-    func didSelectAllDayEvent(_ event: Event, frame: CGRect?) {
-        delegate?.didSelectEventInTimeline(event, frame: frame)
-    }
-    
     fileprivate func setOffsetScrollView() {
         var offsetY: CGFloat = 0
         if !subviews.filter({ $0 is AllDayEventView }).isEmpty || !scrollView.subviews.filter({ $0 is AllDayEventView }).isEmpty {
@@ -163,6 +211,14 @@ final class TimelineView: UIView, AllDayEventDelegate, CalendarFrame {
             let event = allEvents[idx]
             delegate?.didSelectEventInTimeline(event, frame: gesture.view?.frame)
         }
+    }
+    
+    fileprivate func compareStartDate(event: Event, date: Date?) -> Bool {
+        return event.start.year == date?.year && event.start.month == date?.month && event.start.day == date?.day
+    }
+    
+    fileprivate func compareEndDate(event: Event, date: Date?) -> Bool {
+        return event.end.year == date?.year && event.end.month == date?.month && event.end.day == date?.day
     }
     
     func scrollToCurrentTimeEvent(startHour: Int) {
@@ -185,14 +241,6 @@ final class TimelineView: UIView, AllDayEventDelegate, CalendarFrame {
         scrollView.setContentOffset(CGPoint(x: 0, y: pointY), animated: true)
     }
     
-    fileprivate func compareStartDate(event: Event, date: Date?) -> Bool {
-        return event.start.year == date?.year && event.start.month == date?.month && event.start.day == date?.day
-    }
-    
-    fileprivate func compareEndDate(event: Event, date: Date?) -> Bool {
-        return event.end.year == date?.year && event.end.month == date?.month && event.end.day == date?.day
-    }
-    
     func createTimelinePage(dates: [Date?], events: [Event], selectedDate: Date?) {
         subviews.filter({ $0 is AllDayEventView || $0 is AllDayTitleView }).forEach({ $0.removeFromSuperview() })
         scrollView.subviews.forEach({ $0.removeFromSuperview() })
@@ -206,7 +254,7 @@ final class TimelineView: UIView, AllDayEventDelegate, CalendarFrame {
 
         let start: Int
         if dates.count > 1 {
-            start = filteredEvents.sorted(by: { $0.start.hour < $1.start.hour }).first?.start.hour ?? 0
+            start = filteredEvents.sorted(by: { $0.start.hour < $1.start.hour }).first?.start.hour ?? style.timelineStyle.startHour
         } else {
             start = filteredEvents.filter({ compareStartDate(event: $0, date: selectedDate) })
                 .sorted(by: { $0.start.hour < $1.start.hour })
@@ -308,6 +356,7 @@ final class TimelineView: UIView, AllDayEventDelegate, CalendarFrame {
                     newFrame.size.width = newWidth - style.timelineStyle.offsetEvent
                     
                     let page = EventPageView(event: event, style: style.timelineStyle, frame: newFrame)
+                    page.tag = 100
                     let tap = UITapGestureRecognizer(target: self, action: #selector(tapOnEvent))
                     page.addGestureRecognizer(tap)
                     
@@ -320,6 +369,20 @@ final class TimelineView: UIView, AllDayEventDelegate, CalendarFrame {
         }
         setOffsetScrollView()
         scrollToCurrentTimeEvent(startHour: start)
+    }
+}
+
+extension TimelineView: CalendarFrameDelegate {
+    func reloadFrame(frame: CGRect) {
+        self.frame.size = frame.size
+        scrollView.frame.size = frame.size
+        scrollView.contentSize.width = frame.size.width
+    }
+}
+
+extension TimelineView: AllDayEventDelegate {
+    func didSelectAllDayEvent(_ event: Event, frame: CGRect?) {
+        delegate?.didSelectEventInTimeline(event, frame: frame)
     }
 }
 
