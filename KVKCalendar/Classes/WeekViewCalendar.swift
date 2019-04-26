@@ -78,7 +78,7 @@ final class WeekViewCalendar: UIView {
     
     fileprivate func getVisibleDates(date: Date) {
         let scrollDate = date.startOfWeek ?? date
-        guard let idx = data.days.index(where: { $0.date?.year == scrollDate.year
+        guard let idx = data.days.firstIndex(where: { $0.date?.year == scrollDate.year
             && $0.date?.month == scrollDate.month
             && $0.date?.day == scrollDate.day })
             else

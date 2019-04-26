@@ -123,7 +123,7 @@ extension DayViewCalendar: CalendarFrameDelegate {
         timelineFrame.size.height = frame.size.height - scrollHeaderDay.frame.height
         if UIDevice.current.userInterfaceIdiom == .pad {
             timelineFrame.size.width = frame.size.width - style.timelineStyle.widthEventViewer
-            if let idx = subviews.index(where: { $0.tag == -1 }) {
+            if let idx = subviews.firstIndex(where: { $0.tag == -1 }) {
                 let eventView = subviews[idx]
                 var eventFrame = timelineFrame
                 eventFrame.origin.x = eventFrame.width
