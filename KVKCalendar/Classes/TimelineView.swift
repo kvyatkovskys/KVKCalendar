@@ -94,6 +94,8 @@ final class TimelineView: UIView {
             })
         case .possible:
             break
+        @unknown default:
+            fatalError()
         }
     }
     

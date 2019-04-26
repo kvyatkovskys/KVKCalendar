@@ -205,6 +205,8 @@ extension MonthViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateF
         case .vertical:
             widht = (collectionView.frame.width / 7) - 0.2
             height = collectionView.frame.height / 6
+        @unknown default:
+            fatalError()
         }
         
         return CGSize(width: widht, height: height)
