@@ -138,4 +138,8 @@ extension WeekViewCalendar: TimelineDelegate {
     func previousDate() {
         scrollHeaderDay.selectDate(offset: -7)
     }
+    
+    func swipeX(transform: CGAffineTransform) {
+        
+    }
 }

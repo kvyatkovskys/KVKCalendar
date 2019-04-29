@@ -31,7 +31,7 @@ struct MonthData {
         let newDays = cachedDays[startIdx...endIdx].reduce([], { (acc, day) -> [Day] in
             var newDay = day
             guard newDay.events.isEmpty else { return acc + [day] }
-            let sortedByDay = events.filter({ $0.start.month == day.date?.month })
+            let sortedByDay = events.filter({ $0.start.month == day.date?.month && $0.start.year == day.date?.year })
             for (idx, value) in sortedByDay.enumerated() where value.start.day == day.date?.day {
                 newDay.events.append(events[idx])
             }

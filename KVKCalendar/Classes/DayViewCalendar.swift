@@ -111,6 +111,10 @@ extension DayViewCalendar: TimelineDelegate {
     func previousDate() {
         scrollHeaderDay.selectDate(offset: -1)
     }
+    
+    func swipeX(transform: CGAffineTransform) {
+
+    }
 }
 
 extension DayViewCalendar: CalendarFrameDelegate {

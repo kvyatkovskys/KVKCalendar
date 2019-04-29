@@ -86,7 +86,7 @@ struct YearData {
         let range = calendar.range(of: .day, in: .month, for: dateMonth)!
         let numDays = range.count
         formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = self.style.timezone
+        formatter.timeZone = style.timezone
         
         var arrDates = [Date]()
         for day in 1...numDays {

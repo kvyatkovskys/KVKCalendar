@@ -122,17 +122,18 @@ public final class CalendarView: UIView {
     
     public func set(type: CalendarType, date: Date) {
         self.type = type
+        let newDate = conertDate(date)
         switchTypeCalendar(type: type)
         
         switch type {
         case .day:
-            dayCalendar.setDate(date: date)
+            dayCalendar.setDate(date: newDate)
         case .week:
-            weekCalendar.setDate(date: date)
+            weekCalendar.setDate(date: newDate)
         case .month:
-            monthCalendar.setDate(date: date)
+            monthCalendar.setDate(date: newDate)
         case .year:
-            yearCalendar.setDate(date: date)
+            yearCalendar.setDate(date: newDate)
         }
     }
     
@@ -150,16 +151,24 @@ public final class CalendarView: UIView {
     }
     
     public func scrollToDate(date: Date) {
+        let newDate = conertDate(date)
+        
         switch type {
         case .day:
-            dayCalendar.setDate(date: date)
+            dayCalendar.setDate(date: newDate)
         case .week:
-            weekCalendar.setDate(date: date)
+            weekCalendar.setDate(date: newDate)
         case .month:
-            monthCalendar.setDate(date: date)
+            monthCalendar.setDate(date: newDate)
         case .year:
-            yearCalendar.setDate(date: date)
+            yearCalendar.setDate(date: newDate)
         }
+    }
+    
+    private func conertDate(_ date: Date) -> Date {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.date(from: "\(date.year)-\(date.month)-\(date.day)") ?? date
     }
 }
 

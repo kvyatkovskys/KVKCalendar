@@ -11,6 +11,7 @@ protocol TimelineDelegate: AnyObject {
     func didSelectEventInTimeline(_ event: Event, frame: CGRect?)
     func nextDate()
     func previousDate()
+    func swipeX(transform: CGAffineTransform)
 }
 
 final class TimelineView: UIView {
@@ -48,6 +49,18 @@ final class TimelineView: UIView {
         let translation = gesture.translation(in: self)
         let velocity = gesture.velocity(in: self)
         let endGesure = abs(translation.x) > (frame.width / 3.5)
+        let events = scrollView.subviews.filter({ $0 is EventPageView })
+        var eventsAllDay: [UIView]
+        
+        if style.allDayStyle.isPinned {
+            eventsAllDay = subviews.filter({ $0 is AllDayEventView })
+            eventsAllDay += subviews.filter({ $0 is AllDayTitleView })
+        } else {
+            eventsAllDay = scrollView.subviews.filter({ $0 is AllDayEventView })
+            eventsAllDay += scrollView.subviews.filter({ $0 is AllDayTitleView })
+        }
+        
+        let eventViews = events + eventsAllDay
         
         switch gesture.state {
         case .began, .changed:
@@ -56,33 +69,50 @@ final class TimelineView: UIView {
             }
             
             guard endGesure else {
-                scrollView.subviews.filter({ $0.tag == 100 }).forEach { (view) in
+                delegate?.swipeX(transform: CGAffineTransform(translationX: translation.x, y: 0))
+                
+                eventViews.forEach { (view) in
                     view.transform = CGAffineTransform(translationX: translation.x, y: 0)
                 }
                 break
             }
             gesture.state = .ended
         case .failed:
-            UIView.animate(withDuration: 0.3) {
-                self.scrollView.subviews.filter({ $0.tag == 100 }).forEach { (view) in
-                    view.transform = .identity
-                }
-            }
+            delegate?.swipeX(transform: .identity)
+            
+            UIView.animate(withDuration: 0.3,
+                           delay: 0,
+                           usingSpringWithDamping: 0.6,
+                           initialSpringVelocity: 0.8,
+                           options: .curveLinear,
+                           animations: {
+                            eventViews.forEach { (view) in
+                                view.transform = .identity
+                            }
+            }, completion: nil)
         case .cancelled, .ended:
             guard endGesure else {
-                UIView.animate(withDuration: 0.3) {
-                    self.scrollView.subviews.filter({ $0.tag == 100 }).forEach { (view) in
-                        view.transform = .identity
-                    }
-                }
+                delegate?.swipeX(transform: .identity)
+                
+                UIView.animate(withDuration: 0.3,
+                               delay: 0,
+                               usingSpringWithDamping: 0.6,
+                               initialSpringVelocity: 0.8,
+                               options: .curveLinear,
+                               animations: {
+                                eventViews.forEach { (view) in
+                                    view.transform = .identity
+                                }
+                }, completion: nil)
                 break
             }
             
             let previousDay = translation.x > 0
             let translationX = previousDay ? frame.width : -frame.width
+            delegate?.swipeX(transform: CGAffineTransform(translationX: translation.x, y: 0))
             
             UIView.animate(withDuration: 0.3, animations: {
-                self.scrollView.subviews.filter({ $0.tag == 100 }).forEach { (view) in
+                eventViews.forEach { (view) in
                     view.transform = CGAffineTransform(translationX: translationX, y: 0)
                 }
             }, completion: { [weak delegate = self.delegate] _ in
@@ -290,11 +320,8 @@ final class TimelineView: UIView {
                 .filter({ compareStartDate(event: $0, date: date) })
                 //.sorted(by: { ($0.end.hour - $0.start.hour) > ($1.end.hour - $1.start.hour) })
             
-            createAlldayEvents(events: filteredAllDayEvents.filter({ compareStartDate(event: $0, date: date)
-                || compareEndDate(event: $0, date: date) }),
-                               date: date,
-                               width: widthPage,
-                               originX: pointX)
+            let allDayEvents = filteredAllDayEvents.filter({ compareStartDate(event: $0, date: date) || compareEndDate(event: $0, date: date) })
+            createAlldayEvents(events: allDayEvents, date: date, width: widthPage, originX: pointX)
             
             // count event cross in one hour
             let countEventsOneHour = countEventsInHour(events: eventsByDate)
@@ -356,7 +383,7 @@ final class TimelineView: UIView {
                     newFrame.size.width = newWidth - style.timelineStyle.offsetEvent
                     
                     let page = EventPageView(event: event, style: style.timelineStyle, frame: newFrame)
-                    page.tag = 100
+                    page.tag = "\(event.id)".hashValue
                     let tap = UITapGestureRecognizer(target: self, action: #selector(tapOnEvent))
                     page.addGestureRecognizer(tap)
                     
