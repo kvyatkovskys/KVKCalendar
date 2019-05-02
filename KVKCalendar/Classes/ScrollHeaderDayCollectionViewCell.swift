@@ -33,15 +33,19 @@ final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
     
     var day: Day = Day(day: "", type: .empty, date: nil, data: []) {
         didSet {
-            if let number = day.date?.day {
-                if !style.titleDays.isEmpty {
-                    titleLabel.text = style.titleDays[day.type.shiftDay]
-                } else {
-                    titleLabel.text = day.type.rawValue
-                }
-                dateLabel.text = "\(number)"
-                weekendsDays(day: day)
+            guard let number = day.date?.day else {
+                titleLabel.text = nil
+                dateLabel.text = nil
+                return
             }
+            
+            if !style.titleDays.isEmpty {
+                titleLabel.text = style.titleDays[day.type.shiftDay]
+            } else {
+                titleLabel.text = day.type.rawValue
+            }
+            dateLabel.text = "\(number)"
+            weekendsDays(day: day)
         }
     }
     

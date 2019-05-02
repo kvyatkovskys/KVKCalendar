@@ -45,6 +45,7 @@ public struct HeaderScrollStyle {
     public var colorBackgroundSelectDate: UIColor = .black
     public var colorSelectDate: UIColor = .white
     public var colorWeekendDate: UIColor = .gray
+    public var startWeekDay: StartDayType = .monday
 }
 
 public struct TimelineStyle {
@@ -65,6 +66,10 @@ public struct TimelineStyle {
     public var widthEventViewer: CGFloat = 0
     public var iconFile: UIImage = UIImage()
     public var colorIconFile: UIColor = .black
+    public var showCurrentLineHour: Bool = true
+    public var currentLineHourFont: UIFont = .systemFont(ofSize: 12)
+    public var currentLineHourColor: UIColor = .red
+    public var currentLineHourWidth: CGFloat = 50
 }
 
 public struct WeekStyle {

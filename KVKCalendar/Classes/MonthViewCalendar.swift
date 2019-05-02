@@ -13,7 +13,7 @@ final class MonthViewCalendar: UIView {
     fileprivate var collectionView: UICollectionView!
     fileprivate var animated: Bool = false
     
-    weak var delegate: CalendarSelectDateDelegate?
+    weak var delegate: CalendarPrivateDelegate?
     
     fileprivate lazy var headerView: WeekHeaderView = {
         let height: CGFloat
@@ -101,7 +101,7 @@ extension MonthViewCalendar: MonthCellDelegate {
     }
 }
 
-extension MonthViewCalendar: CalendarFrameDelegate {
+extension MonthViewCalendar: CalendarFrameProtocol {
     func reloadFrame(frame: CGRect) {
         self.frame = frame
         headerView.reloadFrame(frame: frame)

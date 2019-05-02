@@ -38,6 +38,7 @@ final class ViewController: UIViewController {
         }
         style.timelineStyle.offsetTimeY = 80
         style.timelineStyle.offsetEvent = 3
+        style.timelineStyle.currentLineHourWidth = 40
         style.allDayStyle.isPinned = true
         
         let calendar = CalendarView(frame: frame, date: selectDate, style: style)
@@ -119,6 +120,10 @@ extension ViewController: CalendarDelegate {
         default:
             break
         }
+    }
+    
+    func eventViewerFrame(_ frame: CGRect) {
+        eventViewer.reloadFrame(frame: frame)
     }
 }
 

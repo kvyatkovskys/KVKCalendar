@@ -17,18 +17,20 @@ protocol TimelineDelegate: AnyObject {
 final class TimelineView: UIView {
     weak var delegate: TimelineDelegate?
     
-    fileprivate var style: Style
-    fileprivate let hours: [String]
-    fileprivate var allEvents = [Event]()
+    private var style: Style
+    private let hours: [String]
+    private let timeHourSystem: TimeHourSystem
+    private var allEvents = [Event]()
     
-    fileprivate lazy var scrollView: UIScrollView = {
+    private lazy var scrollView: UIScrollView = {
         let scroll = UIScrollView()
         scroll.backgroundColor = style.timelineStyle.backgroundColor
         return scroll
     }()
     
-    init(hours: [String], style: Style, frame: CGRect) {
-        self.hours = hours
+    init(timeHourSystem: TimeHourSystem, style: Style, frame: CGRect) {
+        self.timeHourSystem = timeHourSystem
+        self.hours = timeHourSystem.hours
         self.style = style
         super.init(frame: frame)
         
@@ -45,7 +47,7 @@ final class TimelineView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    @objc fileprivate func swipeGesure(gesture: UIPanGestureRecognizer) {
+    @objc private func swipeGesure(gesture: UIPanGestureRecognizer) {
         let translation = gesture.translation(in: self)
         let velocity = gesture.velocity(in: self)
         let endGesure = abs(translation.x) > (frame.width / 3.5)
@@ -127,7 +129,7 @@ final class TimelineView: UIView {
         }
     }
     
-    fileprivate func createTimesLabel(start: Int) -> [TimelineLabel] {
+    private func createTimesLabel(start: Int) -> [TimelineLabel] {
         var times = [TimelineLabel]()
         for (idx, hour) in hours.enumerated() where idx >= start {
             let yTime = (style.timelineStyle.offsetTimeY + style.timelineStyle.heightTime) * CGFloat(idx - start)
@@ -142,14 +144,15 @@ final class TimelineView: UIView {
             time.text = hour
             let formatter = DateFormatter()
             formatter.dateFormat = "HH:mm"
-            time.valueHash = formatter.date(from: hour)?.hour.hashValue
+            let hourTmp = TimeHourSystem.twentyFourHour.hours[idx]
+            time.valueHash = formatter.date(from: hourTmp)?.hour.hashValue
             time.tag = idx - start
             times.append(time)
         }
         return times
     }
     
-    fileprivate func createLines(times: [TimelineLabel]) -> [UIView] {
+    private func createLines(times: [TimelineLabel]) -> [UIView] {
         var lines = [UIView]()
         for (idx, time) in times.enumerated() {
             let xLine = time.frame.width + style.timelineStyle.offsetTimeX + style.timelineStyle.offsetLineLeft
@@ -165,7 +168,7 @@ final class TimelineView: UIView {
         return lines
     }
     
-    fileprivate func countEventsInHour(events: [Event]) -> [CrossPage] {
+    private func countEventsInHour(events: [Event]) -> [CrossPage] {
         var countEvents = [CrossPage]()
         events.forEach({ (item) in
             let cross = CrossPage(start: item.start.timeIntervalSince1970,
@@ -199,7 +202,7 @@ final class TimelineView: UIView {
         return countEvents
     }
     
-    fileprivate func createAlldayEvents(events: [Event], date: Date?, width: CGFloat, originX: CGFloat) {
+    private func createAlldayEvents(events: [Event], date: Date?, width: CGFloat, originX: CGFloat) {
         guard !events.isEmpty else { return }
         let pointY = style.allDayStyle.isPinned ? 0 : -style.allDayStyle.height
         let allDay = AllDayEventView(events: events,
@@ -227,7 +230,7 @@ final class TimelineView: UIView {
         }
     }
     
-    fileprivate func setOffsetScrollView() {
+    private func setOffsetScrollView() {
         var offsetY: CGFloat = 0
         if !subviews.filter({ $0 is AllDayEventView }).isEmpty || !scrollView.subviews.filter({ $0 is AllDayEventView }).isEmpty {
             offsetY = style.allDayStyle.height
@@ -235,7 +238,7 @@ final class TimelineView: UIView {
         scrollView.contentInset = UIEdgeInsets(top: offsetY, left: 0, bottom: 0, right: 0)
     }
     
-    @objc fileprivate func tapOnEvent(gesture: UITapGestureRecognizer) {
+    @objc private func tapOnEvent(gesture: UITapGestureRecognizer) {
         guard let hashValue = gesture.view?.tag else { return }
         if let idx = allEvents.index(where: { "\($0.id)".hashValue == hashValue }) {
             let event = allEvents[idx]
@@ -243,12 +246,69 @@ final class TimelineView: UIView {
         }
     }
     
-    fileprivate func compareStartDate(event: Event, date: Date?) -> Bool {
+    private func compareStartDate(event: Event, date: Date?) -> Bool {
         return event.start.year == date?.year && event.start.month == date?.month && event.start.day == date?.day
     }
     
-    fileprivate func compareEndDate(event: Event, date: Date?) -> Bool {
+    private func compareEndDate(event: Event, date: Date?) -> Bool {
         return event.end.year == date?.year && event.end.month == date?.month && event.end.day == date?.day
+    }
+    
+    private func showCurrentLineHour() {
+        let date = Date()
+        guard let time = scrollView.subviews
+            .filter({ (view) -> Bool in
+                guard let time = view as? TimelineLabel else { return false }
+                return time.valueHash == date.hour.hashValue
+            }).first as? TimelineLabel else {
+                return
+        }
+        var pointY = time.frame.origin.y
+        if !subviews.filter({ $0 is AllDayTitleView }).isEmpty {
+            if style.allDayStyle.isPinned {
+                pointY -= style.allDayStyle.height
+            }
+        }
+        
+        pointY = calculatePointYByMinute(date.minute, time: time)
+        
+        let timeLabel = UILabel(frame: CGRect(x: style.timelineStyle.offsetTimeX,
+                                              y: pointY - 10,
+                                              width: style.timelineStyle.currentLineHourWidth,
+                                              height: 20))
+        timeLabel.textColor = style.timelineStyle.currentLineHourColor
+        timeLabel.textAlignment = .center
+        timeLabel.font = style.timelineStyle.currentLineHourFont
+        timeLabel.adjustsFontSizeToFitWidth = true
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = timeHourSystem == .twentyFourHour ? "HH:mm" : "H:mm a"
+        timeLabel.text = formatter.string(from: date)
+        
+        let lineView = UIView(frame: CGRect(x: timeLabel.frame.origin.x + timeLabel.frame.width,
+                                            y: pointY,
+                                            width: scrollView.frame.width - style.timelineStyle.offsetTimeX,
+                                            height: 1))
+        lineView.backgroundColor = .red
+        scrollView.addSubview(lineView)
+        scrollView.addSubview(timeLabel)
+    }
+    
+    private func calculatePointYByMinute(_ minute: Int, time: TimelineLabel) -> CGFloat {
+        var pointY: CGFloat = 0
+        if 1..<59 ~= minute {
+            let minutePercent = 59.0 / CGFloat(minute)
+            let newY = (style.timelineStyle.offsetTimeY + time.frame.height) / minutePercent
+            let summY = (CGFloat(time.tag) * (style.timelineStyle.offsetTimeY + time.frame.height)) + (time.frame.height / 2)
+            if time.tag == 0 {
+                pointY = newY + (time.frame.height / 2)
+            } else {
+                pointY = summY + newY
+            }
+        } else {
+            pointY = (CGFloat(time.tag) * (style.timelineStyle.offsetTimeY + time.frame.height)) + (time.frame.height / 2)
+        }
+        return pointY
     }
     
     func scrollToCurrentTimeEvent(startHour: Int) {
@@ -303,6 +363,10 @@ final class TimelineView: UIView {
         times.forEach({ scrollView.addSubview($0) })
         lines.forEach({ scrollView.addSubview($0) })
         
+        if style.timelineStyle.showCurrentLineHour {
+            showCurrentLineHour()
+        }
+        
         let offset = style.timelineStyle.widthTime + style.timelineStyle.offsetTimeX + style.timelineStyle.offsetLineLeft
         let widthPage = (frame.width - offset) / CGFloat(dates.count)
         let heightPage = (CGFloat(times.count) * (style.timelineStyle.heightTime + style.timelineStyle.offsetTimeY)) - 75
@@ -334,18 +398,7 @@ final class TimelineView: UIView {
                     times.forEach({ (time) in
                         // detect position 'y'
                         if event.start.hour.hashValue == time.valueHash {
-                            if event.start.minute > 0 && event.start.minute < 59 {
-                                let minutePercent = 59.0 / CGFloat(event.start.minute)
-                                let newY = (style.timelineStyle.offsetTimeY + time.frame.height) / minutePercent
-                                let summY = (CGFloat(time.tag) * (style.timelineStyle.offsetTimeY + time.frame.height)) + (time.frame.height / 2)
-                                if time.tag == 0 {
-                                    newFrame.origin.y = newY + (time.frame.height / 2)
-                                } else {
-                                    newFrame.origin.y = summY + newY
-                                }
-                            } else {
-                                newFrame.origin.y = (CGFloat(time.tag) * (style.timelineStyle.offsetTimeY + time.frame.height)) + (time.frame.height / 2)
-                            }
+                            newFrame.origin.y = calculatePointYByMinute(event.start.minute, time: time)
                         }
                         // detect height event
                         if event.end.hour.hashValue == time.valueHash {
@@ -360,7 +413,7 @@ final class TimelineView: UIView {
                         }
                     })
                     
-                    // считаем кол-во событий в один час
+                    // calculate count of event in one hour
                     var newWidth = widthPage
                     var newPointX = pointX
                     if let idx = countEventsOneHour.index(where: { $0.count > 1 && $0.start == event.start.timeIntervalSince1970 }) {
@@ -399,7 +452,7 @@ final class TimelineView: UIView {
     }
 }
 
-extension TimelineView: CalendarFrameDelegate {
+extension TimelineView: CalendarFrameProtocol {
     func reloadFrame(frame: CGRect) {
         self.frame.size = frame.size
         scrollView.frame.size = frame.size

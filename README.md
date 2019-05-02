@@ -6,8 +6,6 @@
 [![Version](https://img.shields.io/cocoapods/v/KVKCalendar.svg?style=flat)](https://cocoapods.org/pods/KVKCalendar)
 [![License](https://img.shields.io/cocoapods/l/KVKCalendar.svg?style=flat)](https://cocoapods.org/pods/KVKCalendar)
 [![Platform](https://img.shields.io/cocoapods/p/KVKCalendar.svg?style=flat)](https://cocoapods.org/pods/KVKCalendar)
-[![Apps Using](https://img.shields.io/cocoapods/at/KVKCalendar.svg?label=Apps%20Using%20KVKCalendar)](https://cocoapods.org/pods/KVKCalendar)
-[![Downloads](https://img.shields.io/cocoapods/dt/KVKCalendar.svg?label=Total%20Downloads)](https://cocoapods.org/pods/KVKCalendar)
 
 # KVKCalendar
 

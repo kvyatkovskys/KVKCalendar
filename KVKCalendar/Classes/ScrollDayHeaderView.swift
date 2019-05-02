@@ -7,12 +7,12 @@
 
 import UIKit
 
-protocol ScrollDayHeaderProtocol: class {
+protocol ScrollDayHeaderDelegate: class {
     func didSelectDateScrollHeader(_ date: Date?, type: CalendarType)
 }
 
 final class ScrollDayHeaderView: UIView {
-    fileprivate let days: [Day]
+    fileprivate var days: [Day]
     fileprivate var moveDate: Date?
     fileprivate var style: HeaderScrollStyle
     fileprivate var collectionView: UICollectionView!
@@ -20,8 +20,7 @@ final class ScrollDayHeaderView: UIView {
     fileprivate let type: CalendarType
     fileprivate let calendar: Calendar
     
-    weak var delegate: ScrollDayHeaderProtocol?
-    var visibleDates: [Date?] = []
+    weak var delegate: ScrollDayHeaderDelegate?
     
     fileprivate let titleLabel: UILabel = {
         let label = UILabel()
@@ -94,18 +93,20 @@ final class ScrollDayHeaderView: UIView {
         delegate?.didSelectDateScrollHeader(date, type: type)
         setDateToTitle(date: date)
         
-        guard let scrollDate = date.startOfWeek,
+        guard let scrollDate = getScrollDate(date: date),
             let idx = days.index(where: { $0.date?.year == scrollDate.year
                 && $0.date?.month == scrollDate.month
                 && $0.date?.day == scrollDate.day })
             else {
                 return
         }
+        
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
                                              at: .left,
                                              animated: animated)
         }
+        
         if !self.animated {
             self.animated = true
         }
@@ -116,10 +117,10 @@ final class ScrollDayHeaderView: UIView {
     }
 }
 
-extension ScrollDayHeaderView: CalendarFrameDelegate {
+extension ScrollDayHeaderView: CalendarFrameProtocol {
     func reloadFrame(frame: CGRect) {
-        self.frame.size.width = frame.size.width - self.frame.origin.x
-        titleLabel.frame.size.width = self.frame.size.width
+        self.frame.size.width = frame.width - self.frame.origin.x
+        titleLabel.frame.size.width = self.frame.width
         
         collectionView.removeFromSuperview()
         collectionView = createCollectionView(frame: self.frame)
@@ -131,7 +132,7 @@ extension ScrollDayHeaderView: CalendarFrameDelegate {
         addSubview(collectionView)
         
         if let date = moveDate {
-            guard let scrollDate = date.startOfWeek,
+            guard let scrollDate = getScrollDate(date: date),
                 let idx = days.index(where: { $0.date?.year == scrollDate.year
                     && $0.date?.month == scrollDate.month
                     && $0.date?.day == scrollDate.day })
@@ -146,6 +147,13 @@ extension ScrollDayHeaderView: CalendarFrameDelegate {
             
         }
         collectionView.reloadData()
+    }
+    
+    private func getScrollDate(date: Date) -> Date? {
+        guard style.startWeekDay == .sunday else {
+            return date.startOfWeek
+        }
+        return date.startSundayOfWeek
     }
 }
 
