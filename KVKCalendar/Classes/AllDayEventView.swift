@@ -73,7 +73,7 @@ final class AllDayEventView: UIView {
     
     @objc fileprivate func tapOnEvent(gesture: UITapGestureRecognizer) {
         guard let hashValue = gesture.view?.tag else { return }
-        if let idx = events.index(where: { "\($0.id)".hashValue == hashValue }) {
+        if let idx = events.firstIndex(where: { "\($0.id)".hashValue == hashValue }) {
             let event = events[idx]
             delegate?.didSelectAllDayEvent(event, frame: gesture.view?.frame)
         }

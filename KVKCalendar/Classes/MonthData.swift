@@ -26,8 +26,8 @@ struct MonthData {
     mutating func reloadEventsInDays(events: [Event]) {
         let startDate = moveDate.startOfMonth
         let endDate = moveDate.endOfMonth?.startOfDay
-        let startIdx = cachedDays.index(where: { $0.date?.day == startDate?.day && compareDate(day: $0, date: startDate) }) ?? 0
-        let endIdx = cachedDays.index(where: { $0.date?.day == endDate?.day && compareDate(day: $0, date: endDate) }) ?? 0
+        let startIdx = cachedDays.firstIndex(where: { $0.date?.day == startDate?.day && compareDate(day: $0, date: startDate) }) ?? 0
+        let endIdx = cachedDays.firstIndex(where: { $0.date?.day == endDate?.day && compareDate(day: $0, date: endDate) }) ?? 0
         let newDays = cachedDays[startIdx...endIdx].reduce([], { (acc, day) -> [Day] in
             var newDay = day
             guard newDay.events.isEmpty else { return acc + [day] }

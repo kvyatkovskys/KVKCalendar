@@ -74,7 +74,7 @@ final class MonthViewCalendar: UIView {
     
     fileprivate func scrollToDate(date: Date, animated: Bool) {
         delegate?.didSelectCalendarDate(date, type: .month)
-        if let idx = data.days.index(where: { $0.date?.month == date.month && $0.date?.year == date.year }) {
+        if let idx = data.days.firstIndex(where: { $0.date?.month == date.month && $0.date?.year == date.year }) {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
                                                  at: .top,
@@ -115,7 +115,7 @@ extension MonthViewCalendar: CalendarFrameProtocol {
         collectionView.frame = collectionFrame
         addSubview(collectionView)
         
-        if let idx = data.days.index(where: { $0.date?.month == data.moveDate.month && $0.date?.year == data.moveDate.year }) {
+        if let idx = data.days.firstIndex(where: { $0.date?.month == data.moveDate.month && $0.date?.year == data.moveDate.year }) {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
                                                  at: .top,
@@ -205,6 +205,8 @@ extension MonthViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateF
         case .vertical:
             widht = (collectionView.frame.width / 7) - 0.2
             height = collectionView.frame.height / 6
+        @unknown default:
+            fatalError()
         }
         
         return CGSize(width: widht, height: height)

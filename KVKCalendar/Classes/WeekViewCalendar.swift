@@ -83,7 +83,7 @@ final class WeekViewCalendar: UIView {
             scrollDate = Calendar(identifier: .gregorian).date(byAdding: .day, value: -1, to: scrollDate) ?? scrollDate
         }
         
-        guard let idx = data.days.index(where: { $0.date?.year == scrollDate.year
+        guard let idx = data.days.firstIndex(where: { $0.date?.year == scrollDate.year
             && $0.date?.month == scrollDate.month
             && $0.date?.day == scrollDate.day })
             else

@@ -17,5 +17,5 @@ Pod::Spec.new do |s|
   s.social_media_url = 'https://github.com/kvyatkovskys'
   s.ios.deployment_target = '9.0'
   s.source_files = 'KVKCalendar/Classes/*.swift'
-  s.swift_version = '4.2'
+  s.swift_version = '5.0'
 end
