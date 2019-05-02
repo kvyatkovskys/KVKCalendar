@@ -57,7 +57,7 @@ final class WeekHeaderView: UIView {
     fileprivate func addViews(frame: CGRect, fromYear: Bool) {
         var days = DayType.allCases.filter({ $0 != .empty })
         
-        if let idx = days.index(where: { $0 == .sunday }), style.headerScrollStyle.startWeekDay == .sunday {
+        if let idx = days.firstIndex(where: { $0 == .sunday }), style.headerScrollStyle.startWeekDay == .sunday {
             let leftDays = days[..<idx]
             days[..<idx] = []
             days += leftDays
