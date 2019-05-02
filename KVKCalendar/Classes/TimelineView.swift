@@ -94,6 +94,8 @@ final class TimelineView: UIView {
             })
         case .possible:
             break
+        @unknown default:
+            fatalError()
         }
     }
     
@@ -207,7 +209,7 @@ final class TimelineView: UIView {
     
     @objc fileprivate func tapOnEvent(gesture: UITapGestureRecognizer) {
         guard let hashValue = gesture.view?.tag else { return }
-        if let idx = allEvents.index(where: { "\($0.id)".hashValue == hashValue }) {
+        if let idx = allEvents.firstIndex(where: { "\($0.id)".hashValue == hashValue }) {
             let event = allEvents[idx]
             delegate?.didSelectEventInTimeline(event, frame: gesture.view?.frame)
         }
@@ -336,7 +338,7 @@ final class TimelineView: UIView {
                     // считаем кол-во событий в один час
                     var newWidth = widthPage
                     var newPointX = pointX
-                    if let idx = countEventsOneHour.index(where: { $0.count > 1 && $0.start == event.start.timeIntervalSince1970 }) {
+                    if let idx = countEventsOneHour.firstIndex(where: { $0.count > 1 && $0.start == event.start.timeIntervalSince1970 }) {
                         newWidth /= CGFloat(countEventsOneHour[idx].count)
                         if !pagesCached.filter({ $0.start..<$0.end ~= event.start.timeIntervalSince1970 }).isEmpty {
                             let countPages = pagesCached.filter({ $0.start..<$0.end ~= event.start.timeIntervalSince1970 })

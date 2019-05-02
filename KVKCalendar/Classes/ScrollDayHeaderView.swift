@@ -95,7 +95,7 @@ final class ScrollDayHeaderView: UIView {
         setDateToTitle(date: date)
         
         guard let scrollDate = date.startOfWeek,
-            let idx = days.index(where: { $0.date?.year == scrollDate.year
+            let idx = days.firstIndex(where: { $0.date?.year == scrollDate.year
                 && $0.date?.month == scrollDate.month
                 && $0.date?.day == scrollDate.day })
             else {
@@ -132,7 +132,7 @@ extension ScrollDayHeaderView: CalendarFrameDelegate {
         
         if let date = moveDate {
             guard let scrollDate = date.startOfWeek,
-                let idx = days.index(where: { $0.date?.year == scrollDate.year
+                let idx = days.firstIndex(where: { $0.date?.year == scrollDate.year
                     && $0.date?.month == scrollDate.month
                     && $0.date?.day == scrollDate.day })
                 else {

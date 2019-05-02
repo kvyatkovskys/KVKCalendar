@@ -7,3 +7,4 @@ fastlane/test_output/
 fastlane/xcov_report/
 .scannerwork
 *.xcuserstate
+Example/build/*

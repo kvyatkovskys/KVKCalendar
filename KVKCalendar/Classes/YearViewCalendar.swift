@@ -62,14 +62,14 @@ final class YearViewCalendar: UIView {
         delegate?.didSelectCalendarDate(date, type: .year)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             guard UIDevice.current.userInterfaceIdiom == .pad else {
-                if let idx = self.data.months.index(where: { $0.date.year == date.year && $0.date.month == date.month }) {
+                if let idx = self.data.months.firstIndex(where: { $0.date.year == date.year && $0.date.month == date.month }) {
                     self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
                                                      at: .top,
                                                      animated: animated)
                 }
                 return
             }
-            if let idx = self.data.months.index(where: { $0.date.year == date.year }) {
+            if let idx = self.data.months.firstIndex(where: { $0.date.year == date.year }) {
                 self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
                                                  at: .top,
                                                  animated: animated)
@@ -98,14 +98,14 @@ extension YearViewCalendar: CalendarFrameDelegate {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             guard UIDevice.current.userInterfaceIdiom == .pad else {
-                if let idx = self.data.months.index(where: { $0.date.year == self.data.moveDate.year && $0.date.month == self.data.moveDate.month }) {
+                if let idx = self.data.months.firstIndex(where: { $0.date.year == self.data.moveDate.year && $0.date.month == self.data.moveDate.month }) {
                     self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
                                                      at: .top,
                                                      animated: false)
                 }
                 return
             }
-            if let idx = self.data.months.index(where: { $0.date.year == self.data.moveDate.year }) {
+            if let idx = self.data.months.firstIndex(where: { $0.date.year == self.data.moveDate.year }) {
                 self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
                                                  at: .top,
                                                  animated: false)

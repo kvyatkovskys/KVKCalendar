@@ -107,13 +107,13 @@ final class MonthCollectionViewCell: UICollectionViewCell {
     }
     
     @objc fileprivate func tapOneEvent(gesture: UITapGestureRecognizer) {
-        if let idx = events.index(where: { "\($0.id)".hashValue == gesture.view?.tag }) {
+        if let idx = events.firstIndex(where: { "\($0.id)".hashValue == gesture.view?.tag }) {
             delegate?.didSelectEvent(events[idx], frame: gesture.view?.frame)
         }
     }
     
     @objc fileprivate func tapOnMore(gesture: UITapGestureRecognizer) {
-        if let idx = events.index(where: { $0.start.day == gesture.view?.tag }) {
+        if let idx = events.firstIndex(where: { $0.start.day == gesture.view?.tag }) {
             delegate?.didSelectMore(events[idx].start, frame: gesture.view?.frame)
         }
     }
