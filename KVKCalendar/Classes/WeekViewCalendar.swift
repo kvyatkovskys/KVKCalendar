@@ -11,10 +11,10 @@ final class WeekViewCalendar: UIView {
     private var visibleDates: [Date?] = []
     weak var delegate: CalendarPrivateDelegate?
     
-    fileprivate var data: WeekData
-    fileprivate var style: Style
+    private var data: WeekData
+    private var style: Style
     
-    fileprivate lazy var scrollHeaderDay: ScrollDayHeaderView = {
+    private lazy var scrollHeaderDay: ScrollDayHeaderView = {
         let heightView: CGFloat
         if style.headerScrollStyle.isHiddenTitleDate {
             heightView = style.headerScrollStyle.heightHeaderWeek
@@ -35,7 +35,7 @@ final class WeekViewCalendar: UIView {
         return view
     }()
     
-    fileprivate lazy var timelineView: TimelineView = {
+    private lazy var timelineView: TimelineView = {
         var timelineFrame = frame
         timelineFrame.origin.y = scrollHeaderDay.frame.height
         timelineFrame.size.height -= scrollHeaderDay.frame.height
@@ -44,7 +44,7 @@ final class WeekViewCalendar: UIView {
         return view
     }()
     
-    fileprivate lazy var topBackgroundView: UIView = {
+    private lazy var topBackgroundView: UIView = {
         let heightView: CGFloat
         if style.headerScrollStyle.isHiddenTitleDate {
             heightView = style.headerScrollStyle.heightHeaderWeek
@@ -76,16 +76,11 @@ final class WeekViewCalendar: UIView {
         timelineView.createTimelinePage(dates: visibleDates, events: events, selectedDate: data.date)
     }
     
-    fileprivate func getVisibleDates(date: Date) {
-        var scrollDate = date.startOfWeek ?? date
-        
-        if style.headerScrollStyle.startWeekDay == .sunday {
-            scrollDate = Calendar(identifier: .gregorian).date(byAdding: .day, value: -1, to: scrollDate) ?? scrollDate
-        }
-        
-        guard let idx = data.days.firstIndex(where: { $0.date?.year == scrollDate.year
-            && $0.date?.month == scrollDate.month
-            && $0.date?.day == scrollDate.day })
+    private func getVisibleDates(date: Date) {
+        guard let scrollDate = getScrollDate(date: date),
+            let idx = data.days.firstIndex(where: { $0.date?.year == scrollDate.year
+                && $0.date?.month == scrollDate.month
+                && $0.date?.day == scrollDate.day })
             else
         {
             return
@@ -101,6 +96,13 @@ final class WeekViewCalendar: UIView {
         
         guard self.visibleDates != visibleDates else { return }
         self.visibleDates = visibleDates
+    }
+    
+    private func getScrollDate(date: Date) -> Date? {
+        guard style.headerScrollStyle.startWeekDay == .sunday else {
+            return date.startOfWeek
+        }
+        return date.startSundayOfWeek
     }
     
     required init?(coder aDecoder: NSCoder) {
