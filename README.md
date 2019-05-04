@@ -1,5 +1,5 @@
 <pre>
-<img src="https://i.postimg.cc/PNsT9nKV/Simulator-Screen-Shot-i-Phone-Xs-2019-05-04-at-11-11-07-iphon.png" height="400" width="200">   <img src="https://i.postimg.cc/VvMddRVT/Screenshot-2019-05-04-at-11-42-20.png" height="450" width="500">
+<img src="https://i.postimg.cc/PNsT9nKV/Simulator-Screen-Shot-i-Phone-Xs-2019-05-04-at-11-11-07-iphon.png" height="400" width="380">   <img src="https://i.postimg.cc/VvMddRVT/Screenshot-2019-05-04-at-11-42-20.png" height="300" width="400">
 </pre>
 
 [![CI Status](https://img.shields.io/travis/kvyatkovskys/KVKCalendar.svg?style=flat)](https://travis-ci.org/kvyatkovskys/KVKCalendar)
