@@ -1,4 +1,4 @@
-[![Simulator-Screen-Shot-i-Phone-Xs-2019-05-04-at-11-11-07-iphon.png](https://i.postimg.cc/1tx3q61N/Simulator-Screen-Shot-i-Phone-Xs-2019-05-04-at-11-11-07-iphon.png)](https://postimg.cc/t15b0sTX)[![Screenshot-2019-05-04-at-11-42-20.png](https://i.postimg.cc/7Zw2cF5W/Screenshot-2019-05-04-at-11-42-20.png)](https://postimg.cc/SJ1RYt76)
+| [![Simulator-Screen-Shot-i-Phone-Xs-2019-05-04-at-11-11-07-iphon.png](https://i.postimg.cc/1tx3q61N/Simulator-Screen-Shot-i-Phone-Xs-2019-05-04-at-11-11-07-iphon.png)](https://postimg.cc/t15b0sTX) | [![Screenshot-2019-05-04-at-11-42-20.png](https://i.postimg.cc/7Zw2cF5W/Screenshot-2019-05-04-at-11-42-20.png)](https://postimg.cc/SJ1RYt76) |
 
 [![CI Status](https://img.shields.io/travis/kvyatkovskys/KVKCalendar.svg?style=flat)](https://travis-ci.org/kvyatkovskys/KVKCalendar)
 [![Version](https://img.shields.io/cocoapods/v/KVKCalendar.svg?style=flat)](https://cocoapods.org/pods/KVKCalendar)
