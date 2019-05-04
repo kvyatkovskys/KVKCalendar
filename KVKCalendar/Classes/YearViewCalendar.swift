@@ -132,7 +132,7 @@ extension YearViewCalendar: UICollectionViewDataSource {
         cell.style = style
         cell.selectDate = data.moveDate
         cell.title = month.name
-        cell.days = data.addStartEmptyDay(days: month.days, startDay: style.headerScrollStyle.startWeekDay)
+        cell.days = data.addStartEmptyDay(days: month.days, startDay: style.startWeekDay)
         return cell
     }
 }

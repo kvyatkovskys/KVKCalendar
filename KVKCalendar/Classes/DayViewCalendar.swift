@@ -26,7 +26,7 @@ final class DayViewCalendar: UIView {
                                        days: data.days,
                                        date: data.date,
                                        type: .day,
-                                       style: style.headerScrollStyle,
+                                       style: style,
                                        calendar: style.calendar)
         view.delegate = self
         return view

@@ -20,6 +20,8 @@ public struct Style {
     public var calendar = Calendar.autoupdatingCurrent
     public var timezone = TimeZone.autoupdatingCurrent
     public var defaultType: CalendarType?
+    public var timeHourSystem: TimeHourSystem = .twentyFourHour
+    public var startWeekDay: StartDayType = .monday
     
     public init() {}
 }
@@ -45,7 +47,6 @@ public struct HeaderScrollStyle {
     public var colorBackgroundSelectDate: UIColor = .black
     public var colorSelectDate: UIColor = .white
     public var colorWeekendDate: UIColor = .gray
-    public var startWeekDay: StartDayType = .monday
 }
 
 public struct TimelineStyle {

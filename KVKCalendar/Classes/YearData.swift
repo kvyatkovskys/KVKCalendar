@@ -69,7 +69,7 @@ struct YearData {
                     }
                 }
                 
-                if style.headerScrollStyle.startWeekDay == .sunday {
+                if style.startWeekDay == .sunday {
                     days = addSundayToBegin(days: days)
                 }
                 

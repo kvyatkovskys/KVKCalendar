@@ -14,7 +14,7 @@ protocol ScrollDayHeaderDelegate: class {
 final class ScrollDayHeaderView: UIView {
     fileprivate var days: [Day]
     fileprivate var moveDate: Date?
-    fileprivate var style: HeaderScrollStyle
+    fileprivate var style: Style
     fileprivate var collectionView: UICollectionView!
     fileprivate var animated: Bool = false
     fileprivate let type: CalendarType
@@ -36,7 +36,7 @@ final class ScrollDayHeaderView: UIView {
         return layout
     }()
     
-    init(frame: CGRect, days: [Day], date: Date, type: CalendarType, style: HeaderScrollStyle, calendar: Calendar) {
+    init(frame: CGRect, days: [Day], date: Date, type: CalendarType, style: Style, calendar: Calendar) {
         self.days = days
         self.moveDate = date
         self.type = type
@@ -46,8 +46,8 @@ final class ScrollDayHeaderView: UIView {
         
         collectionView = createCollectionView(frame: frame)
         collectionView.frame.origin.x = 0
-        if !style.isHiddenTitleDate {
-            collectionView.frame.size.height = frame.height - style.heightTitleDate
+        if !style.headerScrollStyle.isHiddenTitleDate {
+            collectionView.frame.size.height = frame.height - style.headerScrollStyle.heightTitleDate
             titleLabel.frame = frame
             titleLabel.frame.origin.x = 0
             titleLabel.frame.size.width -= frame.origin.x
@@ -72,8 +72,8 @@ final class ScrollDayHeaderView: UIView {
     }
     
     fileprivate func setDateToTitle(date: Date?) {
-        if let date = date, !style.isHiddenTitleDate {
-            titleLabel.text = style.formatter.string(from: date)
+        if let date = date, !style.headerScrollStyle.isHiddenTitleDate {
+            titleLabel.text = style.headerScrollStyle.formatter.string(from: date)
         }
     }
     
@@ -125,8 +125,8 @@ extension ScrollDayHeaderView: CalendarFrameProtocol {
         collectionView.removeFromSuperview()
         collectionView = createCollectionView(frame: self.frame)
         collectionView.frame.origin.x = 0
-        if !style.isHiddenTitleDate {
-            collectionView.frame.size.height = frame.height - style.heightTitleDate
+        if !style.headerScrollStyle.isHiddenTitleDate {
+            collectionView.frame.size.height = frame.height - style.headerScrollStyle.heightTitleDate
         }
         
         addSubview(collectionView)
@@ -169,7 +169,7 @@ extension ScrollDayHeaderView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ScrollHeaderDayCollectionViewCell.cellIdentifier,
                                                       for: indexPath) as? ScrollHeaderDayCollectionViewCell ?? ScrollHeaderDayCollectionViewCell()
-        cell.style = style
+        cell.style = style.headerScrollStyle
         cell.day = days[indexPath.row]
         cell.selectDate = moveDate ?? Date()
         return cell

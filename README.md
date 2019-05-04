@@ -1,6 +1,4 @@
-<pre>
-<img src="https://i.postimg.cc/KvJWG3kG/Screenshot-1.png" height="400" width="200">     <img src="https://i.postimg.cc/6pqmy6nd/Screenshot-2.png" height="450" width="600">
-</pre>
+[![Simulator-Screen-Shot-i-Phone-Xs-2019-05-04-at-11-11-07-iphon.png](https://i.postimg.cc/PqXP3dv6/Simulator-Screen-Shot-i-Phone-Xs-2019-05-04-at-11-11-07-iphon.png)](https://postimg.cc/k2HJD3c8)
 
 [![CI Status](https://img.shields.io/travis/kvyatkovskys/KVKCalendar.svg?style=flat)](https://travis-ci.org/kvyatkovskys/KVKCalendar)
 [![Version](https://img.shields.io/cocoapods/v/KVKCalendar.svg?style=flat)](https://cocoapods.org/pods/KVKCalendar)
@@ -13,7 +11,7 @@
 
 ## Requirements
 
-- iOS 9.0+
+- iOS 10.0+
 - Swift 5.0
 
 ## Installation

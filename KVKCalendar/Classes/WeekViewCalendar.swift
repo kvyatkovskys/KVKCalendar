@@ -29,7 +29,7 @@ final class WeekViewCalendar: UIView {
                                        days: data.days,
                                        date: data.date,
                                        type: .week,
-                                       style: style.headerScrollStyle,
+                                       style: style,
                                        calendar: style.calendar)
         view.delegate = self
         return view
@@ -99,7 +99,7 @@ final class WeekViewCalendar: UIView {
     }
     
     private func getScrollDate(date: Date) -> Date? {
-        guard style.headerScrollStyle.startWeekDay == .sunday else {
+        guard style.startWeekDay == .sunday else {
             return date.startOfWeek
         }
         return date.startSundayOfWeek
