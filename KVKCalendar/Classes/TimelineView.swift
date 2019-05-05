@@ -287,7 +287,8 @@ final class TimelineView: UIView {
     }
     
     private func moveCurrentLineHour() {
-        var comps = style.calendar.dateComponents([.era, .year, .month, .day, .hour, .minute], from: Date())
+        let date = Date()
+        var comps = style.calendar.dateComponents([.era, .year, .month, .day, .hour, .minute], from: date)
         comps.minute = (comps.minute ?? 0) + 1
         guard let nextMinute = style.calendar.date(from: comps) else { return }
         
@@ -297,7 +298,6 @@ final class TimelineView: UIView {
                 timer = nil
             }
             timer = Timer(fire: nextMinute, interval: 60, repeats: true) { [unowned self] _ in
-                let date = Date()
                 guard let time = self.getTimelineLabel(hour: date.hour) else { return }
                 
                 var pointY = time.frame.origin.y
