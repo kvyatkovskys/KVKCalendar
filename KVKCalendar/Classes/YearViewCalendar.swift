@@ -13,7 +13,7 @@ final class YearViewCalendar: UIView {
     fileprivate var animated: Bool = false
     fileprivate var collectionView: UICollectionView!
     
-    weak var delegate: CalendarSelectDateDelegate?
+    weak var delegate: CalendarPrivateDelegate?
     
     fileprivate let layout: UICollectionViewLayout = {
         let layout = UICollectionViewFlowLayout()
@@ -85,7 +85,7 @@ final class YearViewCalendar: UIView {
     }
 }
 
-extension YearViewCalendar: CalendarFrameDelegate {
+extension YearViewCalendar: CalendarFrameProtocol {
     func reloadFrame(frame: CGRect) {
         self.frame = frame
         headerView.reloadFrame(frame: self.frame)
@@ -132,7 +132,7 @@ extension YearViewCalendar: UICollectionViewDataSource {
         cell.style = style
         cell.selectDate = data.moveDate
         cell.title = month.name
-        cell.days = data.addStartEmptyDay(days: month.days)
+        cell.days = data.addStartEmptyDay(days: month.days, startDay: style.startWeekDay)
         return cell
     }
 }

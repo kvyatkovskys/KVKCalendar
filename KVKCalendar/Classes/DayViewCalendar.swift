@@ -9,7 +9,7 @@ import UIKit
 
 final class DayViewCalendar: UIView {
     fileprivate let style: Style
-    weak var delegate: CalendarSelectDateDelegate?
+    weak var delegate: CalendarPrivateDelegate?
     fileprivate var data: DayData
     
     fileprivate lazy var scrollHeaderDay: ScrollDayHeaderView = {
@@ -26,7 +26,7 @@ final class DayViewCalendar: UIView {
                                        days: data.days,
                                        date: data.date,
                                        type: .day,
-                                       style: style.headerScrollStyle,
+                                       style: style,
                                        calendar: style.calendar)
         view.delegate = self
         return view
@@ -37,9 +37,13 @@ final class DayViewCalendar: UIView {
         timelineFrame.origin.y = scrollHeaderDay.frame.height
         timelineFrame.size.height -= scrollHeaderDay.frame.height
         if UIDevice.current.userInterfaceIdiom == .pad {
-            timelineFrame.size.width -= style.timelineStyle.widthEventViewer
+            if UIDevice.current.orientation.isPortrait {
+                timelineFrame.size.width = UIScreen.main.bounds.width * 0.5
+            } else {
+                timelineFrame.size.width -= style.timelineStyle.widthEventViewer
+            }
         }
-        let view = TimelineView(hours: data.timeSystem.hours, style: style, frame: timelineFrame)
+        let view = TimelineView(timeHourSystem: data.timeSystem, style: style, frame: timelineFrame)
         view.delegate = self
         return view
     }()
@@ -71,12 +75,17 @@ final class DayViewCalendar: UIView {
     
     func addEventView(view: UIView) {
         guard UIDevice.current.userInterfaceIdiom == .pad else { return }
-        var timlineFrame = timelineView.frame
-        timlineFrame.origin.x = timlineFrame.width
-        timlineFrame.size.width = style.timelineStyle.widthEventViewer
-        view.frame = timlineFrame
+        var eventFrame = timelineView.frame
+        eventFrame.origin.x = eventFrame.width
+        if UIDevice.current.orientation.isPortrait {
+            eventFrame.size.width = UIScreen.main.bounds.width * 0.5
+        } else {
+            eventFrame.size.width = style.timelineStyle.widthEventViewer
+        }
+        view.frame = eventFrame
         view.tag = -1
         addSubview(view)
+        delegate?.getEventViewerFrame(frame: eventFrame)
     }
     
     func setDate(date: Date) {
@@ -91,7 +100,7 @@ final class DayViewCalendar: UIView {
     }
 }
 
-extension DayViewCalendar: ScrollDayHeaderProtocol {
+extension DayViewCalendar: ScrollDayHeaderDelegate {
     func didSelectDateScrollHeader(_ date: Date?, type: CalendarType) {
         guard let selectDate = date else { return }
         data.date = selectDate
@@ -111,24 +120,41 @@ extension DayViewCalendar: TimelineDelegate {
     func previousDate() {
         scrollHeaderDay.selectDate(offset: -1)
     }
+    
+    func swipeX(transform: CGAffineTransform) {
+
+    }
 }
 
-extension DayViewCalendar: CalendarFrameDelegate {
+extension DayViewCalendar: CalendarFrameProtocol {
     func reloadFrame(frame: CGRect) {
         self.frame = frame
-        topBackgroundView.frame.size.width = frame.size.width
+        topBackgroundView.frame.size.width = frame.width
         scrollHeaderDay.reloadFrame(frame: frame)
         
         var timelineFrame = timelineView.frame
-        timelineFrame.size.height = frame.size.height - scrollHeaderDay.frame.height
+        timelineFrame.size.height = frame.height - scrollHeaderDay.frame.height
         if UIDevice.current.userInterfaceIdiom == .pad {
             timelineFrame.size.width = frame.size.width - style.timelineStyle.widthEventViewer
             if let idx = subviews.firstIndex(where: { $0.tag == -1 }) {
                 let eventView = subviews[idx]
                 var eventFrame = timelineFrame
-                eventFrame.origin.x = eventFrame.width
-                eventFrame.size.width = style.timelineStyle.widthEventViewer
+                
+                let pointX: CGFloat
+                let width: CGFloat
+                if UIDevice.current.orientation.isPortrait {
+                    width = frame.width * 0.5
+                    pointX = frame.width - width
+                    timelineFrame.size.width = frame.width - width
+                } else {
+                    pointX = eventFrame.width
+                    width = style.timelineStyle.widthEventViewer
+                }
+                
+                eventFrame.origin.x = pointX
+                eventFrame.size.width = width
                 eventView.frame = eventFrame
+                delegate?.getEventViewerFrame(frame: eventFrame)
             }
         }
         timelineView.reloadFrame(frame: timelineFrame)

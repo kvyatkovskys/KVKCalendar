@@ -1,13 +1,11 @@
 <pre>
-<img src="https://i.postimg.cc/KvJWG3kG/Screenshot-1.png" height="400" width="200">     <img src="https://i.postimg.cc/6pqmy6nd/Screenshot-2.png" height="450" width="600">
+<img src="https://i.postimg.cc/PNsT9nKV/Simulator-Screen-Shot-i-Phone-Xs-2019-05-04-at-11-11-07-iphon.png" height="400" width="380">   <img src="https://i.postimg.cc/VvMddRVT/Screenshot-2019-05-04-at-11-42-20.png" height="320" width="430">
 </pre>
 
 [![CI Status](https://img.shields.io/travis/kvyatkovskys/KVKCalendar.svg?style=flat)](https://travis-ci.org/kvyatkovskys/KVKCalendar)
 [![Version](https://img.shields.io/cocoapods/v/KVKCalendar.svg?style=flat)](https://cocoapods.org/pods/KVKCalendar)
 [![License](https://img.shields.io/cocoapods/l/KVKCalendar.svg?style=flat)](https://cocoapods.org/pods/KVKCalendar)
 [![Platform](https://img.shields.io/cocoapods/p/KVKCalendar.svg?style=flat)](https://cocoapods.org/pods/KVKCalendar)
-[![Apps Using](https://img.shields.io/cocoapods/at/KVKCalendar.svg?label=Apps%20Using%20KVKCalendar)](https://cocoapods.org/pods/KVKCalendar)
-[![Downloads](https://img.shields.io/cocoapods/dt/KVKCalendar.svg?label=Total%20Downloads)](https://cocoapods.org/pods/KVKCalendar)
 
 # KVKCalendar
 
@@ -15,7 +13,7 @@
 
 ## Requirements
 
-- iOS 9.0+
+- iOS 10.0+
 - Swift 5.0
 
 ## Installation

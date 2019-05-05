@@ -8,13 +8,13 @@
 import UIKit
 
 final class WeekViewCalendar: UIView {
-    var visibleDates: [Date?] = []
-    weak var delegate: CalendarSelectDateDelegate?
+    private var visibleDates: [Date?] = []
+    weak var delegate: CalendarPrivateDelegate?
     
-    fileprivate var data: WeekData
-    fileprivate var style: Style
+    private var data: WeekData
+    private var style: Style
     
-    fileprivate lazy var scrollHeaderDay: ScrollDayHeaderView = {
+    private lazy var scrollHeaderDay: ScrollDayHeaderView = {
         let heightView: CGFloat
         if style.headerScrollStyle.isHiddenTitleDate {
             heightView = style.headerScrollStyle.heightHeaderWeek
@@ -29,22 +29,22 @@ final class WeekViewCalendar: UIView {
                                        days: data.days,
                                        date: data.date,
                                        type: .week,
-                                       style: style.headerScrollStyle,
+                                       style: style,
                                        calendar: style.calendar)
         view.delegate = self
         return view
     }()
     
-    fileprivate lazy var timelineView: TimelineView = {
+    private lazy var timelineView: TimelineView = {
         var timelineFrame = frame
         timelineFrame.origin.y = scrollHeaderDay.frame.height
         timelineFrame.size.height -= scrollHeaderDay.frame.height
-        let view = TimelineView(hours: data.timeSystem.hours, style: style, frame: timelineFrame)
+        let view = TimelineView(timeHourSystem: data.timeSystem, style: style, frame: timelineFrame)
         view.delegate = self
         return view
     }()
     
-    fileprivate lazy var topBackgroundView: UIView = {
+    private lazy var topBackgroundView: UIView = {
         let heightView: CGFloat
         if style.headerScrollStyle.isHiddenTitleDate {
             heightView = style.headerScrollStyle.heightHeaderWeek
@@ -76,11 +76,11 @@ final class WeekViewCalendar: UIView {
         timelineView.createTimelinePage(dates: visibleDates, events: events, selectedDate: data.date)
     }
     
-    fileprivate func getVisibleDates(date: Date) {
-        let scrollDate = date.startOfWeek ?? date
-        guard let idx = data.days.firstIndex(where: { $0.date?.year == scrollDate.year
-            && $0.date?.month == scrollDate.month
-            && $0.date?.day == scrollDate.day })
+    private func getVisibleDates(date: Date) {
+        guard let scrollDate = getScrollDate(date: date),
+            let idx = data.days.firstIndex(where: { $0.date?.year == scrollDate.year
+                && $0.date?.month == scrollDate.month
+                && $0.date?.day == scrollDate.day })
             else
         {
             return
@@ -98,12 +98,19 @@ final class WeekViewCalendar: UIView {
         self.visibleDates = visibleDates
     }
     
+    private func getScrollDate(date: Date) -> Date? {
+        guard style.startWeekDay == .sunday else {
+            return date.startOfWeek
+        }
+        return date.startSundayOfWeek
+    }
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 }
 
-extension WeekViewCalendar: ScrollDayHeaderProtocol {
+extension WeekViewCalendar: ScrollDayHeaderDelegate {
     func didSelectDateScrollHeader(_ date: Date?, type: CalendarType) {
         guard let selectDate = date else { return }
         data.date = selectDate
@@ -112,15 +119,15 @@ extension WeekViewCalendar: ScrollDayHeaderProtocol {
     }
 }
 
-extension WeekViewCalendar: CalendarFrameDelegate {
+extension WeekViewCalendar: CalendarFrameProtocol {
     func reloadFrame(frame: CGRect) {
         self.frame = frame
-        topBackgroundView.frame.size.width = frame.size.width
+        topBackgroundView.frame.size.width = frame.width
         scrollHeaderDay.reloadFrame(frame: frame)
         
         var timelineFrame = timelineView.frame
-        timelineFrame.size.width = frame.size.width
-        timelineFrame.size.height = frame.size.height - scrollHeaderDay.frame.height
+        timelineFrame.size.width = frame.width
+        timelineFrame.size.height = frame.height - scrollHeaderDay.frame.height
         timelineView.reloadFrame(frame: timelineFrame)
         timelineView.createTimelinePage(dates: visibleDates, events: data.events, selectedDate: data.date)
     }
@@ -137,5 +144,9 @@ extension WeekViewCalendar: TimelineDelegate {
     
     func previousDate() {
         scrollHeaderDay.selectDate(offset: -7)
+    }
+    
+    func swipeX(transform: CGAffineTransform) {
+        
     }
 }

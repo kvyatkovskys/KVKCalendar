@@ -68,6 +68,11 @@ struct YearData {
                         days.append(Day(day: "", type: .empty, date: nil, data: []))
                     }
                 }
+                
+                if style.startWeekDay == .sunday {
+                    days = addSundayToBegin(days: days)
+                }
+                
                 months[idx].days = days
             }
             monthsTemp += months
@@ -86,7 +91,7 @@ struct YearData {
         let range = calendar.range(of: .day, in: .month, for: dateMonth)!
         let numDays = range.count
         formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = self.style.timezone
+        formatter.timeZone = style.timezone
         
         var arrDates = [Date]()
         for day in 1...numDays {
@@ -101,10 +106,11 @@ struct YearData {
         formatterDay.dateFormat = "EE"
         
         let days = arrDates.map({ (date) -> Day in
-            return Day(day: formatter.string(from: date),
-                       type: DayType(rawValue: formatterDay.string(from: date).uppercased()),
-                       date: date,
-                       data: [])
+            let day = Day(day: formatter.string(from: date),
+                          type: DayType(rawValue: formatterDay.string(from: date).uppercased()),
+                          date: date,
+                          data: [])
+            return day
         })
         
         guard let shift = days.first?.type else { return days }
@@ -115,7 +121,7 @@ struct YearData {
         return shiftDays + days
     }
     
-    func addStartEmptyDay(days: [Day]) -> [Day] {
+    func addStartEmptyDay(days: [Day], startDay: StartDayType) -> [Day] {
         var tempDays = [Day]()
         let filterDays = days.filter({ $0.type != .empty })
         if let firstDay = filterDays.first?.type {
@@ -126,7 +132,25 @@ struct YearData {
         } else {
             tempDays = filterDays
         }
+        
+        if startDay == .sunday {
+            tempDays = addSundayToBegin(days: tempDays)
+        }
+        
         return tempDays
+    }
+    
+    private func addSundayToBegin(days: [Day]) -> [Day] {
+        var days = days
+        days.insert(Day.empty(), at: 0)
+        days.removeLast()
+        
+        let emptyFirstWeek = days[0..<7]
+        if emptyFirstWeek.filter({ $0.type != .empty }).isEmpty {
+            days.removeSubrange(0..<7)
+            days += emptyFirstWeek
+        }
+        return days
     }
 }
 
@@ -197,4 +221,8 @@ enum DayType: String, CaseIterable {
         case .empty: return -1
         }
     }
+}
+
+public enum StartDayType: Int {
+    case monday, sunday
 }

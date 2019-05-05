@@ -7,35 +7,6 @@
 
 import UIKit
 
-protocol CalendarFrameDelegate {
-    func reloadFrame(frame: CGRect)
-}
-
-protocol CalendarSelectDateDelegate: AnyObject {
-    func didSelectCalendarDate(_ date: Date?, type: CalendarType)
-    func didSelectCalendarEvents(_ events: [Event])
-    func didSelectCalendarEvent(_ event: Event, frame: CGRect?)
-    func didSelectCalendarMore(_ date: Date, frame: CGRect?)
-}
-
-public protocol CalendarDataSource: AnyObject {
-    func eventsForCalendar() -> [Event]
-}
-
-public protocol CalendarDelegate: AnyObject {
-    func didSelectDate(date: Date?, type: CalendarType)
-    func didSelectEvents(_ events: [Event])
-    func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?)
-    func didSelectMore(_ date: Date, frame: CGRect?)
-}
-
-public extension CalendarDelegate {
-    func didSelectDate(date: Date?, type: CalendarType) {}
-    func didSelectEvents(_ events: [Event]) {}
-    func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?) {}
-    func didSelectMore(_ date: Date, frame: CGRect?) {}
-}
-
 public final class CalendarView: UIView {
     public weak var delegate: CalendarDelegate?
     public weak var dataSource: CalendarDataSource?
@@ -74,12 +45,12 @@ public final class CalendarView: UIView {
         return year
     }()
     
-    public init(frame: CGRect, date: Date = Date(), style: Style = Style(), years: Int = 4, timeHourSystem: TimeHourSystem = .twentyFourHour) {
+    public init(frame: CGRect, date: Date = Date(), style: Style = Style(), years: Int = 4) {
         self.style = style
         self.yearData = YearData(date: date, years: years, style: style)
-        self.dayData = DayData(yearData: yearData, timeSystem: timeHourSystem)
-        self.weekData = WeekData(yearData: yearData, timeSystem: timeHourSystem)
-        self.monthData = MonthData(yearData: yearData)
+        self.dayData = DayData(yearData: yearData, timeSystem: style.timeHourSystem, startDay: style.startWeekDay)
+        self.weekData = WeekData(yearData: yearData, timeSystem: style.timeHourSystem, startDay: style.startWeekDay)
+        self.monthData = MonthData(yearData: yearData, startDay: style.startWeekDay)
         super.init(frame: frame)
         
         if let defaultType = style.defaultType {
@@ -122,17 +93,18 @@ public final class CalendarView: UIView {
     
     public func set(type: CalendarType, date: Date) {
         self.type = type
+        let newDate = conertDate(date)
         switchTypeCalendar(type: type)
         
         switch type {
         case .day:
-            dayCalendar.setDate(date: date)
+            dayCalendar.setDate(date: newDate)
         case .week:
-            weekCalendar.setDate(date: date)
+            weekCalendar.setDate(date: newDate)
         case .month:
-            monthCalendar.setDate(date: date)
+            monthCalendar.setDate(date: newDate)
         case .year:
-            yearCalendar.setDate(date: date)
+            yearCalendar.setDate(date: newDate)
         }
     }
     
@@ -150,20 +122,28 @@ public final class CalendarView: UIView {
     }
     
     public func scrollToDate(date: Date) {
+        let newDate = conertDate(date)
+        
         switch type {
         case .day:
-            dayCalendar.setDate(date: date)
+            dayCalendar.setDate(date: newDate)
         case .week:
-            weekCalendar.setDate(date: date)
+            weekCalendar.setDate(date: newDate)
         case .month:
-            monthCalendar.setDate(date: date)
+            monthCalendar.setDate(date: newDate)
         case .year:
-            yearCalendar.setDate(date: date)
+            yearCalendar.setDate(date: newDate)
         }
+    }
+    
+    private func conertDate(_ date: Date) -> Date {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.date(from: "\(date.year)-\(date.month)-\(date.day)") ?? date
     }
 }
 
-extension CalendarView: CalendarSelectDateDelegate {
+extension CalendarView: CalendarPrivateDelegate {
     func didSelectCalendarDate(_ date: Date?, type: CalendarType) {
         delegate?.didSelectDate(date: date, type: type)
     }
@@ -179,9 +159,15 @@ extension CalendarView: CalendarSelectDateDelegate {
     func didSelectCalendarMore(_ date: Date, frame: CGRect?) {
         delegate?.didSelectMore(date, frame: frame)
     }
+    
+    func getEventViewerFrame(frame: CGRect) {
+        var newFrame = frame
+        newFrame.origin = .zero
+        delegate?.eventViewerFrame(newFrame)
+    }
 }
 
-extension CalendarView: CalendarFrameDelegate {
+extension CalendarView: CalendarFrameProtocol {
     public func reloadFrame(frame: CGRect) {
         self.frame = frame
         dayCalendar.reloadFrame(frame: frame)
@@ -263,3 +249,38 @@ public struct Event {
     public init() {}
 }
 
+protocol CalendarFrameProtocol {
+    func reloadFrame(frame: CGRect)
+}
+
+protocol CalendarPrivateDelegate: AnyObject {
+    func didSelectCalendarDate(_ date: Date?, type: CalendarType)
+    func didSelectCalendarEvents(_ events: [Event])
+    func didSelectCalendarEvent(_ event: Event, frame: CGRect?)
+    func didSelectCalendarMore(_ date: Date, frame: CGRect?)
+    func getEventViewerFrame(frame: CGRect)
+}
+
+extension CalendarPrivateDelegate {
+    func getEventViewerFrame(frame: CGRect) {}
+}
+
+public protocol CalendarDataSource: AnyObject {
+    func eventsForCalendar() -> [Event]
+}
+
+public protocol CalendarDelegate: AnyObject {
+    func didSelectDate(date: Date?, type: CalendarType)
+    func didSelectEvents(_ events: [Event])
+    func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?)
+    func didSelectMore(_ date: Date, frame: CGRect?)
+    func eventViewerFrame(_ frame: CGRect)
+}
+
+public extension CalendarDelegate {
+    func didSelectDate(date: Date?, type: CalendarType) {}
+    func didSelectEvents(_ events: [Event]) {}
+    func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?) {}
+    func didSelectMore(_ date: Date, frame: CGRect?) {}
+    func eventViewerFrame(_ frame: CGRect) {}
+}

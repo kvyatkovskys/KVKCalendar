@@ -66,6 +66,17 @@ extension Date {
         return gregorian.date(byAdding: .day, value: 1, to: sunday!)
     }
     
+    var startSundayOfWeek: Date? {
+        var gregorian = Calendar(identifier: .gregorian)
+        gregorian.timeZone = TimeZone(abbreviation: "UTC")!
+        let sunday = gregorian.date(from: gregorian.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))
+        let components = gregorian.dateComponents([.weekday], from: self)
+        guard components.weekday != 7 else {
+            return self
+        }
+        return sunday
+    }
+    
     var endOfWeek: Date? {
         var gregorian = Calendar(identifier: .gregorian)
         gregorian.timeZone = TimeZone(abbreviation: "UTC")!

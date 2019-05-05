@@ -55,7 +55,14 @@ final class WeekHeaderView: UIView {
     }
     
     fileprivate func addViews(frame: CGRect, fromYear: Bool) {
-        let days = DayType.allCases.filter({ $0 != .empty })
+        var days = DayType.allCases.filter({ $0 != .empty })
+        
+        if let idx = days.firstIndex(where: { $0 == .sunday }), style.startWeekDay == .sunday {
+            let leftDays = days[..<idx]
+            days[..<idx] = []
+            days += leftDays
+        }
+        
         let width = frame.width / CGFloat(days.count)
         for (idx, value) in days.enumerated() {
             let label = UILabel(frame: CGRect(x: width * CGFloat(idx),
@@ -83,9 +90,10 @@ final class WeekHeaderView: UIView {
     }
     
     fileprivate func setDateToTitle(date: Date?, style: Style) {
-        var styleMonth = style
-        if let date = date, !styleMonth.monthStyle.isHiddenTitleDate {
-            titleLabel.text = styleMonth.monthStyle.formatter.string(from: date)
+        if let date = date, !style.monthStyle.isHiddenTitleDate {
+            var monthStyle = style.monthStyle
+            let formatter = monthStyle.formatter
+            titleLabel.text = formatter.string(from: date)
         }
     }
     
@@ -94,7 +102,7 @@ final class WeekHeaderView: UIView {
     }
 }
 
-extension WeekHeaderView: CalendarFrameDelegate {
+extension WeekHeaderView: CalendarFrameProtocol {
     func reloadFrame(frame: CGRect) {
         self.frame.size.width = frame.width
         titleLabel.removeFromSuperview()
