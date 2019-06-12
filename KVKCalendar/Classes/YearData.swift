@@ -92,7 +92,8 @@ struct YearData {
         let numDays = range.count
         formatter.dateFormat = "yyyy-MM-dd"
         formatter.timeZone = style.timezone
-        
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        formatter.locale = Locale(identifier: "en_US")
         var arrDates = [Date]()
         for day in 1...numDays {
             let dateString = "\(components.year ?? 0) \(month) \(day)"
@@ -103,6 +104,7 @@ struct YearData {
         
         formatter.dateFormat = "d"
         let formatterDay = DateFormatter()
+        formatterDay.locale = Locale(identifier: "en_US")
         formatterDay.dateFormat = "EE"
         
         let days = arrDates.map({ (date) -> Day in

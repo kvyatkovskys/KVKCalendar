@@ -124,6 +124,10 @@ extension DayViewCalendar: TimelineDelegate {
     func swipeX(transform: CGAffineTransform) {
 
     }
+
+    func swipeXStart() {
+        
+    }
 }
 
 extension DayViewCalendar: CalendarFrameProtocol {

@@ -63,6 +63,7 @@ final class WeekViewCalendar: UIView {
         addSubview(topBackgroundView)
         topBackgroundView.addSubview(scrollHeaderDay)
         addSubview(timelineView)
+        scrollHeaderDay.swipeDelegate = timelineView
     }
     
     func setDate(date: Date) {
@@ -99,10 +100,7 @@ final class WeekViewCalendar: UIView {
     }
     
     private func getScrollDate(date: Date) -> Date? {
-        guard style.startWeekDay == .sunday else {
-            return date.startOfWeek
-        }
-        return date.startSundayOfWeek
+        return date.startOfWeek
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -147,6 +145,10 @@ extension WeekViewCalendar: TimelineDelegate {
     }
     
     func swipeX(transform: CGAffineTransform) {
-        
+        scrollHeaderDay.collectionView.contentOffset.x = scrollHeaderDay.lastContentOffset - transform.tx
+    }
+
+    func swipeXStart() {
+        scrollHeaderDay.lastContentOffset = scrollHeaderDay.collectionView.contentOffset.x
     }
 }

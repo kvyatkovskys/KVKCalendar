@@ -12,6 +12,7 @@ protocol TimelineDelegate: AnyObject {
     func nextDate()
     func previousDate()
     func swipeX(transform: CGAffineTransform)
+    func swipeXStart()
 }
 
 final class TimelineView: UIView {
@@ -87,6 +88,9 @@ final class TimelineView: UIView {
         }
         
         let eventViews = events + eventsAllDay
+        if gesture.state == .began {
+            delegate?.swipeXStart()
+        }
         
         switch gesture.state {
         case .began, .changed:
@@ -118,34 +122,37 @@ final class TimelineView: UIView {
             }, completion: nil)
         case .cancelled, .ended:
             guard endGesure else {
-                delegate?.swipeX(transform: .identity)
-                
                 UIView.animate(withDuration: 0.3,
                                delay: 0,
                                usingSpringWithDamping: 0.6,
                                initialSpringVelocity: 0.8,
                                options: .curveLinear,
                                animations: {
-                                eventViews.forEach { (view) in
-                                    view.transform = .identity
-                                }
+                                   self.delegate?.swipeX(transform: .identity)
+                                   eventViews.forEach { (view) in 
+                                       view.transform = .identity
+                                   }
                 }, completion: nil)
                 break
             }
             
             let previousDay = translation.x > 0
             let translationX = previousDay ? frame.width : -frame.width
-            delegate?.swipeX(transform: CGAffineTransform(translationX: translation.x, y: 0))
             
             UIView.animate(withDuration: 0.3, animations: {
+                self.delegate?.swipeX(transform: CGAffineTransform(translationX: translationX, y: 0))
+
                 eventViews.forEach { (view) in
                     view.transform = CGAffineTransform(translationX: translationX, y: 0)
                 }
             }, completion: { [weak delegate = self.delegate] _ in
+                self.scrollView.subviews.forEach({ $0.removeFromSuperview() })
                 guard previousDay else {
+                    delegate?.swipeX(transform: .identity)
                     delegate?.nextDate()
                     return
                 }
+                delegate?.swipeX(transform: .identity)
                 delegate?.previousDate()
             })
         case .possible:
@@ -210,20 +217,19 @@ final class TimelineView: UIView {
                 }
             }
         })
-        //if let maxCross = countEvents.sorted(by: { $0.count > $1.count }).first {
-//        countEvents.forEach { (crossPage) in
-//            countEvents = countEvents.reduce([], { (acc, cross) -> [CrossPage] in
-//                var newCross = cross
-//                guard crossPage.start..<crossPage.end ~= newCross.start else {
-//                    if let idx = acc.index(where: { $0.start..<$0.end ~= newCross.start }) {
-//                        newCross.count = acc[idx].count
-//                    }
-//                    return acc + [newCross]
-//                }
-//                newCross.count = crossPage.count
-//                return acc + [newCross]
-//            })
-//        }
+        if let maxCross = countEvents.sorted(by: { $0.count > $1.count }).first {
+            countEvents = countEvents.reduce([], { (acc, cross) -> [CrossPage] in
+                var newCross = cross
+                guard maxCross.start..<maxCross.end ~= newCross.start else {
+                    if let idx = acc.firstIndex(where: { $0.start..<$0.end ~= newCross.start }) {
+                        newCross.count = acc[idx].count
+                    }
+                    return acc + [newCross]
+                }
+                newCross.count = maxCross.count
+                return acc + [newCross]
+            })
+        }
         
         return countEvents
     }
@@ -441,7 +447,7 @@ final class TimelineView: UIView {
             
             let eventsByDate = filteredEvents
                 .filter({ compareStartDate(event: $0, date: date) })
-                //.sorted(by: { ($0.end.hour - $0.start.hour) > ($1.end.hour - $1.start.hour) })
+                .sorted(by: { ($0.end.hour - $0.start.hour) > ($1.end.hour - $1.start.hour) })
             
             let allDayEvents = filteredAllDayEvents.filter({ compareStartDate(event: $0, date: date) || compareEndDate(event: $0, date: date) })
             createAlldayEvents(events: allDayEvents, date: date, width: widthPage, originX: pointX)
@@ -523,6 +529,31 @@ extension TimelineView: CalendarFrameProtocol {
 extension TimelineView: AllDayEventDelegate {
     func didSelectAllDayEvent(_ event: Event, frame: CGRect?) {
         delegate?.didSelectEventInTimeline(event, frame: frame)
+    }
+}
+
+extension TimelineView: ScrollDayHeaderSwipeDelegate {
+    func swipeHeader(transform: CGAffineTransform) {
+        let events = scrollView.subviews.filter({ $0 is EventPageView })
+        var eventsAllDay: [UIView]
+
+        if style.allDayStyle.isPinned {
+            eventsAllDay = subviews.filter({ $0 is AllDayEventView })
+            eventsAllDay += subviews.filter({ $0 is AllDayTitleView })
+        } else {
+            eventsAllDay = scrollView.subviews.filter({ $0 is AllDayEventView })
+            eventsAllDay += scrollView.subviews.filter({ $0 is AllDayTitleView })
+        }
+
+        let eventViews = events + eventsAllDay
+
+        eventViews.forEach { (view) in
+            view.transform = transform
+        }
+    }
+
+    func weekSwiped() {
+        scrollView.subviews.forEach({ $0.removeFromSuperview() })
     }
 }
 

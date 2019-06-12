@@ -93,7 +93,7 @@ public final class CalendarView: UIView {
     
     public func set(type: CalendarType, date: Date) {
         self.type = type
-        let newDate = conertDate(date)
+        let newDate = convertDate(date)
         switchTypeCalendar(type: type)
         
         switch type {
@@ -122,7 +122,7 @@ public final class CalendarView: UIView {
     }
     
     public func scrollToDate(date: Date) {
-        let newDate = conertDate(date)
+        let newDate = convertDate(date)
         
         switch type {
         case .day:
@@ -136,10 +136,13 @@ public final class CalendarView: UIView {
         }
     }
     
-    private func conertDate(_ date: Date) -> Date {
+    private func convertDate(_ date: Date) -> Date {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
-        return formatter.date(from: "\(date.year)-\(date.month)-\(date.day)") ?? date
+        // For situations when UTC have yesterday time
+        let localDate = formatter.string(from: date)
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        return formatter.date(from: localDate) ?? date
     }
 }
 

@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension Date {
+public extension Date {
     var minute: Int {
         let calendar = Calendar.current
         let componet = calendar.dateComponents([.minute], from: self)
@@ -62,8 +62,10 @@ extension Date {
     var startOfWeek: Date? {
         var gregorian = Calendar(identifier: .gregorian)
         gregorian.timeZone = TimeZone(abbreviation: "UTC")!
-        let sunday = gregorian.date(from: gregorian.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))
-        return gregorian.date(byAdding: .day, value: 1, to: sunday!)
+        guard let sunday = gregorian.date(from: gregorian.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self)),
+              let selfDate = gregorian.date(from: gregorian.dateComponents([.year, .month, .day], from: self))else { return nil }
+
+        return selfDate == sunday ? gregorian.date(byAdding: .day, value: -6, to: sunday) : gregorian.date(byAdding: .day, value: 1, to: sunday)
     }
     
     var startSundayOfWeek: Date? {
@@ -80,7 +82,10 @@ extension Date {
     var endOfWeek: Date? {
         var gregorian = Calendar(identifier: .gregorian)
         gregorian.timeZone = TimeZone(abbreviation: "UTC")!
-        return gregorian.date(byAdding: .day, value: 6, to: startOfWeek ?? self)
+        guard let sunday = gregorian.date(from: gregorian.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self)),
+              let selfDate = gregorian.date(from: gregorian.dateComponents([.year, .month, .day], from: self)) else { return nil }
+
+        return selfDate == sunday ? sunday : gregorian.date(byAdding: .day, value: 7, to: sunday)
     }
     
     var startOfMonth: Date? {

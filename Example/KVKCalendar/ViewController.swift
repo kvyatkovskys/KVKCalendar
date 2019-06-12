@@ -234,7 +234,7 @@ struct Item: Decodable {
     }
 }
 
-extension UIColor {
+private extension UIColor {
     static func hexStringToColor(hex: String) -> UIColor {
         var cString = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
         
