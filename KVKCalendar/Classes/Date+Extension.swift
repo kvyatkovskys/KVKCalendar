@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension Date {
+public extension Date {
     var minute: Int {
         let calendar = Calendar.current
         let componet = calendar.dateComponents([.minute], from: self)
@@ -63,7 +63,7 @@ extension Date {
         var gregorian = Calendar(identifier: .gregorian)
         gregorian.timeZone = TimeZone(abbreviation: "UTC")!
         let sunday = gregorian.date(from: gregorian.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))
-        return gregorian.date(byAdding: .day, value: 1, to: sunday!)
+        return gregorian.date(byAdding: .day, value: 1, to: sunday ?? self)
     }
     
     var startSundayOfWeek: Date? {

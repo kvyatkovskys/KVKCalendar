@@ -72,8 +72,8 @@ final class WeekHeaderView: UIView {
             label.adjustsFontSizeToFitWidth = true
             label.textAlignment = .center
             label.textColor = (value == .sunday || value == .saturday) ? .gray : .black
-            if !style.headerScrollStyle.titleDays.isEmpty {
-                label.text = style.headerScrollStyle.titleDays[value.shiftDay]
+            if !style.headerScrollStyle.titleDays.isEmpty, let title = style.headerScrollStyle.titleDays[safe: value.shiftDay] {
+                label.text = title
             } else {
                 label.text = value.rawValue.capitalized
             }

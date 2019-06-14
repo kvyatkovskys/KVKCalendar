@@ -169,7 +169,7 @@ extension YearViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFl
         let newDate = formatter.date(from: "\(data.moveDate.day).\(date.month).\(date.year)")
         data.moveDate = newDate ?? Date()
         headerView.date = newDate
-        delegate?.didSelectCalendarDate(newDate, type: .month)
+        delegate?.didSelectCalendarDate(newDate, type: style.yearStyle.selectCalendarType)
         collectionView.reloadData()
     }
     

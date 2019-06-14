@@ -90,9 +90,7 @@ final class TimelineView: UIView {
         
         switch gesture.state {
         case .began, .changed:
-            guard abs(velocity.y) < abs(velocity.x) else {
-                break
-            }
+            guard abs(velocity.y) < abs(velocity.x) else { break }
             
             guard endGesure else {
                 delegate?.swipeX(transform: CGAffineTransform(translationX: translation.x, y: 0))
@@ -106,9 +104,9 @@ final class TimelineView: UIView {
         case .failed:
             delegate?.swipeX(transform: .identity)
             
-            UIView.animate(withDuration: 0.3,
-                           delay: 0,
-                           usingSpringWithDamping: 0.6,
+            UIView.animate(withDuration: 0.4,
+                           delay: 0.08,
+                           usingSpringWithDamping: 0.8,
                            initialSpringVelocity: 0.8,
                            options: .curveLinear,
                            animations: {
@@ -120,9 +118,9 @@ final class TimelineView: UIView {
             guard endGesure else {
                 delegate?.swipeX(transform: .identity)
                 
-                UIView.animate(withDuration: 0.3,
-                               delay: 0,
-                               usingSpringWithDamping: 0.6,
+                UIView.animate(withDuration: 0.4,
+                               delay: 0.08,
+                               usingSpringWithDamping: 0.8,
                                initialSpringVelocity: 0.8,
                                options: .curveLinear,
                                animations: {
@@ -135,19 +133,20 @@ final class TimelineView: UIView {
             
             let previousDay = translation.x > 0
             let translationX = previousDay ? frame.width : -frame.width
-            delegate?.swipeX(transform: CGAffineTransform(translationX: translation.x, y: 0))
             
-            UIView.animate(withDuration: 0.3, animations: {
+            UIView.animate(withDuration: 0.3) {
                 eventViews.forEach { (view) in
                     view.transform = CGAffineTransform(translationX: translationX, y: 0)
                 }
-            }, completion: { [weak delegate = self.delegate] _ in
-                guard previousDay else {
-                    delegate?.nextDate()
-                    return
-                }
-                delegate?.previousDate()
-            })
+            }
+            
+            delegate?.swipeX(transform: CGAffineTransform(translationX: translation.x, y: 0))
+            guard previousDay else {
+                delegate?.nextDate()
+                return
+            }
+            
+            delegate?.previousDate()
         case .possible:
             break
         @unknown default:
@@ -258,7 +257,7 @@ final class TimelineView: UIView {
     
     private func setOffsetScrollView() {
         var offsetY: CGFloat = 0
-        if !subviews.filter({ $0 is AllDayEventView }).isEmpty || !scrollView.subviews.filter({ $0 is AllDayEventView }).isEmpty {
+        if !subviews.filter({ $0 is AllDayTitleView }).isEmpty || !scrollView.subviews.filter({ $0 is AllDayTitleView }).isEmpty {
             offsetY = style.allDayStyle.height
         }
         scrollView.contentInset = UIEdgeInsets(top: offsetY, left: 0, bottom: 0, right: 0)
@@ -286,7 +285,7 @@ final class TimelineView: UIView {
             return time.valueHash == hour.hashValue }).first as? TimelineLabel
     }
     
-    private func moveCurrentLineHour() {
+    private func currentLineHour() {
         let date = Date()
         var comps = style.calendar.dateComponents([.era, .year, .month, .day, .hour, .minute], from: date)
         comps.minute = (comps.minute ?? 0) + 1
@@ -353,7 +352,7 @@ final class TimelineView: UIView {
         
         scrollView.addSubview(currentTimeLabel)
         scrollView.addSubview(currentLineView)
-        moveCurrentLineHour()
+        currentLineHour()
         
         if let timeNext = getTimelineLabel(hour: date.hour + 1) {
             timeNext.isHidden = currentTimeLabel.frame.intersects(timeNext.frame)
@@ -362,7 +361,7 @@ final class TimelineView: UIView {
     }
     
     private func calculatePointYByMinute(_ minute: Int, time: TimelineLabel) -> CGFloat {
-        var pointY: CGFloat = 0
+        let pointY: CGFloat
         if 1...59 ~= minute {
             let minutePercent = 59.0 / CGFloat(minute)
             let newY = (style.timelineStyle.offsetTimeY + time.frame.height) / minutePercent
@@ -378,20 +377,15 @@ final class TimelineView: UIView {
         return pointY
     }
     
-    func scrollToCurrentTimeEvent(startHour: Int) {
-        guard style.timelineStyle.scrollToCurrentHour else { return }
-        
-        guard let time = getTimelineLabel(hour: Date().hour) else {
+    func scrollToCurrentTime(startHour: Int) {
+        guard let time = getTimelineLabel(hour: Date().hour), style.timelineStyle.scrollToCurrentHour else {
             scrollView.setContentOffset(.zero, animated: true)
             return
         }
-        var pointY = time.frame.origin.y
-        if !subviews.filter({ $0 is AllDayTitleView }).isEmpty {
-            if style.allDayStyle.isPinned {
-                pointY -= style.allDayStyle.height
-            }
-        }
-        scrollView.setContentOffset(CGPoint(x: 0, y: pointY), animated: true)
+        
+        var frame = scrollView.frame
+        frame.origin.y = time.frame.origin.y
+        scrollView.scrollRectToVisible(frame, animated: true)
     }
     
     func createTimelinePage(dates: [Date?], events: [Event], selectedDate: Date?) {
@@ -507,7 +501,7 @@ final class TimelineView: UIView {
             }
         }
         setOffsetScrollView()
-        scrollToCurrentTimeEvent(startHour: start)
+        scrollToCurrentTime(startHour: start)
         showCurrentLineHour()
     }
 }

@@ -104,14 +104,12 @@ struct YearData {
         formatter.dateFormat = "d"
         let formatterDay = DateFormatter()
         formatterDay.dateFormat = "EE"
+        formatterDay.locale = Locale(identifier: "en_US")
         
-        let days = arrDates.map({ (date) -> Day in
-            let day = Day(day: formatter.string(from: date),
-                          type: DayType(rawValue: formatterDay.string(from: date).uppercased()),
-                          date: date,
-                          data: [])
-            return day
-        })
+        let days = arrDates.map({ Day(day: formatter.string(from: $0),
+                                      type: DayType(rawValue: formatterDay.string(from: $0).uppercased()),
+                                      date: $0,
+                                      data: []) })
         
         guard let shift = days.first?.type else { return days }
         var shiftDays = [Day]()

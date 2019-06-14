@@ -39,8 +39,8 @@ final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
                 return
             }
             
-            if !style.titleDays.isEmpty {
-                titleLabel.text = style.titleDays[day.type.shiftDay]
+            if !style.titleDays.isEmpty, let title = style.titleDays[safe: day.type.shiftDay] {
+                titleLabel.text = title
             } else {
                 titleLabel.text = day.type.rawValue
             }

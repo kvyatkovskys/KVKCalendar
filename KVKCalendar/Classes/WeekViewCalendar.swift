@@ -80,11 +80,7 @@ final class WeekViewCalendar: UIView {
         guard let scrollDate = getScrollDate(date: date),
             let idx = data.days.firstIndex(where: { $0.date?.year == scrollDate.year
                 && $0.date?.month == scrollDate.month
-                && $0.date?.day == scrollDate.day })
-            else
-        {
-            return
-        }
+                && $0.date?.day == scrollDate.day }) else { return }
         
         let endIdx: Int
         if idx < 6 {
@@ -147,6 +143,6 @@ extension WeekViewCalendar: TimelineDelegate {
     }
     
     func swipeX(transform: CGAffineTransform) {
-        
+        scrollHeaderDay.scrollHeaderByTransform(transform)
     }
 }

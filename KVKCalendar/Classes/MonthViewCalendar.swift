@@ -172,7 +172,7 @@ extension MonthViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateF
         let date = data.days[indexPath.row].date
         data.moveDate = date ?? data.moveDate
         headerView.date = date
-        delegate?.didSelectCalendarDate(date, type: .month)
+        delegate?.didSelectCalendarDate(date, type: style.monthStyle.selectCalendarType)
         collectionView.reloadData()
     }
     
