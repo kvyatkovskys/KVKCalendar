@@ -91,7 +91,6 @@ final class TimelineView: UIView {
         switch gesture.state {
         case .began, .changed:
             guard abs(velocity.y) < abs(velocity.x) else { break }
-            
             guard endGesure else {
                 delegate?.swipeX(transform: CGAffineTransform(translationX: translation.x, y: 0))
                 
@@ -103,31 +102,11 @@ final class TimelineView: UIView {
             gesture.state = .ended
         case .failed:
             delegate?.swipeX(transform: .identity)
-            
-            UIView.animate(withDuration: 0.4,
-                           delay: 0.08,
-                           usingSpringWithDamping: 0.8,
-                           initialSpringVelocity: 0.8,
-                           options: .curveLinear,
-                           animations: {
-                            eventViews.forEach { (view) in
-                                view.transform = .identity
-                            }
-            }, completion: nil)
+            UIView.identityViews(eventViews)
         case .cancelled, .ended:
             guard endGesure else {
                 delegate?.swipeX(transform: .identity)
-                
-                UIView.animate(withDuration: 0.4,
-                               delay: 0.08,
-                               usingSpringWithDamping: 0.8,
-                               initialSpringVelocity: 0.8,
-                               options: .curveLinear,
-                               animations: {
-                                eventViews.forEach { (view) in
-                                    view.transform = .identity
-                                }
-                }, completion: nil)
+                UIView.identityViews(eventViews)
                 break
             }
             
@@ -143,7 +122,7 @@ final class TimelineView: UIView {
             delegate?.swipeX(transform: CGAffineTransform(translationX: translation.x, y: 0))
             guard previousDay else {
                 delegate?.nextDate()
-                return
+                break
             }
             
             delegate?.previousDate()

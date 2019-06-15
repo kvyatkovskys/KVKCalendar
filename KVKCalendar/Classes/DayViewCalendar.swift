@@ -75,6 +75,7 @@ final class DayViewCalendar: UIView {
     
     func addEventView(view: UIView) {
         guard UIDevice.current.userInterfaceIdiom == .pad else { return }
+        
         var eventFrame = timelineView.frame
         eventFrame.origin.x = eventFrame.width
         if UIDevice.current.orientation.isPortrait {
@@ -122,7 +123,7 @@ extension DayViewCalendar: TimelineDelegate {
     }
     
     func swipeX(transform: CGAffineTransform) {
-
+        scrollHeaderDay.scrollHeaderTitleByTransform(transform)
     }
 }
 
@@ -135,7 +136,7 @@ extension DayViewCalendar: CalendarFrameProtocol {
         var timelineFrame = timelineView.frame
         timelineFrame.size.height = frame.height - scrollHeaderDay.frame.height
         if UIDevice.current.userInterfaceIdiom == .pad {
-            timelineFrame.size.width = frame.size.width - style.timelineStyle.widthEventViewer
+            timelineFrame.size.width = frame.width - style.timelineStyle.widthEventViewer
             if let idx = subviews.firstIndex(where: { $0.tag == -1 }) {
                 let eventView = subviews[idx]
                 var eventFrame = timelineFrame
@@ -156,6 +157,8 @@ extension DayViewCalendar: CalendarFrameProtocol {
                 eventView.frame = eventFrame
                 delegate?.getEventViewerFrame(frame: eventFrame)
             }
+        } else {
+            timelineFrame.size.width = frame.width
         }
         timelineView.reloadFrame(frame: timelineFrame)
         timelineView.createTimelinePage(dates: [data.date], events: data.events, selectedDate: data.date)
