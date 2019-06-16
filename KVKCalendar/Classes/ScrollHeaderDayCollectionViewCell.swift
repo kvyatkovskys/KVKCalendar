@@ -13,7 +13,7 @@ private let heightTitle: CGFloat = 25
 final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
     static let cellIdentifier = #file
     
-    fileprivate lazy var titleLabel: UILabel = {
+    private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 11)
@@ -21,7 +21,7 @@ final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
-    fileprivate lazy var dateLabel: UILabel = {
+    private lazy var dateLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 18)
@@ -104,7 +104,7 @@ final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    fileprivate func weekendsDays(day: Day) {
+    private func weekendsDays(day: Day) {
         guard day.type == .saturday || day.type == .sunday else {
             isNowDate(date: day.date, colorText: style.colorDate)
             titleLabel.textColor = style.colorDate
@@ -114,7 +114,7 @@ final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
         titleLabel.textColor = style.colorWeekendDate
     }
     
-    fileprivate func isNowDate(date: Date?, colorText: UIColor) {
+    private func isNowDate(date: Date?, colorText: UIColor) {
         let nowDate = Date()
         if date?.month == nowDate.month && date?.day == nowDate.day {
             dateLabel.textColor = style.colorCurrentDate

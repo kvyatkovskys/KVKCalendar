@@ -185,10 +185,7 @@ extension ScrollDayHeaderView: CalendarFrameProtocol {
     }
     
     private func getScrollDate(date: Date) -> Date? {
-        guard style.startWeekDay == .sunday else {
-            return date.startOfWeek
-        }
-        return date.startSundayOfWeek
+        return style.startWeekDay == .sunday ? date.startSundayOfWeek : date.startMondayOfWeek
     }
 }
 
@@ -238,12 +235,14 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
         switch type {
         case .day:
             guard moveDate != days[indexPath.row].date, let date = days[indexPath.row].date else { return }
+            
             moveDate = date
             delegate?.didSelectDateScrollHeader(moveDate, type: .day)
             setDateToTitle(date: moveDate)
             collectionView.reloadData()
         case .week:
             guard let date = days[indexPath.row].date else { return }
+            
             moveDate = date
             delegate?.didSelectDateScrollHeader(moveDate, type: style.weekStyle.selectCalendarType)
             setDateToTitle(date: moveDate)

@@ -20,4 +20,3 @@ extension Collection {
         return indices.contains(index) ? self[index] : nil
     }
 }
-

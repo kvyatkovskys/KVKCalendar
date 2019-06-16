@@ -95,10 +95,7 @@ final class WeekViewCalendar: UIView {
     }
     
     private func getScrollDate(date: Date) -> Date? {
-        guard style.startWeekDay == .sunday else {
-            return date.startOfWeek
-        }
-        return date.startSundayOfWeek
+        return style.startWeekDay == .sunday ? date.startSundayOfWeek : date.startMondayOfWeek
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -109,6 +106,7 @@ final class WeekViewCalendar: UIView {
 extension WeekViewCalendar: ScrollDayHeaderDelegate {
     func didSelectDateScrollHeader(_ date: Date?, type: CalendarType) {
         guard let selectDate = date else { return }
+        
         data.date = selectDate
         getVisibleDates(date: selectDate)
         delegate?.didSelectCalendarDate(selectDate, type: type)

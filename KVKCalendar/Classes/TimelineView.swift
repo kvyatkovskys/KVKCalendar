@@ -172,38 +172,31 @@ final class TimelineView: UIView {
         return lines
     }
     
-    private func countEventsInHour(events: [Event]) -> [CrossPage] {
-        var countEvents = [CrossPage]()
-        events.forEach({ (item) in
-            let cross = CrossPage(start: item.start.timeIntervalSince1970,
-                                  end: item.end.timeIntervalSince1970,
-                                  count: 1)
-            countEvents.append(cross)
-            
-            let includes = events.filter({ $0.start.timeIntervalSince1970..<$0.end.timeIntervalSince1970 ~= cross.start })
-            let count = includes.count
-            for (idx, crossPage) in countEvents.enumerated() where count > 1 && crossPage.count < count {
-                if crossPage.start..<crossPage.end ~= cross.start {
-                    countEvents[idx].count = count
-                }
-            }
-        })
-        //if let maxCross = countEvents.sorted(by: { $0.count > $1.count }).first {
-//        countEvents.forEach { (crossPage) in
-//            countEvents = countEvents.reduce([], { (acc, cross) -> [CrossPage] in
-//                var newCross = cross
-//                guard crossPage.start..<crossPage.end ~= newCross.start else {
-//                    if let idx = acc.index(where: { $0.start..<$0.end ~= newCross.start }) {
-//                        newCross.count = acc[idx].count
-//                    }
-//                    return acc + [newCross]
-//                }
-//                newCross.count = crossPage.count
-//                return acc + [newCross]
-//            })
-//        }
+    private func countEventsInHour(events: [Event]) -> [CrossPageTree] {
+        var eventsTemp = events
+        var newCountsEvents = [CrossPageTree]()
         
-        return countEvents
+        while !eventsTemp.isEmpty {
+            guard let event = eventsTemp.first else { return newCountsEvents }
+            
+            if let idx = newCountsEvents.firstIndex(where: { $0.parent.start..<$0.parent.end ~= event.start.timeIntervalSince1970 }) {
+                newCountsEvents[idx].children.append(Child(start: event.start.timeIntervalSince1970,
+                                                           end: event.end.timeIntervalSince1970))
+                newCountsEvents[idx].count = newCountsEvents[idx].children.count + 1
+            } else if let idx = newCountsEvents.firstIndex(where: { $0.excludeToChildren(event) }) {
+                newCountsEvents[idx].children.append(Child(start: event.start.timeIntervalSince1970,
+                                                           end: event.end.timeIntervalSince1970))
+                newCountsEvents[idx].count = newCountsEvents[idx].children.count + 1
+            } else {
+                newCountsEvents.append(CrossPageTree(parent: Parent(start: event.start.timeIntervalSince1970,
+                                                                    end: event.end.timeIntervalSince1970),
+                                                     children: []))
+            }
+            
+            eventsTemp.removeFirst()
+        }
+        
+        return newCountsEvents
     }
     
     private func createAlldayEvents(events: [Event], date: Date?, width: CGFloat, originX: CGFloat) {
@@ -414,25 +407,25 @@ final class TimelineView: UIView {
             
             let eventsByDate = filteredEvents
                 .filter({ compareStartDate(event: $0, date: date) })
-                //.sorted(by: { ($0.end.hour - $0.start.hour) > ($1.end.hour - $1.start.hour) })
+                .sorted(by: { $0.start < $1.start })
             
             let allDayEvents = filteredAllDayEvents.filter({ compareStartDate(event: $0, date: date) || compareEndDate(event: $0, date: date) })
             createAlldayEvents(events: allDayEvents, date: date, width: widthPage, originX: pointX)
             
             // count event cross in one hour
             let countEventsOneHour = countEventsInHour(events: eventsByDate)
-            var pagesCached = [CachedPage]()
+            var pagesCached = [EventPageView]()
             
             if !eventsByDate.isEmpty {
                 // create event
                 var newFrame = CGRect(x: 0, y: 0, width: 0, height: heightPage)
                 eventsByDate.forEach { (event) in
                     times.forEach({ (time) in
-                        // detect position 'y'
+                        // calculate position 'y'
                         if event.start.hour.hashValue == time.valueHash {
                             newFrame.origin.y = calculatePointYByMinute(event.start.minute, time: time)
                         }
-                        // detect height event
+                        // calculate 'height' event
                         if event.end.hour.hashValue == time.valueHash {
                             let summHeight = (CGFloat(time.tag) * (style.timelineStyle.offsetTimeY + time.frame.height)) - newFrame.origin.y + (time.frame.height / 2)
                             if event.end.minute > 0 && event.end.minute <= 59 {
@@ -445,22 +438,26 @@ final class TimelineView: UIView {
                         }
                     })
                     
-                    // calculate count of event in one hour
+                    // calculate 'width' and position 'x'
                     var newWidth = widthPage
                     var newPointX = pointX
-                    if let idx = countEventsOneHour.firstIndex(where: { $0.count > 1 && $0.start == event.start.timeIntervalSince1970 }) {
-                        newWidth /= CGFloat(countEventsOneHour[idx].count)
-                        if !pagesCached.filter({ $0.start..<$0.end ~= event.start.timeIntervalSince1970 }).isEmpty {
-                            let countPages = pagesCached.filter({ $0.start..<$0.end ~= event.start.timeIntervalSince1970 })
-                            for _ in 1...countPages.count {
-                                newPointX += newWidth
-                            }
-                            if !pagesCached.filter({ Date(timeIntervalSince1970: $0.start).day == date?.day
-                                && Int($0.page.frame.origin.x) == Int(newPointX)
-                                && Int($0.page.frame.origin.y) < Int(newFrame.origin.y)
-                                && Int($0.page.frame.origin.y + $0.page.frame.height) > Int(newFrame.origin.y) }).isEmpty
-                            {
-                                newPointX += newWidth
+                    if let idx = countEventsOneHour.firstIndex(where: { $0.parent.start == event.start.timeIntervalSince1970 || $0.equalToChildren(event) }) {
+                        let count = countEventsOneHour[idx].count
+                        newWidth /= CGFloat(count)
+                        
+                        if count > 1 {
+                            var stop = pagesCached.isEmpty
+                            while !stop {
+                                for page in pagesCached {
+                                    if page.frame.origin.x.rounded() <= newPointX.rounded()
+                                        && newPointX.rounded() <= (page.frame.origin.x + page.frame.width).rounded()
+                                        && page.frame.origin.y.rounded() <= newFrame.origin.y.rounded()
+                                        && newFrame.origin.y <= (page.frame.origin.y + page.frame.height).rounded() {
+                                        newPointX = page.frame.origin.x.rounded() + newWidth
+                                    } else {
+                                        stop = true
+                                    }
+                                }
                             }
                         }
                     }
@@ -473,9 +470,7 @@ final class TimelineView: UIView {
                     page.addGestureRecognizer(tap)
                     
                     scrollView.addSubview(page)
-                    pagesCached.append(CachedPage(page: page,
-                                                  start: event.start.timeIntervalSince1970,
-                                                  end: event.end.timeIntervalSince1970))
+                    pagesCached.append(page)
                 }
             }
         }
@@ -499,14 +494,38 @@ extension TimelineView: AllDayEventDelegate {
     }
 }
 
-private struct CrossPage: Hashable {
-    let start: TimeInterval
-    let end: TimeInterval
+private struct CrossPageTree: Hashable {
+    let parent: Parent
+    var children: [Child]
     var count: Int
+    
+    init(parent: Parent, children: [Child]) {
+        self.parent = parent
+        self.children = children
+        self.count = children.count + 1
+    }
+    
+    func equalToChildren(_ event: Event) -> Bool {
+        return children.contains(where: { $0.start == event.start.timeIntervalSince1970 })
+    }
+    
+    func excludeToChildren(_ event: Event) -> Bool {
+        return children.contains(where: { $0.start..<$0.end ~= event.start.timeIntervalSince1970 })
+    }
+    
+    static func == (lhs: CrossPageTree, rhs: CrossPageTree) -> Bool {
+        return lhs.parent == rhs.parent
+            && lhs.children == rhs.children
+            && lhs.count == rhs.count
+    }
 }
 
-private struct CachedPage: Hashable {
-    let page: EventPageView
+private struct Parent: Equatable, Hashable {
+    let start: TimeInterval
+    let end: TimeInterval
+}
+
+private struct Child: Equatable, Hashable {
     let start: TimeInterval
     let end: TimeInterval
 }
