@@ -8,31 +8,31 @@
 import UIKit
 
 final class WeekHeaderView: UIView {
-    fileprivate let style: Style
-    fileprivate let fromYear: Bool
+    private let style: Style
+    private let fromYear: Bool
     
-    fileprivate let titleLabel: UILabel = {
+    private let titleLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
         return label
     }()
     
     var font: UIFont = .systemFont(ofSize: 17) {
-        didSet {
+        willSet {
             subviews.filter({ $0 is UILabel }).forEach { (label) in
                 if let label = label as? UILabel {
-                    label.font = font
+                    label.font = newValue
                 }
             }
         }
     }
     
     var backgroundColorWeekends: UIColor = .clear {
-        didSet {
+        willSet {
             subviews.filter({ $0 is UILabel }).forEach { (label) in
                 if let label = label as? UILabel {
                     if label.tag == DayType.sunday.shiftDay || label.tag == DayType.saturday.shiftDay {
-                        label.backgroundColor = backgroundColorWeekends
+                        label.backgroundColor = newValue
                     } else {
                         label.backgroundColor = .clear
                     }
@@ -42,8 +42,8 @@ final class WeekHeaderView: UIView {
     }
     
     var date: Date? {
-        didSet {
-            setDateToTitle(date: date, style: style)
+        willSet {
+            setDateToTitle(date: newValue, style: style)
         }
     }
     
@@ -54,7 +54,7 @@ final class WeekHeaderView: UIView {
         addViews(frame: frame, fromYear: fromYear)
     }
     
-    fileprivate func addViews(frame: CGRect, fromYear: Bool) {
+    private func addViews(frame: CGRect, fromYear: Bool) {
         var days = DayType.allCases.filter({ $0 != .empty })
         
         if let idx = days.firstIndex(where: { $0 == .sunday }), style.startWeekDay == .sunday {
@@ -72,8 +72,8 @@ final class WeekHeaderView: UIView {
             label.adjustsFontSizeToFitWidth = true
             label.textAlignment = .center
             label.textColor = (value == .sunday || value == .saturday) ? .gray : .black
-            if !style.headerScrollStyle.titleDays.isEmpty {
-                label.text = style.headerScrollStyle.titleDays[value.shiftDay]
+            if !style.headerScrollStyle.titleDays.isEmpty, let title = style.headerScrollStyle.titleDays[safe: value.shiftDay] {
+                label.text = title
             } else {
                 label.text = value.rawValue.capitalized
             }
@@ -89,7 +89,7 @@ final class WeekHeaderView: UIView {
         }
     }
     
-    fileprivate func setDateToTitle(date: Date?, style: Style) {
+    private func setDateToTitle(date: Date?, style: Style) {
         if let date = date, !style.monthStyle.isHiddenTitleDate {
             var monthStyle = style.monthStyle
             let formatter = monthStyle.formatter

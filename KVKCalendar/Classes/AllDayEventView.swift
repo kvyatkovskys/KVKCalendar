@@ -34,7 +34,7 @@ protocol AllDayEventDelegate: AnyObject {
 }
 
 final class AllDayEventView: UIView {
-    fileprivate let events: [Event]
+    private let events: [Event]
     weak var delegate: AllDayEventDelegate?
     
     init(events: [Event], frame: CGRect, style: AllDayStyle, date: Date?) {
@@ -71,7 +71,7 @@ final class AllDayEventView: UIView {
         }
     }
     
-    @objc fileprivate func tapOnEvent(gesture: UITapGestureRecognizer) {
+    @objc private func tapOnEvent(gesture: UITapGestureRecognizer) {
         guard let hashValue = gesture.view?.tag else { return }
         if let idx = events.firstIndex(where: { "\($0.id)".hashValue == hashValue }) {
             let event = events[idx]

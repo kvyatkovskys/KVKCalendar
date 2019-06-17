@@ -7,13 +7,13 @@
 
 import UIKit
 
-fileprivate let pointX: CGFloat = 5
+private let pointX: CGFloat = 5
 
 final class EventPageView: UIView {
-    fileprivate let style: TimelineStyle
-    fileprivate let color: UIColor
+    private let style: TimelineStyle
+    private let color: UIColor
     
-    fileprivate let textView: UITextView = {
+    private let textView: UITextView = {
         let text = UITextView()
         text.backgroundColor = .clear
         text.isScrollEnabled = false
@@ -23,7 +23,7 @@ final class EventPageView: UIView {
         return text
     }()
     
-    fileprivate lazy var iconFileImageView: UIImageView = {
+    private lazy var iconFileImageView: UIImageView = {
         let image = UIImageView(frame: CGRect(x: 0, y: 2, width: 10, height: 10))
         image.image = style.iconFile.withRenderingMode(.alwaysTemplate)
         image.tintColor = style.colorIconFile

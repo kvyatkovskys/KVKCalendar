@@ -47,6 +47,7 @@ public struct HeaderScrollStyle {
     public var colorBackgroundSelectDate: UIColor = .black
     public var colorSelectDate: UIColor = .white
     public var colorWeekendDate: UIColor = .gray
+    public var isScrollEnabled: Bool = true
 }
 
 public struct TimelineStyle {
@@ -83,6 +84,7 @@ public struct WeekStyle {
     public var colorSelectDate: UIColor = .white
     public var colorWeekendDate: UIColor = .gray
     public var colorBackgroundWeekendDate: UIColor = gainsboro.withAlphaComponent(0.4)
+    public var selectCalendarType: CalendarType = .day
 }
 
 public struct MonthStyle {
@@ -114,6 +116,7 @@ public struct MonthStyle {
     public var colorBackgroundWeekendDate: UIColor = gainsboro.withAlphaComponent(0.4)
     public var colorBackgroundDate: UIColor = .white
     public var scrollDirection: UICollectionView.ScrollDirection = .vertical
+    public var selectCalendarType: CalendarType = .week
 }
 
 public struct YearStyle {
@@ -140,6 +143,7 @@ public struct YearStyle {
     public var aligmentTitleHeader: NSTextAlignment = .center
     public var fontDayTitle: UIFont = .systemFont(ofSize: 15)
     public var colorDayTitle: UIColor = .black
+    public var selectCalendarType: CalendarType = .month
 }
 
 public struct AllDayStyle {
