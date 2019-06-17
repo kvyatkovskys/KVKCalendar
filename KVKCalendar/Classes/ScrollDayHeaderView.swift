@@ -64,7 +64,7 @@ final class ScrollDayHeaderView: UIView {
     
     func scrollHeaderTitleByTransform(_ transform: CGAffineTransform) {
         guard !transform.isIdentity else {
-            UIView.identityViews([titleLabel])
+            identityViews([titleLabel])
             return
         }
         titleLabel.transform = transform
@@ -148,6 +148,15 @@ final class ScrollDayHeaderView: UIView {
         if !self.animated {
             self.animated = true
         }
+    }
+    
+    private func identityViews(duration: TimeInterval = 0.4, delay: TimeInterval = 0.07, _ views: [UIView], action: @escaping (() -> Void) = {}) {
+        UIView.animate(withDuration: duration, delay: delay, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.8, options: .curveLinear, animations: {
+            views.forEach { (view) in
+                view.transform = .identity
+            }
+            action()
+        }, completion: nil)
     }
     
     required init?(coder aDecoder: NSCoder) {
