@@ -2,7 +2,7 @@
 # * https://www.objc.io/issues/6-build-tools/travis-ci/
 # * https://github.com/supermarin/xcpretty#usage
 
-osx_image: xcode10.2.1
+osx_image: xcode10.2
 language: swift
 #cache: false
 # before_install:
