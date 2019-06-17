@@ -102,11 +102,11 @@ final class TimelineView: UIView {
             gesture.state = .ended
         case .failed:
             delegate?.swipeX(transform: .identity)
-            UIView.identityViews(eventViews)
+            identityViews(eventViews)
         case .cancelled, .ended:
             guard endGesure else {
                 delegate?.swipeX(transform: .identity)
-                UIView.identityViews(eventViews)
+                identityViews(eventViews)
                 break
             }
             
@@ -347,6 +347,15 @@ final class TimelineView: UIView {
             pointY = (CGFloat(time.tag) * (style.timelineStyle.offsetTimeY + time.frame.height)) + (time.frame.height / 2)
         }
         return pointY
+    }
+    
+    private func identityViews(duration: TimeInterval = 0.4, delay: TimeInterval = 0.07, _ views: [UIView], action: @escaping (() -> Void) = {}) {
+        UIView.animate(withDuration: duration, delay: delay, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.8, options: .curveLinear, animations: {
+            views.forEach { (view) in
+                view.transform = .identity
+            }
+            action()
+        }, completion: nil)
     }
     
     func scrollToCurrentTime(startHour: Int) {
