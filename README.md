@@ -23,6 +23,7 @@ it, simply add the following line to your Podfile or Cartfile:
 
 ```ruby
 pod 'KVKCalendar'
+
 github 'kvyatkovskys/KVKCalendar'
 ```
 
