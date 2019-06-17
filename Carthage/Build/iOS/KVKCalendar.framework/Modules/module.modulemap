@@ -1,0 +1,11 @@
+framework module KVKCalendar {
+  umbrella header "KVKCalendar-umbrella.h"
+
+  export *
+  module * { export * }
+}
+
+module KVKCalendar.Swift {
+    header "KVKCalendar-Swift.h"
+    requires objc
+}
