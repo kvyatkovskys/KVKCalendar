@@ -39,6 +39,7 @@
 		F91321A621DE24D60076B714 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91321A521DE24D60076B714 /* CalendarView.swift */; };
 		F91321A821DE40590076B714 /* YearHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91321A721DE40590076B714 /* YearHeaderView.swift */; };
 		F987481B22B509F200E9F4C5 /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F987481A22B509F200E9F4C5 /* View+Extension.swift */; };
+		F987481D22B7E24800E9F4C5 /* CalendarModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F987481C22B7E24800E9F4C5 /* CalendarModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -112,6 +113,7 @@
 		F91321A521DE24D60076B714 /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CalendarView.swift; path = KVKCalendar/Classes/CalendarView.swift; sourceTree = "<group>"; };
 		F91321A721DE40590076B714 /* YearHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = YearHeaderView.swift; path = KVKCalendar/Classes/YearHeaderView.swift; sourceTree = "<group>"; };
 		F987481A22B509F200E9F4C5 /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
+		F987481C22B7E24800E9F4C5 /* CalendarModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarModel.swift; sourceTree = "<group>"; };
 		FA2CDFE87246C08EF83AEEA2FA5D1E0A /* Pods-KVKCalendar_Example-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-KVKCalendar_Example-acknowledgements.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -197,6 +199,7 @@
 				F913218921DE19260076B714 /* TimelineLabel.swift */,
 				F913218B21DE193A0076B714 /* Style.swift */,
 				F91321A521DE24D60076B714 /* CalendarView.swift */,
+				F987481C22B7E24800E9F4C5 /* CalendarModel.swift */,
 			);
 			name = KVKCalendar;
 			path = ../..;
@@ -448,6 +451,7 @@
 				F913217C21DE185E0076B714 /* YearViewCalendar.swift in Sources */,
 				F91321A421DE1A670076B714 /* AllDayEventView.swift in Sources */,
 				F987481B22B509F200E9F4C5 /* View+Extension.swift in Sources */,
+				F987481D22B7E24800E9F4C5 /* CalendarModel.swift in Sources */,
 				F913219821DE19E00076B714 /* EventPageView.swift in Sources */,
 				F913219A21DE19F80076B714 /* DayViewCalendar.swift in Sources */,
 				F913218021DE18980076B714 /* YearCollectionViewCell.swift in Sources */,
