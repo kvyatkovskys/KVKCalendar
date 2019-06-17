@@ -4,7 +4,7 @@
 
 osx_image: xcode10.2.1
 language: swift
-cache: false
+#cache: false
 # before_install:
 # - gem install cocoapods # Since Travis is not always on latest version
 # - pod install --project-directory=Example
