@@ -9,7 +9,7 @@
 import UIKit
 
 final class EventViewer: UIView {
-    fileprivate let textLabel: UILabel = {
+    private let textLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 19)
         label.textAlignment = .center

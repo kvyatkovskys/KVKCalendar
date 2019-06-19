@@ -165,7 +165,7 @@ final class ScrollDayHeaderView: UIView {
 }
 
 extension ScrollDayHeaderView: CalendarFrameProtocol {
-    func reloadFrame(frame: CGRect) {
+    func reloadFrame(_ frame: CGRect) {
         self.frame.size.width = frame.width - self.frame.origin.x
         titleLabel.frame.size.width = self.frame.width
         

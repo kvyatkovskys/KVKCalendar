@@ -86,7 +86,7 @@ final class ViewController: UIViewController {
         super.viewDidLayoutSubviews()
         var frame = view.frame
         frame.origin.y = 0
-        calendarView.reloadFrame(frame: frame)
+        calendarView.reloadFrame(frame)
     }
     
     @objc func today(sender: UIBarButtonItem) {

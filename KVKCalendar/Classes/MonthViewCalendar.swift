@@ -102,9 +102,9 @@ extension MonthViewCalendar: MonthCellDelegate {
 }
 
 extension MonthViewCalendar: CalendarFrameProtocol {
-    func reloadFrame(frame: CGRect) {
+    func reloadFrame(_ frame: CGRect) {
         self.frame = frame
-        headerView.reloadFrame(frame: frame)
+        headerView.reloadFrame(frame)
         
         collectionView.removeFromSuperview()
         collectionView = createCollectionView(frame: self.frame)

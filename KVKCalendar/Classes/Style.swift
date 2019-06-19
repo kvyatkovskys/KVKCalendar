@@ -7,7 +7,7 @@
 
 import UIKit
 
-let gainsboro: UIColor = UIColor(red: 220 / 255, green: 220 / 255, blue: 220 / 255, alpha: 1)
+private let gainsboro: UIColor = UIColor(red: 220 / 255, green: 220 / 255, blue: 220 / 255, alpha: 1)
 
 public struct Style {
     public var timelineStyle = TimelineStyle()

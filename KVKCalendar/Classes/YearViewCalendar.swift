@@ -86,9 +86,9 @@ final class YearViewCalendar: UIView {
 }
 
 extension YearViewCalendar: CalendarFrameProtocol {
-    func reloadFrame(frame: CGRect) {
+    func reloadFrame(_ frame: CGRect) {
         self.frame = frame
-        headerView.reloadFrame(frame: self.frame)
+        headerView.reloadFrame(self.frame)
         
         collectionView.removeFromSuperview()
         collectionView = createCollectionView(frame: self.frame)

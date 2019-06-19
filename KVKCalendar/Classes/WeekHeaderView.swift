@@ -103,7 +103,7 @@ final class WeekHeaderView: UIView {
 }
 
 extension WeekHeaderView: CalendarFrameProtocol {
-    func reloadFrame(frame: CGRect) {
+    func reloadFrame(_ frame: CGRect) {
         self.frame.size.width = frame.width
         titleLabel.removeFromSuperview()
         DayType.allCases.filter({ $0 != .empty }).forEach { (day) in

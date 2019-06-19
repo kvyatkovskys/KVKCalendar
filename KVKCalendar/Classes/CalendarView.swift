@@ -169,12 +169,12 @@ extension CalendarView: CalendarPrivateDelegate {
 }
 
 extension CalendarView: CalendarFrameProtocol {
-    public func reloadFrame(frame: CGRect) {
+    public func reloadFrame(_ frame: CGRect) {
         self.frame = frame
-        dayCalendar.reloadFrame(frame: frame)
-        weekCalendar.reloadFrame(frame: frame)
-        monthCalendar.reloadFrame(frame: frame)
-        yearCalendar.reloadFrame(frame: frame)
+        dayCalendar.reloadFrame(frame)
+        weekCalendar.reloadFrame(frame)
+        monthCalendar.reloadFrame(frame)
+        yearCalendar.reloadFrame(frame)
     }
 }
 
@@ -251,7 +251,7 @@ public struct Event {
 }
 
 protocol CalendarFrameProtocol {
-    func reloadFrame(frame: CGRect)
+    func reloadFrame(_ frame: CGRect)
 }
 
 protocol CalendarPrivateDelegate: AnyObject {

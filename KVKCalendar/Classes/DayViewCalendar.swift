@@ -126,10 +126,10 @@ extension DayViewCalendar: TimelineDelegate {
 }
 
 extension DayViewCalendar: CalendarFrameProtocol {
-    func reloadFrame(frame: CGRect) {
+    func reloadFrame(_ frame: CGRect) {
         self.frame = frame
         topBackgroundView.frame.size.width = frame.width
-        scrollHeaderDay.reloadFrame(frame: frame)
+        scrollHeaderDay.reloadFrame(frame)
         
         var timelineFrame = timelineView.frame
         timelineFrame.size.height = frame.height - scrollHeaderDay.frame.height
@@ -158,7 +158,7 @@ extension DayViewCalendar: CalendarFrameProtocol {
         } else {
             timelineFrame.size.width = frame.width
         }
-        timelineView.reloadFrame(frame: timelineFrame)
+        timelineView.reloadFrame(timelineFrame)
         timelineView.createTimelinePage(dates: [data.date], events: data.events, selectedDate: data.date)
     }
 }

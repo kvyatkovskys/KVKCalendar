@@ -490,7 +490,7 @@ final class TimelineView: UIView {
 }
 
 extension TimelineView: CalendarFrameProtocol {
-    func reloadFrame(frame: CGRect) {
+    func reloadFrame(_ frame: CGRect) {
         self.frame.size = frame.size
         scrollView.frame.size = frame.size
         scrollView.contentSize.width = frame.size.width
