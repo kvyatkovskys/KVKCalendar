@@ -11,7 +11,7 @@ struct MonthData {
     var days: [Day]
     var moveDate: Date
     
-    fileprivate let cachedDays: [Day]
+    private let cachedDays: [Day]
     
     init(yearData: YearData, startDay: StartDayType) {
         self.days = yearData.months.reduce([], { $0 + $1.days })
@@ -19,7 +19,7 @@ struct MonthData {
         self.cachedDays = days
     }
     
-    fileprivate func compareDate(day: Day, date: Date?) -> Bool {
+    private func compareDate(day: Day, date: Date?) -> Bool {
         return day.date?.year == date?.year && day.date?.month == date?.month
     }
     

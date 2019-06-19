@@ -181,14 +181,13 @@ extension ScrollDayHeaderView: CalendarFrameProtocol {
         guard let scrollDate = getScrollDate(date: moveDate),
             let idx = days.firstIndex(where: { $0.date?.year == scrollDate.year
                 && $0.date?.month == scrollDate.month
-                && $0.date?.day == scrollDate.day })
-            else {
-                return
-        }
+                && $0.date?.day == scrollDate.day }) else { return }
+        
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
                                              at: .left,
                                              animated: false)
+            self.lastContentOffset = self.collectionView.contentOffset.x
         }
         collectionView.reloadData()
     }

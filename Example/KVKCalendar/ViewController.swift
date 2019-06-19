@@ -25,8 +25,6 @@ final class ViewController: UIViewController {
     }()
     
     private lazy var calendarView: CalendarView = {
-        var frame = view.frame
-        frame.size.height -= (navigationController?.navigationBar.frame.height ?? 0) + UIApplication.shared.statusBarFrame.height
         var style = Style()
         if UIDevice.current.userInterfaceIdiom == .phone {
             style.monthStyle.isHiddenSeporator = true
@@ -43,7 +41,7 @@ final class ViewController: UIViewController {
         style.startWeekDay = .sunday
         style.timeHourSystem = .twelveHour
         
-        let calendar = CalendarView(frame: frame, date: selectDate, style: style)
+        let calendar = CalendarView(frame: view.frame, date: selectDate, style: style)
         calendar.delegate = self
         calendar.dataSource = self
         return calendar
@@ -84,9 +82,10 @@ final class ViewController: UIViewController {
         }
     }
     
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        var frame = calendarView.frame
-        frame.size = size
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        var frame = view.frame
+        frame.origin.y = 0
         calendarView.reloadFrame(frame: frame)
     }
     

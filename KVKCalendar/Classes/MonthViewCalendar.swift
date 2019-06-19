@@ -8,14 +8,14 @@
 import UIKit
 
 final class MonthViewCalendar: UIView {
-    fileprivate var data: MonthData
-    fileprivate let style: Style
-    fileprivate var collectionView: UICollectionView!
-    fileprivate var animated: Bool = false
+    private var data: MonthData
+    private let style: Style
+    private var collectionView: UICollectionView!
+    private var animated: Bool = false
     
     weak var delegate: CalendarPrivateDelegate?
     
-    fileprivate lazy var headerView: WeekHeaderView = {
+    private lazy var headerView: WeekHeaderView = {
         let height: CGFloat
         if style.monthStyle.isHiddenTitleDate {
             height = style.monthStyle.heightHeaderWeek
@@ -27,7 +27,7 @@ final class MonthViewCalendar: UIView {
         return view
     }()
     
-    fileprivate lazy var layout: UICollectionViewLayout = {
+    private lazy var layout: UICollectionViewLayout = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 0
@@ -61,7 +61,7 @@ final class MonthViewCalendar: UIView {
         collectionView.reloadData()
     }
     
-    fileprivate func createCollectionView(frame: CGRect) -> UICollectionView {
+    private func createCollectionView(frame: CGRect) -> UICollectionView {
         let collection = UICollectionView(frame: frame, collectionViewLayout: layout)
         collection.backgroundColor = .clear
         collection.isPagingEnabled = true
@@ -72,7 +72,7 @@ final class MonthViewCalendar: UIView {
         return collection
     }
     
-    fileprivate func scrollToDate(date: Date, animated: Bool) {
+    private func scrollToDate(date: Date, animated: Bool) {
         delegate?.didSelectCalendarDate(date, type: .month)
         if let idx = data.days.firstIndex(where: { $0.date?.month == date.month && $0.date?.year == date.year }) {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {

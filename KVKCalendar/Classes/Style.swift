@@ -115,7 +115,7 @@ public struct MonthStyle {
     public var colorSeporator: UIColor = gainsboro.withAlphaComponent(0.9)
     public var colorBackgroundWeekendDate: UIColor = gainsboro.withAlphaComponent(0.4)
     public var colorBackgroundDate: UIColor = .white
-    public var scrollDirection: UICollectionView.ScrollDirection = .vertical
+    var scrollDirection: UICollectionView.ScrollDirection = .vertical
     public var selectCalendarType: CalendarType = .week
 }
 

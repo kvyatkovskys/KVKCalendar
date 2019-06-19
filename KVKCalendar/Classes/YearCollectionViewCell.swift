@@ -12,7 +12,7 @@ private let daysInWeek = 7
 final class YearCollectionViewCell: UICollectionViewCell {
     static let cellIdentifier = #file
     
-    fileprivate let titleLabel: UILabel = {
+    private let titleLabel: UILabel = {
         let label = UILabel()
         return label
     }()
@@ -66,7 +66,7 @@ final class YearCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    fileprivate func addDayToLabel(days: ArraySlice<Day>, step: Int) {
+    private func addDayToLabel(days: ArraySlice<Day>, step: Int) {
         let width = frame.width / CGFloat(daysInWeek)
         let newY: CGFloat = 70
         let height: CGFloat = (frame.height - newY) / CGFloat(daysInWeek - 1)
@@ -106,7 +106,7 @@ final class YearCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    fileprivate func weekendsDays(day: Day, label: UILabel, view: UIView) {
+    private func weekendsDays(day: Day, label: UILabel, view: UIView) {
         guard day.type == .saturday || day.type == .sunday else {
             isNowDate(date: day.date, weekend: false, label: label, view: view)
             return
@@ -114,7 +114,7 @@ final class YearCollectionViewCell: UICollectionViewCell {
         isNowDate(date: day.date, weekend: true, label: label, view: view)
     }
     
-    fileprivate func isNowDate(date: Date?, weekend: Bool, label: UILabel, view: UIView) {
+    private func isNowDate(date: Date?, weekend: Bool, label: UILabel, view: UIView) {
         let nowDate = Date()
         
         if weekend {

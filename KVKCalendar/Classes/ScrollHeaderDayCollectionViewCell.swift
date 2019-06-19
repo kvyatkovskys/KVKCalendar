@@ -54,12 +54,12 @@ final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
             let nowDate = Date()
             guard nowDate.month != day.date?.month else {
                 // remove the selection if the current date (for the day) does not match the selected one
-                if selectDate.day != nowDate.day && day.date?.day == nowDate.day {
+                if selectDate.day != nowDate.day, day.date?.day == nowDate.day, day.date?.year == nowDate.year {
                     dateLabel.textColor = style.colorBackgroundCurrentDate
                     dateLabel.backgroundColor = .clear
                 }
                 // mark the selected date, which is not the same as the current one
-                if day.date?.month == selectDate.month && day.date?.day == selectDate.day && selectDate.day != nowDate.day {
+                if day.date?.month == selectDate.month, day.date?.day == selectDate.day, selectDate.day != nowDate.day {
                     dateLabel.textColor = style.colorSelectDate
                     dateLabel.backgroundColor = style.colorBackgroundSelectDate
                     dateLabel.layer.cornerRadius = dateLabel.frame.width / 2
@@ -69,7 +69,7 @@ final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
             }
             
             // select date not in the current month
-            guard day.date?.month == selectDate.month && day.date?.day == selectDate.day else {
+            guard day.date?.month == selectDate.month, day.date?.day == selectDate.day else {
                 weekendsDays(day: day)
                 return
             }
@@ -116,7 +116,7 @@ final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
     
     private func isNowDate(date: Date?, colorText: UIColor) {
         let nowDate = Date()
-        if date?.month == nowDate.month && date?.day == nowDate.day {
+        if date?.month == nowDate.month, date?.day == nowDate.day, date?.year == nowDate.year {
             dateLabel.textColor = style.colorCurrentDate
             dateLabel.backgroundColor = style.colorBackgroundCurrentDate
             dateLabel.layer.cornerRadius = dateLabel.frame.height / 2
