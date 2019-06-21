@@ -154,7 +154,7 @@ extension ViewController {
             event.id = idx
             event.start = startDate
             event.end = endDate
-            event.color = item.color
+            event.color = EventColor(item.color)
             event.isAllDay = item.allDay
             event.isContainsFile = !item.files.isEmpty
             event.textForMonth = item.title

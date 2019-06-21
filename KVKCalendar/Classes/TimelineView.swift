@@ -99,6 +99,7 @@ final class TimelineView: UIView {
                 }
                 break
             }
+    
             gesture.state = .ended
         case .failed:
             delegate?.swipeX(transform: .identity)
@@ -113,19 +114,20 @@ final class TimelineView: UIView {
             let previousDay = translation.x > 0
             let translationX = previousDay ? frame.width : -frame.width
             
-            UIView.animate(withDuration: 0.3) {
+            UIView.animate(withDuration: 0.2, animations: { [weak delegate = self.delegate] in
+                delegate?.swipeX(transform: CGAffineTransform(translationX: translationX * 0.8, y: 0))
+                
                 eventViews.forEach { (view) in
                     view.transform = CGAffineTransform(translationX: translationX, y: 0)
                 }
+            }) { [weak delegate = self.delegate] (_) in
+                guard previousDay else {
+                    delegate?.nextDate()
+                    return
+                }
+                
+                delegate?.previousDate()
             }
-            
-            delegate?.swipeX(transform: CGAffineTransform(translationX: translation.x, y: 0))
-            guard previousDay else {
-                delegate?.nextDate()
-                break
-            }
-            
-            delegate?.previousDate()
         case .possible:
             break
         @unknown default:
@@ -455,18 +457,17 @@ final class TimelineView: UIView {
                         newWidth /= CGFloat(count)
                         
                         if count > 1 {
-                            var stop = pagesCached.isEmpty
-                            while !stop {
+                            var stop = pagesCached.count
+                            while stop != 0 {
                                 for page in pagesCached {
                                     if page.frame.origin.x.rounded() <= newPointX.rounded()
                                         && newPointX.rounded() <= (page.frame.origin.x + page.frame.width).rounded()
                                         && page.frame.origin.y.rounded() <= newFrame.origin.y.rounded()
                                         && newFrame.origin.y <= (page.frame.origin.y + page.frame.height).rounded() {
                                         newPointX = page.frame.origin.x.rounded() + newWidth
-                                    } else {
-                                        stop = true
                                     }
                                 }
+                                stop -= 1
                             }
                         }
                     }
