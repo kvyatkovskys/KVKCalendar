@@ -14,7 +14,7 @@ struct DayData {
     var events: [Event] = []
     
     init(yearData: YearData, timeSystem: TimeHourSystem, startDay: StartDayType) {
-        self.date = yearData.moveDate
+        self.date = yearData.date
         let days = yearData.months.reduce([], { $0 + $1.days }).filter({ $0.type != .empty })
         var tempDays = [Day]()
         if let firstDay = days.first?.type {

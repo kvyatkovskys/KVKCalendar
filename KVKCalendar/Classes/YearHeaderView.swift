@@ -45,10 +45,13 @@ final class YearHeaderView: UIView {
     }
 }
 
-extension YearHeaderView: CalendarFrameProtocol {
+extension YearHeaderView: CalendarSettingProtocol {
     func reloadFrame(_ frame: CGRect) {
         self.frame.size.width = frame.width
         titleLabel.frame.size.width = frame.width
     }
     
+    func updateStyle(_ style: Style) {
+        self.style = style
+    }
 }

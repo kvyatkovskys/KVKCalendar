@@ -11,7 +11,7 @@ protocol TimelineDelegate: AnyObject {
     func didSelectEventInTimeline(_ event: Event, frame: CGRect?)
     func nextDate()
     func previousDate()
-    func swipeX(transform: CGAffineTransform)
+    func swipeX(transform: CGAffineTransform, stop: Bool)
 }
 
 final class TimelineView: UIView {
@@ -92,7 +92,7 @@ final class TimelineView: UIView {
         case .began, .changed:
             guard abs(velocity.y) < abs(velocity.x) else { break }
             guard endGesure else {
-                delegate?.swipeX(transform: CGAffineTransform(translationX: translation.x, y: 0))
+                delegate?.swipeX(transform: CGAffineTransform(translationX: translation.x, y: 0), stop: false)
                 
                 eventViews.forEach { (view) in
                     view.transform = CGAffineTransform(translationX: translation.x, y: 0)
@@ -102,11 +102,11 @@ final class TimelineView: UIView {
     
             gesture.state = .ended
         case .failed:
-            delegate?.swipeX(transform: .identity)
+            delegate?.swipeX(transform: .identity, stop: false)
             identityViews(eventViews)
         case .cancelled, .ended:
             guard endGesure else {
-                delegate?.swipeX(transform: .identity)
+                delegate?.swipeX(transform: .identity, stop: false)
                 identityViews(eventViews)
                 break
             }
@@ -115,7 +115,7 @@ final class TimelineView: UIView {
             let translationX = previousDay ? frame.width : -frame.width
             
             UIView.animate(withDuration: 0.2, animations: { [weak delegate = self.delegate] in
-                delegate?.swipeX(transform: CGAffineTransform(translationX: translationX * 0.8, y: 0))
+                delegate?.swipeX(transform: CGAffineTransform(translationX: translationX * 0.8, y: 0), stop: true)
                 
                 eventViews.forEach { (view) in
                     view.transform = CGAffineTransform(translationX: translationX, y: 0)
@@ -490,11 +490,15 @@ final class TimelineView: UIView {
     }
 }
 
-extension TimelineView: CalendarFrameProtocol {
+extension TimelineView: CalendarSettingProtocol {
     func reloadFrame(_ frame: CGRect) {
         self.frame.size = frame.size
         scrollView.frame.size = frame.size
         scrollView.contentSize.width = frame.size.width
+    }
+    
+    func updateStyle(_ style: Style) {
+        self.style = style
     }
 }
 

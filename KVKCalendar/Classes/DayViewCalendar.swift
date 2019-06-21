@@ -8,7 +8,7 @@
 import UIKit
 
 final class DayViewCalendar: UIView {
-    private let style: Style
+    private var style: Style
     private var data: DayData
     
     weak var delegate: CalendarPrivateDelegate?
@@ -62,9 +62,7 @@ final class DayViewCalendar: UIView {
         self.style = style
         self.data = data
         super.init(frame: frame)
-        addSubview(topBackgroundView)
-        topBackgroundView.addSubview(scrollHeaderDay)
-        addSubview(timelineView)
+        setUI()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -87,9 +85,9 @@ final class DayViewCalendar: UIView {
         delegate?.getEventViewerFrame(frame: eventFrame)
     }
     
-    func setDate(date: Date) {
+    func setDate(_ date: Date) {
         data.date = date
-        scrollHeaderDay.setDate(date: date)
+        scrollHeaderDay.setDate(date)
         reloadData(events: data.events)
     }
     
@@ -120,12 +118,12 @@ extension DayViewCalendar: TimelineDelegate {
         scrollHeaderDay.selectDate(offset: -1)
     }
     
-    func swipeX(transform: CGAffineTransform) {
+    func swipeX(transform: CGAffineTransform, stop: Bool) {
         scrollHeaderDay.scrollHeaderTitleByTransform(transform)
     }
 }
 
-extension DayViewCalendar: CalendarFrameProtocol {
+extension DayViewCalendar: CalendarSettingProtocol {
     func reloadFrame(_ frame: CGRect) {
         self.frame = frame
         topBackgroundView.frame.size.width = frame.width
@@ -160,5 +158,18 @@ extension DayViewCalendar: CalendarFrameProtocol {
         }
         timelineView.reloadFrame(timelineFrame)
         timelineView.createTimelinePage(dates: [data.date], events: data.events, selectedDate: data.date)
+    }
+    
+    func updateStyle(_ style: Style) {
+        self.style = style
+        setUI()
+        setDate(data.date)
+    }
+    
+    func setUI() {
+        subviews.forEach({ $0.removeFromSuperview() })
+        addSubview(topBackgroundView)
+        topBackgroundView.addSubview(scrollHeaderDay)
+        addSubview(timelineView)
     }
 }

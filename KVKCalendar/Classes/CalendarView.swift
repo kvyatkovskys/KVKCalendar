@@ -14,7 +14,7 @@ public final class CalendarView: UIView {
         return type
     }
     
-    private let style: Style
+    private var style: Style
     private var type = CalendarType.day
     private var yearData: YearData
     private var weekData: WeekData
@@ -98,13 +98,13 @@ public final class CalendarView: UIView {
         
         switch type {
         case .day:
-            dayCalendar.setDate(date: newDate)
+            dayCalendar.setDate(newDate)
         case .week:
-            weekCalendar.setDate(date: newDate)
+            weekCalendar.setDate(newDate)
         case .month:
-            monthCalendar.setDate(date: newDate)
+            monthCalendar.setDate(newDate)
         case .year:
-            yearCalendar.setDate(date: newDate)
+            yearCalendar.setDate(newDate)
         }
     }
     
@@ -126,13 +126,13 @@ public final class CalendarView: UIView {
         
         switch type {
         case .day:
-            dayCalendar.setDate(date: newDate)
+            dayCalendar.setDate(newDate)
         case .week:
-            weekCalendar.setDate(date: newDate)
+            weekCalendar.setDate(newDate)
         case .month:
-            monthCalendar.setDate(date: newDate)
+            monthCalendar.setDate(newDate)
         case .year:
-            yearCalendar.setDate(date: newDate)
+            yearCalendar.setDate(newDate)
         }
     }
     
@@ -168,13 +168,18 @@ extension CalendarView: CalendarPrivateDelegate {
     }
 }
 
-extension CalendarView: CalendarFrameProtocol {
+extension CalendarView: CalendarSettingProtocol {
     public func reloadFrame(_ frame: CGRect) {
         self.frame = frame
         dayCalendar.reloadFrame(frame)
         weekCalendar.reloadFrame(frame)
         monthCalendar.reloadFrame(frame)
         yearCalendar.reloadFrame(frame)
+    }
+    
+    // work in progress
+    func updateStyle(_ style: Style) {
+        self.style = style
     }
 }
 
@@ -260,8 +265,14 @@ public struct Event {
     public init() {}
 }
 
-protocol CalendarFrameProtocol {
+protocol CalendarSettingProtocol {
     func reloadFrame(_ frame: CGRect)
+    func updateStyle(_ style: Style)
+    func setUI()
+}
+
+extension CalendarSettingProtocol {
+    func setUI() {}
 }
 
 protocol CalendarPrivateDelegate: AnyObject {

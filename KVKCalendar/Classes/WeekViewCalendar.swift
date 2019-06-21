@@ -68,15 +68,12 @@ final class WeekViewCalendar: UIView {
         self.style = style
         self.data = data
         super.init(frame: frame)
-        addSubview(topBackgroundView)
-        topBackgroundView.addSubview(scrollHeaderDay)
-        addSubview(timelineView)
-        addCornerLabel()
+        setUI()
     }
     
-    func setDate(date: Date) {
+    func setDate(_ date: Date) {
         data.date = date
-        scrollHeaderDay.setDate(date: date)
+        scrollHeaderDay.setDate(date)
         reloadData(events: data.events)
     }
     
@@ -141,7 +138,7 @@ extension WeekViewCalendar: ScrollDayHeaderDelegate {
     }
 }
 
-extension WeekViewCalendar: CalendarFrameProtocol {
+extension WeekViewCalendar: CalendarSettingProtocol {
     func reloadFrame(_ frame: CGRect) {
         self.frame = frame
         topBackgroundView.frame.size.width = frame.width
@@ -153,6 +150,21 @@ extension WeekViewCalendar: CalendarFrameProtocol {
         timelineView.reloadFrame(timelineFrame)
         timelineView.createTimelinePage(dates: visibleDates, events: data.events, selectedDate: data.date)
         
+        addCornerLabel()
+    }
+    
+    func updateStyle(_ style: Style) {
+        self.style = style
+        setUI()
+        setDate(data.date)
+    }
+    
+    func setUI() {
+        subviews.forEach({ $0.removeFromSuperview() })
+        
+        addSubview(topBackgroundView)
+        topBackgroundView.addSubview(scrollHeaderDay)
+        addSubview(timelineView)
         addCornerLabel()
     }
 }
@@ -170,7 +182,9 @@ extension WeekViewCalendar: TimelineDelegate {
         scrollHeaderDay.selectDate(offset: -7)
     }
     
-    func swipeX(transform: CGAffineTransform) {
+    func swipeX(transform: CGAffineTransform, stop: Bool) {
+        guard !stop else { return }
+        
         scrollHeaderDay.scrollHeaderByTransform(transform)
     }
 }
