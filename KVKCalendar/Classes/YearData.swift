@@ -10,13 +10,14 @@ import Foundation
 private let boxCount = 42
 
 struct YearData {
-    fileprivate let style: Style
+    private let style: Style
+    
     var months = [Month]()
-    var moveDate: Date
+    var date: Date
     
     init(date: Date, years: Int, style: Style) {
         self.style = style
-        self.moveDate = date
+        self.date = date
         // count years for calendar
         let indexsYear = [Int](repeating: 0, count: years).split(half: years / 2)
         let lastYear = indexsYear.left

@@ -8,7 +8,7 @@
 import UIKit
 
 final class WeekHeaderView: UIView {
-    private let style: Style
+    private var style: Style
     private let fromYear: Bool
     
     private let titleLabel: UILabel = {
@@ -102,13 +102,17 @@ final class WeekHeaderView: UIView {
     }
 }
 
-extension WeekHeaderView: CalendarFrameProtocol {
-    func reloadFrame(frame: CGRect) {
+extension WeekHeaderView: CalendarSettingProtocol {
+    func reloadFrame(_ frame: CGRect) {
         self.frame.size.width = frame.width
         titleLabel.removeFromSuperview()
         DayType.allCases.filter({ $0 != .empty }).forEach { (day) in
             subviews.filter({ $0.tag == day.shiftDay }).forEach({ $0.removeFromSuperview() })
         }
         addViews(frame: self.frame, fromYear: fromYear)
+    }
+    
+    func updateStyle(_ style: Style) {
+        self.style = style
     }
 }

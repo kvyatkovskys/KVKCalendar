@@ -10,6 +10,7 @@ import UIKit
 private let pointX: CGFloat = 5
 
 final class EventPageView: UIView {
+    let event: Event
     private let style: TimelineStyle
     private let color: UIColor
     
@@ -31,8 +32,9 @@ final class EventPageView: UIView {
     }()
     
     init(event: Event, style: TimelineStyle, frame: CGRect) {
+        self.event = event
         self.style = style
-        self.color = event.color ?? event.backgroundColor
+        self.color = EventColor(event.color?.value ?? event.backgroundColor).value
         super.init(frame: frame)
         backgroundColor = event.backgroundColor
         

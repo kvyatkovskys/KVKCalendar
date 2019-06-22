@@ -9,7 +9,7 @@ import UIKit
 
 final class YearViewCalendar: UIView {
     fileprivate var data: YearData
-    fileprivate let style: Style
+    fileprivate var style: Style
     fileprivate var animated: Bool = false
     fileprivate var collectionView: UICollectionView!
     
@@ -32,17 +32,12 @@ final class YearViewCalendar: UIView {
         self.data = data
         self.style = style
         super.init(frame: frame)
-        
-        collectionView = createCollectionView(frame: frame)
-        collectionView.frame.origin.y = style.yearStyle.heightTitleHeader
-        collectionView.frame.size.height -= style.yearStyle.heightTitleHeader
-        addSubview(collectionView)
-        addSubview(headerView)        
+        setUI()
     }
     
-    func setDate(date: Date) {
+    func setDate(_ date: Date) {
         headerView.date = date
-        data.moveDate = date
+        data.date = date
         scrollToDate(date: date, animated: animated)
         collectionView.reloadData()
     }
@@ -85,10 +80,10 @@ final class YearViewCalendar: UIView {
     }
 }
 
-extension YearViewCalendar: CalendarFrameProtocol {
-    func reloadFrame(frame: CGRect) {
+extension YearViewCalendar: CalendarSettingProtocol {
+    func reloadFrame(_ frame: CGRect) {
         self.frame = frame
-        headerView.reloadFrame(frame: self.frame)
+        headerView.reloadFrame(self.frame)
         
         collectionView.removeFromSuperview()
         collectionView = createCollectionView(frame: self.frame)
@@ -98,14 +93,14 @@ extension YearViewCalendar: CalendarFrameProtocol {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             guard UIDevice.current.userInterfaceIdiom == .pad else {
-                if let idx = self.data.months.firstIndex(where: { $0.date.year == self.data.moveDate.year && $0.date.month == self.data.moveDate.month }) {
+                if let idx = self.data.months.firstIndex(where: { $0.date.year == self.data.date.year && $0.date.month == self.data.date.month }) {
                     self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
                                                      at: .top,
                                                      animated: false)
                 }
                 return
             }
-            if let idx = self.data.months.firstIndex(where: { $0.date.year == self.data.moveDate.year }) {
+            if let idx = self.data.months.firstIndex(where: { $0.date.year == self.data.date.year }) {
                 self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
                                                  at: .top,
                                                  animated: false)
@@ -113,6 +108,22 @@ extension YearViewCalendar: CalendarFrameProtocol {
         }
         
         collectionView.reloadData()
+    }
+    
+    func updateStyle(_ style: Style) {
+        self.style = style
+        setUI()
+        setDate(data.date)
+    }
+    
+    func setUI() {
+        subviews.forEach({ $0.removeFromSuperview() })
+        
+        collectionView = createCollectionView(frame: frame)
+        collectionView.frame.origin.y = style.yearStyle.heightTitleHeader
+        collectionView.frame.size.height -= style.yearStyle.heightTitleHeader
+        addSubview(collectionView)
+        addSubview(headerView)
     }
 }
 
@@ -130,7 +141,7 @@ extension YearViewCalendar: UICollectionViewDataSource {
                                                       for: indexPath) as? YearCollectionViewCell ?? YearCollectionViewCell()
         let month = data.months[indexPath.row]
         cell.style = style
-        cell.selectDate = data.moveDate
+        cell.selectDate = data.date
         cell.title = month.name
         cell.days = data.addStartEmptyDay(days: month.days, startDay: style.startWeekDay)
         return cell
@@ -143,19 +154,19 @@ extension YearViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFl
         let newMoveDate = cells.reduce([]) { (acc, month) -> [Date?] in
             var resultDate = acc
             guard UIDevice.current.userInterfaceIdiom == .pad else {
-                if let day = month.days.filter({ $0.date?.day == data.moveDate.day }).first {
+                if let day = month.days.filter({ $0.date?.day == data.date.day }).first {
                     resultDate = [day.date]
                 }
                 return resultDate
             }
-            if let day = month.days.filter({ $0.date?.month == data.moveDate.month && $0.date?.day == data.moveDate.day }).first {
+            if let day = month.days.filter({ $0.date?.month == data.date.month && $0.date?.day == data.date.day }).first {
                 resultDate = [day.date]
             }
             return resultDate
             }
             .compactMap({ $0 })
             .first
-        data.moveDate = newMoveDate ?? Date()
+        data.date = newMoveDate ?? Date()
         headerView.date = newMoveDate
         delegate?.didSelectCalendarDate(newMoveDate, type: .year)
         collectionView.reloadData()
@@ -166,8 +177,8 @@ extension YearViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFl
         let date = data.months[indexPath.row].date
         let formatter = DateFormatter()
         formatter.dateFormat = "dd.MM.yyyy"
-        let newDate = formatter.date(from: "\(data.moveDate.day).\(date.month).\(date.year)")
-        data.moveDate = newDate ?? Date()
+        let newDate = formatter.date(from: "\(data.date.day).\(date.month).\(date.year)")
+        data.date = newDate ?? Date()
         headerView.date = newDate
         delegate?.didSelectCalendarDate(newDate, type: style.yearStyle.selectCalendarType)
         collectionView.reloadData()

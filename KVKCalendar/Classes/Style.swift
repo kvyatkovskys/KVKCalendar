@@ -7,7 +7,7 @@
 
 import UIKit
 
-let gainsboro: UIColor = UIColor(red: 220 / 255, green: 220 / 255, blue: 220 / 255, alpha: 1)
+private let gainsboro: UIColor = UIColor(red: 220 / 255, green: 220 / 255, blue: 220 / 255, alpha: 1)
 
 public struct Style {
     public var timelineStyle = TimelineStyle()
@@ -27,9 +27,16 @@ public struct Style {
 }
 
 public struct HeaderScrollStyle {
-    fileprivate let format: DateFormatter = {
+    private let formatFull: DateFormatter = {
         let format = DateFormatter()
         format.dateStyle = .full
+        return format
+    }()
+    
+    private let formatSort: DateFormatter = {
+        let format = DateFormatter()
+        format.locale = Locale(identifier: "en_EN")
+        format.dateFormat = "LLL"
         return format
     }()
     
@@ -38,8 +45,11 @@ public struct HeaderScrollStyle {
     public var heightTitleDate: CGFloat = 30
     public var backgroundColor: UIColor = UIColor(red: 246 / 255, green: 246 / 255, blue: 246 / 255, alpha: 1)
     public var isHiddenTitleDate: Bool = false
-    public lazy var formatter: DateFormatter = format
+    public var isHiddenCornerTitleDate: Bool = true
+    public lazy var formatterTitle: DateFormatter = formatFull
+    public lazy var formatterCornerTitle: DateFormatter = formatSort
     public var colorTitleDate: UIColor = .black
+    public var colorTitleCornerDate: UIColor = .red
     public var colorDate: UIColor = .black
     public var colorNameDay: UIColor = .black
     public var colorCurrentDate: UIColor = .white
@@ -115,12 +125,12 @@ public struct MonthStyle {
     public var colorSeporator: UIColor = gainsboro.withAlphaComponent(0.9)
     public var colorBackgroundWeekendDate: UIColor = gainsboro.withAlphaComponent(0.4)
     public var colorBackgroundDate: UIColor = .white
-    public var scrollDirection: UICollectionView.ScrollDirection = .vertical
+    var scrollDirection: UICollectionView.ScrollDirection = .vertical
     public var selectCalendarType: CalendarType = .week
 }
 
 public struct YearStyle {
-    fileprivate let format: DateFormatter = {
+    private let format: DateFormatter = {
         let format = DateFormatter()
         format.dateStyle = .full
         return format

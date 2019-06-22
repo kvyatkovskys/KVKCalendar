@@ -14,7 +14,7 @@ public final class CalendarView: UIView {
         return type
     }
     
-    private let style: Style
+    private var style: Style
     private var type = CalendarType.day
     private var yearData: YearData
     private var weekData: WeekData
@@ -98,13 +98,13 @@ public final class CalendarView: UIView {
         
         switch type {
         case .day:
-            dayCalendar.setDate(date: newDate)
+            dayCalendar.setDate(newDate)
         case .week:
-            weekCalendar.setDate(date: newDate)
+            weekCalendar.setDate(newDate)
         case .month:
-            monthCalendar.setDate(date: newDate)
+            monthCalendar.setDate(newDate)
         case .year:
-            yearCalendar.setDate(date: newDate)
+            yearCalendar.setDate(newDate)
         }
     }
     
@@ -126,13 +126,13 @@ public final class CalendarView: UIView {
         
         switch type {
         case .day:
-            dayCalendar.setDate(date: newDate)
+            dayCalendar.setDate(newDate)
         case .week:
-            weekCalendar.setDate(date: newDate)
+            weekCalendar.setDate(newDate)
         case .month:
-            monthCalendar.setDate(date: newDate)
+            monthCalendar.setDate(newDate)
         case .year:
-            yearCalendar.setDate(date: newDate)
+            yearCalendar.setDate(newDate)
         }
     }
     
@@ -168,13 +168,18 @@ extension CalendarView: CalendarPrivateDelegate {
     }
 }
 
-extension CalendarView: CalendarFrameProtocol {
-    public func reloadFrame(frame: CGRect) {
+extension CalendarView: CalendarSettingProtocol {
+    public func reloadFrame(_ frame: CGRect) {
         self.frame = frame
-        dayCalendar.reloadFrame(frame: frame)
-        weekCalendar.reloadFrame(frame: frame)
-        monthCalendar.reloadFrame(frame: frame)
-        yearCalendar.reloadFrame(frame: frame)
+        dayCalendar.reloadFrame(frame)
+        weekCalendar.reloadFrame(frame)
+        monthCalendar.reloadFrame(frame)
+        yearCalendar.reloadFrame(frame)
+    }
+    
+    // work in progress
+    func updateStyle(_ style: Style) {
+        self.style = style
     }
 }
 
@@ -226,17 +231,27 @@ public enum CalendarType: String, CaseIterable {
     case day, week, month, year
 }
 
+public struct EventColor {
+    let value: UIColor
+    let alpha: CGFloat
+    
+    public init(_ color: UIColor, alpha: CGFloat = 0.3) {
+        self.value = color
+        self.alpha = alpha
+    }
+}
+
 public struct Event {
     public var id: Any = 0
     public var text: String = ""
     public var start: Date = Date()
     public var end: Date = Date()
-    public var color: UIColor? = nil {
+    public var color: EventColor? = nil {
         didSet {
-            guard let color = color else { return }
-            backgroundColor = color.withAlphaComponent(0.3)
+            guard let valueColor = color else { return }
+            backgroundColor = valueColor.value.withAlphaComponent(valueColor.alpha)
             var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 0
-            color.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
+            valueColor.value.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
             colorText = UIColor(hue: hue, saturation: saturation, brightness: brightness * 0.4, alpha: alpha)
         }
     }
@@ -250,8 +265,14 @@ public struct Event {
     public init() {}
 }
 
-protocol CalendarFrameProtocol {
-    func reloadFrame(frame: CGRect)
+protocol CalendarSettingProtocol {
+    func reloadFrame(_ frame: CGRect)
+    func updateStyle(_ style: Style)
+    func setUI()
+}
+
+extension CalendarSettingProtocol {
+    func setUI() {}
 }
 
 protocol CalendarPrivateDelegate: AnyObject {
