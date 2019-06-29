@@ -199,8 +199,6 @@ SWIFT_CLASS("_TtC11KVKCalendar12CalendarView")
 
 
 
-
-
 #if __has_attribute(external_source_symbol)
 # pragma clang attribute pop
 #endif
@@ -401,8 +399,6 @@ SWIFT_CLASS("_TtC11KVKCalendar12CalendarView")
 - (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)aDecoder SWIFT_UNAVAILABLE;
 - (nonnull instancetype)initWithFrame:(CGRect)frame SWIFT_UNAVAILABLE;
 @end
-
-
 
 
 
