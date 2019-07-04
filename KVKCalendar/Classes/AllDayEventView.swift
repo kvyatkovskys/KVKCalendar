@@ -34,7 +34,7 @@ protocol AllDayEventDelegate: AnyObject {
 }
 
 final class AllDayEventView: UIView {
-    fileprivate let events: [Event]
+    private let events: [Event]
     weak var delegate: AllDayEventDelegate?
     
     init(events: [Event], frame: CGRect, style: AllDayStyle, date: Date?) {
@@ -42,8 +42,8 @@ final class AllDayEventView: UIView {
         super.init(frame: frame)
         backgroundColor = style.backgroundColor
         
-        let startEvents = events.map({ AllDayEvent(id: $0.id, text: $0.text, date: $0.start, color: $0.color ?? $0.backgroundColor) })
-        let endEvents = events.map({ AllDayEvent(id: $0.id, text: $0.text, date: $0.end, color: $0.color ?? $0.backgroundColor) })
+        let startEvents = events.map({ AllDayEvent(id: $0.id, text: $0.text, date: $0.start, color: EventColor($0.color?.value ?? $0.backgroundColor).value) })
+        let endEvents = events.map({ AllDayEvent(id: $0.id, text: $0.text, date: $0.end, color: EventColor($0.color?.value ?? $0.backgroundColor).value) })
         let result = startEvents + endEvents
         let distinct = result.reduce([]) { (acc, event) -> [AllDayEvent] in
             guard acc.contains(where: { $0.date.day == event.date.day && "\($0.id)".hashValue == "\(event.id)".hashValue }) else {
@@ -71,7 +71,7 @@ final class AllDayEventView: UIView {
         }
     }
     
-    @objc fileprivate func tapOnEvent(gesture: UITapGestureRecognizer) {
+    @objc private func tapOnEvent(gesture: UITapGestureRecognizer) {
         guard let hashValue = gesture.view?.tag else { return }
         if let idx = events.firstIndex(where: { "\($0.id)".hashValue == hashValue }) {
             let event = events[idx]

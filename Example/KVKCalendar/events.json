@@ -48,7 +48,7 @@
             "all_day": 0,
             "border_color": "#FFFFFF",
             "color": "#3f645a",
-            "end": "2018-12-10T09:30:00+03:00",
+            "end": "2018-12-10T09:50:00+03:00",
             "id": "3",
             "start": "2018-12-10T09:00:00+03:00",
             "text_color": "#000000",
@@ -59,9 +59,9 @@
             "all_day": 0,
             "border_color": "#FFFFFF",
             "color": "#93c47d",
-            "end": "2018-12-10T09:30:00+03:00",
+            "end": "2018-12-10T09:40:00+03:00",
             "id": "4",
-            "start": "2018-12-10T09:00:00+03:00",
+            "start": "2018-12-10T09:10:00+03:00",
             "text_color": "#000000",
             "title": "Event number 2-1",
             "files": ["file"]
@@ -86,6 +86,39 @@
             "start": "2018-12-11T10:00:00+03:00",
             "text_color": "#000000",
             "title": "Event number 4",
+            "files": []
+        },
+        {
+            "all_day": 0,
+            "id": "62",
+            "border_color": "#FFFFFF",
+            "color": "#662f63",
+            "end": "2018-12-10T11:00:00+03:00",
+            "start": "2018-12-10T09:25:00+03:00",
+            "text_color": "#000000",
+            "title": "New",
+            "files": []
+        },
+        {
+            "all_day": 0,
+            "id": "629",
+            "border_color": "#FFFFFF",
+            "color": "#662f63",
+            "end": "2018-12-10T11:50:00+03:00",
+            "start": "2018-12-10T10:25:00+03:00",
+            "text_color": "#000000",
+            "title": "New 3",
+            "files": []
+        },
+        {
+            "all_day": 0,
+            "id": "64",
+            "border_color": "#FFFFFF",
+            "color": "#662f63",
+            "end": "2018-12-10T09:50:00+03:00",
+            "start": "2018-12-10T09:05:00+03:00",
+            "text_color": "#000000",
+            "title": "New 2",
             "files": []
         },
         {

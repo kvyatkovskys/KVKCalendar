@@ -14,32 +14,32 @@ public final class CalendarView: UIView {
         return type
     }
     
-    fileprivate let style: Style
-    fileprivate var type = CalendarType.day
-    fileprivate var yearData: YearData
-    fileprivate var weekData: WeekData
-    fileprivate let monthData: MonthData
-    fileprivate var dayData: DayData
+    private var style: Style
+    private var type = CalendarType.day
+    private var yearData: YearData
+    private var weekData: WeekData
+    private let monthData: MonthData
+    private var dayData: DayData
     
-    fileprivate lazy var dayCalendar: DayViewCalendar = {
+    private lazy var dayCalendar: DayViewCalendar = {
         let day = DayViewCalendar(data: dayData, frame: frame, style: style)
         day.delegate = self
         return day
     }()
     
-    fileprivate lazy var weekCalendar: WeekViewCalendar = {
+    private lazy var weekCalendar: WeekViewCalendar = {
         let week = WeekViewCalendar(data: weekData, frame: frame, style: style)
         week.delegate = self
         return week
     }()
     
-    fileprivate lazy var monthCalendar: MonthViewCalendar = {
+    private lazy var monthCalendar: MonthViewCalendar = {
         let month = MonthViewCalendar(data: monthData, frame: frame, style: style)
         month.delegate = self
         return month
     }()
     
-    fileprivate lazy var yearCalendar: YearViewCalendar = {
+    private lazy var yearCalendar: YearViewCalendar = {
         let year = YearViewCalendar(data: yearData, frame: frame, style: style)
         year.delegate = self
         return year
@@ -65,7 +65,7 @@ public final class CalendarView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    fileprivate func switchTypeCalendar(type: CalendarType) {
+    private func switchTypeCalendar(type: CalendarType) {
         self.type = type
         if UIDevice.current.userInterfaceIdiom == .phone && type == .year {
             self.type = .month
@@ -93,18 +93,18 @@ public final class CalendarView: UIView {
     
     public func set(type: CalendarType, date: Date) {
         self.type = type
-        let newDate = conertDate(date)
+        let newDate = convertDate(date)
         switchTypeCalendar(type: type)
         
         switch type {
         case .day:
-            dayCalendar.setDate(date: newDate)
+            dayCalendar.setDate(newDate)
         case .week:
-            weekCalendar.setDate(date: newDate)
+            weekCalendar.setDate(newDate)
         case .month:
-            monthCalendar.setDate(date: newDate)
+            monthCalendar.setDate(newDate)
         case .year:
-            yearCalendar.setDate(date: newDate)
+            yearCalendar.setDate(newDate)
         }
     }
     
@@ -122,23 +122,24 @@ public final class CalendarView: UIView {
     }
     
     public func scrollToDate(date: Date) {
-        let newDate = conertDate(date)
+        let newDate = convertDate(date)
         
         switch type {
         case .day:
-            dayCalendar.setDate(date: newDate)
+            dayCalendar.setDate(newDate)
         case .week:
-            weekCalendar.setDate(date: newDate)
+            weekCalendar.setDate(newDate)
         case .month:
-            monthCalendar.setDate(date: newDate)
+            monthCalendar.setDate(newDate)
         case .year:
-            yearCalendar.setDate(date: newDate)
+            yearCalendar.setDate(newDate)
         }
     }
     
-    private func conertDate(_ date: Date) -> Date {
+    private func convertDate(_ date: Date) -> Date {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
+        formatter.timeZone = TimeZone(identifier: "UTC")
         return formatter.date(from: "\(date.year)-\(date.month)-\(date.day)") ?? date
     }
 }
@@ -167,13 +168,18 @@ extension CalendarView: CalendarPrivateDelegate {
     }
 }
 
-extension CalendarView: CalendarFrameProtocol {
-    public func reloadFrame(frame: CGRect) {
+extension CalendarView: CalendarSettingProtocol {
+    public func reloadFrame(_ frame: CGRect) {
         self.frame = frame
-        dayCalendar.reloadFrame(frame: frame)
-        weekCalendar.reloadFrame(frame: frame)
-        monthCalendar.reloadFrame(frame: frame)
-        yearCalendar.reloadFrame(frame: frame)
+        dayCalendar.reloadFrame(frame)
+        weekCalendar.reloadFrame(frame)
+        monthCalendar.reloadFrame(frame)
+        yearCalendar.reloadFrame(frame)
+    }
+    
+    // work in progress
+    func updateStyle(_ style: Style) {
+        self.style = style
     }
 }
 
@@ -225,17 +231,27 @@ public enum CalendarType: String, CaseIterable {
     case day, week, month, year
 }
 
+public struct EventColor {
+    let value: UIColor
+    let alpha: CGFloat
+    
+    public init(_ color: UIColor, alpha: CGFloat = 0.3) {
+        self.value = color
+        self.alpha = alpha
+    }
+}
+
 public struct Event {
     public var id: Any = 0
     public var text: String = ""
     public var start: Date = Date()
     public var end: Date = Date()
-    public var color: UIColor? = nil {
+    public var color: EventColor? = nil {
         didSet {
-            guard let color = color else { return }
-            backgroundColor = color.withAlphaComponent(0.3)
+            guard let valueColor = color else { return }
+            backgroundColor = valueColor.value.withAlphaComponent(valueColor.alpha)
             var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 0
-            color.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
+            valueColor.value.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
             colorText = UIColor(hue: hue, saturation: saturation, brightness: brightness * 0.4, alpha: alpha)
         }
     }
@@ -249,8 +265,14 @@ public struct Event {
     public init() {}
 }
 
-protocol CalendarFrameProtocol {
-    func reloadFrame(frame: CGRect)
+protocol CalendarSettingProtocol {
+    func reloadFrame(_ frame: CGRect)
+    func updateStyle(_ style: Style)
+    func setUI()
+}
+
+extension CalendarSettingProtocol {
+    func setUI() {}
 }
 
 protocol CalendarPrivateDelegate: AnyObject {

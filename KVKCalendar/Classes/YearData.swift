@@ -10,13 +10,14 @@ import Foundation
 private let boxCount = 42
 
 struct YearData {
-    fileprivate let style: Style
+    private let style: Style
+    
     var months = [Month]()
-    var moveDate: Date
+    var date: Date
     
     init(date: Date, years: Int, style: Style) {
         self.style = style
-        self.moveDate = date
+        self.date = date
         // count years for calendar
         let indexsYear = [Int](repeating: 0, count: years).split(half: years / 2)
         let lastYear = indexsYear.left
@@ -104,14 +105,12 @@ struct YearData {
         formatter.dateFormat = "d"
         let formatterDay = DateFormatter()
         formatterDay.dateFormat = "EE"
+        formatterDay.locale = Locale(identifier: "en_US")
         
-        let days = arrDates.map({ (date) -> Day in
-            let day = Day(day: formatter.string(from: date),
-                          type: DayType(rawValue: formatterDay.string(from: date).uppercased()),
-                          date: date,
-                          data: [])
-            return day
-        })
+        let days = arrDates.map({ Day(day: formatter.string(from: $0),
+                                      type: DayType(rawValue: formatterDay.string(from: $0).uppercased()),
+                                      date: $0,
+                                      data: []) })
         
         guard let shift = days.first?.type else { return days }
         var shiftDays = [Day]()

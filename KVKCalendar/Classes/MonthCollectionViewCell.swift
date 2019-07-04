@@ -19,7 +19,7 @@ final class MonthCollectionViewCell: UICollectionViewCell {
     static let cellIdentifier = #file
     static let titlesCount = 3
     
-    fileprivate lazy var dateLabel: UILabel = {
+    private lazy var dateLabel: UILabel = {
         let label = UILabel()
         label.tag = -1
         label.font = style.fontNameDate
@@ -82,7 +82,7 @@ final class MonthCollectionViewCell: UICollectionViewCell {
             let nowDate = Date()
             guard nowDate.month != day.date?.month else {
                 // remove the selection if the current date (for the day) does not match the selected one
-                if selectDate.day != nowDate.day && day.date?.day == nowDate.day {
+                if selectDate.day != nowDate.day && day.date?.day == nowDate.day, day.date?.year == nowDate.year {
                     dateLabel.textColor = style.colorBackgroundCurrentDate
                     dateLabel.backgroundColor = .clear
                 }
@@ -106,13 +106,13 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    @objc fileprivate func tapOneEvent(gesture: UITapGestureRecognizer) {
+    @objc private func tapOneEvent(gesture: UITapGestureRecognizer) {
         if let idx = events.firstIndex(where: { "\($0.id)".hashValue == gesture.view?.tag }) {
             delegate?.didSelectEvent(events[idx], frame: gesture.view?.frame)
         }
     }
     
-    @objc fileprivate func tapOnMore(gesture: UITapGestureRecognizer) {
+    @objc private func tapOnMore(gesture: UITapGestureRecognizer) {
         if let idx = events.firstIndex(where: { $0.start.day == gesture.view?.tag }) {
             delegate?.didSelectMore(events[idx].start, frame: gesture.view?.frame)
         }
@@ -133,7 +133,7 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    fileprivate func weekendsDays(day: Day) {
+    private func weekendsDays(day: Day) {
         guard day.type == .saturday || day.type == .sunday else {
             backgroundColor = style.colorBackgroundDate
             isNowDate(date: day.date, colorText: style.colorDate)
@@ -143,9 +143,9 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         backgroundColor = style.colorBackgroundWeekendDate
     }
     
-    fileprivate func isNowDate(date: Date?, colorText: UIColor) {
+    private func isNowDate(date: Date?, colorText: UIColor) {
         let nowDate = Date()
-        if date?.month == nowDate.month && date?.day == nowDate.day {
+        if date?.month == nowDate.month, date?.day == nowDate.day, date?.year == nowDate.year {
             dateLabel.textColor = style.colorCurrentDate
             dateLabel.backgroundColor = style.colorBackgroundCurrentDate
             dateLabel.layer.cornerRadius = dateLabel.frame.width / 2

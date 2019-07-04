@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension Date {
+public extension Date {
     var minute: Int {
         let calendar = Calendar.current
         let componet = calendar.dateComponents([.minute], from: self)
@@ -59,28 +59,30 @@ extension Date {
         return gregorian.date(byAdding: components, to: startOfDay ?? self)
     }
     
-    var startOfWeek: Date? {
+    var startMondayOfWeek: Date? {
         var gregorian = Calendar(identifier: .gregorian)
         gregorian.timeZone = TimeZone(abbreviation: "UTC")!
         let sunday = gregorian.date(from: gregorian.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))
-        return gregorian.date(byAdding: .day, value: 1, to: sunday!)
+        return gregorian.date(byAdding: .day, value: 1, to: sunday ?? self)
     }
     
     var startSundayOfWeek: Date? {
         var gregorian = Calendar(identifier: .gregorian)
         gregorian.timeZone = TimeZone(abbreviation: "UTC")!
         let sunday = gregorian.date(from: gregorian.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))
-        let components = gregorian.dateComponents([.weekday], from: self)
-        guard components.weekday != 7 else {
-            return self
-        }
-        return sunday
+        return gregorian.date(byAdding: .day, value: 0, to: sunday ?? self)
     }
     
     var endOfWeek: Date? {
         var gregorian = Calendar(identifier: .gregorian)
         gregorian.timeZone = TimeZone(abbreviation: "UTC")!
-        return gregorian.date(byAdding: .day, value: 6, to: startOfWeek ?? self)
+        return gregorian.date(byAdding: .day, value: 6, to: startMondayOfWeek ?? self)
+    }
+    
+    var endSaturdayOfWeek: Date? {
+        var gregorian = Calendar(identifier: .gregorian)
+        gregorian.timeZone = TimeZone(abbreviation: "UTC")!
+        return gregorian.date(byAdding: .day, value: 6, to: startSundayOfWeek ?? self)
     }
     
     var startOfMonth: Date? {

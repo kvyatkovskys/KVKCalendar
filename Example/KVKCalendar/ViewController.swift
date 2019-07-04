@@ -10,23 +10,21 @@ import UIKit
 import KVKCalendar
 
 final class ViewController: UIViewController {
-    fileprivate var events = [Event]()
+    private var events = [Event]()
     
-    fileprivate var selectDate: Date = {
+    private var selectDate: Date = {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd.MM.yyyy"
         return formatter.date(from: "14.12.2018") ?? Date()
     }()
     
-    fileprivate lazy var todayButton: UIBarButtonItem = {
+    private lazy var todayButton: UIBarButtonItem = {
         let button = UIBarButtonItem(title: "Today", style: .done, target: self, action: #selector(today))
         button.tintColor = .red
         return button
     }()
     
-    fileprivate lazy var calendarView: CalendarView = {
-        var frame = view.frame
-        frame.size.height -= (navigationController?.navigationBar.frame.height ?? 0) + UIApplication.shared.statusBarFrame.height
+    private lazy var calendarView: CalendarView = {
         var style = Style()
         if UIDevice.current.userInterfaceIdiom == .phone {
             style.monthStyle.isHiddenSeporator = true
@@ -43,13 +41,13 @@ final class ViewController: UIViewController {
         style.startWeekDay = .sunday
         style.timeHourSystem = .twelveHour
         
-        let calendar = CalendarView(frame: frame, date: selectDate, style: style)
+        let calendar = CalendarView(frame: view.frame, date: selectDate, style: style)
         calendar.delegate = self
         calendar.dataSource = self
         return calendar
     }()
     
-    fileprivate lazy var segmentedControl: UISegmentedControl = {
+    private lazy var segmentedControl: UISegmentedControl = {
         let array: [CalendarType]
         if UIDevice.current.userInterfaceIdiom == .pad {
             array = CalendarType.allCases
@@ -63,13 +61,14 @@ final class ViewController: UIViewController {
         return control
     }()
     
-    fileprivate lazy var eventViewer: EventViewer = {
+    private lazy var eventViewer: EventViewer = {
         let view = EventViewer(frame: CGRect(x: 0, y: 0, width: 500, height: calendarView.frame.height))
         return view
     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         view.backgroundColor = .white
         view.addSubview(calendarView)
         navigationItem.titleView = segmentedControl
@@ -83,10 +82,11 @@ final class ViewController: UIViewController {
         }
     }
     
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        var frame = calendarView.frame
-        frame.size = size
-        calendarView.reloadFrame(frame: frame)
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        var frame = view.frame
+        frame.origin.y = 0
+        calendarView.reloadFrame(frame)
     }
     
     @objc func today(sender: UIBarButtonItem) {
@@ -154,7 +154,7 @@ extension ViewController {
             event.id = idx
             event.start = startDate
             event.end = endDate
-            event.color = item.color
+            event.color = EventColor(item.color)
             event.isAllDay = item.allDay
             event.isContainsFile = !item.files.isEmpty
             event.textForMonth = item.title

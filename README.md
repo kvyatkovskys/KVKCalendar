@@ -18,11 +18,13 @@
 
 ## Installation
 
-**KVKCalendar** is available through [CocoaPods](https://cocoapods.org). To install
-it, simply add the following line to your Podfile:
+**KVKCalendar** is available through [CocoaPods](https://cocoapods.org) or [Carthage](https://github.com/Carthage/Carthage). To install
+it, simply add the following line to your Podfile or Cartfile:
 
 ```ruby
 pod 'KVKCalendar'
+
+github "kvyatkovskys/KVKCalendar"
 ```
 
 ## Usage

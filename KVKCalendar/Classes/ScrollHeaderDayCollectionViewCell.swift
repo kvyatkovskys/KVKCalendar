@@ -13,7 +13,7 @@ private let heightTitle: CGFloat = 25
 final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
     static let cellIdentifier = #file
     
-    fileprivate lazy var titleLabel: UILabel = {
+    private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 11)
@@ -21,7 +21,7 @@ final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
-    fileprivate lazy var dateLabel: UILabel = {
+    private lazy var dateLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 18)
@@ -39,8 +39,8 @@ final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
                 return
             }
             
-            if !style.titleDays.isEmpty {
-                titleLabel.text = style.titleDays[day.type.shiftDay]
+            if !style.titleDays.isEmpty, let title = style.titleDays[safe: day.type.shiftDay] {
+                titleLabel.text = title
             } else {
                 titleLabel.text = day.type.rawValue
             }
@@ -54,12 +54,12 @@ final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
             let nowDate = Date()
             guard nowDate.month != day.date?.month else {
                 // remove the selection if the current date (for the day) does not match the selected one
-                if selectDate.day != nowDate.day && day.date?.day == nowDate.day {
+                if selectDate.day != nowDate.day, day.date?.day == nowDate.day, day.date?.year == nowDate.year {
                     dateLabel.textColor = style.colorBackgroundCurrentDate
                     dateLabel.backgroundColor = .clear
                 }
                 // mark the selected date, which is not the same as the current one
-                if day.date?.month == selectDate.month && day.date?.day == selectDate.day && selectDate.day != nowDate.day {
+                if day.date?.month == selectDate.month, day.date?.day == selectDate.day, selectDate.day != nowDate.day {
                     dateLabel.textColor = style.colorSelectDate
                     dateLabel.backgroundColor = style.colorBackgroundSelectDate
                     dateLabel.layer.cornerRadius = dateLabel.frame.width / 2
@@ -69,7 +69,7 @@ final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
             }
             
             // select date not in the current month
-            guard day.date?.month == selectDate.month && day.date?.day == selectDate.day else {
+            guard day.date?.month == selectDate.month, day.date?.day == selectDate.day else {
                 weekendsDays(day: day)
                 return
             }
@@ -104,7 +104,7 @@ final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    fileprivate func weekendsDays(day: Day) {
+    private func weekendsDays(day: Day) {
         guard day.type == .saturday || day.type == .sunday else {
             isNowDate(date: day.date, colorText: style.colorDate)
             titleLabel.textColor = style.colorDate
@@ -114,9 +114,9 @@ final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
         titleLabel.textColor = style.colorWeekendDate
     }
     
-    fileprivate func isNowDate(date: Date?, colorText: UIColor) {
+    private func isNowDate(date: Date?, colorText: UIColor) {
         let nowDate = Date()
-        if date?.month == nowDate.month && date?.day == nowDate.day {
+        if date?.month == nowDate.month, date?.day == nowDate.day, date?.year == nowDate.year {
             dateLabel.textColor = style.colorCurrentDate
             dateLabel.backgroundColor = style.colorBackgroundCurrentDate
             dateLabel.layer.cornerRadius = dateLabel.frame.height / 2
