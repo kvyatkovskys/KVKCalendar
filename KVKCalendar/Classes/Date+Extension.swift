@@ -73,7 +73,7 @@ public extension Date {
         return gregorian.date(byAdding: .day, value: 0, to: sunday ?? self)
     }
     
-    var endOfWeek: Date? {
+    var endSundayOfWeek: Date? {
         var gregorian = Calendar(identifier: .gregorian)
         gregorian.timeZone = TimeZone(abbreviation: "UTC")!
         return gregorian.date(byAdding: .day, value: 6, to: startMondayOfWeek ?? self)
