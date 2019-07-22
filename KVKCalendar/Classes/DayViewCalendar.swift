@@ -101,7 +101,7 @@ extension DayViewCalendar: ScrollDayHeaderDelegate {
     func didSelectDateScrollHeader(_ date: Date?, type: CalendarType) {
         guard let selectDate = date else { return }
         data.date = selectDate
-        delegate?.didSelectCalendarDate(selectDate, type: type)
+        delegate?.didSelectCalendarDate(selectDate, type: type, frame: nil)
     }
 }
 

@@ -54,7 +54,7 @@ final class YearViewCalendar: UIView {
     }
     
     fileprivate func scrollToDate(date: Date, animated: Bool) {
-        delegate?.didSelectCalendarDate(date, type: .year)
+        delegate?.didSelectCalendarDate(date, type: .year, frame: nil)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             guard UIDevice.current.userInterfaceIdiom == .pad else {
                 if let idx = self.data.months.firstIndex(where: { $0.date.year == date.year && $0.date.month == date.month }) {
@@ -168,7 +168,7 @@ extension YearViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFl
             .first
         data.date = newMoveDate ?? Date()
         headerView.date = newMoveDate
-        delegate?.didSelectCalendarDate(newMoveDate, type: .year)
+        delegate?.didSelectCalendarDate(newMoveDate, type: .year, frame: nil)
         collectionView.reloadData()
     }
     
@@ -180,12 +180,17 @@ extension YearViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFl
         let newDate = formatter.date(from: "\(data.date.day).\(date.month).\(date.year)")
         data.date = newDate ?? Date()
         headerView.date = newDate
-        delegate?.didSelectCalendarDate(newDate, type: style.yearStyle.selectCalendarType)
+        
+        let attributes = collectionView.layoutAttributesForItem(at: indexPath)
+        let frame = collectionView.convert(attributes?.frame ?? .zero, to: collectionView)
+        
+        delegate?.didSelectCalendarDate(newDate, type: style.yearStyle.selectCalendarType, frame: frame)
         collectionView.reloadData()
     }
     
     func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
-        guard UIDevice.current.userInterfaceIdiom == .pad else { return }
+        guard UIDevice.current.userInterfaceIdiom == .pad, style.monthStyle.isAnimateSelection else { return }
+        
         let cell = collectionView.cellForItem(at: indexPath)
         UIView.animate(withDuration: 0.4,
                        delay: 0,
@@ -197,7 +202,8 @@ extension YearViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFl
     }
     
     func collectionView(_ collectionView: UICollectionView, didUnhighlightItemAt indexPath: IndexPath) {
-        guard UIDevice.current.userInterfaceIdiom == .pad else { return }
+        guard UIDevice.current.userInterfaceIdiom == .pad, style.monthStyle.isAnimateSelection else { return }
+        
         let cell = collectionView.cellForItem(at: indexPath)
         UIView.animate(withDuration: 0.1) {
             cell?.transform = CGAffineTransform(scaleX: 1, y: 1)

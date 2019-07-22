@@ -110,7 +110,7 @@ final class ViewController: UIViewController {
 }
 
 extension ViewController: CalendarDelegate {
-    func didSelectDate(date: Date?, type: CalendarType) {
+    func didSelectDate(date: Date?, type: CalendarType, frame: CGRect?) {
         selectDate = date ?? Date()
         calendarView.reloadData()
     }
