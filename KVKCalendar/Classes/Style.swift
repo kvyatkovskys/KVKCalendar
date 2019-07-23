@@ -128,6 +128,7 @@ public struct MonthStyle {
     var scrollDirection: UICollectionView.ScrollDirection = .vertical
     public var selectCalendarType: CalendarType = .week
     public var isAnimateSelection: Bool = true
+    public var isPagingEnabled: Bool = true
 }
 
 public struct YearStyle {
@@ -156,6 +157,7 @@ public struct YearStyle {
     public var colorDayTitle: UIColor = .black
     public var selectCalendarType: CalendarType = .month
     public var isAnimateSelection: Bool = true
+    public var isPagingEnabled: Bool = true
 }
 
 public struct AllDayStyle {

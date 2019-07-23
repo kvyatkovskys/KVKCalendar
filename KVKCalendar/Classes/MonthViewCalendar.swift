@@ -54,10 +54,10 @@ final class MonthViewCalendar: UIView {
         collectionView.reloadData()
     }
     
-    private func createCollectionView(frame: CGRect) -> UICollectionView {
+    private func createCollectionView(frame: CGRect, style: MonthStyle) -> UICollectionView {
         let collection = UICollectionView(frame: frame, collectionViewLayout: layout)
         collection.backgroundColor = .clear
-        collection.isPagingEnabled = true
+        collection.isPagingEnabled = style.isPagingEnabled
         collection.dataSource = self
         collection.delegate = self
         collection.register(MonthCollectionViewCell.self,
@@ -100,7 +100,7 @@ extension MonthViewCalendar: CalendarSettingProtocol {
         headerView.reloadFrame(frame)
         
         collectionView.removeFromSuperview()
-        collectionView = createCollectionView(frame: self.frame)
+        collectionView = createCollectionView(frame: self.frame, style: style.monthStyle)
         
         var collectionFrame = frame
         collectionFrame.origin.y = headerView.frame.height
@@ -128,7 +128,7 @@ extension MonthViewCalendar: CalendarSettingProtocol {
         subviews.forEach({ $0.removeFromSuperview() })
         
         addSubview(headerView)
-        collectionView = createCollectionView(frame: frame)
+        collectionView = createCollectionView(frame: frame, style: style.monthStyle)
         var collectionFrame = frame
         collectionFrame.origin.y = headerView.frame.height
         collectionFrame.size.height = collectionFrame.height - headerView.frame.height
@@ -159,7 +159,7 @@ extension MonthViewCalendar: UICollectionViewDataSource {
     }
 }
 
-extension MonthViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+extension MonthViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {    
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         let cells = collectionView.visibleCells as? [MonthCollectionViewCell] ?? [MonthCollectionViewCell()]
         let cellDays = cells.filter({ $0.day.type != .empty })
