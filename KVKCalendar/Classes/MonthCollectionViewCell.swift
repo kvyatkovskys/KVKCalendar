@@ -85,7 +85,7 @@ final class MonthCollectionViewCell: UICollectionViewCell {
                     addSubview(label)
                     return
                 } else {
-                    label.text = event.textForMonth
+                    label.attributedText = addIconBeforeLabel(stringList: [event.textForMonth], font: style.fontEventTitle, bullet: "•", bulletColor: event.color!.value)
                 }
                 addSubview(label)
             }
@@ -194,5 +194,30 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         label.backgroundColor = style.colorBackgroundCurrentDate
         label.layer.cornerRadius = label.frame.height / 2
         label.clipsToBounds = true
+    }
+    
+    private func addIconBeforeLabel(stringList: [String], font: UIFont, bullet: String = "\u{2022}", indentation: CGFloat = 10, lineSpacing: CGFloat = 2, paragraphSpacing: CGFloat = 10, textColor: UIColor = .black, bulletColor: UIColor) -> NSAttributedString {
+        let textAttributes: [NSAttributedString.Key: Any] = [NSAttributedString.Key.font: font, NSAttributedString.Key.foregroundColor: textColor]
+        let bulletAttributes: [NSAttributedString.Key: Any] = [NSAttributedString.Key.font: font, NSAttributedString.Key.foregroundColor: bulletColor]
+        let paragraphStyle = NSMutableParagraphStyle()
+        let nonOptions = [NSTextTab.OptionKey: Any]()
+        paragraphStyle.tabStops = [
+            NSTextTab(textAlignment: .left, location: indentation, options: nonOptions)]
+        paragraphStyle.defaultTabInterval = indentation
+        paragraphStyle.lineSpacing = lineSpacing
+        paragraphStyle.paragraphSpacing = paragraphSpacing
+        paragraphStyle.headIndent = indentation
+        let bulletList = NSMutableAttributedString()
+        for string in stringList {
+            let formattedString = "\(bullet)\t\(string)\n"
+            let attributedString = NSMutableAttributedString(string: formattedString)
+            attributedString.addAttributes([NSAttributedString.Key.paragraphStyle: paragraphStyle], range: NSMakeRange(0, attributedString.length))
+            attributedString.addAttributes(textAttributes, range: NSMakeRange(0, attributedString.length))
+            let string: NSString = NSString(string: formattedString)
+            let rangeForBullet: NSRange = string.range(of: bullet)
+            attributedString.addAttributes(bulletAttributes, range: rangeForBullet)
+            bulletList.append(attributedString)
+        }
+        return bulletList
     }
 }
