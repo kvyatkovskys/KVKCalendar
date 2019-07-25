@@ -174,6 +174,21 @@ final class TimelineView: UIView {
         return lines
     }
     
+    fileprivate func createVerticalLines() -> [UIView] {
+        var lines = [UIView]()
+        var index: Int = 0
+        while index < 7 {
+            let xLine = index == 0 ? 0 : ((self.frame.width / 7) * CGFloat(index)) + 60 - CGFloat(index * 9)
+            let frame = CGRect(x: xLine, y: 0, width: 0.5, height: (CGFloat(25) * (style.timelineStyle.heightTime + style.timelineStyle.offsetTimeY)) - 75)
+            let line = UIView(frame: frame)
+            line.backgroundColor = .lightGray
+            line.tag = 0
+            lines.append(line)
+            index += 1
+        }
+        return lines
+    }
+    
     private func countEventsInHour(events: [Event]) -> [CrossPageTree] {
         var eventsTemp = events
         var newCountsEvents = [CrossPageTree]()
@@ -371,7 +386,7 @@ final class TimelineView: UIView {
         scrollView.scrollRectToVisible(frame, animated: true)
     }
     
-    func createTimelinePage(dates: [Date?], events: [Event], selectedDate: Date?) {
+    func createTimelinePage(dates: [Date?], events: [Event], selectedDate: Date?, showVerticalLine: Bool) {
         subviews.filter({ $0 is AllDayEventView || $0 is AllDayTitleView }).forEach({ $0.removeFromSuperview() })
         scrollView.subviews.forEach({ $0.removeFromSuperview() })
         
@@ -402,7 +417,10 @@ final class TimelineView: UIView {
         scrollView.contentSize = CGSize(width: frame.width, height: heightAllTimes + 20)
         times.forEach({ scrollView.addSubview($0) })
         lines.forEach({ scrollView.addSubview($0) })
-        
+        if showVerticalLine {
+            let verticalLines = createVerticalLines()
+            verticalLines.forEach({ scrollView.addSubview($0) })
+        }
         let offset = style.timelineStyle.widthTime + style.timelineStyle.offsetTimeX + style.timelineStyle.offsetLineLeft
         let widthPage = (frame.width - offset) / CGFloat(dates.count)
         let heightPage = (CGFloat(times.count) * (style.timelineStyle.heightTime + style.timelineStyle.offsetTimeY)) - 75
