@@ -1,24 +1,25 @@
 {
   "name": "KVKCalendar",
-  "version": "0.1.0",
-  "summary": "Fully customized calendar with weekly timeline and day.",
-  "description": "Fully customized calendar with timeline for the week and day. Display appointments for a month, view the calendar for a year.",
+  "version": "0.1.9",
+  "summary": "A most fully customization calendar library for iOS.",
+  "description": "KVKCalendar is a most fully customization calendar library.\nLibrary consists of four modules for displaying various types of calendar (day, week, month, year).\nYou can choose any module or use all. It is designed based on a standard iOS calendar, but with additional features.\nTimeline displays the schedule for the day and week.",
   "homepage": "https://github.com/kvyatkovskys/KVKCalendar",
   "license": {
     "type": "MIT",
-    "file": "LICENSE"
+    "file": "LICENSE.md"
   },
   "authors": {
     "Sergei Kviatkovskii": "sergejkvyatkovskij@gmail.com"
   },
   "source": {
     "git": "https://github.com/kvyatkovskys/KVKCalendar.git",
-    "tag": "0.1.0"
+    "tag": "0.1.9"
   },
+  "social_media_url": "https://github.com/kvyatkovskys",
   "platforms": {
-    "ios": "9.0"
+    "ios": "10.0"
   },
   "source_files": "KVKCalendar/Classes/*.swift",
-  "frameworks": "UIKit",
-  "swift_version": "4.2"
+  "swift_versions": "5.0",
+  "swift_version": "5.0"
 }
