@@ -95,6 +95,7 @@ public struct WeekStyle {
     public var colorWeekendDate: UIColor = .gray
     public var colorBackgroundWeekendDate: UIColor = gainsboro.withAlphaComponent(0.4)
     public var selectCalendarType: CalendarType = .day
+    public var showVerticalDayDivider: Bool = true
 }
 
 public struct MonthStyle {

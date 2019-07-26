@@ -386,7 +386,7 @@ final class TimelineView: UIView {
         scrollView.scrollRectToVisible(frame, animated: true)
     }
     
-    func createTimelinePage(dates: [Date?], events: [Event], selectedDate: Date?, showVerticalLine: Bool) {
+    func createTimelinePage(dates: [Date?], events: [Event], selectedDate: Date?) {
         subviews.filter({ $0 is AllDayEventView || $0 is AllDayTitleView }).forEach({ $0.removeFromSuperview() })
         scrollView.subviews.forEach({ $0.removeFromSuperview() })
         
@@ -417,7 +417,7 @@ final class TimelineView: UIView {
         scrollView.contentSize = CGSize(width: frame.width, height: heightAllTimes + 20)
         times.forEach({ scrollView.addSubview($0) })
         lines.forEach({ scrollView.addSubview($0) })
-        if showVerticalLine {
+        if style.weekStyle.showVerticalDayDivider {
             let verticalLines = createVerticalLines()
             verticalLines.forEach({ scrollView.addSubview($0) })
         }
