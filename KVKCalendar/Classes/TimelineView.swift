@@ -42,7 +42,7 @@ final class TimelineView: UIView {
     private lazy var currentLineView: UIView = {
         let view = UIView()
         view.tag = tagCurrentHourLine
-        view.backgroundColor = .red
+        view.backgroundColor = style.timelineStyle.currentLineHourColor
         return view
     }()
     

@@ -71,7 +71,7 @@ final class WeekHeaderView: UIView {
                                               height: fromYear ? frame.height : style.monthStyle.heightHeaderWeek))
             label.adjustsFontSizeToFitWidth = true
             label.textAlignment = .center
-            label.textColor = (value == .sunday || value == .saturday) ? .gray : .black
+            label.textColor = (value == .sunday || value == .saturday) ? style.weekStyle.colorWeekendDate : style.weekStyle.colorDate
             if !style.headerScrollStyle.titleDays.isEmpty, let title = style.headerScrollStyle.titleDays[safe: value.shiftDay] {
                 label.text = title
             } else {
