@@ -36,30 +36,30 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         willSet {
             subviews.filter({ $0.tag != -1 }).forEach({ $0.removeFromSuperview() })
             
-            guard UIDevice.current.userInterfaceIdiom == .pad else {
-                guard !newValue.isEmpty else { return }
-                
-                let height = (frame.height - dateLabel.bounds.height - offset)
-                let label = UILabel(frame: CGRect(x: 0,
-                                                  y: offset + dateLabel.bounds.height,
-                                                  width: frame.width,
-                                                  height: height))
-                let tap = UITapGestureRecognizer(target: self, action: #selector(tapOnMore))
-                label.isUserInteractionEnabled = true
-                label.tag = newValue.first?.start.day ?? 1
-                label.addGestureRecognizer(tap)
-                if UIDevice.current.userInterfaceIdiom == .phone, UIDevice.current.orientation.isLandscape {
-                    label.font = style.fontEventTitle
-                    label.text = "."
-                } else {
-                    label.text = "●"
-                    label.font = style.fontEventTitle
-                }
-                label.textColor = style.colorEventTitle
-                label.textAlignment = .center
-                addSubview(label)
-                return
-            }
+//            guard UIDevice.current.userInterfaceIdiom == .pad else {
+//                guard !newValue.isEmpty else { return }
+//
+//                let height = (frame.height - dateLabel.bounds.height - offset)
+//                let label = UILabel(frame: CGRect(x: 0,
+//                                                  y: offset + dateLabel.bounds.height,
+//                                                  width: frame.width,
+//                                                  height: height))
+//                let tap = UITapGestureRecognizer(target: self, action: #selector(tapOnMore))
+//                label.isUserInteractionEnabled = true
+//                label.tag = newValue.first?.start.day ?? 1
+//                label.addGestureRecognizer(tap)
+//                if UIDevice.current.userInterfaceIdiom == .phone, UIDevice.current.orientation.isLandscape {
+//                    label.font = style.fontEventTitle
+//                    label.text = "."
+//                } else {
+//                    label.text = "●"
+//                    label.font = style.fontEventTitle
+//                }
+//                label.textColor = style.colorEventTitle
+//                label.textAlignment = .center
+//                addSubview(label)
+//                return
+//            }
             
             let height = (frame.height - dateLabel.bounds.height - offset) / countInCell
             for (idx, event) in newValue.enumerated() {
@@ -85,7 +85,7 @@ final class MonthCollectionViewCell: UICollectionViewCell {
                     addSubview(label)
                     return
                 } else {
-                    label.attributedText = addIconBeforeLabel(stringList: [event.textForMonth], font: style.fontEventTitle, bullet: "•", bulletColor: event.color!.value)
+                    label.attributedText = addIconBeforeLabel(stringList: [event.textForMonth], font: style.fontEventTitle, bullet: "•", bulletColor: event.color?.value ?? .black)
                 }
                 addSubview(label)
             }

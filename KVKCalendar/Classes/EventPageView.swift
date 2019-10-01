@@ -24,12 +24,12 @@ final class EventPageView: UIView {
         return text
     }()
     
-//    private lazy var iconFileImageView: UIImageView = {
-//        let image = UIImageView(frame: CGRect(x: 0, y: 2, width: 10, height: 10))
-//        image.image = style.iconFile.withRenderingMode(.alwaysTemplate)
-//        image.tintColor = style.colorIconFile
-//        return image
-//    }()
+    private lazy var iconFileImageView: UIImageView = {
+        let image = UIImageView(frame: CGRect(x: 0, y: 2, width: 10, height: 10))
+        image.image = style.iconFile?.withRenderingMode(.alwaysTemplate)
+        image.tintColor = style.colorIconFile
+        return image
+    }()
     
     init(event: Event, style: TimelineStyle, frame: CGRect) {
         self.event = event
@@ -43,9 +43,9 @@ final class EventPageView: UIView {
         textFrame.origin.y = 0
         
         if event.isContainsFile {
-            //textFrame.size.width = frame.width - iconFileImageView.frame.width - pointX
-            //iconFileImageView.frame.origin.x = frame.width - iconFileImageView.frame.width - pointX
-            //addSubview(iconFileImageView)
+            textFrame.size.width = frame.width - iconFileImageView.frame.width - pointX
+            iconFileImageView.frame.origin.x = frame.width - iconFileImageView.frame.width - pointX
+            addSubview(iconFileImageView)
         }
         
         textFrame.size.height = textFrame.height
