@@ -36,30 +36,9 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         willSet {
             subviews.filter({ $0.tag != -1 }).forEach({ $0.removeFromSuperview() })
             
-//            guard UIDevice.current.userInterfaceIdiom == .pad else {
-//                guard !newValue.isEmpty else { return }
-//
-//                let height = (frame.height - dateLabel.bounds.height - offset)
-//                let label = UILabel(frame: CGRect(x: 0,
-//                                                  y: offset + dateLabel.bounds.height,
-//                                                  width: frame.width,
-//                                                  height: height))
-//                let tap = UITapGestureRecognizer(target: self, action: #selector(tapOnMore))
-//                label.isUserInteractionEnabled = true
-//                label.tag = newValue.first?.start.day ?? 1
-//                label.addGestureRecognizer(tap)
-//                if UIDevice.current.userInterfaceIdiom == .phone, UIDevice.current.orientation.isLandscape {
-//                    label.font = style.fontEventTitle
-//                    label.text = "."
-//                } else {
-//                    label.text = "●"
-//                    label.font = style.fontEventTitle
-//                }
-//                label.textColor = style.colorEventTitle
-//                label.textAlignment = .center
-//                addSubview(label)
-//                return
-//            }
+            if UIDevice.current.userInterfaceIdiom == .phone, UIDevice.current.orientation.isLandscape {
+                return
+            }
             
             let height = (frame.height - dateLabel.bounds.height - offset) / countInCell
             for (idx, event) in newValue.enumerated() {
@@ -131,7 +110,7 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         var dateFrame = frame
         dateFrame.size = CGSize(width: 35, height: 35)
         dateFrame.origin.y = offset
-        dateFrame.origin.x = (frame.width - dateFrame.width) / 2
+        dateFrame.origin.x = (frame.width - dateFrame.width)
         dateLabel.frame = dateFrame
         addSubview(dateLabel)
     }
