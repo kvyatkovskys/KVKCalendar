@@ -45,7 +45,7 @@ public struct Style {
             newStyle.timelineStyle.backgroundColor = UIColor.useForStyle(dark: .black, white: .white)
             newStyle.timelineStyle.timeColor = .systemGray
             newStyle.timelineStyle.colorIconFile = UIColor.useForStyle(dark: .systemGray, white: .black)
-            newStyle.timelineStyle.currentLineHourColor = .systemRed
+            newStyle.timelineStyle.currentLineHourColor = UIColor.useForStyle(dark: .systemRed, white: .red)
             
             newStyle.weekStyle.colorBackground = UIColor.useForStyle(dark: .black, white: gainsboro.withAlphaComponent(0.4))
             newStyle.weekStyle.colorDate = UIColor.useForStyle(dark: .systemGray, white: .black)
