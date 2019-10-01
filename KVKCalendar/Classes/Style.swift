@@ -76,7 +76,7 @@ public struct TimelineStyle {
     public var timeFont: UIFont = .systemFont(ofSize: 12)
     public var scrollToCurrentHour: Bool = true
     public var widthEventViewer: CGFloat = 0
-    public var iconFile: UIImage = UIImage()
+    public var iconFile: UIImage? = nil
     public var colorIconFile: UIColor = .black
     public var showCurrentLineHour: Bool = true
     public var currentLineHourFont: UIFont = .systemFont(ofSize: 12)
