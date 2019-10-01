@@ -60,7 +60,7 @@ struct YearData {
             var months = zip(nameMonths, dateMonths).map({ Month(name: $0.0,
                                                                  date: $0.1,
                                                                  week: [.empty],
-                                                                 days: [Day.empty()]) })
+                                                                 days: [.empty()]) })
             
             for (idx, month) in months.enumerated() {
                 var days = getDaysInMonth(month: idx + 1, date: month.date)
@@ -115,7 +115,7 @@ struct YearData {
         guard let shift = days.first?.type else { return days }
         var shiftDays = [Day]()
         for _ in 0..<shift.shiftDay {
-            shiftDays.append(Day.empty())
+            shiftDays.append(.empty())
         }
         return shiftDays + days
     }
@@ -125,7 +125,7 @@ struct YearData {
         let filterDays = days.filter({ $0.type != .empty })
         if let firstDay = filterDays.first?.type {
             for _ in 0..<firstDay.shiftDay {
-                tempDays.append(Day.empty())
+                tempDays.append(.empty())
             }
             tempDays += filterDays
         } else {
@@ -141,7 +141,7 @@ struct YearData {
     
     private func addSundayToBegin(days: [Day]) -> [Day] {
         var days = days
-        days.insert(Day.empty(), at: 0)
+        days.insert(.empty(), at: 0)
         days.removeLast()
         
         let emptyFirstWeek = days[0..<7]
