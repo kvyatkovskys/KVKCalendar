@@ -97,7 +97,7 @@ struct YearData {
         var arrDates = [Date]()
         for day in 1...numDays {
             let dateString = "\(components.year ?? 0) \(month) \(day)"
-            if let date = formatter.date(from: dateString) {
+            if let date = formatter.date(from: dateString)?.toLocalTime() {
                 arrDates.append(date)
             }
         }

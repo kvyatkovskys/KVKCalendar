@@ -133,7 +133,7 @@ extension WeekViewCalendar: ScrollDayHeaderDelegate {
         
         data.date = selectDate
         getVisibleDates(date: selectDate)
-        delegate?.didSelectCalendarDate(selectDate, type: type)
+        delegate?.didSelectCalendarDate(selectDate, type: type, frame: nil)
         setDateToTitleCorner(selectDate)
     }
 }

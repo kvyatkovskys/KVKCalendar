@@ -316,9 +316,9 @@ final class TimelineView: UIView {
         pointY = calculatePointYByMinute(date.minute, time: time)
         
         currentTimeLabel.frame = CGRect(x: style.timelineStyle.offsetTimeX,
-                                        y: pointY - 5,
+                                        y: pointY - 10,
                                         width: style.timelineStyle.currentLineHourWidth,
-                                        height: 10)
+                                        height: 15)
         currentLineView.frame = CGRect(x: currentTimeLabel.frame.width + style.timelineStyle.offsetTimeX + style.timelineStyle.offsetLineLeft,
                                        y: pointY,
                                        width: scrollView.frame.width - style.timelineStyle.offsetTimeX,

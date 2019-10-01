@@ -8,21 +8,21 @@
 import UIKit
 
 final class YearViewCalendar: UIView {
-    fileprivate var data: YearData
-    fileprivate var style: Style
-    fileprivate var animated: Bool = false
-    fileprivate var collectionView: UICollectionView!
+    private var data: YearData
+    private var style: Style
+    private var animated: Bool = false
+    private var collectionView: UICollectionView!
     
     weak var delegate: CalendarPrivateDelegate?
     
-    fileprivate let layout: UICollectionViewLayout = {
+    private let layout: UICollectionViewLayout = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 10
         layout.minimumInteritemSpacing = 10
         return layout
     }()
     
-    fileprivate lazy var headerView: YearHeaderView = {
+    private lazy var headerView: YearHeaderView = {
         let view = YearHeaderView(frame: CGRect(x: 0, y: 0, width: frame.width, height: style.yearStyle.heightTitleHeader))
         view.style = style
         return view
@@ -42,10 +42,10 @@ final class YearViewCalendar: UIView {
         collectionView.reloadData()
     }
     
-    fileprivate func createCollectionView(frame: CGRect)  -> UICollectionView {
+    private func createCollectionView(frame: CGRect, style: YearStyle)  -> UICollectionView {
         let collection = UICollectionView(frame: frame, collectionViewLayout: layout)
         collection.backgroundColor = .clear
-        collection.isPagingEnabled = true
+        collection.isPagingEnabled = style.isPagingEnabled
         collection.dataSource = self
         collection.delegate = self
         collection.register(YearCollectionViewCell.self,
@@ -53,8 +53,8 @@ final class YearViewCalendar: UIView {
         return collection
     }
     
-    fileprivate func scrollToDate(date: Date, animated: Bool) {
-        delegate?.didSelectCalendarDate(date, type: .year)
+    private func scrollToDate(date: Date, animated: Bool) {
+        delegate?.didSelectCalendarDate(date, type: .year, frame: nil)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             guard UIDevice.current.userInterfaceIdiom == .pad else {
                 if let idx = self.data.months.firstIndex(where: { $0.date.year == date.year && $0.date.month == date.month }) {
@@ -86,7 +86,7 @@ extension YearViewCalendar: CalendarSettingProtocol {
         headerView.reloadFrame(self.frame)
         
         collectionView.removeFromSuperview()
-        collectionView = createCollectionView(frame: self.frame)
+        collectionView = createCollectionView(frame: self.frame, style: style.yearStyle)
         collectionView.frame.origin.y = style.yearStyle.heightTitleHeader
         collectionView.frame.size.height -= style.yearStyle.heightTitleHeader
         addSubview(collectionView)
@@ -119,7 +119,7 @@ extension YearViewCalendar: CalendarSettingProtocol {
     func setUI() {
         subviews.forEach({ $0.removeFromSuperview() })
         
-        collectionView = createCollectionView(frame: frame)
+        collectionView = createCollectionView(frame: frame, style: style.yearStyle)
         collectionView.frame.origin.y = style.yearStyle.heightTitleHeader
         collectionView.frame.size.height -= style.yearStyle.heightTitleHeader
         addSubview(collectionView)
@@ -168,7 +168,7 @@ extension YearViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFl
             .first
         data.date = newMoveDate ?? Date()
         headerView.date = newMoveDate
-        delegate?.didSelectCalendarDate(newMoveDate, type: .year)
+        delegate?.didSelectCalendarDate(newMoveDate, type: .year, frame: nil)
         collectionView.reloadData()
     }
     
@@ -180,12 +180,17 @@ extension YearViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFl
         let newDate = formatter.date(from: "\(data.date.day).\(date.month).\(date.year)")
         data.date = newDate ?? Date()
         headerView.date = newDate
-        delegate?.didSelectCalendarDate(newDate, type: style.yearStyle.selectCalendarType)
+        
+        let attributes = collectionView.layoutAttributesForItem(at: indexPath)
+        let frame = collectionView.convert(attributes?.frame ?? .zero, to: collectionView)
+        
+        delegate?.didSelectCalendarDate(newDate, type: style.yearStyle.selectCalendarType, frame: frame)
         collectionView.reloadData()
     }
     
     func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
-        guard UIDevice.current.userInterfaceIdiom == .pad else { return }
+        guard UIDevice.current.userInterfaceIdiom == .pad, style.monthStyle.isAnimateSelection else { return }
+        
         let cell = collectionView.cellForItem(at: indexPath)
         UIView.animate(withDuration: 0.4,
                        delay: 0,
@@ -197,7 +202,8 @@ extension YearViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFl
     }
     
     func collectionView(_ collectionView: UICollectionView, didUnhighlightItemAt indexPath: IndexPath) {
-        guard UIDevice.current.userInterfaceIdiom == .pad else { return }
+        guard UIDevice.current.userInterfaceIdiom == .pad, style.monthStyle.isAnimateSelection else { return }
+        
         let cell = collectionView.cellForItem(at: indexPath)
         UIView.animate(withDuration: 0.1) {
             cell?.transform = CGAffineTransform(scaleX: 1, y: 1)
