@@ -85,7 +85,11 @@ final class MonthCollectionViewCell: UICollectionViewCell {
                     addSubview(label)
                     return
                 } else {
-                    label.attributedText = addIconBeforeLabel(stringList: [event.textForMonth], font: style.fontEventTitle, bullet: "•", bulletColor: event.color?.value ?? .black)
+                    label.attributedText = addIconBeforeLabel(stringList: [event.textForMonth],
+                                                              font: style.fontEventTitle,
+                                                              bullet: "•",
+                                                              textColor: style.colorEventTitle,
+                                                              bulletColor: event.color?.value ?? .systemGray)
                 }
                 addSubview(label)
             }
@@ -196,13 +200,12 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         label.clipsToBounds = true
     }
     
-    private func addIconBeforeLabel(stringList: [String], font: UIFont, bullet: String = "\u{2022}", indentation: CGFloat = 10, lineSpacing: CGFloat = 2, paragraphSpacing: CGFloat = 10, textColor: UIColor = .black, bulletColor: UIColor) -> NSAttributedString {
-        let textAttributes: [NSAttributedString.Key: Any] = [NSAttributedString.Key.font: font, NSAttributedString.Key.foregroundColor: textColor]
-        let bulletAttributes: [NSAttributedString.Key: Any] = [NSAttributedString.Key.font: font, NSAttributedString.Key.foregroundColor: bulletColor]
+    private func addIconBeforeLabel(stringList: [String], font: UIFont, bullet: String = "\u{2022}", indentation: CGFloat = 10, lineSpacing: CGFloat = 2, paragraphSpacing: CGFloat = 10, textColor: UIColor, bulletColor: UIColor) -> NSAttributedString {
+        let textAttributes: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: textColor]
+        let bulletAttributes: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: bulletColor]
         let paragraphStyle = NSMutableParagraphStyle()
         let nonOptions = [NSTextTab.OptionKey: Any]()
-        paragraphStyle.tabStops = [
-            NSTextTab(textAlignment: .left, location: indentation, options: nonOptions)]
+        paragraphStyle.tabStops = [NSTextTab(textAlignment: .left, location: indentation, options: nonOptions)]
         paragraphStyle.defaultTabInterval = indentation
         paragraphStyle.lineSpacing = lineSpacing
         paragraphStyle.paragraphSpacing = paragraphSpacing

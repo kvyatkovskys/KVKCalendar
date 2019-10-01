@@ -10,7 +10,7 @@ import UIKit
 final class YearHeaderView: UIView {
     static let identifier = #file
     
-    fileprivate let titleLabel: UILabel = {
+    private let titleLabel: UILabel = {
         let label = UILabel()
         label.backgroundColor = .clear
         return label
