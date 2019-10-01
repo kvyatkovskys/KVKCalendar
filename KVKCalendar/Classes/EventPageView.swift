@@ -51,10 +51,13 @@ final class EventPageView: UIView {
         textFrame.size.height = textFrame.height
         textFrame.size.width = textFrame.width - pointX
         textView.frame = textFrame
-        addSubview(textView)
         textView.font = style.eventFont
         textView.textColor = event.colorText
         textView.text = event.text
+        
+        if textView.frame.width > 20 {
+            addSubview(textView)
+        }
         tag = "\(event.id)".hashValue
     }
     

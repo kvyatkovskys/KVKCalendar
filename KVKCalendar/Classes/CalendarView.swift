@@ -190,38 +190,22 @@ public enum TimeHourSystem: Int {
     var hours: [String] {
         switch self {
         case .twelveHour:
-            var array = [String]()
-            
-            for idx in 0...11 {
-                if idx == 0 {
-                    array.append("12")
-                } else {
-                    let string = String(idx)
-                    array.append(string)
-                }
-            }
-            var am = array.map { $0 + " AM" }
+            let array = ["12"] + Array(1...11).map({ String($0) })
+            let am = array.map { $0 + " AM" } + ["Noon"]
             var pm = array.map { $0 + " PM" }
             
-            am.append("Noon")
             pm.removeFirst()
-            pm.append(am.first!)
-            
+            if let item = am.first {
+                pm.append(item)
+            }
             return am + pm
         case .twentyFourHour:
-            var array = [String]()
-            
-            for i in 0...24 {
-                if i == 0 {
-                    array.append("00:00")
-                } else {
-                    let i = i % 24
-                    var string = i < 10 ? "0" + "\(i)" : "\(i)"
-                    string.append(":00")
-                    array.append(string)
-                }
-            }
-            
+            let array = ["00:00"] + Array(1...24).map({ (i) -> String in
+                let i = i % 24
+                var string = i < 10 ? "0" + "\(i)" : "\(i)"
+                string.append(":00")
+                return string
+            })
             return array
         }
     }

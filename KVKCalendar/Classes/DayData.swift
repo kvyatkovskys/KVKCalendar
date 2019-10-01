@@ -19,7 +19,7 @@ struct DayData {
         var tempDays = [Day]()
         if let firstDay = days.first?.type {
             for _ in 0..<firstDay.shiftDay {
-                tempDays.append(Day.empty())
+                tempDays.append(.empty())
             }
             tempDays += days
         } else {
@@ -27,7 +27,7 @@ struct DayData {
         }
         
         if startDay == .sunday {
-            tempDays.insert(Day.empty(), at: 0)
+            tempDays.insert(.empty(), at: 0)
         }
         
         self.days = tempDays
