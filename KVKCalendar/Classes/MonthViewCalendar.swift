@@ -54,10 +54,10 @@ final class MonthViewCalendar: UIView {
         collectionView.reloadData()
     }
     
-    private func createCollectionView(frame: CGRect) -> UICollectionView {
+    private func createCollectionView(frame: CGRect, style: MonthStyle) -> UICollectionView {
         let collection = UICollectionView(frame: frame, collectionViewLayout: layout)
         collection.backgroundColor = .clear
-        collection.isPagingEnabled = true
+        collection.isPagingEnabled = style.isPagingEnabled
         collection.dataSource = self
         collection.delegate = self
         collection.register(MonthCollectionViewCell.self,
@@ -66,7 +66,7 @@ final class MonthViewCalendar: UIView {
     }
     
     private func scrollToDate(date: Date, animated: Bool) {
-        delegate?.didSelectCalendarDate(date, type: .month)
+        delegate?.didSelectCalendarDate(date, type: .month, frame: nil)
         if let idx = data.days.firstIndex(where: { $0.date?.month == date.month && $0.date?.year == date.year }) {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
@@ -100,7 +100,7 @@ extension MonthViewCalendar: CalendarSettingProtocol {
         headerView.reloadFrame(frame)
         
         collectionView.removeFromSuperview()
-        collectionView = createCollectionView(frame: self.frame)
+        collectionView = createCollectionView(frame: self.frame, style: style.monthStyle)
         
         var collectionFrame = frame
         collectionFrame.origin.y = headerView.frame.height
@@ -128,7 +128,7 @@ extension MonthViewCalendar: CalendarSettingProtocol {
         subviews.forEach({ $0.removeFromSuperview() })
         
         addSubview(headerView)
-        collectionView = createCollectionView(frame: frame)
+        collectionView = createCollectionView(frame: frame, style: style.monthStyle)
         var collectionFrame = frame
         collectionFrame.origin.y = headerView.frame.height
         collectionFrame.size.height = collectionFrame.height - headerView.frame.height
@@ -150,16 +150,16 @@ extension MonthViewCalendar: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MonthCollectionViewCell.cellIdentifier,
                                                       for: indexPath) as? MonthCollectionViewCell ?? MonthCollectionViewCell()
         let day = data.days[indexPath.row]
+        cell.selectDate = data.date
         cell.style = style.monthStyle
         cell.day = day
-        cell.selectDate = data.date
         cell.events = day.events
         cell.delegate = self
         return cell
     }
 }
 
-extension MonthViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+extension MonthViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {    
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         let cells = collectionView.visibleCells as? [MonthCollectionViewCell] ?? [MonthCollectionViewCell()]
         let cellDays = cells.filter({ $0.day.type != .empty })
@@ -168,14 +168,14 @@ extension MonthViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateF
             if let lastDate = sorted.last?.day.date, lastDate.day < data.date.day {
                 data.date = lastDate
                 headerView.date = lastDate
-                delegate?.didSelectCalendarDate(lastDate, type: .month)
+                delegate?.didSelectCalendarDate(lastDate, type: .month, frame: nil)
                 collectionView.reloadData()
             }
             return
         }
         data.date = newMoveDate
         headerView.date = newMoveDate
-        delegate?.didSelectCalendarDate(newMoveDate, type: .month)
+        delegate?.didSelectCalendarDate(newMoveDate, type: .month, frame: nil)
         collectionView.reloadData()
     }
     
@@ -183,11 +183,17 @@ extension MonthViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateF
         let date = data.days[indexPath.row].date
         data.date = date ?? data.date
         headerView.date = date
-        delegate?.didSelectCalendarDate(date, type: style.monthStyle.selectCalendarType)
+        
+        let attributes = collectionView.layoutAttributesForItem(at: indexPath)
+        let frame = collectionView.convert(attributes?.frame ?? .zero, to: collectionView)
+        
+        delegate?.didSelectCalendarDate(date, type: style.monthStyle.selectCalendarType, frame: frame)
         collectionView.reloadData()
     }
     
     func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
+        guard style.monthStyle.isAnimateSelection else { return }
+        
         let cell = collectionView.cellForItem(at: indexPath)
         UIView.animate(withDuration: 0.4,
                        delay: 0,
@@ -199,6 +205,8 @@ extension MonthViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateF
     }
     
     func collectionView(_ collectionView: UICollectionView, didUnhighlightItemAt indexPath: IndexPath) {
+        guard style.monthStyle.isAnimateSelection else { return }
+        
         let cell = collectionView.cellForItem(at: indexPath)
         UIView.animate(withDuration: 0.1) {
             cell?.transform = CGAffineTransform(scaleX: 1, y: 1)

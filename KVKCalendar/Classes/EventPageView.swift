@@ -26,7 +26,7 @@ final class EventPageView: UIView {
     
     private lazy var iconFileImageView: UIImageView = {
         let image = UIImageView(frame: CGRect(x: 0, y: 2, width: 10, height: 10))
-        image.image = style.iconFile.withRenderingMode(.alwaysTemplate)
+        image.image = style.iconFile?.withRenderingMode(.alwaysTemplate)
         image.tintColor = style.colorIconFile
         return image
     }()
@@ -51,10 +51,13 @@ final class EventPageView: UIView {
         textFrame.size.height = textFrame.height
         textFrame.size.width = textFrame.width - pointX
         textView.frame = textFrame
-        addSubview(textView)
         textView.font = style.eventFont
         textView.textColor = event.colorText
         textView.text = event.text
+        
+        if textView.frame.width > 20 {
+            addSubview(textView)
+        }
         tag = "\(event.id)".hashValue
     }
     

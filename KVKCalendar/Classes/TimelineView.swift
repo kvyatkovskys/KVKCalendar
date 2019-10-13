@@ -42,7 +42,7 @@ final class TimelineView: UIView {
     private lazy var currentLineView: UIView = {
         let view = UIView()
         view.tag = tagCurrentHourLine
-        view.backgroundColor = .red
+        view.backgroundColor = style.timelineStyle.currentLineHourColor
         return view
     }()
     
@@ -172,6 +172,14 @@ final class TimelineView: UIView {
             lines.append(line)
         }
         return lines
+    }
+    
+    private func createVerticalLine(pointX: CGFloat) -> UIView {
+        let frame = CGRect(x: pointX, y: 0, width: 0.5, height: (CGFloat(25) * (style.timelineStyle.heightTime + style.timelineStyle.offsetTimeY)) - 75)
+        let line = UIView(frame: frame)
+        line.tag = -999
+        line.backgroundColor = .lightGray
+        return line
     }
     
     private func countEventsInHour(events: [Event]) -> [CrossPageTree] {
@@ -316,9 +324,9 @@ final class TimelineView: UIView {
         pointY = calculatePointYByMinute(date.minute, time: time)
         
         currentTimeLabel.frame = CGRect(x: style.timelineStyle.offsetTimeX,
-                                        y: pointY - 5,
+                                        y: pointY - 10,
                                         width: style.timelineStyle.currentLineHourWidth,
-                                        height: 10)
+                                        height: 15)
         currentLineView.frame = CGRect(x: currentTimeLabel.frame.width + style.timelineStyle.offsetTimeX + style.timelineStyle.offsetLineLeft,
                                        y: pointY,
                                        width: scrollView.frame.width - style.timelineStyle.offsetTimeX,
@@ -374,6 +382,7 @@ final class TimelineView: UIView {
     func createTimelinePage(dates: [Date?], events: [Event], selectedDate: Date?) {
         subviews.filter({ $0 is AllDayEventView || $0 is AllDayTitleView }).forEach({ $0.removeFromSuperview() })
         scrollView.subviews.forEach({ $0.removeFromSuperview() })
+        subviews.filter({ $0.tag == -999 }).forEach({ $0.removeFromSuperview() })
         
         allEvents = events.filter { (event) -> Bool in
             let date = event.start
@@ -402,7 +411,7 @@ final class TimelineView: UIView {
         scrollView.contentSize = CGSize(width: frame.width, height: heightAllTimes + 20)
         times.forEach({ scrollView.addSubview($0) })
         lines.forEach({ scrollView.addSubview($0) })
-        
+
         let offset = style.timelineStyle.widthTime + style.timelineStyle.offsetTimeX + style.timelineStyle.offsetLineLeft
         let widthPage = (frame.width - offset) / CGFloat(dates.count)
         let heightPage = (CGFloat(times.count) * (style.timelineStyle.heightTime + style.timelineStyle.offsetTimeY)) - 75
@@ -414,6 +423,10 @@ final class TimelineView: UIView {
                 pointX = offset
             } else {
                 pointX = CGFloat(idx) * widthPage + offset
+            }
+            
+            if style.weekStyle.showVerticalDayDivider {
+                addSubview(createVerticalLine(pointX: pointX))
             }
             
             let eventsByDate = filteredEvents

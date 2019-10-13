@@ -22,8 +22,71 @@ public struct Style {
     public var defaultType: CalendarType?
     public var timeHourSystem: TimeHourSystem = .twentyFourHour
     public var startWeekDay: StartDayType = .monday
+    public var followInInterfaceStyle: Bool = false
     
     public init() {}
+    
+    var checkStyle: Style {
+        guard followInInterfaceStyle else { return self }
+        
+        var newStyle = self
+        if #available(iOS 13.0, *) {
+            newStyle.headerScrollStyle.backgroundColor = UIColor.useForStyle(dark: .black, white: UIColor(red: 246 / 255, green: 246 / 255, blue: 246 / 255, alpha: 1))
+            newStyle.headerScrollStyle.colorTitleDate = UIColor.useForStyle(dark: .white, white: .black)
+            newStyle.headerScrollStyle.colorTitleCornerDate = .systemRed
+            newStyle.headerScrollStyle.colorDate = UIColor.useForStyle(dark: .systemGray, white: .black)
+            newStyle.headerScrollStyle.colorNameDay = UIColor.useForStyle(dark: .systemGray, white: .black)
+            newStyle.headerScrollStyle.colorCurrentDate = .systemGray6
+            newStyle.headerScrollStyle.colorBackgroundCurrentDate = .systemRed
+            newStyle.headerScrollStyle.colorBackgroundSelectDate = UIColor.useForStyle(dark: .systemGray, white: .black)
+            newStyle.headerScrollStyle.colorSelectDate = .systemGray6
+            newStyle.headerScrollStyle.colorWeekendDate = .systemGray2
+            
+            newStyle.timelineStyle.backgroundColor = UIColor.useForStyle(dark: .black, white: .white)
+            newStyle.timelineStyle.timeColor = .systemGray
+            newStyle.timelineStyle.colorIconFile = UIColor.useForStyle(dark: .systemGray, white: .black)
+            newStyle.timelineStyle.currentLineHourColor = UIColor.useForStyle(dark: .systemRed, white: .red)
+            
+            newStyle.weekStyle.colorBackground = UIColor.useForStyle(dark: .black, white: gainsboro.withAlphaComponent(0.4))
+            newStyle.weekStyle.colorDate = UIColor.useForStyle(dark: .systemGray, white: .black)
+            newStyle.weekStyle.colorNameDay = UIColor.useForStyle(dark: .systemGray, white: .black)
+            newStyle.weekStyle.colorCurrentDate = UIColor.useForStyle(dark: .systemGray, white: .white)
+            newStyle.weekStyle.colorBackgroundSelectDate = UIColor.useForStyle(dark: .systemGray, white: .black)
+            newStyle.weekStyle.colorBackgroundCurrentDate = .systemRed
+            newStyle.weekStyle.colorSelectDate = .white
+            newStyle.weekStyle.colorWeekendDate = .systemGray2
+            newStyle.weekStyle.colorBackgroundWeekendDate = UIColor.useForStyle(dark: .systemGray, white: gainsboro.withAlphaComponent(0.4))
+            
+            newStyle.monthStyle.colorDate = UIColor.useForStyle(dark: .systemGray, white: .black)
+            newStyle.monthStyle.colorNameDay = UIColor.useForStyle(dark: .systemGray, white: .black)
+            newStyle.monthStyle.colorCurrentDate = .white
+            newStyle.monthStyle.colorBackgroundCurrentDate = .systemRed
+            newStyle.monthStyle.colorBackgroundSelectDate = UIColor.useForStyle(dark: .systemGray, white: .black)
+            newStyle.monthStyle.colorSelectDate = UIColor.useForStyle(dark: .black, white: .white)
+            newStyle.monthStyle.colorWeekendDate = .systemGray2
+            newStyle.monthStyle.colorMoreTitle = UIColor.useForStyle(dark: .systemGray3, white: .gray)
+            newStyle.monthStyle.colorEventTitle = UIColor.useForStyle(dark: .systemGray, white: .black)
+            newStyle.monthStyle.colorSeporator = UIColor.useForStyle(dark: .systemGray, white: gainsboro.withAlphaComponent(0.9))
+            newStyle.monthStyle.colorBackgroundWeekendDate = UIColor.useForStyle(dark: .systemGray5, white: gainsboro.withAlphaComponent(0.4))
+            newStyle.monthStyle.colorBackgroundDate = UIColor.useForStyle(dark: .black, white: .white)
+            
+            newStyle.yearStyle.colorCurrentDate = .white
+            newStyle.yearStyle.colorBackgroundCurrentDate = .systemRed
+            newStyle.yearStyle.colorBackgroundSelectDate = UIColor.useForStyle(dark: .systemGray, white: .black)
+            newStyle.yearStyle.colorSelectDate = .white
+            newStyle.yearStyle.colorWeekendDate = .systemGray2
+            newStyle.yearStyle.colorBackgroundWeekendDate = UIColor.useForStyle(dark: .systemGray5, white: gainsboro.withAlphaComponent(0.4))
+            newStyle.yearStyle.colorTitle = UIColor.useForStyle(dark: .systemGray, white: .black)
+            newStyle.yearStyle.colorBackgroundHeader = UIColor.useForStyle(dark: .black, white: gainsboro.withAlphaComponent(0.4))
+            newStyle.yearStyle.colorTitleHeader = UIColor.useForStyle(dark: .white, white: .black)
+            newStyle.yearStyle.colorDayTitle = UIColor.useForStyle(dark: .systemGray, white: .black)
+            
+            newStyle.allDayStyle.backgroundColor = .systemGray
+            newStyle.allDayStyle.titleColor = UIColor.useForStyle(dark: .white, white: .black)
+            newStyle.allDayStyle.textColor = UIColor.useForStyle(dark: .white, white: .black)
+        }
+        return newStyle
+    }
 }
 
 public struct HeaderScrollStyle {
@@ -76,7 +139,7 @@ public struct TimelineStyle {
     public var timeFont: UIFont = .systemFont(ofSize: 12)
     public var scrollToCurrentHour: Bool = true
     public var widthEventViewer: CGFloat = 0
-    public var iconFile: UIImage = UIImage()
+    public var iconFile: UIImage? = nil
     public var colorIconFile: UIColor = .black
     public var showCurrentLineHour: Bool = true
     public var currentLineHourFont: UIFont = .systemFont(ofSize: 12)
@@ -95,6 +158,7 @@ public struct WeekStyle {
     public var colorWeekendDate: UIColor = .gray
     public var colorBackgroundWeekendDate: UIColor = gainsboro.withAlphaComponent(0.4)
     public var selectCalendarType: CalendarType = .day
+    public var showVerticalDayDivider: Bool = true
 }
 
 public struct MonthStyle {
@@ -127,6 +191,8 @@ public struct MonthStyle {
     public var colorBackgroundDate: UIColor = .white
     var scrollDirection: UICollectionView.ScrollDirection = .vertical
     public var selectCalendarType: CalendarType = .week
+    public var isAnimateSelection: Bool = true
+    public var isPagingEnabled: Bool = true
 }
 
 public struct YearStyle {
@@ -154,6 +220,8 @@ public struct YearStyle {
     public var fontDayTitle: UIFont = .systemFont(ofSize: 15)
     public var colorDayTitle: UIColor = .black
     public var selectCalendarType: CalendarType = .month
+    public var isAnimateSelection: Bool = true
+    public var isPagingEnabled: Bool = true
 }
 
 public struct AllDayStyle {

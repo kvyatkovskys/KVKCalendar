@@ -34,6 +34,7 @@ final class ViewController: UIViewController {
         } else {
             style.timelineStyle.widthEventViewer = 500
         }
+        style.followInInterfaceStyle = true
         style.timelineStyle.offsetTimeY = 80
         style.timelineStyle.offsetEvent = 3
         style.timelineStyle.currentLineHourWidth = 40
@@ -69,7 +70,11 @@ final class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .white
+        if #available(iOS 13.0, *) {
+            view.backgroundColor = .systemBackground
+        } else {
+            view.backgroundColor = .white
+        }
         view.addSubview(calendarView)
         navigationItem.titleView = segmentedControl
         navigationItem.rightBarButtonItem = todayButton
@@ -110,7 +115,7 @@ final class ViewController: UIViewController {
 }
 
 extension ViewController: CalendarDelegate {
-    func didSelectDate(date: Date?, type: CalendarType) {
+    func didSelectDate(date: Date?, type: CalendarType, frame: CGRect?) {
         selectDate = date ?? Date()
         calendarView.reloadData()
     }

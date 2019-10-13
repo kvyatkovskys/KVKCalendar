@@ -46,7 +46,7 @@ public final class CalendarView: UIView {
     }()
     
     public init(frame: CGRect, date: Date = Date(), style: Style = Style(), years: Int = 4) {
-        self.style = style
+        self.style = style.checkStyle
         self.yearData = YearData(date: date, years: years, style: style)
         self.dayData = DayData(yearData: yearData, timeSystem: style.timeHourSystem, startDay: style.startWeekDay)
         self.weekData = WeekData(yearData: yearData, timeSystem: style.timeHourSystem, startDay: style.startWeekDay)
@@ -145,12 +145,12 @@ public final class CalendarView: UIView {
 }
 
 extension CalendarView: CalendarPrivateDelegate {
-    func didSelectCalendarDate(_ date: Date?, type: CalendarType) {
-        delegate?.didSelectDate(date: date, type: type)
+    func didSelectCalendarDate(_ date: Date?, type: CalendarType, frame: CGRect?) {
+        delegate?.didSelectDate(date: date, type: type, frame: frame)
     }
     
     func didSelectCalendarEvents(_ events: [Event]) {
-        delegate?.didSelectEvents(events)
+        //delegate?.didSelectEvents(events)
     }
     
     func didSelectCalendarEvent(_ event: Event, frame: CGRect?) {
@@ -190,38 +190,22 @@ public enum TimeHourSystem: Int {
     var hours: [String] {
         switch self {
         case .twelveHour:
-            var array = [String]()
-            
-            for idx in 0...11 {
-                if idx == 0 {
-                    array.append("12")
-                } else {
-                    let string = String(idx)
-                    array.append(string)
-                }
-            }
-            var am = array.map { $0 + " AM" }
+            let array = ["12"] + Array(1...11).map({ String($0) })
+            let am = array.map { $0 + " AM" } + ["Noon"]
             var pm = array.map { $0 + " PM" }
             
-            am.append("Noon")
             pm.removeFirst()
-            pm.append(am.first!)
-            
+            if let item = am.first {
+                pm.append(item)
+            }
             return am + pm
         case .twentyFourHour:
-            var array = [String]()
-            
-            for i in 0...24 {
-                if i == 0 {
-                    array.append("00:00")
-                } else {
-                    let i = i % 24
-                    var string = i < 10 ? "0" + "\(i)" : "\(i)"
-                    string.append(":00")
-                    array.append(string)
-                }
-            }
-            
+            let array = ["00:00"] + Array(1...24).map({ (i) -> String in
+                let i = i % 24
+                var string = i < 10 ? "0" + "\(i)" : "\(i)"
+                string.append(":00")
+                return string
+            })
             return array
         }
     }
@@ -276,8 +260,8 @@ extension CalendarSettingProtocol {
 }
 
 protocol CalendarPrivateDelegate: AnyObject {
-    func didSelectCalendarDate(_ date: Date?, type: CalendarType)
-    func didSelectCalendarEvents(_ events: [Event])
+    func didSelectCalendarDate(_ date: Date?, type: CalendarType, frame: CGRect?)
+    //func didSelectCalendarEvents(_ events: [Event])
     func didSelectCalendarEvent(_ event: Event, frame: CGRect?)
     func didSelectCalendarMore(_ date: Date, frame: CGRect?)
     func getEventViewerFrame(frame: CGRect)
@@ -292,16 +276,15 @@ public protocol CalendarDataSource: AnyObject {
 }
 
 public protocol CalendarDelegate: AnyObject {
-    func didSelectDate(date: Date?, type: CalendarType)
-    func didSelectEvents(_ events: [Event])
+    func didSelectDate(date: Date?, type: CalendarType, frame: CGRect?)
+    //func didSelectEvents(_ events: [Event])
     func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?)
     func didSelectMore(_ date: Date, frame: CGRect?)
     func eventViewerFrame(_ frame: CGRect)
 }
 
 public extension CalendarDelegate {
-    func didSelectDate(date: Date?, type: CalendarType) {}
-    func didSelectEvents(_ events: [Event]) {}
+    func didSelectDate(date: Date?, type: CalendarType, frame: CGRect?) {}
     func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?) {}
     func didSelectMore(_ date: Date, frame: CGRect?) {}
     func eventViewerFrame(_ frame: CGRect) {}
