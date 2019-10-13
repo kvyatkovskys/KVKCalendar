@@ -14,18 +14,21 @@
 ## Requirements
 
 - iOS 10.0+
-- Swift 5.0
+- Swift 5.0+
 
 ## Installation
 
-**KVKCalendar** is available through [CocoaPods](https://cocoapods.org) or [Carthage](https://github.com/Carthage/Carthage). To install
-it, simply add the following line to your Podfile or Cartfile:
+**KVKCalendar** is available through [CocoaPods](https://cocoapods.org) and [Carthage](https://github.com/Carthage/Carthage).
 
-```ruby
+### CocoaPods
+~~~bash
 pod 'KVKCalendar'
+~~~
 
+### Carthage
+~~~bash
 github "kvyatkovskys/KVKCalendar"
-```
+~~~
 
 ## Usage
 Import `KVKCalendar`.
@@ -121,8 +124,8 @@ style.timezone = TimeZone //create any
 
 ## Author
 
-Sergei Kviatkovskii
+[Sergei Kviatkovskii](https://github.com/kvyatkovskys)
 
 ## License
 
-KVKCalendar is available under the MIT license. See the LICENSE file for more info.
+KVKCalendar is available under the [MIT license](https://github.com/kvyatkovskys/KVKCalendar/blob/master/LICENSE.md)
