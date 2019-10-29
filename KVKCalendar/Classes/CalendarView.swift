@@ -236,7 +236,7 @@ public struct Event {
             backgroundColor = valueColor.value.withAlphaComponent(valueColor.alpha)
             var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 0
             valueColor.value.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
-            colorText = UIColor(hue: hue, saturation: saturation, brightness: brightness * 0.4, alpha: alpha)
+            colorText = UIColor(hue: hue, saturation: saturation, brightness: UIScreen.isDarkMode ? brightness : brightness * 0.4, alpha: alpha)
         }
     }
     public var backgroundColor: UIColor = UIColor.blue.withAlphaComponent(0.3)

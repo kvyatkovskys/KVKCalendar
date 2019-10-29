@@ -112,6 +112,13 @@ final class ViewController: UIViewController {
         }
         calendarView.reloadData()
     }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        loadEvents { [unowned self] (events) in
+            self.events = events
+            self.calendarView.reloadData()
+        }
+    }
 }
 
 extension ViewController: CalendarDelegate {
