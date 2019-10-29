@@ -1,5 +1,5 @@
 //
-//  Array+Extension.swift
+//  Calendar+Extension.swift
 //  KVKCalendar
 //
 //  Created by Sergei Kviatkovskii on 02/01/2019.
@@ -26,6 +26,16 @@ extension UIColor {
     static func useForStyle(dark: UIColor, white: UIColor) -> UIColor {
         return UIColor { (traitCollection: UITraitCollection) -> UIColor in
             return traitCollection.userInterfaceStyle == .dark ? dark : white
+        }
+    }
+}
+
+extension UIScreen {
+    static var isDarkMode: Bool {
+        if #available(iOS 12.0, *) {
+            return main.traitCollection.userInterfaceStyle == .dark
+        } else {
+            return false
         }
     }
 }

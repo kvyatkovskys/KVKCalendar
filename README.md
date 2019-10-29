@@ -1,6 +1,4 @@
-<pre>
-<img src="https://i.postimg.cc/PNsT9nKV/Simulator-Screen-Shot-i-Phone-Xs-2019-05-04-at-11-11-07-iphon.png" height="400" width="380">   <img src="https://i.postimg.cc/VvMddRVT/Screenshot-2019-05-04-at-11-42-20.png" height="320" width="430">
-</pre>
+[url=https://postimg.cc/f30wpxFc][img]https://i.postimg.cc/f30wpxFc/Screenshot-2019-10-29-at-12-00-35.png[/img][/url] [url=https://postimg.cc/tZQXjsQL][img]https://i.postimg.cc/tZQXjsQL/Screenshot-2019-10-29-at-12-00-59.png[/img][/url]
 
 [![CI Status](https://img.shields.io/travis/kvyatkovskys/KVKCalendar.svg?style=flat)](https://travis-ci.org/kvyatkovskys/KVKCalendar)
 [![Version](https://img.shields.io/cocoapods/v/KVKCalendar.svg?style=flat)](https://cocoapods.org/pods/KVKCalendar)
