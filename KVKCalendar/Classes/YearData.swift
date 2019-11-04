@@ -105,7 +105,7 @@ struct YearData {
         formatter.dateFormat = "d"
         let formatterDay = DateFormatter()
         formatterDay.dateFormat = "EE"
-        formatterDay.locale = Locale(identifier: "en_US")
+        formatterDay.locale = Locale(identifier: "fr_FR")
         
         let days = arrDates.map({ Day(day: formatter.string(from: $0),
                                       type: DayType(rawValue: formatterDay.string(from: $0).uppercased()),
@@ -186,24 +186,24 @@ struct Day {
 }
 
 enum DayType: String, CaseIterable {
-    case monday = "MON"
-    case tuesday = "TUE"
-    case wednesday = "WED"
-    case thursday = "THU"
-    case friday = "FRI"
-    case saturday = "SAT"
-    case sunday = "SUN"
+    case monday = "LUN."
+    case tuesday = "MAR."
+    case wednesday = "MER."
+    case thursday = "JEU."
+    case friday = "VEN."
+    case saturday = "SAM."
+    case sunday = "DIM."
     case empty
     
     init(rawValue: String) {
         switch rawValue {
-        case "MON": self = .monday
-        case "TUE": self = .tuesday
-        case "WED": self = .wednesday
-        case "THU": self = .thursday
-        case "FRI": self = .friday
-        case "SAT": self = .saturday
-        case "SUN": self = .sunday
+        case "LUN.": self = .monday
+        case "MAR.": self = .tuesday
+        case "MER.": self = .wednesday
+        case "JEU.": self = .thursday
+        case "VEN.": self = .friday
+        case "SAM.": self = .saturday
+        case "DIM.": self = .sunday
         default: self = .empty
         }
     }
