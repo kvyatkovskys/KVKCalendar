@@ -45,7 +45,7 @@ final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
                 titleLabel.text = day.type.rawValue
             }
             dateLabel.text = "\(number)"
-            weekendsDays(day: day)
+            weekendDays(day: day)
         }
     }
     
@@ -70,7 +70,7 @@ final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
             
             // select date not in the current month
             guard day.date?.month == selectDate.month, day.date?.day == selectDate.day else {
-                weekendsDays(day: day)
+                weekendDays(day: day)
                 return
             }
             dateLabel.textColor = style.colorSelectDate
@@ -104,7 +104,7 @@ final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func weekendsDays(day: Day) {
+    private func weekendDays(day: Day) {
         guard day.type == .saturday || day.type == .sunday else {
             isNowDate(date: day.date, colorText: style.colorDate)
             titleLabel.textColor = style.colorDate

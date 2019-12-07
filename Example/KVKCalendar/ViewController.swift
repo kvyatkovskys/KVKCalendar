@@ -39,7 +39,7 @@ final class ViewController: UIViewController {
         style.timelineStyle.offsetEvent = 3
         style.timelineStyle.currentLineHourWidth = 40
         style.allDayStyle.isPinned = true
-        style.startWeekDay = .sunday
+        //style.startWeekDay = .sunday
         style.timeHourSystem = .twelveHour
         
         let calendar = CalendarView(frame: view.frame, date: selectDate, style: style)
@@ -150,11 +150,11 @@ extension ViewController: CalendarDataSource {
 extension ViewController {
     func loadEvents(completion: ([Event]) -> Void) {
         var events = [Event]()
-        
-        let path = Bundle.main.path(forResource: "events", ofType: "json")!
-        let data = try! Data(contentsOf: URL(fileURLWithPath: path), options: .mappedIfSafe)
         let decoder = JSONDecoder()
-        let result = try! decoder.decode(ItemData.self, from: data)
+                
+        guard let path = Bundle.main.path(forResource: "events", ofType: "json"),
+            let data = try? Data(contentsOf: URL(fileURLWithPath: path), options: .mappedIfSafe),
+            let result = try? decoder.decode(ItemData.self, from: data) else { return }
         
         for (idx, item) in result.data.enumerated() {
             let startDate = self.formatter(date: item.start)
