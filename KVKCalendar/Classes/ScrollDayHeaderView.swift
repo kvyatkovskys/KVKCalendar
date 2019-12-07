@@ -75,14 +75,14 @@ final class ScrollDayHeaderView: UIView {
     
     func scrollHeaderByTransform(_ transform: CGAffineTransform) {
         guard !transform.isIdentity else {
-            guard let scrollDate = getScrollDate(date: date),
-                let idx = days.firstIndex(where: { $0.date?.year == scrollDate.year
-                    && $0.date?.month == scrollDate.month
-                    && $0.date?.day == scrollDate.day }) else { return }
-
-            collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
-                                        at: .left,
-                                        animated: true)
+//            guard let scrollDate = getScrollDate(date),
+//                let idx = days.firstIndex(where: { $0.date?.year == scrollDate.year
+//                    && $0.date?.month == scrollDate.month
+//                    && $0.date?.day == scrollDate.day }) else { return }
+//
+//            collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
+//                                        at: .left,
+//                                        animated: true)
             return
         }
         
@@ -130,13 +130,25 @@ final class ScrollDayHeaderView: UIView {
         delegate?.didSelectDateScrollHeader(date, type: type)
         setDateToTitle(date)
         
-        guard let scrollDate = getScrollDate(date: date),
-            let idx = days.firstIndex(where: { $0.date?.year == scrollDate.year
-                && $0.date?.month == scrollDate.month
-                && $0.date?.day == scrollDate.day }) else { return }
+        guard var indexPath = getMiddleIndexPath(), let middleDate = days[indexPath.row].date else { return }
+        
+        if date.weekday == 1, date.day > middleDate.day {
+            return
+        } else if middleDate.day > date.day, 4...5 ~= middleDate.weekday - date.weekday {
+            indexPath.row -= 10
+        } else if date.day > middleDate.day, 4...5 ~= date.weekday - middleDate.weekday {
+            indexPath.row += 4
+        } else {
+            guard let scrollDate = getScrollDate(date),
+                       let idx = days.firstIndex(where: { $0.date?.year == scrollDate.year
+                           && $0.date?.month == scrollDate.month
+                           && $0.date?.day == scrollDate.day }) else { return }
+            
+            indexPath.row = idx
+        }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
+            self.collectionView.scrollToItem(at: indexPath,
                                              at: .left,
                                              animated: animated)
         }
@@ -180,7 +192,7 @@ extension ScrollDayHeaderView: CalendarSettingProtocol {
         }
         addSubview(newView)
         
-        guard let scrollDate = getScrollDate(date: date),
+        guard let scrollDate = getScrollDate(date),
             let idx = days.firstIndex(where: { $0.date?.year == scrollDate.year
                 && $0.date?.month == scrollDate.month
                 && $0.date?.day == scrollDate.day }) else { return }
@@ -197,8 +209,13 @@ extension ScrollDayHeaderView: CalendarSettingProtocol {
         self.style = style
     }
     
-    private func getScrollDate(date: Date) -> Date? {
+    private func getScrollDate(_ date: Date) -> Date? {
         return style.startWeekDay == .sunday ? date.startSundayOfWeek : date.startMondayOfWeek
+    }
+    
+    private func getMiddleIndexPath() -> IndexPath? {
+        let rect = CGRect(origin: collectionView.contentOffset, size: collectionView.bounds.size)
+        return collectionView.indexPathForItem(at: CGPoint(x: rect.midX, y: rect.midY))
     }
 }
 
@@ -232,9 +249,22 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        let cells = collectionView.visibleCells as? [ScrollHeaderDayCollectionViewCell] ?? [ScrollHeaderDayCollectionViewCell()]
-        let cellDays = cells.filter({ $0.day.type != .empty })
-        guard let newMoveDate = cellDays.filter({ $0.day.date?.weekday == date.weekday }).first?.day.date, date != newMoveDate else { return }
+        guard var indexPath = getMiddleIndexPath(), let scrollDate = days[indexPath.row].date else { return }
+        
+        if date.weekday == 1 {
+            switch style.startWeekDay {
+            case .monday:
+                indexPath.row += 3
+            case .sunday:
+                indexPath.row -= 3
+            }
+        } else if date.weekday > scrollDate.weekday {
+            indexPath.row += date.weekday - scrollDate.weekday
+        } else if scrollDate.weekday > date.weekday {
+            indexPath.row -= scrollDate.weekday - date.weekday
+        }
+        
+        guard let newMoveDate = days[indexPath.row].date else { return }
         
         date = newMoveDate.toLocalTime()
         delegate?.didSelectDateScrollHeader(newMoveDate, type: type)
