@@ -75,14 +75,14 @@ final class ScrollDayHeaderView: UIView {
     
     func scrollHeaderByTransform(_ transform: CGAffineTransform) {
         guard !transform.isIdentity else {
-//            guard let scrollDate = getScrollDate(date),
-//                let idx = days.firstIndex(where: { $0.date?.year == scrollDate.year
-//                    && $0.date?.month == scrollDate.month
-//                    && $0.date?.day == scrollDate.day }) else { return }
-//
-//            collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
-//                                        at: .left,
-//                                        animated: true)
+            guard let scrollDate = getScrollDate(date),
+                let idx = days.firstIndex(where: { $0.date?.year == scrollDate.year
+                    && $0.date?.month == scrollDate.month
+                    && $0.date?.day == scrollDate.day }) else { return }
+
+            collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
+                                        at: .left,
+                                        animated: true)
             return
         }
         
@@ -149,7 +149,12 @@ final class ScrollDayHeaderView: UIView {
                 indexPath.row = idx
             }
         case .week:
-            break
+            guard let scrollDate = getScrollDate(date),
+                       let idx = days.firstIndex(where: { $0.date?.year == scrollDate.year
+                           && $0.date?.month == scrollDate.month
+                           && $0.date?.day == scrollDate.day }) else { return }
+            
+            indexPath.row = idx
         default:
             return
         }
