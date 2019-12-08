@@ -134,11 +134,13 @@ final class ScrollDayHeaderView: UIView {
         
         switch type {
         case .day:
-            guard middleDate.day - date.day >= 4 || date.day - middleDate.day >= 4 else { return }
+            let minOffset = 4
+            let maxOffset = 5
+            guard middleDate.day - date.day >= minOffset || date.day - middleDate.day >= minOffset else { return }
             
-            if middleDate.day > date.day, 4...5 ~= middleDate.day - date.day {
+            if middleDate.day > date.day, minOffset...maxOffset ~= middleDate.day - date.day {
                 indexPath.row -= 10
-            } else if date.day > middleDate.day, 4...5 ~= date.day - middleDate.day {
+            } else if date.day > middleDate.day, minOffset...maxOffset ~= date.day - middleDate.day {
                 indexPath.row += 4
             } else {
                 guard let scrollDate = getScrollDate(date),
@@ -263,7 +265,7 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         guard var indexPath = getMiddleIndexPath(), let scrollDate = days[indexPath.row].date else { return }
         
-        if date.weekday == 1 {
+        if date.isSunday {
             switch style.startWeekDay {
             case .monday:
                 indexPath.row += 3

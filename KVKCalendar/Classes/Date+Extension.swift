@@ -8,6 +8,10 @@
 import Foundation
 
 public extension Date {
+    var isSunday: Bool {
+        return weekday == 1
+    }
+    
     var minute: Int {
         let calendar = Calendar.current
         let componet = calendar.dateComponents([.minute], from: self)
@@ -62,9 +66,8 @@ public extension Date {
     var startMondayOfWeek: Date? {
         var gregorian = Calendar(identifier: .gregorian)
         gregorian.timeZone = TimeZone(abbreviation: "UTC")!
-        // check if self == sunday
         let sunday = gregorian.date(from: gregorian.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))
-        return gregorian.date(byAdding: .day, value: 1, to: sunday ?? self)
+        return gregorian.date(byAdding: .day, value: self.isSunday ? -6 : 1, to: sunday ?? self)
     }
     
     var startSundayOfWeek: Date? {
