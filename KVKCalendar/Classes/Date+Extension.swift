@@ -66,7 +66,6 @@ public extension Date {
     var startMondayOfWeek: Date? {
         var gregorian = Calendar(identifier: .gregorian)
         gregorian.timeZone = TimeZone(abbreviation: "UTC")!
-        // check if self == sunday
         let sunday = gregorian.date(from: gregorian.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))
         return gregorian.date(byAdding: .day, value: self.isSunday ? -6 : 1, to: sunday ?? self)
     }
