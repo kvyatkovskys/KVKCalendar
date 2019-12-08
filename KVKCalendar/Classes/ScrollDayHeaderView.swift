@@ -132,19 +132,26 @@ final class ScrollDayHeaderView: UIView {
         
         guard var indexPath = getMiddleIndexPath(), let middleDate = days[indexPath.row].date else { return }
         
-        if date.weekday == 1, date.day > middleDate.day {
-            return
-        } else if middleDate.day > date.day, 4...5 ~= middleDate.weekday - date.weekday {
-            indexPath.row -= 10
-        } else if date.day > middleDate.day, 4...5 ~= date.weekday - middleDate.weekday {
-            indexPath.row += 4
-        } else {
-            guard let scrollDate = getScrollDate(date),
-                       let idx = days.firstIndex(where: { $0.date?.year == scrollDate.year
-                           && $0.date?.month == scrollDate.month
-                           && $0.date?.day == scrollDate.day }) else { return }
+        switch type {
+        case .day:
+            guard middleDate.day - date.day >= 4 || date.day - middleDate.day >= 4 else { return }
             
-            indexPath.row = idx
+            if middleDate.day > date.day, 4...5 ~= middleDate.day - date.day {
+                indexPath.row -= 10
+            } else if date.day > middleDate.day, 4...5 ~= date.day - middleDate.day {
+                indexPath.row += 4
+            } else {
+                guard let scrollDate = getScrollDate(date),
+                           let idx = days.firstIndex(where: { $0.date?.year == scrollDate.year
+                               && $0.date?.month == scrollDate.month
+                               && $0.date?.day == scrollDate.day }) else { return }
+                
+                indexPath.row = idx
+            }
+        case .week:
+            break
+        default:
+            return
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
