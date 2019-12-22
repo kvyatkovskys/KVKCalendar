@@ -65,14 +65,6 @@ final class ScrollDayHeaderView: UIView {
         addSubview(collectionView)
     }
     
-    func scrollHeaderTitleByTransform(_ transform: CGAffineTransform) {
-        guard !transform.isIdentity else {
-            identityViews([titleLabel])
-            return
-        }
-        titleLabel.transform = transform
-    }
-    
     func scrollHeaderByTransform(_ transform: CGAffineTransform) {
         guard !transform.isIdentity else {
             guard let scrollDate = getScrollDate(date),
@@ -97,12 +89,6 @@ final class ScrollDayHeaderView: UIView {
     
     func selectDate(offset: Int) {
         guard let nextDate = calendar.date(byAdding: .day, value: offset, to: date) else { return }
-        
-        if type == .day, !style.headerScrollStyle.isHiddenTitleDate {
-            let x = titleLabel.transform.tx < 0 ? frame.width : -frame.width
-            titleLabel.transform = CGAffineTransform(translationX: x, y: 0)
-            titleLabel.alpha = 0
-        }
         
         setDate(nextDate)
     }

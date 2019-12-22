@@ -27,12 +27,12 @@ struct YearData {
         
         // last years
         for lastIdx in lastYear.indices.reversed() {
-            yearsCount.append(-(lastIdx + 1))
+            yearsCount.append(-lastIdx)
         }
         
         // next years
         for nextIdx in nextYear.indices {
-            yearsCount.append(nextIdx)
+            yearsCount.append(nextIdx + 1)
         }
         
         let formatter = DateFormatter()

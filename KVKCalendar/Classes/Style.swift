@@ -31,7 +31,7 @@ public struct Style {
         
         var newStyle = self
         if #available(iOS 13.0, *) {
-            let colorBackgroundWeekendDate = UIColor.useForStyle(dark: .systemGray, white: gainsboro.withAlphaComponent(0.2))
+            let colorBackgroundWeekendDate = UIColor.useForStyle(dark: .systemGray6, white: gainsboro.withAlphaComponent(0.2))
             
             newStyle.headerScrollStyle.backgroundColor = UIColor.useForStyle(dark: .black, white: UIColor(red: 246 / 255, green: 246 / 255, blue: 246 / 255, alpha: 1))
             newStyle.headerScrollStyle.colorTitleDate = UIColor.useForStyle(dark: .white, white: .black)

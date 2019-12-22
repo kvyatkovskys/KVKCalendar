@@ -119,7 +119,7 @@ extension DayViewCalendar: TimelineDelegate {
     }
     
     func swipeX(transform: CGAffineTransform, stop: Bool) {
-        scrollHeaderDay.scrollHeaderTitleByTransform(transform)
+        
     }
 }
 
