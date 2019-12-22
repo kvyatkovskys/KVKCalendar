@@ -1,0 +1,19 @@
+{
+  "Mac" : [
+
+  ],
+  "watchOS" : [
+
+  ],
+  "tvOS" : [
+
+  ],
+  "commitish" : "0.2.1",
+  "iOS" : [
+    {
+      "name" : "KVKCalendar",
+      "hash" : "6ef23be16a71cdfd78f526fa507f2984d20fcd870339bb0ae480151435c18f3e",
+      "swiftToolchainVersion" : "5.1 (swiftlang-1100.0.270.13 clang-1100.0.33.7)"
+    }
+  ]
+}
