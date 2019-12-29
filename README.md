@@ -28,7 +28,7 @@ pod 'KVKCalendar'
 github "kvyatkovskys/KVKCalendar"
 ~~~
 
-## Usage
+## Usage for UIKit
 Import `KVKCalendar`.
 Create a subclass view `CalendarView` and implement `CalendarDataSource` protocol. Create an array of class `[Event]` and return this array in the function.
 
@@ -101,6 +101,75 @@ extension ViewController: CalendarDelegate {
 }
 ```
 
+## Usage for SwiftUI
+Create a new `SwiftUI` file => import `KVKCalendar`.
+Create a struct `CalendarDisplayView` with declare the protocol `UIViewRepresentable` to connect `UIKit` with `SwiftUI`.
+
+```swift
+import SwiftUI
+import KVKCalendar
+
+struct CalendarDisplayView: UIViewRepresentable {
+    
+    private var calendar: CalendarView = {
+        return CalendarView(frame: frame, style: style)
+    }()
+        
+    func makeUIView(context: UIViewRepresentableContext<CalendarDisplayView>) -> CalendarView {
+        calendar.dataSource = context.coordinator
+        calendar.delegate = context.coordinator
+        calendar.reloadData()
+        return calendar
+    }
+    
+    func updateUIView(_ uiView: CalendarView, context: UIViewRepresentableContext<CalendarDisplayView>) {
+        
+    }
+    
+    func makeCoordinator() -> CalendarDisplayView.Coordinator {
+        Coordinator(self)
+    }
+    
+    // MARK: Calendar DataSource and Delegate
+    class Coordinator: NSObject, CalendarDataSource, CalendarDelegate {
+        private let view: CalendarDisplayView
+        
+        init(_ view: CalendarDisplayView) {
+            self.view = view
+            super.init()
+        }
+        
+        func eventsForCalendar() -> [Event] {
+            return events
+        }
+    }
+}
+
+struct CalendarContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        CalendarDisplayView()
+    }
+}
+```
+
+Create a new `SwiftUI` file and implement `CalendarDisplayView`.
+
+```swift
+import SwiftUI
+
+struct CalendarContentView: View {    
+    var body: some View {
+        CalendarDisplayView()
+    }
+}
+
+struct CalendarDisplayView_Previews: PreviewProvider {
+    static var previews: some View {
+        CalendarContentView()
+    }
+}
+```
+
 ## Styles
 To customize calendar create an object `Style` and add to `init` class `CalendarView`.
 
@@ -113,6 +182,7 @@ style.allDayStyle.isPinned = true
 style.timelineStyle.widthEventViewer = 500
 let calendar = CalendarView(frame: frame, style: style)
 ```
+
 If needed to customize `Locale`, `TimeZone`.
 
 ```swift

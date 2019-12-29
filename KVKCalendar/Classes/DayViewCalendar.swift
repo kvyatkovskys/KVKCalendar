@@ -82,7 +82,7 @@ final class DayViewCalendar: UIView {
         view.frame = eventFrame
         view.tag = -1
         addSubview(view)
-        delegate?.getEventViewerFrame(frame: eventFrame)
+        delegate?.getEventViewerFrame(eventFrame)
     }
     
     func setDate(_ date: Date) {
@@ -151,7 +151,7 @@ extension DayViewCalendar: CalendarSettingProtocol {
                 eventFrame.origin.x = pointX
                 eventFrame.size.width = width
                 eventView.frame = eventFrame
-                delegate?.getEventViewerFrame(frame: eventFrame)
+                delegate?.getEventViewerFrame(eventFrame)
             }
         } else {
             timelineFrame.size.width = frame.width
