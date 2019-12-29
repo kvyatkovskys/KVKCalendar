@@ -102,8 +102,8 @@ extension ViewController: CalendarDelegate {
 ```
 
 ## Usage for SwiftUI
-Create a new `SwiftUI` file => import `KVKCalendar`.
-Create a struct `CalendarDisplayView` with declare the protocol `UIViewRepresentable` to connect `UIKit` with `SwiftUI`.
+Add a new `SwiftUI` file and import `KVKCalendar`.
+Create a struct `CalendarDisplayView` and declare the protocol `UIViewRepresentable` for connection `UIKit` with `SwiftUI`.
 
 ```swift
 import SwiftUI
@@ -152,7 +152,7 @@ struct CalendarContentView_Previews: PreviewProvider {
 }
 ```
 
-Create a new `SwiftUI` file and implement `CalendarDisplayView`.
+Create a new `SwiftUI` file and add `CalendarDisplayView` to `body`.
 
 ```swift
 import SwiftUI
