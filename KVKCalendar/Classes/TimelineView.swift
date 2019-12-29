@@ -18,7 +18,6 @@ final class TimelineView: UIView {
     weak var delegate: TimelineDelegate?
     
     private let tagCurrentHourLine = -10
-    private let tagCurrentHourTime = -20
     private var style: Style
     private let hours: [String]
     private let timeHourSystem: TimeHourSystem
@@ -27,7 +26,7 @@ final class TimelineView: UIView {
     
     private lazy var currentTimeLabel: UILabel = {
         let label = UILabel()
-        label.tag = tagCurrentHourTime
+        label.tag = tagCurrentHourLine
         label.textColor = style.timelineStyle.currentLineHourColor
         label.textAlignment = .center
         label.font = style.timelineStyle.currentLineHourFont
@@ -39,6 +38,7 @@ final class TimelineView: UIView {
         
         return label
     }()
+    
     private lazy var currentLineView: UIView = {
         let view = UIView()
         view.tag = tagCurrentHourLine
@@ -178,7 +178,7 @@ final class TimelineView: UIView {
         let frame = CGRect(x: pointX, y: 0, width: 0.5, height: (CGFloat(25) * (style.timelineStyle.heightTime + style.timelineStyle.offsetTimeY)) - 75)
         let line = UIView(frame: frame)
         line.tag = -999
-        line.backgroundColor = .lightGray
+        line.backgroundColor = .systemGray
         return line
     }
     
@@ -268,24 +268,20 @@ final class TimelineView: UIView {
     }
     
     private func movingCurrentLineHour() {
+        guard !(timer?.isValid ?? false) else { return }
+        
         let date = Date()
         var comps = style.calendar.dateComponents([.era, .year, .month, .day, .hour, .minute], from: date)
         comps.minute = (comps.minute ?? 0) + 1
         guard let nextMinute = style.calendar.date(from: comps) else { return }
         
-        if timer != nil {
-            timer?.invalidate()
-            timer = nil
-        }
         timer = Timer(fire: nextMinute, interval: 60, repeats: true) { [unowned self] _ in
             let nextDate = Date()
             guard let time = self.getTimelineLabel(hour: nextDate.hour) else { return }
             
             var pointY = time.frame.origin.y
-            if !self.subviews.filter({ $0 is AllDayTitleView }).isEmpty {
-                if self.style.allDayStyle.isPinned {
-                    pointY -= self.style.allDayStyle.height
-                }
+            if !self.subviews.filter({ $0 is AllDayTitleView }).isEmpty, self.style.allDayStyle.isPinned {
+                pointY -= self.style.allDayStyle.height
             }
             
             pointY = self.calculatePointYByMinute(nextDate.minute, time: time)
@@ -312,10 +308,8 @@ final class TimelineView: UIView {
         guard style.timelineStyle.showCurrentLineHour, let time = getTimelineLabel(hour: date.hour) else { return }
         
         var pointY = time.frame.origin.y
-        if !subviews.filter({ $0 is AllDayTitleView }).isEmpty {
-            if style.allDayStyle.isPinned {
-                pointY -= style.allDayStyle.height
-            }
+        if !subviews.filter({ $0 is AllDayTitleView }).isEmpty, style.allDayStyle.isPinned {
+            pointY -= style.allDayStyle.height
         }
         
         pointY = calculatePointYByMinute(date.minute, time: time)
@@ -378,7 +372,7 @@ final class TimelineView: UIView {
     
     func createTimelinePage(dates: [Date?], events: [Event], selectedDate: Date?) {
         subviews.filter({ $0 is AllDayEventView || $0 is AllDayTitleView }).forEach({ $0.removeFromSuperview() })
-        scrollView.subviews.forEach({ $0.removeFromSuperview() })
+        scrollView.subviews.filter({ $0.tag != tagCurrentHourLine }).forEach({ $0.removeFromSuperview() })
         subviews.filter({ $0.tag == -999 }).forEach({ $0.removeFromSuperview() })
         
         allEvents = events.filter { (event) -> Bool in
@@ -469,13 +463,11 @@ final class TimelineView: UIView {
                         if count > 1 {
                             var stop = pagesCached.count
                             while stop != 0 {
-                                for page in pagesCached {
-                                    if page.frame.origin.x.rounded() <= newPointX.rounded()
-                                        && newPointX.rounded() <= (page.frame.origin.x + page.frame.width).rounded()
-                                        && page.frame.origin.y.rounded() <= newFrame.origin.y.rounded()
-                                        && newFrame.origin.y <= (page.frame.origin.y + page.frame.height).rounded() {
+                                for page in pagesCached where page.frame.origin.x.rounded() <= newPointX.rounded()
+                                    && newPointX.rounded() <= (page.frame.origin.x + page.frame.width).rounded()
+                                    && page.frame.origin.y.rounded() <= newFrame.origin.y.rounded()
+                                    && newFrame.origin.y <= (page.frame.origin.y + page.frame.height).rounded() {
                                         newPointX = page.frame.origin.x.rounded() + newWidth
-                                    }
                                 }
                                 stop -= 1
                             }

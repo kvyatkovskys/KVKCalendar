@@ -146,7 +146,7 @@ public final class CalendarView: UIView {
 
 extension CalendarView: CalendarPrivateDelegate {
     func didSelectCalendarDate(_ date: Date?, type: CalendarType, frame: CGRect?) {
-        delegate?.didSelectDate(date: date, type: type, frame: frame)
+        delegate?.didSelectDate(date, type: type, frame: frame)
     }
     
     func didSelectCalendarEvents(_ events: [Event]) {
@@ -264,11 +264,11 @@ protocol CalendarPrivateDelegate: AnyObject {
     //func didSelectCalendarEvents(_ events: [Event])
     func didSelectCalendarEvent(_ event: Event, frame: CGRect?)
     func didSelectCalendarMore(_ date: Date, frame: CGRect?)
-    func getEventViewerFrame(frame: CGRect)
+    func getEventViewerFrame(_ frame: CGRect)
 }
 
 extension CalendarPrivateDelegate {
-    func getEventViewerFrame(frame: CGRect) {}
+    func getEventViewerFrame(_ frame: CGRect) {}
 }
 
 public protocol CalendarDataSource: AnyObject {
@@ -276,7 +276,7 @@ public protocol CalendarDataSource: AnyObject {
 }
 
 public protocol CalendarDelegate: AnyObject {
-    func didSelectDate(date: Date?, type: CalendarType, frame: CGRect?)
+    func didSelectDate(_ date: Date?, type: CalendarType, frame: CGRect?)
     //func didSelectEvents(_ events: [Event])
     func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?)
     func didSelectMore(_ date: Date, frame: CGRect?)
@@ -284,7 +284,7 @@ public protocol CalendarDelegate: AnyObject {
 }
 
 public extension CalendarDelegate {
-    func didSelectDate(date: Date?, type: CalendarType, frame: CGRect?) {}
+    func didSelectDate(_ date: Date?, type: CalendarType, frame: CGRect?) {}
     func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?) {}
     func didSelectMore(_ date: Date, frame: CGRect?) {}
     func eventViewerFrame(_ frame: CGRect) {}
