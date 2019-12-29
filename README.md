@@ -159,7 +159,9 @@ import SwiftUI
 
 struct CalendarContentView: View {    
     var body: some View {
-        CalendarDisplayView()
+        NavigationView {
+            CalendarDisplayView()
+        }
     }
 }
 
