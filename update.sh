@@ -6,6 +6,7 @@ echo "Build for Carthage!"
 
 git add .
 git commit -m "update version to $VALUE"
+git push -u origin master
 git tag $VALUE
 git push origin $VALUE
 pod lib lint
