@@ -145,7 +145,7 @@ struct CalendarDisplayView: UIViewRepresentable {
     }
 }
 
-struct CalendarContentView_Previews: PreviewProvider {
+struct CalendarDisplayView_Previews: PreviewProvider {
     static var previews: some View {
         CalendarDisplayView()
     }
@@ -165,7 +165,7 @@ struct CalendarContentView: View {
     }
 }
 
-struct CalendarDisplayView_Previews: PreviewProvider {
+struct CalendarContentView_Previews: PreviewProvider {
     static var previews: some View {
         CalendarContentView()
     }
