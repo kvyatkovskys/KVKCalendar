@@ -26,7 +26,7 @@ final class ScrollDayHeaderView: UIView {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
-        label.textColor = style.headerScrollStyle.colorTitleDate
+        label.textColor = style.headerScroll.colorTitleDate
         return label
     }()
         
@@ -48,10 +48,10 @@ final class ScrollDayHeaderView: UIView {
         
         var newFrame = frame
         newFrame.origin.x = 0
-        collectionView = createCollectionView(frame: newFrame, isScrollEnabled: style.headerScrollStyle.isScrollEnabled)
+        collectionView = createCollectionView(frame: newFrame, isScrollEnabled: style.headerScroll.isScrollEnabled)
         
-        if !style.headerScrollStyle.isHiddenTitleDate {
-            collectionView.frame.size.height = frame.height - style.headerScrollStyle.heightTitleDate
+        if !style.headerScroll.isHiddenTitleDate {
+            collectionView.frame.size.height = frame.height - style.headerScroll.heightTitleDate
             titleLabel.frame = frame
             titleLabel.frame.origin.x = 0
             titleLabel.frame.size.width -= frame.origin.x
@@ -94,8 +94,8 @@ final class ScrollDayHeaderView: UIView {
     }
     
     private func setDateToTitle(_ date: Date?) {
-        if let date = date, !style.headerScrollStyle.isHiddenTitleDate {
-            titleLabel.text = style.headerScrollStyle.formatterTitle.string(from: date)
+        if let date = date, !style.headerScroll.isHiddenTitleDate {
+            titleLabel.text = style.headerScroll.formatterTitle.string(from: date)
         }
     }
     
@@ -103,7 +103,7 @@ final class ScrollDayHeaderView: UIView {
         let collection = UICollectionView(frame: frame, collectionViewLayout: layout)
         collection.isPagingEnabled = true
         collection.showsHorizontalScrollIndicator = false
-        collection.backgroundColor = style.headerScrollStyle.backgroundColor
+        collection.backgroundColor = style.headerScroll.backgroundColor
         collection.delegate = self
         collection.dataSource = self
         collection.isScrollEnabled = isScrollEnabled
@@ -153,7 +153,7 @@ final class ScrollDayHeaderView: UIView {
                                              animated: animated)
         }
         
-        if type == .day, !style.headerScrollStyle.isHiddenTitleDate {
+        if type == .day, !style.headerScroll.isHiddenTitleDate {
             UIView.animate(withDuration: 0.3) {
                 self.titleLabel.transform = .identity
                 self.titleLabel.alpha = 1
@@ -185,10 +185,10 @@ extension ScrollDayHeaderView: CalendarSettingProtocol {
         titleLabel.frame.size.width = self.frame.width
         
         collectionView.removeFromSuperview()
-        let newView = createCollectionView(frame: self.frame, isScrollEnabled: style.headerScrollStyle.isScrollEnabled)
+        let newView = createCollectionView(frame: self.frame, isScrollEnabled: style.headerScroll.isScrollEnabled)
         newView.frame.origin.x = 0
-        if !style.headerScrollStyle.isHiddenTitleDate {
-            newView.frame.size.height = self.frame.height - style.headerScrollStyle.heightTitleDate
+        if !style.headerScroll.isHiddenTitleDate {
+            newView.frame.size.height = self.frame.height - style.headerScroll.heightTitleDate
         }
         addSubview(newView)
         
@@ -231,7 +231,7 @@ extension ScrollDayHeaderView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ScrollHeaderDayCollectionViewCell.cellIdentifier,
                                                       for: indexPath) as? ScrollHeaderDayCollectionViewCell ?? ScrollHeaderDayCollectionViewCell()
-        cell.style = style.headerScrollStyle
+        cell.style = style.headerScroll
         cell.day = days[indexPath.row]
         cell.selectDate = date
         return cell
@@ -287,7 +287,7 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
             guard let dateTemp = days[indexPath.row].date else { return }
             
             date = dateTemp.toLocalTime()
-            delegate?.didSelectDateScrollHeader(date, type: style.weekStyle.selectCalendarType)
+            delegate?.didSelectDateScrollHeader(date, type: style.week.selectCalendarType)
             setDateToTitle(date)
             collectionView.reloadData()
         default:

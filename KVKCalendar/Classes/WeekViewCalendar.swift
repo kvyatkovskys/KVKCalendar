@@ -16,12 +16,12 @@ final class WeekViewCalendar: UIView {
     
     private lazy var scrollHeaderDay: ScrollDayHeaderView = {
         let heightView: CGFloat
-        if style.headerScrollStyle.isHiddenTitleDate {
-            heightView = style.headerScrollStyle.heightHeaderWeek
+        if style.headerScroll.isHiddenTitleDate {
+            heightView = style.headerScroll.heightHeaderWeek
         } else {
-            heightView = style.headerScrollStyle.heightHeaderWeek + style.headerScrollStyle.heightTitleDate
+            heightView = style.headerScroll.heightHeaderWeek + style.headerScroll.heightTitleDate
         }
-        let offsetX = style.timelineStyle.widthTime + style.timelineStyle.offsetTimeX + style.timelineStyle.offsetLineLeft
+        let offsetX = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
         let view = ScrollDayHeaderView(frame: CGRect(x: offsetX,
                                                      y: 0,
                                                      width: frame.width - offsetX,
@@ -46,13 +46,13 @@ final class WeekViewCalendar: UIView {
     
     private lazy var topBackgroundView: UIView = {
         let heightView: CGFloat
-        if style.headerScrollStyle.isHiddenTitleDate {
-            heightView = style.headerScrollStyle.heightHeaderWeek
+        if style.headerScroll.isHiddenTitleDate {
+            heightView = style.headerScroll.heightHeaderWeek
         } else {
-            heightView = style.headerScrollStyle.heightHeaderWeek + style.headerScrollStyle.heightTitleDate
+            heightView = style.headerScroll.heightHeaderWeek + style.headerScroll.heightTitleDate
         }
         let view = UIView(frame: CGRect(x: 0, y: 0, width: frame.width, height: heightView))
-        view.backgroundColor = style.headerScrollStyle.backgroundColor
+        view.backgroundColor = style.headerScroll.backgroundColor
         return view
     }()
     
@@ -60,7 +60,7 @@ final class WeekViewCalendar: UIView {
         let label = UILabel()
         label.textAlignment = .center
         label.adjustsFontSizeToFitWidth = true
-        label.textColor = style.headerScrollStyle.colorTitleCornerDate
+        label.textColor = style.headerScroll.colorTitleCornerDate
         return label
     }()
     
@@ -83,8 +83,8 @@ final class WeekViewCalendar: UIView {
     }
     
     private func addCornerLabel() {
-        if !style.headerScrollStyle.isHiddenCornerTitleDate {
-            titleInCornerLabel.frame = CGRect(x: 0, y: 0, width: scrollHeaderDay.frame.origin.x, height: style.headerScrollStyle.heightHeaderWeek)
+        if !style.headerScroll.isHiddenCornerTitleDate {
+            titleInCornerLabel.frame = CGRect(x: 0, y: 0, width: scrollHeaderDay.frame.origin.x, height: style.headerScroll.heightHeaderWeek)
             setDateToTitleCorner(data.date)
             
             if subviews.contains(titleInCornerLabel) {
@@ -95,8 +95,8 @@ final class WeekViewCalendar: UIView {
     }
     
     private func setDateToTitleCorner(_ date: Date?) {
-        if let date = date, !style.headerScrollStyle.isHiddenCornerTitleDate {
-            titleInCornerLabel.text = style.headerScrollStyle.formatterCornerTitle.string(from: date)
+        if let date = date, !style.headerScroll.isHiddenCornerTitleDate {
+            titleInCornerLabel.text = style.headerScroll.formatterCornerTitle.string(from: date)
         }
     }
     
