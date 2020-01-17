@@ -27,18 +27,19 @@ final class ViewController: UIViewController {
     private lazy var calendarView: CalendarView = {
         var style = Style()
         if UIDevice.current.userInterfaceIdiom == .phone {
-            style.monthStyle.isHiddenSeporator = true
-            style.timelineStyle.widthTime = 40
-            style.timelineStyle.offsetTimeX = 2
-            style.timelineStyle.offsetLineLeft = 2
+            style.month.isHiddenSeporator = true
+            style.timeline.widthTime = 40
+            style.timeline.offsetTimeX = 2
+            style.timeline.offsetLineLeft = 2
         } else {
-            style.timelineStyle.widthEventViewer = 500
+            style.timeline.widthEventViewer = 500
         }
-        style.followInInterfaceStyle = true
-        style.timelineStyle.offsetTimeY = 80
-        style.timelineStyle.offsetEvent = 3
-        style.timelineStyle.currentLineHourWidth = 40
-        style.allDayStyle.isPinned = true
+        style.timeline.startFromFirstEvent = false
+        style.followInInterface = true
+        style.timeline.offsetTimeY = 80
+        style.timeline.offsetEvent = 3
+        style.timeline.currentLineHourWidth = 40
+        style.allDay.isPinned = true
         style.startWeekDay = .sunday
         style.timeHourSystem = .twelveHour
         

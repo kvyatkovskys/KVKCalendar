@@ -19,18 +19,18 @@ final class YearHeaderView: UIView {
     var date: Date? {
         didSet {
             if let date = date {
-                titleLabel.text = style.yearStyle.formatter.string(from: date)
+                titleLabel.text = style.year.formatter.string(from: date)
             }
         }
     }
     
     var style: Style = Style() {
         didSet {
-            titleLabel.textColor = style.yearStyle.colorTitleHeader
-            titleLabel.font = style.yearStyle.fontTitleHeader
-            titleLabel.textAlignment = style.yearStyle.aligmentTitleHeader
+            titleLabel.textColor = style.year.colorTitleHeader
+            titleLabel.font = style.year.fontTitleHeader
+            titleLabel.textAlignment = style.year.aligmentTitleHeader
             
-            backgroundColor = style.yearStyle.colorBackgroundHeader
+            backgroundColor = style.year.colorBackgroundHeader
         }
     }
     

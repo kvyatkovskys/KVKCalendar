@@ -15,10 +15,10 @@ final class DayViewCalendar: UIView {
     
     private lazy var scrollHeaderDay: ScrollDayHeaderView = {
         let heightView: CGFloat
-        if style.headerScrollStyle.isHiddenTitleDate {
-            heightView = style.headerScrollStyle.heightHeaderWeek
+        if style.headerScroll.isHiddenTitleDate {
+            heightView = style.headerScroll.heightHeaderWeek
         } else {
-            heightView = style.headerScrollStyle.heightHeaderWeek + style.headerScrollStyle.heightTitleDate
+            heightView = style.headerScroll.heightHeaderWeek + style.headerScroll.heightTitleDate
         }
         let view = ScrollDayHeaderView(frame: CGRect(x: 0, y: 0, width: frame.width, height: heightView),
                                        days: data.days,
@@ -38,7 +38,7 @@ final class DayViewCalendar: UIView {
             if UIDevice.current.orientation.isPortrait {
                 timelineFrame.size.width = UIScreen.main.bounds.width * 0.5
             } else {
-                timelineFrame.size.width -= style.timelineStyle.widthEventViewer
+                timelineFrame.size.width -= style.timeline.widthEventViewer
             }
         }
         let view = TimelineView(timeHourSystem: data.timeSystem, style: style, frame: timelineFrame)
@@ -48,13 +48,13 @@ final class DayViewCalendar: UIView {
     
     private lazy var topBackgroundView: UIView = {
         let heightView: CGFloat
-        if style.headerScrollStyle.isHiddenTitleDate {
-            heightView = style.headerScrollStyle.heightHeaderWeek
+        if style.headerScroll.isHiddenTitleDate {
+            heightView = style.headerScroll.heightHeaderWeek
         } else {
-            heightView = style.headerScrollStyle.heightHeaderWeek + style.headerScrollStyle.heightTitleDate
+            heightView = style.headerScroll.heightHeaderWeek + style.headerScroll.heightTitleDate
         }
         let view = UIView(frame: CGRect(x: 0, y: 0, width: frame.width, height: heightView))
-        view.backgroundColor = style.headerScrollStyle.backgroundColor
+        view.backgroundColor = style.headerScroll.backgroundColor
         return view
     }()
     
@@ -77,7 +77,7 @@ final class DayViewCalendar: UIView {
         if UIDevice.current.orientation.isPortrait {
             eventFrame.size.width = UIScreen.main.bounds.width * 0.5
         } else {
-            eventFrame.size.width = style.timelineStyle.widthEventViewer
+            eventFrame.size.width = style.timeline.widthEventViewer
         }
         view.frame = eventFrame
         view.tag = -1
@@ -132,7 +132,7 @@ extension DayViewCalendar: CalendarSettingProtocol {
         var timelineFrame = timelineView.frame
         timelineFrame.size.height = frame.height - scrollHeaderDay.frame.height
         if UIDevice.current.userInterfaceIdiom == .pad {
-            timelineFrame.size.width = frame.width - style.timelineStyle.widthEventViewer
+            timelineFrame.size.width = frame.width - style.timeline.widthEventViewer
             if let idx = subviews.firstIndex(where: { $0.tag == -1 }) {
                 let eventView = subviews[idx]
                 var eventFrame = timelineFrame
@@ -145,7 +145,7 @@ extension DayViewCalendar: CalendarSettingProtocol {
                     timelineFrame.size.width = frame.width - width
                 } else {
                     pointX = eventFrame.width
-                    width = style.timelineStyle.widthEventViewer
+                    width = style.timeline.widthEventViewer
                 }
                 
                 eventFrame.origin.x = pointX
