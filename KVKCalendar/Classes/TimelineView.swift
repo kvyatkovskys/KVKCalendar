@@ -286,6 +286,7 @@ final class TimelineView: UIView {
             guard let self = self else { return }
             
             let nextDate = Date()
+            guard self.currentTimeLabel.valueHash != nextDate.minute.hashValue else { return }
             guard let time = self.getTimelineLabel(hour: nextDate.hour) else { return }
             
             var pointY = time.frame.origin.y
@@ -294,7 +295,6 @@ final class TimelineView: UIView {
             }
             
             pointY = self.calculatePointYByMinute(nextDate.minute, time: time)
-            guard self.currentTimeLabel.valueHash != nextDate.minute.hashValue else { return }
             
             self.currentTimeLabel.frame.origin.y = pointY - 7.5
             self.currentLineView.frame.origin.y = pointY
