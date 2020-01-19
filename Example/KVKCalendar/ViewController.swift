@@ -100,17 +100,8 @@ final class ViewController: UIViewController {
     }
     
     @objc func switchCalendar(sender: UISegmentedControl) {
-        guard let type = CalendarType(rawValue: CalendarType.allCases[sender.selectedSegmentIndex].rawValue) else { return }
-        switch type {
-        case .day:
-            calendarView.set(type: .day, date: selectDate)
-        case .week:
-            calendarView.set(type: .week, date: selectDate)
-        case .month:
-            calendarView.set(type: .month, date: selectDate)
-        case .year:
-            calendarView.set(type: .year, date: selectDate)
-        }
+        let type = CalendarType.allCases[sender.selectedSegmentIndex]
+        calendarView.set(type: type, date: selectDate)
         calendarView.reloadData()
     }
     
