@@ -137,10 +137,13 @@ public final class CalendarView: UIView {
     }
     
     private func convertDate(_ date: Date) -> Date {
+        let roundedDate = "\(date.year)-\(date.month)-\(date.day) 00:00:00"
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = TimeZone(identifier: "UTC")
-        return formatter.date(from: "\(date.year)-\(date.month)-\(date.day)") ?? date
+        formatter.dateFormat = "yyyy-MM-dd hh:mm:ss"
+        formatter.timeZone = style.timezone
+        formatter.locale = style.locale
+        formatter.calendar = style.calendar
+        return formatter.date(from: roundedDate) ?? date
     }
 }
 
