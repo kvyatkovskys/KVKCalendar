@@ -110,7 +110,7 @@ final class WeekViewCalendar: UIView {
         if idx < 6 {
             endIdx = 0
         } else {
-            endIdx = (idx + 6) > data.days.count ? (data.days.count - 1) : (idx + 6)
+            endIdx = (idx + 6) >= data.days.count ? (data.days.count - 1) : (idx + 6)
         }
         let visibleDates = data.days[idx...endIdx].map({ $0.date })
         
