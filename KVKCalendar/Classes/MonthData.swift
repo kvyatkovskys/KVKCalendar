@@ -10,20 +10,25 @@ import Foundation
 struct MonthData {
     var days: [Day]
     var date: Date
+    var data: YearData
     
     private let cachedDays: [Day]
     
     init(yearData: YearData, startDay: StartDayType) {
-        self.days = yearData.months.reduce([], { (acc, month) -> [Day] in
+        self.data = yearData
+        data.months = yearData.months.reduce([], { (acc, month) -> [Month] in
             var daysTemp = yearData.addStartEmptyDay(days: month.days, startDay: startDay)
             if daysTemp.count < yearData.boxCount {
                 Array(1...yearData.boxCount - daysTemp.count).forEach { _ in
                     daysTemp.append(.empty())
                 }
             }
-            return acc + daysTemp
+            var monthTemp = month
+            monthTemp.days = daysTemp
+            return acc + [monthTemp]
         })
         self.date = yearData.date
+        self.days = data.months.flatMap({ $0.days })
         self.cachedDays = days
     }
     

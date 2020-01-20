@@ -151,7 +151,7 @@ extension MonthViewCalendar: UICollectionViewDataSource {
                                                       for: indexPath) as? MonthCollectionViewCell ?? MonthCollectionViewCell()
         let day = data.days[indexPath.row]
         cell.selectDate = data.date
-        cell.style = style.month
+        cell.style = style
         cell.day = day
         cell.events = day.events
         cell.delegate = self

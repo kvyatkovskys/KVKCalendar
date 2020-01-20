@@ -23,7 +23,7 @@ final class YearCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    var style: Style = Style() {
+    var style = Style() {
         didSet {
             titleLabel.font = style.year.fontTitle
             titleLabel.textColor = style.year.colorTitle
@@ -41,7 +41,7 @@ final class YearCollectionViewCell: UICollectionViewCell {
             subviews.filter({ $0.tag == 1 }).forEach({ $0.removeFromSuperview() })
             var step = 0
             let weekCount = ceil((CGFloat(days.count) / CGFloat(daysInWeek)))
-            for idx in 1...Int(weekCount) {
+            Array(1...Int(weekCount)).forEach { idx in
                 if idx == Int(weekCount) {
                     let sliceDays = days[step...]
                     addDayToLabel(days: sliceDays, step: idx)
@@ -94,10 +94,7 @@ final class YearCollectionViewCell: UICollectionViewCell {
             label.textAlignment = .center
             label.font = style.year.fontDayTitle
             label.textColor = style.year.colorDayTitle
-            
-            if let day = day.date?.day {
-                label.text = "\(day)"
-            }
+            label.text = day.day
             
             view.tag = 1
             weekendsDays(day: day, label: label, view: view)
