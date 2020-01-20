@@ -100,7 +100,11 @@ struct YearData {
     func addStartEmptyDay(days: [Day], startDay: StartDayType) -> [Day] {
         var tempDays = [Day]()
         if let firstDay = days.first?.type {
-            tempDays = Array(0..<firstDay.shiftDay).compactMap({ _ in Day.empty() }) + days
+            if firstDay == .sunday, startDay == .sunday {
+                tempDays = days
+            } else {
+                tempDays = Array(0..<firstDay.shiftDay).compactMap({ _ in Day.empty() }) + days
+            }
         } else {
             tempDays = days
         }

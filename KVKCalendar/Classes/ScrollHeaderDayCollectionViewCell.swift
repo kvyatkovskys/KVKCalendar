@@ -17,7 +17,7 @@ final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
         let label = UILabel()
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 11)
-        label.textColor = style.colorNameDay
+        label.textColor = headerStyle.colorNameDay
         return label
     }()
     
@@ -25,26 +25,32 @@ final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
         let label = UILabel()
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 18)
-        label.textColor = style.colorDate
+        label.textColor = headerStyle.colorDate
         return label
     }()
     
-    var style = HeaderScrollStyle()
+    private var headerStyle = HeaderScrollStyle()
     
-    var day: Day = Day(day: "", type: .empty, date: nil, data: []) {
+    var style = Style() {
+        willSet {
+            headerStyle = newValue.headerScroll
+        }
+    }
+    
+    var day: Day = .empty() {
         didSet {
-            guard let number = day.date?.day else {
+            guard day.date != nil else {
                 titleLabel.text = nil
                 dateLabel.text = nil
                 return
             }
             
-            if !style.titleDays.isEmpty, let title = style.titleDays[safe: day.type.shiftDay] {
+            if !headerStyle.titleDays.isEmpty, let title = headerStyle.titleDays[safe: day.type.shiftDay] {
                 titleLabel.text = title
             } else {
                 titleLabel.text = day.type.rawValue
             }
-            dateLabel.text = "\(number)"
+            dateLabel.text = day.day
             weekendDays(day: day)
         }
     }
@@ -55,13 +61,13 @@ final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
             guard nowDate.month != day.date?.month else {
                 // remove the selection if the current date (for the day) does not match the selected one
                 if selectDate.day != nowDate.day, day.date?.day == nowDate.day, day.date?.year == nowDate.year {
-                    dateLabel.textColor = style.colorBackgroundCurrentDate
+                    dateLabel.textColor = headerStyle.colorBackgroundCurrentDate
                     dateLabel.backgroundColor = .clear
                 }
                 // mark the selected date, which is not the same as the current one
                 if day.date?.month == selectDate.month, day.date?.day == selectDate.day, selectDate.day != nowDate.day {
-                    dateLabel.textColor = style.colorSelectDate
-                    dateLabel.backgroundColor = style.colorBackgroundSelectDate
+                    dateLabel.textColor = headerStyle.colorSelectDate
+                    dateLabel.backgroundColor = headerStyle.colorBackgroundSelectDate
                     dateLabel.layer.cornerRadius = dateLabel.frame.width / 2
                     dateLabel.clipsToBounds = true
                 }
@@ -73,8 +79,8 @@ final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
                 weekendDays(day: day)
                 return
             }
-            dateLabel.textColor = style.colorSelectDate
-            dateLabel.backgroundColor = style.colorBackgroundSelectDate
+            dateLabel.textColor = headerStyle.colorSelectDate
+            dateLabel.backgroundColor = headerStyle.colorBackgroundSelectDate
             dateLabel.layer.cornerRadius = dateLabel.frame.width / 2
             dateLabel.clipsToBounds = true
         }
@@ -106,19 +112,20 @@ final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
     
     private func weekendDays(day: Day) {
         guard day.type == .saturday || day.type == .sunday else {
-            isNowDate(date: day.date, colorText: style.colorDate)
-            titleLabel.textColor = style.colorDate
+            isNowDate(date: day.date, colorText: headerStyle.colorDate)
+            titleLabel.textColor = headerStyle.colorDate
             return
         }
-        isNowDate(date: day.date, colorText: style.colorWeekendDate)
-        titleLabel.textColor = style.colorWeekendDate
+        isNowDate(date: day.date, colorText: headerStyle.colorWeekendDate)
+        titleLabel.textColor = headerStyle.colorWeekendDate
     }
     
     private func isNowDate(date: Date?, colorText: UIColor) {
         let nowDate = Date()
         if date?.month == nowDate.month, date?.day == nowDate.day, date?.year == nowDate.year {
-            dateLabel.textColor = style.colorCurrentDate
-            dateLabel.backgroundColor = style.colorBackgroundCurrentDate
+            print(date?.day, nowDate.day)
+            dateLabel.textColor = headerStyle.colorCurrentDate
+            dateLabel.backgroundColor = headerStyle.colorBackgroundCurrentDate
             dateLabel.layer.cornerRadius = dateLabel.frame.height / 2
             dateLabel.clipsToBounds = true
         } else {

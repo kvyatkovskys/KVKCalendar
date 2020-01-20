@@ -225,9 +225,9 @@ extension ScrollDayHeaderView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ScrollHeaderDayCollectionViewCell.cellIdentifier,
                                                       for: indexPath) as? ScrollHeaderDayCollectionViewCell ?? ScrollHeaderDayCollectionViewCell()
-        cell.style = style.headerScroll
-        cell.day = days[indexPath.row]
         cell.selectDate = date
+        cell.style = style
+        cell.day = days[indexPath.row]
         return cell
     }
 }

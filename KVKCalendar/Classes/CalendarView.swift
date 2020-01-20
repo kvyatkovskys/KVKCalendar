@@ -40,7 +40,7 @@ public final class CalendarView: UIView {
     }()
     
     private lazy var yearCalendar: YearViewCalendar = {
-        let year = YearViewCalendar(data: yearData, frame: frame, style: style)
+        let year = YearViewCalendar(data: monthData.data, frame: frame, style: style)
         year.delegate = self
         return year
     }()
@@ -93,18 +93,17 @@ public final class CalendarView: UIView {
     
     public func set(type: CalendarType, date: Date) {
         self.type = type
-        let newDate = convertDate(date)
         switchTypeCalendar(type: type)
         
         switch type {
         case .day:
-            dayCalendar.setDate(newDate)
+            dayCalendar.setDate(date)
         case .week:
-            weekCalendar.setDate(newDate)
+            weekCalendar.setDate(date)
         case .month:
-            monthCalendar.setDate(newDate)
+            monthCalendar.setDate(date)
         case .year:
-            yearCalendar.setDate(newDate)
+            yearCalendar.setDate(date)
         }
     }
     
@@ -122,28 +121,16 @@ public final class CalendarView: UIView {
     }
     
     public func scrollToDate(date: Date) {
-        let newDate = convertDate(date)
-        
         switch type {
         case .day:
-            dayCalendar.setDate(newDate)
+            dayCalendar.setDate(date)
         case .week:
-            weekCalendar.setDate(newDate)
+            weekCalendar.setDate(date)
         case .month:
-            monthCalendar.setDate(newDate)
+            monthCalendar.setDate(date)
         case .year:
-            yearCalendar.setDate(newDate)
+            yearCalendar.setDate(date)
         }
-    }
-    
-    private func convertDate(_ date: Date) -> Date {
-        let roundedDate = "\(date.year)-\(date.month)-\(date.day) 00:00:00"
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd hh:mm:ss"
-        formatter.timeZone = style.timezone
-        formatter.locale = style.locale
-        formatter.calendar = style.calendar
-        return formatter.date(from: roundedDate) ?? date
     }
 }
 
