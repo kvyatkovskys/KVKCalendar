@@ -94,7 +94,11 @@ final class YearCollectionViewCell: UICollectionViewCell {
             label.textAlignment = .center
             label.font = style.year.fontDayTitle
             label.textColor = style.year.colorDayTitle
-            label.text = day.day
+            if let tempDay = day.date?.day {
+                label.text = "\(tempDay)"
+            } else {
+                label.text = nil
+            }
             
             view.tag = 1
             weekendsDays(day: day, label: label, view: view)

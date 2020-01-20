@@ -48,18 +48,14 @@ struct YearData {
             var dateMonths = [Date]()
             if let monthsOfYearRange = monthsOfYearRange {
                 let year = calendar.component(.year, from: yearDate ?? date)
-                for monthOfYear in (monthsOfYearRange.lowerBound..<monthsOfYearRange.upperBound) {
+                dateMonths = Array(monthsOfYearRange.lowerBound..<monthsOfYearRange.upperBound).compactMap({ monthOfYear -> Date? in
                     var components = DateComponents(year: year, month: monthOfYear)
                     components.day = 2
-                    guard let dateMonth = calendar.date(from: components) else { continue }
-                    dateMonths.append(dateMonth)
-                }
+                    return calendar.date(from: components)
+                })
             }
             
-            var months = zip(nameMonths, dateMonths).map({ Month(name: $0.0,
-                                                                 date: $0.1,
-                                                                 week: [.empty],
-                                                                 days: [.empty()]) })
+            var months = zip(nameMonths, dateMonths).map({ Month(name: $0.0, date: $0.1, days: []) })
             
             for (idx, month) in months.enumerated() {
                 let days = getDaysInMonth(month: idx + 1, date: month.date)
@@ -78,22 +74,13 @@ struct YearData {
         guard let dateMonth = calendar.date(from: dateComponents), let range = calendar.range(of: .day, in: .month, for: dateMonth) else { return [] }
         
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd hh:mm:ss"
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = "yyyy-MM-dd"
+        let arrDates = Array(range.lowerBound...range.upperBound).compactMap({ formatter.date(from: "\(date.year)-\(month)-\($0)") })
         
-        let arrDates = Array(1...range.count).compactMap({ day in formatter.date(from: "\(date.year)-\(month)-\(day) 00:00:00") })
-
-        formatter.dateFormat = "d"
         let formatterDay = DateFormatter()
         formatterDay.dateFormat = "EE"
         formatterDay.timeZone = TimeZone(secondsFromGMT: 0)
-        formatterDay.calendar = style.calendar
-        formatterDay.locale = style.locale
-        
-        let days = arrDates.map({ Day(day: formatter.string(from: $0),
-                                      type: DayType(rawValue: formatterDay.string(from: $0).uppercased()),
-                                      date: $0,
-                                      data: []) })
+        let days = arrDates.map({ Day(type: DayType(rawValue: formatterDay.string(from: $0).uppercased()), date: $0, data: []) })
         return days
     }
     
@@ -143,12 +130,10 @@ struct YearData {
 struct Month {
     let name: String
     let date: Date
-    let week: [DayType]
     var days: [Day]
 }
 
 struct Day {
-    let day: String
     let type: DayType
     let date: Date?
     var events: [Event]
@@ -158,14 +143,12 @@ struct Day {
     }
     
     private init() {
-        self.day = ""
         self.date = nil
         self.events = []
         self.type = .empty
     }
     
-    init(day: String, type: DayType, date: Date?, data: [Event]) {
-        self.day = day
+    init(type: DayType, date: Date?, data: [Event]) {
         self.type = type
         self.events = data
         self.date = date

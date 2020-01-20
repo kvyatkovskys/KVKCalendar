@@ -32,14 +32,14 @@ final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
     private var headerStyle = HeaderScrollStyle()
     
     var style = Style() {
-        willSet {
-            headerStyle = newValue.headerScroll
+        didSet {
+            headerStyle = style.headerScroll
         }
     }
     
     var day: Day = .empty() {
         didSet {
-            guard day.date != nil else {
+            guard let tempDay = day.date?.day else {
                 titleLabel.text = nil
                 dateLabel.text = nil
                 return
@@ -50,7 +50,7 @@ final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
             } else {
                 titleLabel.text = day.type.rawValue
             }
-            dateLabel.text = day.day
+            dateLabel.text = "\(tempDay)"
             weekendDays(day: day)
         }
     }
@@ -123,7 +123,6 @@ final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
     private func isNowDate(date: Date?, colorText: UIColor) {
         let nowDate = Date()
         if date?.month == nowDate.month, date?.day == nowDate.day, date?.year == nowDate.year {
-            print(date?.day, nowDate.day)
             dateLabel.textColor = headerStyle.colorCurrentDate
             dateLabel.backgroundColor = headerStyle.colorBackgroundCurrentDate
             dateLabel.layer.cornerRadius = dateLabel.frame.height / 2
