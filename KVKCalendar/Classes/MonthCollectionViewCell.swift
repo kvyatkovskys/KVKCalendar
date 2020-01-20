@@ -31,14 +31,14 @@ final class MonthCollectionViewCell: UICollectionViewCell {
     
     private var monthStyle = MonthStyle()
     var style = Style() {
-        willSet {
-            monthStyle = newValue.month
+        didSet {
+            monthStyle = style.month
         }
     }
     weak var delegate: MonthCellDelegate?
     
     var events: [Event] = [] {
-        willSet {
+        didSet {
             subviews.filter({ $0.tag != -1 }).forEach({ $0.removeFromSuperview() })
             
             if UIDevice.current.userInterfaceIdiom == .phone, UIDevice.current.orientation.isLandscape {
@@ -46,7 +46,7 @@ final class MonthCollectionViewCell: UICollectionViewCell {
             }
             
             let height = (frame.height - dateLabel.bounds.height - offset) / countInCell
-            for (idx, event) in newValue.enumerated() {
+            for (idx, event) in events.enumerated() {
                 let count = idx + 1
                 let label = UILabel(frame: CGRect(x: 5,
                                                   y: offset + dateLabel.bounds.height + height * CGFloat(idx),
@@ -65,7 +65,7 @@ final class MonthCollectionViewCell: UICollectionViewCell {
                     label.tag = event.start.day
                     label.addGestureRecognizer(tap)
                     label.textColor = monthStyle.colorMoreTitle
-                    label.text = "\(monthStyle.moreTitle) \(newValue.count - MonthCollectionViewCell.titlesCount)"
+                    label.text = "\(monthStyle.moreTitle) \(events.count - MonthCollectionViewCell.titlesCount)"
                     addSubview(label)
                     return
                 } else {
@@ -81,13 +81,17 @@ final class MonthCollectionViewCell: UICollectionViewCell {
     }
     
     var day: Day = .empty() {
-        willSet {
-            dateLabel.text = newValue.day
-            if !monthStyle.isHiddenSeporator {
-                layer.borderWidth = newValue.type != .empty ? monthStyle.widthSeporator : 0
-                layer.borderColor = newValue.type != .empty ? monthStyle.colorSeporator.cgColor : UIColor.clear.cgColor
+        didSet {
+            if let tempDay = day.date?.day {
+                dateLabel.text = "\(tempDay)"
+            } else {
+                dateLabel.text = nil
             }
-            weekendsDays(day: newValue, label: dateLabel, view: self)
+            if !monthStyle.isHiddenSeporator {
+                layer.borderWidth = day.type != .empty ? monthStyle.widthSeporator : 0
+                layer.borderColor = day.type != .empty ? monthStyle.colorSeporator.cgColor : UIColor.clear.cgColor
+            }
+            weekendsDays(day: day, label: dateLabel, view: self)
         }
     }
     

@@ -225,9 +225,9 @@ extension ScrollDayHeaderView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ScrollHeaderDayCollectionViewCell.cellIdentifier,
                                                       for: indexPath) as? ScrollHeaderDayCollectionViewCell ?? ScrollHeaderDayCollectionViewCell()
-        cell.selectDate = date
         cell.style = style
         cell.day = days[indexPath.row]
+        cell.selectDate = date
         return cell
     }
 }
@@ -260,7 +260,7 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
         
         guard let newMoveDate = days[indexPath.row].date else { return }
         
-        date = newMoveDate.toLocalTime()
+        date = newMoveDate
         delegate?.didSelectDateScrollHeader(newMoveDate, type: type)
         setDateToTitle(newMoveDate)
         collectionView.reloadData()
@@ -273,14 +273,14 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
         case .day:
             guard date != days[indexPath.row].date, let dateNew = days[indexPath.row].date else { return }
             
-            date = dateNew.toLocalTime()
+            date = dateNew
             delegate?.didSelectDateScrollHeader(date, type: .day)
             setDateToTitle(date)
             collectionView.reloadData()
         case .week:
             guard let dateTemp = days[indexPath.row].date else { return }
             
-            date = dateTemp.toLocalTime()
+            date = dateTemp
             delegate?.didSelectDateScrollHeader(date, type: style.week.selectCalendarType)
             setDateToTitle(date)
             collectionView.reloadData()

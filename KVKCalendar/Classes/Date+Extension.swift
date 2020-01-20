@@ -103,16 +103,4 @@ public extension Date {
         components.second = -1
         return gregorian.date(byAdding: components, to: startOfMonth ?? self)
     }
-    
-    func toGlobalTime() -> Date { 
-        let timezone = TimeZone.autoupdatingCurrent
-        let seconds = -TimeInterval(timezone.secondsFromGMT(for: self))
-        return Date(timeInterval: seconds, since: self)
-    }
-    
-    func toLocalTime() -> Date {
-        let timezone = TimeZone.autoupdatingCurrent
-        let seconds = TimeInterval(timezone.secondsFromGMT(for: self))
-        return Date(timeInterval: seconds, since: self)
-    }
 }
