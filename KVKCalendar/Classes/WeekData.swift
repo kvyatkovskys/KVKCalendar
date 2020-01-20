@@ -15,22 +15,11 @@ struct WeekData {
     
     init(yearData: YearData, timeSystem: TimeHourSystem, startDay: StartDayType) {
         self.date = yearData.date
-        let days = yearData.months.reduce([], { $0 + $1.days }).filter({ $0.type != .empty })
-        var tempDays = [Day]()
-        if let firstDay = days.first?.type {
-            for _ in 0..<firstDay.shiftDay {
-                tempDays.append(.empty())
-            }
-            tempDays += days
-        } else {
-            tempDays = days
-        }
-        
-        if startDay == .sunday {
-            tempDays.insert(.empty(), at: 0)
-        }
-        
-        self.days = tempDays
+        var tempDays = yearData.months.reduce([], { $0 + $1.days })
+        let startIdx = tempDays.count > 7 ? tempDays.count - 7 : tempDays.count
+        let endWeek = yearData.addEndEmptyDay(days: Array(tempDays[startIdx..<tempDays.count]), startDay: startDay)
+        tempDays.removeSubrange(startIdx..<tempDays.count)
+        self.days = yearData.addStartEmptyDay(days: tempDays, startDay: startDay) + endWeek
         self.timeSystem = timeSystem
     }
 }

@@ -16,7 +16,7 @@ final class ScrollDayHeaderView: UIView {
     private var date: Date
     private var style: Style
     private var collectionView: UICollectionView!
-    private var animated: Bool = false
+    private var isEndAnimated: Bool = false
     private let type: CalendarType
     private let calendar: Calendar
     private var lastContentOffset: CGFloat = 0
@@ -83,7 +83,7 @@ final class ScrollDayHeaderView: UIView {
     
     func setDate(_ date: Date) {
         self.date = date
-        scrollToDate(date, animated: animated)
+        scrollToDate(date, isEndAnimated: isEndAnimated)
         collectionView.reloadData()
     }
     
@@ -112,7 +112,7 @@ final class ScrollDayHeaderView: UIView {
         return collection
     }
     
-    private func scrollToDate(_ date: Date, animated: Bool) {
+    private func scrollToDate(_ date: Date, isEndAnimated: Bool) {
         delegate?.didSelectDateScrollHeader(date, type: type)
         setDateToTitle(date)
         
@@ -141,16 +141,14 @@ final class ScrollDayHeaderView: UIView {
                        let idx = days.firstIndex(where: { $0.date?.year == scrollDate.year
                            && $0.date?.month == scrollDate.month
                            && $0.date?.day == scrollDate.day }) else { return }
-            
+
             indexPath.row = idx
         default:
             return
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            self.collectionView.scrollToItem(at: indexPath,
-                                             at: .left,
-                                             animated: animated)
+            self.collectionView.scrollToItem(at: indexPath, at: .left, animated: true)
         }
         
         if type == .day, !style.headerScroll.isHiddenTitleDate {
@@ -158,10 +156,6 @@ final class ScrollDayHeaderView: UIView {
                 self.titleLabel.transform = .identity
                 self.titleLabel.alpha = 1
             }
-        }
-        
-        if !self.animated {
-            self.animated = true
         }
     }
     
