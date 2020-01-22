@@ -53,14 +53,14 @@ final class MonthCollectionViewCell: UICollectionViewCell {
                                                   width: frame.width - 10,
                                                   height: height))
                 label.isUserInteractionEnabled = true
-                label.tag = "\(event.id)".hashValue
-                let tap = UITapGestureRecognizer(target: self, action: #selector(tapOneEvent))
-                label.addGestureRecognizer(tap)
                 label.font = monthStyle.fontEventTitle
                 label.textColor = monthStyle.colorEventTitle
                 label.lineBreakMode = .byTruncatingMiddle
-                label.textAlignment = .center
+                label.adjustsFontSizeToFitWidth = true
+                label.minimumScaleFactor = 0.8
+                
                 if count > MonthCollectionViewCell.titlesCount {
+                    label.textAlignment = .center
                     let tap = UITapGestureRecognizer(target: self, action: #selector(tapOnMore))
                     label.tag = event.start.day
                     label.addGestureRecognizer(tap)
@@ -69,6 +69,9 @@ final class MonthCollectionViewCell: UICollectionViewCell {
                     addSubview(label)
                     return
                 } else {
+                    let tap = UITapGestureRecognizer(target: self, action: #selector(tapOneEvent))
+                    label.addGestureRecognizer(tap)
+                    label.tag = "\(event.id)".hashValue
                     label.attributedText = addIconBeforeLabel(stringList: [event.textForMonth],
                                                               font: monthStyle.fontEventTitle,
                                                               bullet: "•",
@@ -119,7 +122,11 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         var dateFrame = frame
         dateFrame.size = CGSize(width: 35, height: 35)
         dateFrame.origin.y = offset
-        dateFrame.origin.x = (frame.width - dateFrame.width)
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            dateFrame.origin.x = (frame.width - dateFrame.width)
+        } else {
+            dateFrame.origin.x = (frame.width / 2) - (dateFrame.width / 2)
+        }
         dateLabel.frame = dateFrame
         addSubview(dateLabel)
     }
@@ -193,14 +200,14 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         let bulletAttributes: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: bulletColor]
         let paragraphStyle = NSMutableParagraphStyle()
         
-        paragraphStyle.tabStops = [NSTextTab(textAlignment: UIDevice.current.userInterfaceIdiom == .pad ? .left : .center, location: indentation, options: [:])]
+        paragraphStyle.alignment = UIDevice.current.userInterfaceIdiom == .pad ? .left : .center
+        paragraphStyle.tabStops = [NSTextTab(textAlignment: .left, location: indentation, options: [:])]
         paragraphStyle.defaultTabInterval = indentation
         paragraphStyle.lineSpacing = lineSpacing
         paragraphStyle.paragraphSpacing = paragraphSpacing
         paragraphStyle.headIndent = indentation
-        //let bulletList = NSMutableAttributedString()
         
-        return stringList.reduce(NSMutableAttributedString()) { acc, string -> NSMutableAttributedString in
+        return stringList.reduce(NSMutableAttributedString()) { _, string -> NSMutableAttributedString in
             let formattedString = UIDevice.current.userInterfaceIdiom == .pad ? "\(bullet)\t\(string)\n" : bullet
             let attributedString = NSMutableAttributedString(string: formattedString)
             attributedString.addAttributes([NSAttributedString.Key.paragraphStyle: paragraphStyle], range: NSMakeRange(0, attributedString.length))
@@ -210,16 +217,5 @@ final class MonthCollectionViewCell: UICollectionViewCell {
             attributedString.addAttributes(bulletAttributes, range: rangeForBullet)
             return attributedString
         }
-//        for string in stringList {
-//            let formattedString = UIDevice.current.userInterfaceIdiom == .pad ? "\(bullet)\t\(string)\n" : bullet
-//            let attributedString = NSMutableAttributedString(string: formattedString)
-//            attributedString.addAttributes([NSAttributedString.Key.paragraphStyle: paragraphStyle], range: NSMakeRange(0, attributedString.length))
-//            attributedString.addAttributes(textAttributes, range: NSMakeRange(0, attributedString.length))
-//            let string: NSString = NSString(string: formattedString)
-//            let rangeForBullet: NSRange = string.range(of: bullet)
-//            attributedString.addAttributes(bulletAttributes, range: rangeForBullet)
-//            bulletList.append(attributedString)
-//        }
-//        return bulletList
     }
 }
