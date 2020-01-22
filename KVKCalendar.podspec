@@ -16,6 +16,7 @@ Pod::Spec.new do |s|
   s.source           = { :git => 'https://github.com/kvyatkovskys/KVKCalendar.git', :tag => s.version.to_s }
   s.social_media_url = 'https://github.com/kvyatkovskys'
   s.ios.deployment_target = '10.0'
+  s.osx.deployment_target = '10.15'
   s.source_files = 'KVKCalendar/Classes/*.swift'
   s.swift_version = '5.0'
 end
