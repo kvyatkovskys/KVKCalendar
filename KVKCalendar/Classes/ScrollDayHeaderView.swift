@@ -16,7 +16,7 @@ final class ScrollDayHeaderView: UIView {
     private var date: Date
     private var style: Style
     private var collectionView: UICollectionView!
-    private var isEndAnimated: Bool = false
+    private var isAnimate: Bool = false
     private let type: CalendarType
     private let calendar: Calendar
     private var lastContentOffset: CGFloat = 0
@@ -83,7 +83,7 @@ final class ScrollDayHeaderView: UIView {
     
     func setDate(_ date: Date) {
         self.date = date
-        scrollToDate(date, isEndAnimated: isEndAnimated)
+        scrollToDate(date, isAnimate: isAnimate)
         collectionView.reloadData()
     }
     
@@ -112,7 +112,7 @@ final class ScrollDayHeaderView: UIView {
         return collection
     }
     
-    private func scrollToDate(_ date: Date, isEndAnimated: Bool) {
+    private func scrollToDate(_ date: Date, isAnimate: Bool) {
         delegate?.didSelectDateScrollHeader(date, type: type)
         setDateToTitle(date)
         
@@ -155,7 +155,11 @@ final class ScrollDayHeaderView: UIView {
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            self.collectionView.scrollToItem(at: indexPath, at: .left, animated: true)
+            self.collectionView.scrollToItem(at: indexPath, at: .left, animated: isAnimate)
+        }
+        
+        if !self.isAnimate {
+            self.isAnimate = true
         }
         
         if type == .day, !style.headerScroll.isHiddenTitleDate {
