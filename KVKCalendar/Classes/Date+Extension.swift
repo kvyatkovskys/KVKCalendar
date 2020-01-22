@@ -63,18 +63,22 @@ public extension Date {
         return gregorian.date(byAdding: components, to: startOfDay ?? self)
     }
     
+    // TO DO: need to think about it
     var startMondayOfWeek: Date? {
         var gregorian = Calendar(identifier: .gregorian)
+        gregorian.firstWeekday = 3 // <--- 🤔
         gregorian.timeZone = TimeZone(abbreviation: "UTC")!
-        let sunday = gregorian.date(from: gregorian.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))
-        return gregorian.date(byAdding: .day, value: self.isSunday ? -6 : 1, to: sunday ?? self)
+        var startDate = Date()
+        var interval = TimeInterval()
+        _ = gregorian.dateInterval(of: .weekOfMonth, start: &startDate, interval: &interval, for: self)
+        return startDate
     }
     
     var startSundayOfWeek: Date? {
         var gregorian = Calendar(identifier: .gregorian)
         gregorian.timeZone = TimeZone(abbreviation: "UTC")!
         let sunday = gregorian.date(from: gregorian.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))
-        return gregorian.date(byAdding: .day, value: 0, to: sunday ?? self)
+        return gregorian.date(byAdding: .day, value: 1, to: sunday ?? self)
     }
     
     var endSundayOfWeek: Date? {
