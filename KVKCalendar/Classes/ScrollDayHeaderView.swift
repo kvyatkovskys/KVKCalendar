@@ -122,7 +122,14 @@ final class ScrollDayHeaderView: UIView {
         case .day:
             let minOffset = 4
             let maxOffset = 5
-            guard middleDate.day - date.day >= minOffset || date.day - middleDate.day >= minOffset else { return }
+            guard middleDate.day - date.day >= minOffset || date.day - middleDate.day >= minOffset else {
+                guard let scrollDate = getScrollDate(date),
+                    let idx = days.firstIndex(where: { $0.date?.year == scrollDate.year
+                        && $0.date?.month == scrollDate.month
+                        && $0.date?.day == scrollDate.day }) else { return }
+                indexPath.row = idx
+                break
+            }
             
             if middleDate.day > date.day, minOffset...maxOffset ~= middleDate.day - date.day {
                 indexPath.row -= 10
