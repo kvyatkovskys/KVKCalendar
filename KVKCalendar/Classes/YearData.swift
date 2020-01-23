@@ -7,11 +7,10 @@
 
 import Foundation
 
-private let boxCount = 42
-
 struct YearData {
     private let style: Style
     
+    let boxCount = 42
     var months = [Month]()
     var date: Date
     
@@ -27,12 +26,12 @@ struct YearData {
         
         // last years
         for lastIdx in lastYear.indices.reversed() {
-            yearsCount.append(-(lastIdx + 1))
+            yearsCount.append(-lastIdx)
         }
         
         // next years
         for nextIdx in nextYear.indices {
-            yearsCount.append(nextIdx)
+            yearsCount.append(nextIdx + 1)
         }
         
         let formatter = DateFormatter()
@@ -49,31 +48,17 @@ struct YearData {
             var dateMonths = [Date]()
             if let monthsOfYearRange = monthsOfYearRange {
                 let year = calendar.component(.year, from: yearDate ?? date)
-                for monthOfYear in (monthsOfYearRange.lowerBound..<monthsOfYearRange.upperBound) {
+                dateMonths = Array(monthsOfYearRange.lowerBound..<monthsOfYearRange.upperBound).compactMap({ monthOfYear -> Date? in
                     var components = DateComponents(year: year, month: monthOfYear)
                     components.day = 2
-                    guard let dateMonth = calendar.date(from: components) else { continue }
-                    dateMonths.append(dateMonth)
-                }
+                    return calendar.date(from: components)
+                })
             }
             
-            var months = zip(nameMonths, dateMonths).map({ Month(name: $0.0,
-                                                                 date: $0.1,
-                                                                 week: [.empty],
-                                                                 days: [.empty()]) })
+            var months = zip(nameMonths, dateMonths).map({ Month(name: $0.0, date: $0.1, days: []) })
             
             for (idx, month) in months.enumerated() {
-                var days = getDaysInMonth(month: idx + 1, date: month.date)
-                if days.count < boxCount {
-                    for _ in 1...boxCount - days.count {
-                        days.append(Day(day: "", type: .empty, date: nil, data: []))
-                    }
-                }
-                
-                if style.startWeekDay == .sunday {
-                    days = addSundayToBegin(days: days)
-                }
-                
+                let days = getDaysInMonth(month: idx + 1, date: month.date)
                 months[idx].days = days
             }
             monthsTemp += months
@@ -82,54 +67,33 @@ struct YearData {
     }
     
     func getDaysInMonth(month: Int, date: Date) -> [Day] {
-        let calendar = Calendar.current
-        let components = calendar.dateComponents([.year], from: date)
-        let formatter = DateFormatter()
-        var dateComponents = DateComponents(year: components.year ?? 0, month: month)
+        let calendar = style.calendar
+        var dateComponents = DateComponents(year: date.year, month: month)
         dateComponents.day = 2
-        let dateMonth = calendar.date(from: dateComponents)!
         
-        let range = calendar.range(of: .day, in: .month, for: dateMonth)!
-        let numDays = range.count
+        guard let dateMonth = calendar.date(from: dateComponents), let range = calendar.range(of: .day, in: .month, for: dateMonth) else { return [] }
+        
+        let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = style.timezone
+        let arrDates = Array(range.lowerBound...range.upperBound).compactMap({ formatter.date(from: "\(date.year)-\(month)-\($0)") })
         
-        var arrDates = [Date]()
-        for day in 1...numDays {
-            let dateString = "\(components.year ?? 0) \(month) \(day)"
-            if let date = formatter.date(from: dateString)?.toLocalTime() {
-                arrDates.append(date)
-            }
-        }
-        
-        formatter.dateFormat = "d"
         let formatterDay = DateFormatter()
         formatterDay.dateFormat = "EE"
-        formatterDay.locale = Locale(identifier: "en_US")
-        
-        let days = arrDates.map({ Day(day: formatter.string(from: $0),
-                                      type: DayType(rawValue: formatterDay.string(from: $0).uppercased()),
-                                      date: $0,
-                                      data: []) })
-        
-        guard let shift = days.first?.type else { return days }
-        var shiftDays = [Day]()
-        for _ in 0..<shift.shiftDay {
-            shiftDays.append(.empty())
-        }
-        return shiftDays + days
+        formatterDay.timeZone = TimeZone(secondsFromGMT: 0)
+        let days = arrDates.map({ Day(type: DayType(rawValue: formatterDay.string(from: $0).uppercased()), date: $0, data: []) })
+        return days
     }
     
     func addStartEmptyDay(days: [Day], startDay: StartDayType) -> [Day] {
         var tempDays = [Day]()
-        let filterDays = days.filter({ $0.type != .empty })
-        if let firstDay = filterDays.first?.type {
-            for _ in 0..<firstDay.shiftDay {
-                tempDays.append(.empty())
+        if let firstDay = days.first?.type {
+            if firstDay == .sunday, startDay == .sunday {
+                tempDays = days
+            } else {
+                tempDays = Array(0..<firstDay.shiftDay).compactMap({ _ in Day.empty() }) + days
             }
-            tempDays += filterDays
         } else {
-            tempDays = filterDays
+            tempDays = days
         }
         
         if startDay == .sunday {
@@ -139,15 +103,25 @@ struct YearData {
         return tempDays
     }
     
+    func addEndEmptyDay(days: [Day], startDay: StartDayType) -> [Day] {
+        var tempDays = [Day]()
+        if let lastDay = days.last?.type {
+            let maxShift: DayType = startDay == .sunday ? .saturday : .sunday
+            var emptyDays = [Day]()
+            if maxShift.shiftDay > lastDay.shiftDay {
+                emptyDays = Array(0..<maxShift.shiftDay - lastDay.shiftDay).compactMap({ _ in Day.empty() })
+            }
+            tempDays = days + emptyDays
+        } else {
+            tempDays = days
+        }
+        return tempDays
+    }
+    
     private func addSundayToBegin(days: [Day]) -> [Day] {
         var days = days
-        days.insert(.empty(), at: 0)
-        days.removeLast()
-        
-        let emptyFirstWeek = days[0..<7]
-        if emptyFirstWeek.filter({ $0.type != .empty }).isEmpty {
-            days.removeSubrange(0..<7)
-            days += emptyFirstWeek
+        if days.first?.type != .sunday {
+            days.insert(.empty(), at: 0)
         }
         return days
     }
@@ -156,12 +130,10 @@ struct YearData {
 struct Month {
     let name: String
     let date: Date
-    let week: [DayType]
     var days: [Day]
 }
 
 struct Day {
-    let day: String
     let type: DayType
     let date: Date?
     var events: [Event]
@@ -171,14 +143,12 @@ struct Day {
     }
     
     private init() {
-        self.day = ""
         self.date = nil
         self.events = []
         self.type = .empty
     }
     
-    init(day: String, type: DayType, date: Date?, data: [Event]) {
-        self.day = day
+    init(type: DayType, date: Date?, data: [Event]) {
         self.type = type
         self.events = data
         self.date = date

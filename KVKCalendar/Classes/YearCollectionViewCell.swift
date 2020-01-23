@@ -23,15 +23,15 @@ final class YearCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    var style: Style = Style() {
+    var style = Style() {
         didSet {
-            titleLabel.font = style.yearStyle.fontTitle
-            titleLabel.textColor = style.yearStyle.colorTitle
+            titleLabel.font = style.year.fontTitle
+            titleLabel.textColor = style.year.colorTitle
             
             subviews.filter({ $0 is WeekHeaderView }).forEach({ $0.removeFromSuperview() })
             let view = WeekHeaderView(frame: CGRect(x: 0, y: 40, width: frame.width, height: 30), style: style, fromYear: true)
-            view.font = style.yearStyle.weekFont
-            view.backgroundColorWeekends = style.weekStyle.colorBackgroundWeekendDate
+            view.font = style.year.weekFont
+            view.backgroundColorWeekends = style.week.colorBackgroundWeekendDate
             addSubview(view)
         }
     }
@@ -41,7 +41,7 @@ final class YearCollectionViewCell: UICollectionViewCell {
             subviews.filter({ $0.tag == 1 }).forEach({ $0.removeFromSuperview() })
             var step = 0
             let weekCount = ceil((CGFloat(days.count) / CGFloat(daysInWeek)))
-            for idx in 1...Int(weekCount) {
+            Array(1...Int(weekCount)).forEach { idx in
                 if idx == Int(weekCount) {
                     let sliceDays = days[step...]
                     addDayToLabel(days: sliceDays, step: idx)
@@ -92,11 +92,12 @@ final class YearCollectionViewCell: UICollectionViewCell {
                                               width: size,
                                               height: size))
             label.textAlignment = .center
-            label.font = style.yearStyle.fontDayTitle
-            label.textColor = style.yearStyle.colorDayTitle
-            
-            if let day = day.date?.day {
-                label.text = "\(day)"
+            label.font = style.year.fontDayTitle
+            label.textColor = style.year.colorDayTitle
+            if let tempDay = day.date?.day {
+                label.text = "\(tempDay)"
+            } else {
+                label.text = nil
             }
             
             view.tag = 1
@@ -118,14 +119,14 @@ final class YearCollectionViewCell: UICollectionViewCell {
         let nowDate = Date()
         
         if weekend {
-            label.textColor = style.yearStyle.colorWeekendDate
-            view.backgroundColor = style.yearStyle.colorBackgroundWeekendDate
+            label.textColor = style.year.colorWeekendDate
+            view.backgroundColor = style.year.colorBackgroundWeekendDate
         }
         
         guard date?.year == nowDate.year else {
             if date?.year == selectDate.year && date?.month == selectDate.month && date?.day == selectDate.day {
-                label.textColor = style.yearStyle.colorSelectDate
-                label.backgroundColor = style.yearStyle.colorBackgroundSelectDate
+                label.textColor = style.year.colorSelectDate
+                label.backgroundColor = style.year.colorBackgroundSelectDate
                 label.layer.cornerRadius = label.frame.height / 2
                 label.clipsToBounds = true
             }
@@ -134,8 +135,8 @@ final class YearCollectionViewCell: UICollectionViewCell {
         
         guard date?.month == nowDate.month else {
             if selectDate.day == date?.day && selectDate.month == date?.month {
-                label.textColor = style.yearStyle.colorSelectDate
-                label.backgroundColor = style.yearStyle.colorBackgroundSelectDate
+                label.textColor = style.year.colorSelectDate
+                label.backgroundColor = style.year.colorBackgroundSelectDate
                 label.layer.cornerRadius = label.frame.height / 2
                 label.clipsToBounds = true
             }
@@ -144,8 +145,8 @@ final class YearCollectionViewCell: UICollectionViewCell {
         
         guard date?.day == nowDate.day else {
             if selectDate.day == date?.day && date?.month == selectDate.month {
-                label.textColor = style.yearStyle.colorSelectDate
-                label.backgroundColor = style.yearStyle.colorBackgroundSelectDate
+                label.textColor = style.year.colorSelectDate
+                label.backgroundColor = style.year.colorBackgroundSelectDate
                 label.layer.cornerRadius = label.frame.height / 2
                 label.clipsToBounds = true
             }
@@ -153,13 +154,13 @@ final class YearCollectionViewCell: UICollectionViewCell {
         }
         guard selectDate.day == date?.day && selectDate.month == date?.month else {
             if date?.day == nowDate.day {
-                label.textColor = style.yearStyle.colorBackgroundCurrentDate
+                label.textColor = style.year.colorBackgroundCurrentDate
                 label.backgroundColor = .clear
             }
             return
         }
-        label.textColor = style.yearStyle.colorCurrentDate
-        label.backgroundColor = style.yearStyle.colorBackgroundCurrentDate
+        label.textColor = style.year.colorCurrentDate
+        label.backgroundColor = style.year.colorBackgroundCurrentDate
         label.layer.cornerRadius = label.frame.height / 2
         label.clipsToBounds = true
     }

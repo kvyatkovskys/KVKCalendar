@@ -22,18 +22,23 @@ final class MonthCollectionViewCell: UICollectionViewCell {
     private lazy var dateLabel: UILabel = {
         let label = UILabel()
         label.tag = -1
-        label.font = style.fontNameDate
-        label.textColor = style.colorNameDay
+        label.font = monthStyle.fontNameDate
+        label.textColor = monthStyle.colorNameDay
         label.textAlignment = .center
         label.clipsToBounds = true
         return label
     }()
     
-    var style = MonthStyle()
+    private var monthStyle = MonthStyle()
+    var style = Style() {
+        didSet {
+            monthStyle = style.month
+        }
+    }
     weak var delegate: MonthCellDelegate?
     
     var events: [Event] = [] {
-        willSet {
+        didSet {
             subviews.filter({ $0.tag != -1 }).forEach({ $0.removeFromSuperview() })
             
             if UIDevice.current.userInterfaceIdiom == .phone, UIDevice.current.orientation.isLandscape {
@@ -41,33 +46,36 @@ final class MonthCollectionViewCell: UICollectionViewCell {
             }
             
             let height = (frame.height - dateLabel.bounds.height - offset) / countInCell
-            for (idx, event) in newValue.enumerated() {
+            for (idx, event) in events.enumerated() {
                 let count = idx + 1
                 let label = UILabel(frame: CGRect(x: 5,
                                                   y: offset + dateLabel.bounds.height + height * CGFloat(idx),
                                                   width: frame.width - 10,
                                                   height: height))
                 label.isUserInteractionEnabled = true
-                label.tag = "\(event.id)".hashValue
-                let tap = UITapGestureRecognizer(target: self, action: #selector(tapOneEvent))
-                label.addGestureRecognizer(tap)
-                label.font = style.fontEventTitle
-                label.textColor = style.colorEventTitle
+                label.font = monthStyle.fontEventTitle
+                label.textColor = monthStyle.colorEventTitle
                 label.lineBreakMode = .byTruncatingMiddle
-                label.textAlignment = .center
+                label.adjustsFontSizeToFitWidth = true
+                label.minimumScaleFactor = 0.8
+                
                 if count > MonthCollectionViewCell.titlesCount {
+                    label.textAlignment = .center
                     let tap = UITapGestureRecognizer(target: self, action: #selector(tapOnMore))
                     label.tag = event.start.day
                     label.addGestureRecognizer(tap)
-                    label.textColor = style.colorMoreTitle
-                    label.text = "\(style.moreTitle) \(newValue.count - MonthCollectionViewCell.titlesCount)"
+                    label.textColor = monthStyle.colorMoreTitle
+                    label.text = "\(monthStyle.moreTitle) \(events.count - MonthCollectionViewCell.titlesCount)"
                     addSubview(label)
                     return
                 } else {
+                    let tap = UITapGestureRecognizer(target: self, action: #selector(tapOneEvent))
+                    label.addGestureRecognizer(tap)
+                    label.tag = "\(event.id)".hashValue
                     label.attributedText = addIconBeforeLabel(stringList: [event.textForMonth],
-                                                              font: style.fontEventTitle,
+                                                              font: monthStyle.fontEventTitle,
                                                               bullet: "•",
-                                                              textColor: style.colorEventTitle,
+                                                              textColor: monthStyle.colorEventTitle,
                                                               bulletColor: event.color?.value ?? .systemGray)
                 }
                 addSubview(label)
@@ -75,14 +83,18 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    var day: Day = Day.empty() {
-        willSet {
-            dateLabel.text = newValue.day
-            if !style.isHiddenSeporator {
-                layer.borderWidth = newValue.type != .empty ? style.widthSeporator : 0
-                layer.borderColor = newValue.type != .empty ? style.colorSeporator.cgColor : UIColor.clear.cgColor
+    var day: Day = .empty() {
+        didSet {
+            if let tempDay = day.date?.day {
+                dateLabel.text = "\(tempDay)"
+            } else {
+                dateLabel.text = nil
             }
-            weekendsDays(day: newValue, label: dateLabel, view: self)
+            if !monthStyle.isHiddenSeporator {
+                layer.borderWidth = day.type != .empty ? monthStyle.widthSeporator : 0
+                layer.borderColor = day.type != .empty ? monthStyle.colorSeporator.cgColor : UIColor.clear.cgColor
+            }
+            weekendsDays(day: day, label: dateLabel, view: self)
         }
     }
     
@@ -110,7 +122,11 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         var dateFrame = frame
         dateFrame.size = CGSize(width: 35, height: 35)
         dateFrame.origin.y = offset
-        dateFrame.origin.x = (frame.width - dateFrame.width)
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            dateFrame.origin.x = (frame.width - dateFrame.width)
+        } else {
+            dateFrame.origin.x = (frame.width / 2) - (dateFrame.width / 2)
+        }
         dateLabel.frame = dateFrame
         addSubview(dateLabel)
     }
@@ -128,17 +144,17 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         label.backgroundColor = .clear
         
         if weekend {
-            label.textColor = style.colorWeekendDate
-            view.backgroundColor = style.colorBackgroundWeekendDate
+            label.textColor = monthStyle.colorWeekendDate
+            view.backgroundColor = monthStyle.colorBackgroundWeekendDate
         } else {
-            view.backgroundColor = style.colorBackgroundDate
-            label.textColor = style.colorDate
+            view.backgroundColor = monthStyle.colorBackgroundDate
+            label.textColor = monthStyle.colorDate
         }
         
         guard date?.year == nowDate.year else {
             if date?.year == selectDate.year && date?.month == selectDate.month && date?.day == selectDate.day {
-                label.textColor = style.colorSelectDate
-                label.backgroundColor = style.colorBackgroundSelectDate
+                label.textColor = monthStyle.colorSelectDate
+                label.backgroundColor = monthStyle.colorBackgroundSelectDate
                 label.layer.cornerRadius = label.frame.height / 2
                 label.clipsToBounds = true
             }
@@ -147,8 +163,8 @@ final class MonthCollectionViewCell: UICollectionViewCell {
 
         guard date?.month == nowDate.month else {
             if selectDate.day == date?.day && selectDate.month == date?.month {
-                label.textColor = style.colorSelectDate
-                label.backgroundColor = style.colorBackgroundSelectDate
+                label.textColor = monthStyle.colorSelectDate
+                label.backgroundColor = monthStyle.colorBackgroundSelectDate
                 label.layer.cornerRadius = label.frame.height / 2
                 label.clipsToBounds = true
             }
@@ -157,8 +173,8 @@ final class MonthCollectionViewCell: UICollectionViewCell {
 
         guard date?.day == nowDate.day else {
             if selectDate.day == date?.day && date?.month == selectDate.month {
-                label.textColor = style.colorSelectDate
-                label.backgroundColor = style.colorBackgroundSelectDate
+                label.textColor = monthStyle.colorSelectDate
+                label.backgroundColor = monthStyle.colorBackgroundSelectDate
                 label.layer.cornerRadius = label.frame.height / 2
                 label.clipsToBounds = true
             }
@@ -167,14 +183,14 @@ final class MonthCollectionViewCell: UICollectionViewCell {
 
         guard selectDate.day == date?.day && selectDate.month == date?.month else {
             if date?.day == nowDate.day {
-                label.textColor = style.colorDate
+                label.textColor = monthStyle.colorDate
                 label.backgroundColor = .clear
             }
             return
         }
 
-        label.textColor = style.colorCurrentDate
-        label.backgroundColor = style.colorBackgroundCurrentDate
+        label.textColor = monthStyle.colorCurrentDate
+        label.backgroundColor = monthStyle.colorBackgroundCurrentDate
         label.layer.cornerRadius = label.frame.height / 2
         label.clipsToBounds = true
     }
@@ -183,23 +199,23 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         let textAttributes: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: textColor]
         let bulletAttributes: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: bulletColor]
         let paragraphStyle = NSMutableParagraphStyle()
-        let nonOptions = [NSTextTab.OptionKey: Any]()
-        paragraphStyle.tabStops = [NSTextTab(textAlignment: .left, location: indentation, options: nonOptions)]
+        
+        paragraphStyle.alignment = UIDevice.current.userInterfaceIdiom == .pad ? .left : .center
+        paragraphStyle.tabStops = [NSTextTab(textAlignment: .left, location: indentation, options: [:])]
         paragraphStyle.defaultTabInterval = indentation
         paragraphStyle.lineSpacing = lineSpacing
         paragraphStyle.paragraphSpacing = paragraphSpacing
         paragraphStyle.headIndent = indentation
-        let bulletList = NSMutableAttributedString()
-        for string in stringList {
-            let formattedString = "\(bullet)\t\(string)\n"
+        
+        return stringList.reduce(NSMutableAttributedString()) { _, string -> NSMutableAttributedString in
+            let formattedString = UIDevice.current.userInterfaceIdiom == .pad ? "\(bullet)\t\(string)\n" : bullet
             let attributedString = NSMutableAttributedString(string: formattedString)
             attributedString.addAttributes([NSAttributedString.Key.paragraphStyle: paragraphStyle], range: NSMakeRange(0, attributedString.length))
             attributedString.addAttributes(textAttributes, range: NSMakeRange(0, attributedString.length))
             let string: NSString = NSString(string: formattedString)
             let rangeForBullet: NSRange = string.range(of: bullet)
             attributedString.addAttributes(bulletAttributes, range: rangeForBullet)
-            bulletList.append(attributedString)
+            return attributedString
         }
-        return bulletList
     }
 }

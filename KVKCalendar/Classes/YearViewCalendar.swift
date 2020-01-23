@@ -23,7 +23,7 @@ final class YearViewCalendar: UIView {
     }()
     
     private lazy var headerView: YearHeaderView = {
-        let view = YearHeaderView(frame: CGRect(x: 0, y: 0, width: frame.width, height: style.yearStyle.heightTitleHeader))
+        let view = YearHeaderView(frame: CGRect(x: 0, y: 0, width: frame.width, height: style.year.heightTitleHeader))
         view.style = style
         return view
     }()
@@ -86,9 +86,9 @@ extension YearViewCalendar: CalendarSettingProtocol {
         headerView.reloadFrame(self.frame)
         
         collectionView.removeFromSuperview()
-        collectionView = createCollectionView(frame: self.frame, style: style.yearStyle)
-        collectionView.frame.origin.y = style.yearStyle.heightTitleHeader
-        collectionView.frame.size.height -= style.yearStyle.heightTitleHeader
+        collectionView = createCollectionView(frame: self.frame, style: style.year)
+        collectionView.frame.origin.y = style.year.heightTitleHeader
+        collectionView.frame.size.height -= style.year.heightTitleHeader
         addSubview(collectionView)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
@@ -119,9 +119,9 @@ extension YearViewCalendar: CalendarSettingProtocol {
     func setUI() {
         subviews.forEach({ $0.removeFromSuperview() })
         
-        collectionView = createCollectionView(frame: frame, style: style.yearStyle)
-        collectionView.frame.origin.y = style.yearStyle.heightTitleHeader
-        collectionView.frame.size.height -= style.yearStyle.heightTitleHeader
+        collectionView = createCollectionView(frame: frame, style: style.year)
+        collectionView.frame.origin.y = style.year.heightTitleHeader
+        collectionView.frame.size.height -= style.year.heightTitleHeader
         addSubview(collectionView)
         addSubview(headerView)
     }
@@ -143,7 +143,7 @@ extension YearViewCalendar: UICollectionViewDataSource {
         cell.style = style
         cell.selectDate = data.date
         cell.title = month.name
-        cell.days = data.addStartEmptyDay(days: month.days, startDay: style.startWeekDay)
+        cell.days = month.days
         return cell
     }
 }
@@ -184,12 +184,12 @@ extension YearViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFl
         let attributes = collectionView.layoutAttributesForItem(at: indexPath)
         let frame = collectionView.convert(attributes?.frame ?? .zero, to: collectionView)
         
-        delegate?.didSelectCalendarDate(newDate, type: style.yearStyle.selectCalendarType, frame: frame)
+        delegate?.didSelectCalendarDate(newDate, type: style.year.selectCalendarType, frame: frame)
         collectionView.reloadData()
     }
     
     func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
-        guard UIDevice.current.userInterfaceIdiom == .pad, style.monthStyle.isAnimateSelection else { return }
+        guard UIDevice.current.userInterfaceIdiom == .pad, style.month.isAnimateSelection else { return }
         
         let cell = collectionView.cellForItem(at: indexPath)
         UIView.animate(withDuration: 0.4,
@@ -202,7 +202,7 @@ extension YearViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFl
     }
     
     func collectionView(_ collectionView: UICollectionView, didUnhighlightItemAt indexPath: IndexPath) {
-        guard UIDevice.current.userInterfaceIdiom == .pad, style.monthStyle.isAnimateSelection else { return }
+        guard UIDevice.current.userInterfaceIdiom == .pad, style.month.isAnimateSelection else { return }
         
         let cell = collectionView.cellForItem(at: indexPath)
         UIView.animate(withDuration: 0.1) {

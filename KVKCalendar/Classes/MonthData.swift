@@ -10,12 +10,25 @@ import Foundation
 struct MonthData {
     var days: [Day]
     var date: Date
+    var data: YearData
     
     private let cachedDays: [Day]
     
     init(yearData: YearData, startDay: StartDayType) {
-        self.days = yearData.months.reduce([], { $0 + $1.days })
+        self.data = yearData
+        data.months = yearData.months.reduce([], { (acc, month) -> [Month] in
+            var daysTemp = yearData.addStartEmptyDay(days: month.days, startDay: startDay)
+            if daysTemp.count < yearData.boxCount {
+                Array(1...yearData.boxCount - daysTemp.count).forEach { _ in
+                    daysTemp.append(.empty())
+                }
+            }
+            var monthTemp = month
+            monthTemp.days = daysTemp
+            return acc + [monthTemp]
+        })
         self.date = yearData.date
+        self.days = data.months.flatMap({ $0.days })
         self.cachedDays = days
     }
     
@@ -31,10 +44,8 @@ struct MonthData {
         let newDays = cachedDays[startIdx...endIdx].reduce([], { (acc, day) -> [Day] in
             var newDay = day
             guard newDay.events.isEmpty else { return acc + [day] }
-            let sortedByDay = events.filter({ $0.start.month == day.date?.month && $0.start.year == day.date?.year })
-            for (idx, value) in sortedByDay.enumerated() where value.start.day == day.date?.day {
-                newDay.events.append(events[idx])
-            }
+            let sortedByDay = events.filter({ $0.start.month == day.date?.month && $0.start.year == day.date?.year && $0.start.day == day.date?.day })
+            newDay.events = sortedByDay
             return acc + [newDay]
         })
         days[startIdx...endIdx] = ArraySlice(newDays)

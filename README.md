@@ -1,9 +1,8 @@
-<pre>
-<img src="https://i.postimg.cc/PNsT9nKV/Simulator-Screen-Shot-i-Phone-Xs-2019-05-04-at-11-11-07-iphon.png" height="400" width="380">   <img src="https://i.postimg.cc/VvMddRVT/Screenshot-2019-05-04-at-11-42-20.png" height="320" width="430">
-</pre>
+<a href="https://postimg.cc/BLBC07wH" target="_blank"><img src="https://i.postimg.cc/BLBC07wH/Screenshot-2019-10-29-at-11-07-07.png" alt="Screenshot-2019-10-29-at-11-07-07"/></a> <a href="https://postimg.cc/QKNJxgRP" target="_blank"><img src="https://i.postimg.cc/QKNJxgRP/Screenshot-2019-10-29-at-11-58-44.png" alt="Screenshot-2019-10-29-at-11-58-44"/></a> <a href="https://postimg.cc/f30wpxFc" target="_blank"><img src="https://i.postimg.cc/f30wpxFc/Screenshot-2019-10-29-at-12-00-35.png" alt="Screenshot-2019-10-29-at-12-00-35"/></a> <a href="https://postimg.cc/tZQXjsQL" target="_blank"><img src="https://i.postimg.cc/tZQXjsQL/Screenshot-2019-10-29-at-12-00-59.png" alt="Screenshot-2019-10-29-at-12-00-59"/></a><br/><br/>
 
 [![CI Status](https://img.shields.io/travis/kvyatkovskys/KVKCalendar.svg?style=flat)](https://travis-ci.org/kvyatkovskys/KVKCalendar)
 [![Version](https://img.shields.io/cocoapods/v/KVKCalendar.svg?style=flat)](https://cocoapods.org/pods/KVKCalendar)
+[![Carthage](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=fla)](https://github.com/Carthage/Carthage/)
 [![License](https://img.shields.io/cocoapods/l/KVKCalendar.svg?style=flat)](https://cocoapods.org/pods/KVKCalendar)
 [![Platform](https://img.shields.io/cocoapods/p/KVKCalendar.svg?style=flat)](https://cocoapods.org/pods/KVKCalendar)
 
@@ -14,20 +13,23 @@
 ## Requirements
 
 - iOS 10.0+
-- Swift 5.0
+- Swift 5.0+
 
 ## Installation
 
-**KVKCalendar** is available through [CocoaPods](https://cocoapods.org) or [Carthage](https://github.com/Carthage/Carthage). To install
-it, simply add the following line to your Podfile or Cartfile:
+**KVKCalendar** is available through [CocoaPods](https://cocoapods.org) and [Carthage](https://github.com/Carthage/Carthage).
 
-```ruby
+### CocoaPods
+~~~bash
 pod 'KVKCalendar'
+~~~
 
+### Carthage
+~~~bash
 github "kvyatkovskys/KVKCalendar"
-```
+~~~
 
-## Usage
+## Usage for UIKit
 Import `KVKCalendar`.
 Create a subclass view `CalendarView` and implement `CalendarDataSource` protocol. Create an array of class `[Event]` and return this array in the function.
 
@@ -100,6 +102,77 @@ extension ViewController: CalendarDelegate {
 }
 ```
 
+## Usage for SwiftUI
+Add a new `SwiftUI` file and import `KVKCalendar`.
+Create a struct `CalendarDisplayView` and declare the protocol `UIViewRepresentable` for connection `UIKit` with `SwiftUI`.
+
+```swift
+import SwiftUI
+import KVKCalendar
+
+struct CalendarDisplayView: UIViewRepresentable {
+    
+    private var calendar: CalendarView = {
+        return CalendarView(frame: frame, style: style)
+    }()
+        
+    func makeUIView(context: UIViewRepresentableContext<CalendarDisplayView>) -> CalendarView {
+        calendar.dataSource = context.coordinator
+        calendar.delegate = context.coordinator
+        calendar.reloadData()
+        return calendar
+    }
+    
+    func updateUIView(_ uiView: CalendarView, context: UIViewRepresentableContext<CalendarDisplayView>) {
+        
+    }
+    
+    func makeCoordinator() -> CalendarDisplayView.Coordinator {
+        Coordinator(self)
+    }
+    
+    // MARK: Calendar DataSource and Delegate
+    class Coordinator: NSObject, CalendarDataSource, CalendarDelegate {
+        private let view: CalendarDisplayView
+        
+        init(_ view: CalendarDisplayView) {
+            self.view = view
+            super.init()
+        }
+        
+        func eventsForCalendar() -> [Event] {
+            return events
+        }
+    }
+}
+
+struct CalendarDisplayView_Previews: PreviewProvider {
+    static var previews: some View {
+        CalendarDisplayView()
+    }
+}
+```
+
+Create a new `SwiftUI` file and add `CalendarDisplayView` to `body`.
+
+```swift
+import SwiftUI
+
+struct CalendarContentView: View {    
+    var body: some View {
+        NavigationView {
+            CalendarDisplayView()
+        }
+    }
+}
+
+struct CalendarContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        CalendarContentView()
+    }
+}
+```
+
 ## Styles
 To customize calendar create an object `Style` and add to `init` class `CalendarView`.
 
@@ -112,6 +185,7 @@ style.allDayStyle.isPinned = true
 style.timelineStyle.widthEventViewer = 500
 let calendar = CalendarView(frame: frame, style: style)
 ```
+
 If needed to customize `Locale`, `TimeZone`.
 
 ```swift
@@ -121,8 +195,8 @@ style.timezone = TimeZone //create any
 
 ## Author
 
-Sergei Kviatkovskii
+[Sergei Kviatkovskii](https://github.com/kvyatkovskys)
 
 ## License
 
-KVKCalendar is available under the MIT license. See the LICENSE file for more info.
+KVKCalendar is available under the [MIT license](https://github.com/kvyatkovskys/KVKCalendar/blob/master/LICENSE.md)

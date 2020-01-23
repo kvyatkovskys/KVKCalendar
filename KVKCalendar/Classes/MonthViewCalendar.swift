@@ -17,13 +17,13 @@ final class MonthViewCalendar: UIView {
     
     private lazy var headerView: WeekHeaderView = {
         let height: CGFloat
-        if style.monthStyle.isHiddenTitleDate {
-            height = style.monthStyle.heightHeaderWeek
+        if style.month.isHiddenTitleDate {
+            height = style.month.heightHeaderWeek
         } else {
-            height = style.monthStyle.heightHeaderWeek + style.monthStyle.heightTitleDate
+            height = style.month.heightHeaderWeek + style.month.heightTitleDate
         }
         let view = WeekHeaderView(frame: CGRect(x: 0, y: 0, width: frame.width, height: height), style: style)
-        view.backgroundColor = style.weekStyle.colorBackground
+        view.backgroundColor = style.week.colorBackground
         return view
     }()
     
@@ -31,7 +31,7 @@ final class MonthViewCalendar: UIView {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 0
-        layout.scrollDirection = style.monthStyle.scrollDirection
+        layout.scrollDirection = style.month.scrollDirection
         return layout
     }()
     
@@ -100,7 +100,7 @@ extension MonthViewCalendar: CalendarSettingProtocol {
         headerView.reloadFrame(frame)
         
         collectionView.removeFromSuperview()
-        collectionView = createCollectionView(frame: self.frame, style: style.monthStyle)
+        collectionView = createCollectionView(frame: self.frame, style: style.month)
         
         var collectionFrame = frame
         collectionFrame.origin.y = headerView.frame.height
@@ -128,7 +128,7 @@ extension MonthViewCalendar: CalendarSettingProtocol {
         subviews.forEach({ $0.removeFromSuperview() })
         
         addSubview(headerView)
-        collectionView = createCollectionView(frame: frame, style: style.monthStyle)
+        collectionView = createCollectionView(frame: frame, style: style.month)
         var collectionFrame = frame
         collectionFrame.origin.y = headerView.frame.height
         collectionFrame.size.height = collectionFrame.height - headerView.frame.height
@@ -151,7 +151,7 @@ extension MonthViewCalendar: UICollectionViewDataSource {
                                                       for: indexPath) as? MonthCollectionViewCell ?? MonthCollectionViewCell()
         let day = data.days[indexPath.row]
         cell.selectDate = data.date
-        cell.style = style.monthStyle
+        cell.style = style
         cell.day = day
         cell.events = day.events
         cell.delegate = self
@@ -187,12 +187,12 @@ extension MonthViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateF
         let attributes = collectionView.layoutAttributesForItem(at: indexPath)
         let frame = collectionView.convert(attributes?.frame ?? .zero, to: collectionView)
         
-        delegate?.didSelectCalendarDate(date, type: style.monthStyle.selectCalendarType, frame: frame)
+        delegate?.didSelectCalendarDate(date, type: style.month.selectCalendarType, frame: frame)
         collectionView.reloadData()
     }
     
     func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
-        guard style.monthStyle.isAnimateSelection else { return }
+        guard style.month.isAnimateSelection else { return }
         
         let cell = collectionView.cellForItem(at: indexPath)
         UIView.animate(withDuration: 0.4,
@@ -205,7 +205,7 @@ extension MonthViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateF
     }
     
     func collectionView(_ collectionView: UICollectionView, didUnhighlightItemAt indexPath: IndexPath) {
-        guard style.monthStyle.isAnimateSelection else { return }
+        guard style.month.isAnimateSelection else { return }
         
         let cell = collectionView.cellForItem(at: indexPath)
         UIView.animate(withDuration: 0.1) {
@@ -217,7 +217,7 @@ extension MonthViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateF
         let widht: CGFloat
         let height: CGFloat
         
-        switch style.monthStyle.scrollDirection {
+        switch style.month.scrollDirection {
         case .horizontal:
             widht = collectionView.frame.width / 7
             height = collectionView.frame.height / 6

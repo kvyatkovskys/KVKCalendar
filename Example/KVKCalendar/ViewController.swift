@@ -27,18 +27,19 @@ final class ViewController: UIViewController {
     private lazy var calendarView: CalendarView = {
         var style = Style()
         if UIDevice.current.userInterfaceIdiom == .phone {
-            style.monthStyle.isHiddenSeporator = true
-            style.timelineStyle.widthTime = 40
-            style.timelineStyle.offsetTimeX = 2
-            style.timelineStyle.offsetLineLeft = 2
+            style.month.isHiddenSeporator = true
+            style.timeline.widthTime = 40
+            style.timeline.offsetTimeX = 2
+            style.timeline.offsetLineLeft = 2
         } else {
-            style.timelineStyle.widthEventViewer = 500
+            style.timeline.widthEventViewer = 500
         }
-        style.followInInterfaceStyle = true
-        style.timelineStyle.offsetTimeY = 80
-        style.timelineStyle.offsetEvent = 3
-        style.timelineStyle.currentLineHourWidth = 40
-        style.allDayStyle.isPinned = true
+        style.timeline.startFromFirstEvent = false
+        style.followInInterface = true
+        style.timeline.offsetTimeY = 80
+        style.timeline.offsetEvent = 3
+        style.timeline.currentLineHourWidth = 40
+        style.allDay.isPinned = true
         style.startWeekDay = .sunday
         style.timeHourSystem = .twelveHour
         
@@ -99,23 +100,21 @@ final class ViewController: UIViewController {
     }
     
     @objc func switchCalendar(sender: UISegmentedControl) {
-        guard let type = CalendarType(rawValue: CalendarType.allCases[sender.selectedSegmentIndex].rawValue) else { return }
-        switch type {
-        case .day:
-            calendarView.set(type: .day, date: selectDate)
-        case .week:
-            calendarView.set(type: .week, date: selectDate)
-        case .month:
-            calendarView.set(type: .month, date: selectDate)
-        case .year:
-            calendarView.set(type: .year, date: selectDate)
-        }
+        let type = CalendarType.allCases[sender.selectedSegmentIndex]
+        calendarView.set(type: type, date: selectDate)
         calendarView.reloadData()
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        loadEvents { [unowned self] (events) in
+            self.events = events
+            self.calendarView.reloadData()
+        }
     }
 }
 
 extension ViewController: CalendarDelegate {
-    func didSelectDate(date: Date?, type: CalendarType, frame: CGRect?) {
+    func didSelectDate(_ date: Date?, type: CalendarType, frame: CGRect?) {
         selectDate = date ?? Date()
         calendarView.reloadData()
     }
@@ -143,11 +142,11 @@ extension ViewController: CalendarDataSource {
 extension ViewController {
     func loadEvents(completion: ([Event]) -> Void) {
         var events = [Event]()
-        
-        let path = Bundle.main.path(forResource: "events", ofType: "json")!
-        let data = try! Data(contentsOf: URL(fileURLWithPath: path), options: .mappedIfSafe)
         let decoder = JSONDecoder()
-        let result = try! decoder.decode(ItemData.self, from: data)
+                
+        guard let path = Bundle.main.path(forResource: "events", ofType: "json"),
+            let data = try? Data(contentsOf: URL(fileURLWithPath: path), options: .mappedIfSafe),
+            let result = try? decoder.decode(ItemData.self, from: data) else { return }
         
         for (idx, item) in result.data.enumerated() {
             let startDate = self.formatter(date: item.start)

@@ -68,11 +68,11 @@ final class WeekHeaderView: UIView {
             let label = UILabel(frame: CGRect(x: width * CGFloat(idx),
                                               y: 0,
                                               width: width,
-                                              height: fromYear ? frame.height : style.monthStyle.heightHeaderWeek))
+                                              height: fromYear ? frame.height : style.month.heightHeaderWeek))
             label.adjustsFontSizeToFitWidth = true
             label.textAlignment = .center
-            label.textColor = (value == .sunday || value == .saturday) ? style.weekStyle.colorWeekendDate : style.weekStyle.colorDate
-            if !style.headerScrollStyle.titleDays.isEmpty, let title = style.headerScrollStyle.titleDays[safe: value.shiftDay] {
+            label.textColor = (value == .sunday || value == .saturday) ? style.week.colorWeekendDate : style.week.colorDate
+            if !style.headerScroll.titleDays.isEmpty, let title = style.headerScroll.titleDays[safe: value.shiftDay] {
                 label.text = title
             } else {
                 label.text = value.rawValue.capitalized
@@ -80,18 +80,18 @@ final class WeekHeaderView: UIView {
             label.tag = value.shiftDay
             addSubview(label)
         }
-        if !style.monthStyle.isHiddenTitleDate && !fromYear {
+        if !style.month.isHiddenTitleDate && !fromYear {
             titleLabel.frame = CGRect(x: 0,
-                                      y: style.monthStyle.heightHeaderWeek,
+                                      y: style.month.heightHeaderWeek,
                                       width: frame.width,
-                                      height: style.monthStyle.heightTitleDate - 10)
+                                      height: style.month.heightTitleDate - 10)
             addSubview(titleLabel)
         }
     }
     
     private func setDateToTitle(date: Date?, style: Style) {
-        if let date = date, !style.monthStyle.isHiddenTitleDate {
-            var monthStyle = style.monthStyle
+        if let date = date, !style.month.isHiddenTitleDate {
+            var monthStyle = style.month
             let formatter = monthStyle.formatter
             titleLabel.text = formatter.string(from: date)
         }
