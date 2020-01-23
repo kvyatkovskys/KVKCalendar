@@ -384,7 +384,7 @@ final class TimelineView: UIView {
     func createTimelinePage(dates: [Date?], events: [Event], selectedDate: Date?) {
         subviews.filter({ $0 is AllDayEventView || $0 is AllDayTitleView }).forEach({ $0.removeFromSuperview() })
         scrollView.subviews.filter({ $0.tag != tagCurrentHourLine }).forEach({ $0.removeFromSuperview() })
-        subviews.filter({ $0.tag == -999 }).forEach({ $0.removeFromSuperview() })
+        scrollView.subviews.filter({ $0.tag == -999 }).forEach({ $0.removeFromSuperview() })
         
         allEvents = events.filter { (event) -> Bool in
             let date = event.start
@@ -432,7 +432,7 @@ final class TimelineView: UIView {
             }
             
             if style.week.showVerticalDayDivider {
-                addSubview(createVerticalLine(pointX: pointX))
+                scrollView.addSubview(createVerticalLine(pointX: pointX))
             }
             
             let eventsByDate = filteredEvents
