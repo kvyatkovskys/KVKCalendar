@@ -77,7 +77,7 @@ struct YearData {
         formatter.formatOptions = [.withFullDate, .withDashSeparatorInDate]
         formatter.timeZone = style.timezone
         let arrDates = Array(range.lowerBound..<range.upperBound).compactMap({ formatter.date(from: "\(date.year)-\(month)-\($0)") })
-        print(arrDates)
+
         let formatterDay = DateFormatter()
         formatterDay.dateFormat = "EE"
         formatterDay.locale = Locale(identifier: "en_US")

@@ -316,7 +316,12 @@ final class TimelineView: UIView {
     
     private func showCurrentLineHour() {
         let date = Date()
-        guard style.timeline.showCurrentLineHour, let time = getTimelineLabel(hour: date.hour) else { return }
+        guard style.timeline.showCurrentLineHour, let time = getTimelineLabel(hour: date.hour) else {
+            currentLineView.removeFromSuperview()
+            currentTimeLabel.removeFromSuperview()
+            timer?.invalidate()
+            return
+        }
         
         var pointY = time.frame.origin.y
         if !subviews.filter({ $0 is AllDayTitleView }).isEmpty, style.allDay.isPinned {
