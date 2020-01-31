@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "9660BC57C37610700397EA7D538D0758"
+               BlueprintIdentifier = "7C8627CB6D8E7BCF51A7504F548575BC"
                BuildableName = "KVKCalendar.framework"
                BlueprintName = "KVKCalendar"
                ReferencedContainer = "container:Pods.xcodeproj">
@@ -29,8 +29,6 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
       </Testables>
-      <AdditionalOptions>
-      </AdditionalOptions>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -45,14 +43,12 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "9660BC57C37610700397EA7D538D0758"
+            BlueprintIdentifier = "7C8627CB6D8E7BCF51A7504F548575BC"
             BuildableName = "KVKCalendar.framework"
             BlueprintName = "KVKCalendar"
             ReferencedContainer = "container:Pods.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
-      <AdditionalOptions>
-      </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
