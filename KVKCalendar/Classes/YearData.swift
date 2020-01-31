@@ -73,16 +73,15 @@ struct YearData {
         
         guard let dateMonth = calendar.date(from: dateComponents), let range = calendar.range(of: .day, in: .month, for: dateMonth) else { return [] }
         
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        let arrDates = Array(range.lowerBound..<range.upperBound).compactMap({ formatter.date(from: "\(date.year)-\(month)-\($0)")?.toLocalTime() })
-
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withFullDate, .withDashSeparatorInDate]
+        formatter.timeZone = style.timezone
+        let arrDates = Array(range.lowerBound..<range.upperBound).compactMap({ formatter.date(from: "\(date.year)-\(month)-\($0)") })
+        print(arrDates)
         let formatterDay = DateFormatter()
         formatterDay.dateFormat = "EE"
         formatterDay.locale = Locale(identifier: "en_US")
-        formatterDay.timeZone = TimeZone(secondsFromGMT: 0)
         let days = arrDates.map({ Day(type: DayType(rawValue: formatterDay.string(from: $0).uppercased()), date: $0, data: []) })
-        print(days.first?.date)
         return days
     }
     

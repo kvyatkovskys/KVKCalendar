@@ -40,10 +40,10 @@ final class ViewController: UIViewController {
         style.timeline.offsetEvent = 3
         style.timeline.currentLineHourWidth = 40
         style.allDay.isPinned = true
-        //style.startWeekDay = .sunday
-        //style.timeHourSystem = .twelveHour
+        style.startWeekDay = .sunday
+        style.timeHourSystem = .twelveHour
         
-        let calendar = CalendarView(frame: view.frame, date: Date(), style: style)
+        let calendar = CalendarView(frame: view.frame, date: selectDate, style: style)
         calendar.delegate = self
         calendar.dataSource = self
         return calendar

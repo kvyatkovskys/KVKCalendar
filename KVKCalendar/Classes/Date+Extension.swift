@@ -63,11 +63,10 @@ public extension Date {
         return gregorian.date(byAdding: components, to: startOfDay ?? self)
     }
     
-    // TO DO: need to think about it
     var startMondayOfWeek: Date? {
         var gregorian = Calendar(identifier: .gregorian)
-        gregorian.firstWeekday = 3 // <--- 🤔
-        gregorian.timeZone = TimeZone(abbreviation: "UTC")!
+        gregorian.firstWeekday = 2
+        gregorian.timeZone = TimeZone.current
         var startDate = Date()
         var interval = TimeInterval()
         _ = gregorian.dateInterval(of: .weekOfMonth, start: &startDate, interval: &interval, for: self)
