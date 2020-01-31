@@ -1,4 +1,4 @@
-<a href="https://postimg.cc/BLBC07wH" target="_blank"><img src="https://i.postimg.cc/BLBC07wH/Screenshot-2019-10-29-at-11-07-07.png" alt="Screenshot-2019-10-29-at-11-07-07"/></a> <a href="https://postimg.cc/QKNJxgRP" target="_blank"><img src="https://i.postimg.cc/QKNJxgRP/Screenshot-2019-10-29-at-11-58-44.png" alt="Screenshot-2019-10-29-at-11-58-44"/></a> <a href="https://postimg.cc/f30wpxFc" target="_blank"><img src="https://i.postimg.cc/f30wpxFc/Screenshot-2019-10-29-at-12-00-35.png" alt="Screenshot-2019-10-29-at-12-00-35"/></a> <a href="https://postimg.cc/tZQXjsQL" target="_blank"><img src="https://i.postimg.cc/tZQXjsQL/Screenshot-2019-10-29-at-12-00-59.png" alt="Screenshot-2019-10-29-at-12-00-59"/></a><br/><br/>
+<img src="Screenshot 2020-02-01 at 00.17.36.png" width="300"> <img src="Screenshot 2020-02-01 at 00.18.14.png" width="550">
 
 [![CI Status](https://img.shields.io/travis/kvyatkovskys/KVKCalendar.svg?style=flat)](https://travis-ci.org/kvyatkovskys/KVKCalendar)
 [![Version](https://img.shields.io/cocoapods/v/KVKCalendar.svg?style=flat)](https://cocoapods.org/pods/KVKCalendar)
