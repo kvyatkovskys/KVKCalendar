@@ -10,6 +10,7 @@ import UIKit
 private let pointX: CGFloat = 5
 
 final class EventPageView: UIView {
+    weak var delegate: EventPageDelegate?
     let event: Event
     private let style: TimelineStyle
     private let color: UIColor
@@ -21,6 +22,7 @@ final class EventPageView: UIView {
         text.isUserInteractionEnabled = false
         text.textContainer.lineBreakMode = .byTruncatingTail
         text.textContainer.lineFragmentPadding = 0
+        text.layoutManager.allowsNonContiguousLayout = true
         return text
     }()
     
@@ -59,10 +61,36 @@ final class EventPageView: UIView {
             addSubview(textView)
         }
         tag = "\(event.id)".hashValue
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(tapOnEvent))
+        addGestureRecognizer(tap)
+        
+        if style.isEnableMoveEvent {
+            let longGesture = UILongPressGestureRecognizer(target: self, action: #selector(activateMoveEvent))
+            longGesture.minimumPressDuration = style.minimumPressDuration
+            addGestureRecognizer(longGesture)
+        }
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    @objc private func tapOnEvent(gesture: UITapGestureRecognizer) {
+        delegate?.didSelectEvent(event, gesture: gesture)
+    }
+    
+    @objc private func activateMoveEvent(gesture: UILongPressGestureRecognizer) {        
+        switch gesture.state {
+        case .began:
+            delegate?.didStartMoveEventPage(self, gesture: gesture)
+        case .changed:
+            delegate?.didChangeMoveEventPage(self, gesture: gesture)
+        case .cancelled, .ended, .failed:
+            delegate?.didEndMoveEventPage(self, gesture: gesture)
+        default:
+            break
+        }
     }
     
     override func draw(_ rect: CGRect) {
@@ -79,4 +107,11 @@ final class EventPageView: UIView {
         context.strokePath()
         context.restoreGState()
     }
+}
+
+protocol EventPageDelegate: class {
+    func didStartMoveEventPage(_ eventPage: EventPageView, gesture: UILongPressGestureRecognizer)
+    func didEndMoveEventPage(_ eventPage: EventPageView, gesture: UILongPressGestureRecognizer)
+    func didChangeMoveEventPage(_ eventPage: EventPageView, gesture: UILongPressGestureRecognizer)
+    func didSelectEvent(_ event: Event, gesture: UITapGestureRecognizer)
 }

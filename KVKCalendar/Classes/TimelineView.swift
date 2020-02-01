@@ -18,11 +18,16 @@ final class TimelineView: UIView {
     weak var delegate: TimelineDelegate?
     
     private let tagCurrentHourLine = -10
+    private let tagEventPagePreview = -20
+    private let tagVerticalLine = -30
     private var style: Style
     private let hours: [String]
     private let timeHourSystem: TimeHourSystem
     private var allEvents = [Event]()
     private var timer: Timer?
+    private var eventPreview: EventPageView?
+    private var dates = [Date?]()
+    private var selectedDate: Date?
     
     private lazy var currentTimeLabel: TimelineLabel = {
         let label = TimelineLabel()
@@ -182,7 +187,7 @@ final class TimelineView: UIView {
     private func createVerticalLine(pointX: CGFloat) -> UIView {
         let frame = CGRect(x: pointX, y: 0, width: 0.5, height: (CGFloat(25) * (style.timeline.heightTime + style.timeline.offsetTimeY)) - 75)
         let line = UIView(frame: frame)
-        line.tag = -999
+        line.tag = tagVerticalLine
         line.backgroundColor = .systemGray
         return line
     }
@@ -248,14 +253,6 @@ final class TimelineView: UIView {
             offsetY = style.allDay.height
         }
         scrollView.contentInset = UIEdgeInsets(top: offsetY, left: 0, bottom: 0, right: 0)
-    }
-    
-    @objc private func tapOnEvent(gesture: UITapGestureRecognizer) {
-        guard let hashValue = gesture.view?.tag else { return }
-        if let idx = allEvents.firstIndex(where: { "\($0.id)".hashValue == hashValue }) {
-            let event = allEvents[idx]
-            delegate?.didSelectEventInTimeline(event, frame: gesture.view?.frame)
-        }
     }
     
     private func compareStartDate(event: Event, date: Date?) -> Bool {
@@ -387,6 +384,9 @@ final class TimelineView: UIView {
     }
     
     func createTimelinePage(dates: [Date?], events: [Event], selectedDate: Date?) {
+        self.dates = dates
+        self.selectedDate = selectedDate
+        
         subviews.filter({ $0 is AllDayEventView || $0 is AllDayTitleView }).forEach({ $0.removeFromSuperview() })
         scrollView.subviews.filter({ $0.tag != tagCurrentHourLine }).forEach({ $0.removeFromSuperview() })
         
@@ -496,10 +496,7 @@ final class TimelineView: UIView {
                     newFrame.size.width = newWidth - style.timeline.offsetEvent
                     
                     let page = EventPageView(event: event, style: style.timeline, frame: newFrame)
-                    page.tag = "\(event.id)".hashValue
-                    let tap = UITapGestureRecognizer(target: self, action: #selector(tapOnEvent))
-                    page.addGestureRecognizer(tap)
-                    
+                    page.delegate = self
                     scrollView.addSubview(page)
                     pagesCached.append(page)
                 }
@@ -508,6 +505,44 @@ final class TimelineView: UIView {
         setOffsetScrollView()
         scrollToCurrentTime(startHour: start)
         showCurrentLineHour()
+    }
+}
+
+extension TimelineView: EventPageDelegate {
+    func didSelectEvent(_ event: Event, gesture: UITapGestureRecognizer) {
+        if let idx = allEvents.firstIndex(where: { "\($0.id)".hashValue == "\(event.id)".hashValue }) {
+            let event = allEvents[idx]
+            delegate?.didSelectEventInTimeline(event, frame: gesture.view?.frame)
+        }
+    }
+    
+    func didStartMoveEventPage(_ eventPage: EventPageView, gesture: UILongPressGestureRecognizer) {
+        eventPreview = nil
+        let point = gesture.location(in: scrollView)
+        eventPreview = EventPageView(event: eventPage.event,
+                                     style: style.timeline,
+                                     frame: CGRect(origin: CGPoint(x: point.x - 50, y: point.y - 60),
+                                                   size: CGSize(width: 100, height: 100)))
+        eventPreview?.alpha = 0.9
+        eventPreview?.tag = tagEventPagePreview
+        if let eventTemp = eventPreview {
+            scrollView.addSubview(eventTemp)
+        }
+    }
+    
+    func didEndMoveEventPage(_ eventPage: EventPageView, gesture: UILongPressGestureRecognizer) {
+        let point = gesture.location(in: scrollView)
+        eventPreview?.removeFromSuperview()
+        eventPreview = nil
+    }
+    
+    func didChangeMoveEventPage(_ eventPage: EventPageView, gesture: UILongPressGestureRecognizer) {
+        let point = gesture.location(in: scrollView)
+        let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
+        let newX = point.x - 50
+        guard scrollView.frame.width >= (point.x + 50), newX >= leftOffset else { return }
+        
+        eventPreview?.frame.origin = CGPoint(x: newX, y: point.y - 60)
     }
 }
 
