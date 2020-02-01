@@ -11,7 +11,7 @@ final class MonthViewCalendar: UIView {
     private var data: MonthData
     private var style: Style
     private var collectionView: UICollectionView!
-    private var animated: Bool = false
+    private var isAnimate: Bool = false
     
     weak var delegate: CalendarPrivateDelegate?
     
@@ -45,7 +45,7 @@ final class MonthViewCalendar: UIView {
     func setDate(_ date: Date) {
         headerView.date = date
         data.date = date
-        scrollToDate(date: date, animated: animated)
+        scrollToDate(date, animated: isAnimate)
         collectionView.reloadData()
     }
     
@@ -65,7 +65,7 @@ final class MonthViewCalendar: UIView {
         return collection
     }
     
-    private func scrollToDate(date: Date, animated: Bool) {
+    private func scrollToDate(_ date: Date, animated: Bool) {
         delegate?.didSelectCalendarDate(date, type: .month, frame: nil)
         if let idx = data.days.firstIndex(where: { $0.date?.month == date.month && $0.date?.year == date.year }) {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
@@ -74,8 +74,8 @@ final class MonthViewCalendar: UIView {
                                                  animated: animated)
             }
         }
-        if !self.animated {
-            self.animated = true
+        if !self.isAnimate {
+            self.isAnimate = true
         }
     }
     
@@ -222,8 +222,14 @@ extension MonthViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateF
             widht = collectionView.frame.width / 7
             height = collectionView.frame.height / 6
         case .vertical:
-            widht = (collectionView.frame.width / 7) - 0.2
-            height = collectionView.frame.height / 6
+            if style.month.isPagingEnabled {
+                widht = (collectionView.frame.width / 7) - 0.2
+                height = collectionView.frame.height / 6
+            } else {
+                let value: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 6 : 7
+                widht = (collectionView.frame.width / 7) - 0.2
+                height = collectionView.frame.height / value
+            }
         @unknown default:
             fatalError()
         }

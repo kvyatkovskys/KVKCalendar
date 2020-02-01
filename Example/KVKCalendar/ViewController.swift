@@ -42,6 +42,9 @@ final class ViewController: UIViewController {
         style.allDay.isPinned = true
         style.startWeekDay = .sunday
         style.timeHourSystem = .twelveHour
+        style.month.isPagingEnabled = false
+        style.year.isPagingEnabled = false
+        style.timeline.isEnableMoveEvent = true
         
         let calendar = CalendarView(frame: view.frame, date: selectDate, style: style)
         calendar.delegate = self
