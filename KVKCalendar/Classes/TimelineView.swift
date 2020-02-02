@@ -532,6 +532,18 @@ extension TimelineView: EventPageDelegate {
     
     func didEndMoveEventPage(_ eventPage: EventPageView, gesture: UILongPressGestureRecognizer) {
         let point = gesture.location(in: scrollView)
+        let times = scrollView.subviews.filter({ ($0 is TimelineLabel) }).compactMap({ $0 as? TimelineLabel })
+        if let time = times.filter({ $0.frame.origin.y >= (point.y - 60) }).first {
+            let firstY = time.frame.origin.y - (style.timeline.offsetTimeY + style.timeline.heightTime)
+            let percent = ((point.y - 60) - firstY) / (style.timeline.offsetTimeY + style.timeline.heightTime)
+            let newMinutes: Int
+            if percent < 0.1 {
+                newMinutes = 0
+            } else {
+                newMinutes = Int(60.0 * percent)
+            }
+            print(percent, newMinutes)
+        }
         eventPreview?.removeFromSuperview()
         eventPreview = nil
     }
