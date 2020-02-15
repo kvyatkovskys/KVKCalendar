@@ -41,7 +41,15 @@ final class TimelineView: UIView {
         formatter.dateFormat = timeHourSystem == .twentyFourHour ? "HH:mm" : "h:mm a"
         label.text = formatter.string(from: Date())
         label.valueHash = Date().minute.hashValue
-        
+        return label
+    }()
+    
+    private lazy var movingMinutesLabel: TimelineLabel = {
+        let label = TimelineLabel()
+        label.adjustsFontSizeToFitWidth = true
+        label.textColor = style.timeline.movingMinutesColor
+        label.textAlignment = .right
+        label.font = style.timeline.timeFont
         return label
     }()
     
@@ -462,7 +470,7 @@ final class TimelineView: UIView {
                         // calculate 'height' event
                         if event.end.hour.hashValue == time.valueHash {
                             let summHeight = (CGFloat(time.tag) * (style.timeline.offsetTimeY + time.frame.height)) - newFrame.origin.y + (time.frame.height / 2)
-                            if event.end.minute > 0 && event.end.minute <= 59 {
+                            if 0..<59 ~= event.end.minute {
                                 let minutePercent = 59.0 / CGFloat(event.end.minute)
                                 let newY = (style.timeline.offsetTimeY + time.frame.height) / minutePercent
                                 newFrame.size.height = summHeight + newY - style.timeline.offsetEvent
@@ -527,25 +535,16 @@ extension TimelineView: EventPageDelegate {
         eventPreview?.tag = tagEventPagePreview
         if let eventTemp = eventPreview {
             scrollView.addSubview(eventTemp)
+            showChangeMinutes(pointY: point.y)
         }
     }
     
     func didEndMoveEventPage(_ eventPage: EventPageView, gesture: UILongPressGestureRecognizer) {
         let point = gesture.location(in: scrollView)
-        let times = scrollView.subviews.filter({ ($0 is TimelineLabel) }).compactMap({ $0 as? TimelineLabel })
-        if let time = times.filter({ $0.frame.origin.y >= (point.y - 60) }).first {
-            let firstY = time.frame.origin.y - (style.timeline.offsetTimeY + style.timeline.heightTime)
-            let percent = ((point.y - 60) - firstY) / (style.timeline.offsetTimeY + style.timeline.heightTime)
-            let newMinutes: Int
-            if percent < 0.1 {
-                newMinutes = 0
-            } else {
-                newMinutes = Int(60.0 * percent)
-            }
-            print(percent, newMinutes)
-        }
+        print(calculateMinutes(pointY: point.y))
         eventPreview?.removeFromSuperview()
         eventPreview = nil
+        movingMinutesLabel.removeFromSuperview()
     }
     
     func didChangeMoveEventPage(_ eventPage: EventPageView, gesture: UILongPressGestureRecognizer) {
@@ -554,7 +553,45 @@ extension TimelineView: EventPageDelegate {
         let newX = point.x - 50
         guard scrollView.frame.width >= (point.x + 50), newX >= leftOffset else { return }
         
+        var offset = scrollView.contentOffset
+        if (point.y - 80) < scrollView.contentOffset.y, (point.y - 100) >= 0 {
+            // scroll up
+            offset.y -= 5
+            scrollView.setContentOffset(offset, animated: false)
+        } else if (point.y + 80) > (scrollView.contentOffset.y + scrollView.bounds.height), point.y + 100 <= scrollView.contentSize.height {
+            // scroll down
+            offset.y += 5
+            scrollView.setContentOffset(offset, animated: false)
+        }
+        
         eventPreview?.frame.origin = CGPoint(x: newX, y: point.y - 60)
+        showChangeMinutes(pointY: point.y)
+    }
+    
+    private func showChangeMinutes(pointY: CGFloat) {
+        movingMinutesLabel.removeFromSuperview()
+        
+        if style.timeline.offsetTimeY > 50, let minutes = calculateMinutes(pointY: pointY - style.timeline.offsetEvent), 0...59 ~= minutes {
+            movingMinutesLabel.frame =  CGRect(x: style.timeline.offsetTimeX, y: (pointY - 60) - (style.timeline.heightTime / 2),
+                                               width: style.timeline.widthTime, height: style.timeline.heightTime)
+            scrollView.addSubview(movingMinutesLabel)
+            movingMinutesLabel.text = ":\(minutes)"
+        }
+    }
+    
+    private func calculateMinutes(pointY: CGFloat) -> Int? {
+        let times = scrollView.subviews.filter({ ($0 is TimelineLabel) }).compactMap({ $0 as? TimelineLabel })
+        guard let time = times.filter({ $0.frame.origin.y >= (pointY - 60) }).first else { return nil }
+        
+        let firstY = time.frame.origin.y - (style.timeline.offsetTimeY + style.timeline.heightTime)
+        let percent = ((pointY - 60) - firstY) / (style.timeline.offsetTimeY + style.timeline.heightTime)
+        let newMinutes: Int
+        if percent < 0.1 {
+            newMinutes = 0
+        } else {
+            newMinutes = Int(60.0 * percent)
+        }
+        return newMinutes
     }
 }
 
