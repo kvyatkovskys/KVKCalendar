@@ -541,7 +541,7 @@ extension TimelineView: EventPageDelegate {
     
     func didEndMoveEventPage(_ eventPage: EventPageView, gesture: UILongPressGestureRecognizer) {
         let point = gesture.location(in: scrollView)
-        print(calculateMinutes(pointY: point.y))
+        print(calculateMinutes(pointY: point.y) ?? 0)
         eventPreview?.removeFromSuperview()
         eventPreview = nil
         movingMinutesLabel.removeFromSuperview()
