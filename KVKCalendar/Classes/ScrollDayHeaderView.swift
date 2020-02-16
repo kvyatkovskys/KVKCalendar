@@ -38,12 +38,12 @@ final class ScrollDayHeaderView: UIView {
         return layout
     }()
     
-    init(frame: CGRect, days: [Day], date: Date, type: CalendarType, style: Style, calendar: Calendar) {
+    init(frame: CGRect, days: [Day], date: Date, type: CalendarType, style: Style) {
         self.days = days
         self.date = date
         self.type = type
         self.style = style
-        self.calendar = calendar
+        self.calendar = style.calendar
         super.init(frame: frame)
         
         var newFrame = frame

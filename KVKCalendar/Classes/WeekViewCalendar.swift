@@ -22,15 +22,11 @@ final class WeekViewCalendar: UIView {
             heightView = style.headerScroll.heightHeaderWeek + style.headerScroll.heightTitleDate
         }
         let offsetX = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
-        let view = ScrollDayHeaderView(frame: CGRect(x: offsetX,
-                                                     y: 0,
-                                                     width: frame.width - offsetX,
-                                                     height: heightView),
+        let view = ScrollDayHeaderView(frame: CGRect(x: offsetX, y: 0, width: frame.width - offsetX, height: heightView),
                                        days: data.days,
                                        date: data.date,
                                        type: .week,
-                                       style: style,
-                                       calendar: style.calendar)
+                                       style: style)
         view.delegate = self
         return view
     }()
@@ -170,7 +166,7 @@ extension WeekViewCalendar: CalendarSettingProtocol {
 }
 
 extension WeekViewCalendar: TimelineDelegate {
-    func didSelectEventInTimeline(_ event: Event, frame: CGRect?) {
+    func didSelectEvent(_ event: Event, frame: CGRect?) {
         delegate?.didSelectCalendarEvent(event, frame: frame)
     }
     
@@ -186,5 +182,9 @@ extension WeekViewCalendar: TimelineDelegate {
         guard !stop else { return }
         
         scrollHeaderDay.scrollHeaderByTransform(transform)
+    }
+    
+    func didMovingEvent(_ event: Event, minutes: Int, hour: Int) {
+        
     }
 }

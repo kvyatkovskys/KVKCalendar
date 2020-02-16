@@ -7,13 +7,6 @@
 
 import UIKit
 
-protocol TimelineDelegate: AnyObject {
-    func didSelectEventInTimeline(_ event: Event, frame: CGRect?)
-    func nextDate()
-    func previousDate()
-    func swipeX(transform: CGAffineTransform, stop: Bool)
-}
-
 final class TimelineView: UIView {
     weak var delegate: TimelineDelegate?
     
@@ -380,7 +373,7 @@ final class TimelineView: UIView {
         }, completion: nil)
     }
     
-    func scrollToCurrentTime(startHour: Int) {
+    private func scrollToCurrentTime(startHour: Int) {
         guard let time = getTimelineLabel(hour: Date().hour), style.timeline.scrollToCurrentHour else {
             scrollView.setContentOffset(.zero, animated: true)
             return
@@ -518,10 +511,7 @@ final class TimelineView: UIView {
 
 extension TimelineView: EventPageDelegate {
     func didSelectEvent(_ event: Event, gesture: UITapGestureRecognizer) {
-        if let idx = allEvents.firstIndex(where: { "\($0.id)".hashValue == "\(event.id)".hashValue }) {
-            let event = allEvents[idx]
-            delegate?.didSelectEventInTimeline(event, frame: gesture.view?.frame)
-        }
+        delegate?.didSelectEvent(event, frame: gesture.view?.frame)
     }
     
     func didStartMoveEventPage(_ eventPage: EventPageView, gesture: UILongPressGestureRecognizer) {
@@ -540,11 +530,15 @@ extension TimelineView: EventPageDelegate {
     }
     
     func didEndMoveEventPage(_ eventPage: EventPageView, gesture: UILongPressGestureRecognizer) {
-        let point = gesture.location(in: scrollView)
-        print(calculateMinutes(pointY: point.y) ?? 0)
         eventPreview?.removeFromSuperview()
         eventPreview = nil
         movingMinutesLabel.removeFromSuperview()
+        
+        let point = gesture.location(in: scrollView)
+        let time = calculateChangeTime(pointY: point.y)
+        if let minutes = time.minute, let hour = time.hour {
+            delegate?.didMovingEvent(eventPage.event, minutes: minutes, hour: hour)
+        }
     }
     
     func didChangeMoveEventPage(_ eventPage: EventPageView, gesture: UILongPressGestureRecognizer) {
@@ -571,7 +565,8 @@ extension TimelineView: EventPageDelegate {
     private func showChangeMinutes(pointY: CGFloat) {
         movingMinutesLabel.removeFromSuperview()
         
-        if style.timeline.offsetTimeY > 50, let minutes = calculateMinutes(pointY: pointY - style.timeline.offsetEvent), 0...59 ~= minutes {
+        let time = calculateChangeTime(pointY: pointY - style.timeline.offsetEvent)
+        if style.timeline.offsetTimeY > 50, let minutes = time.minute, 0...59 ~= minutes {
             movingMinutesLabel.frame =  CGRect(x: style.timeline.offsetTimeX, y: (pointY - 60) - (style.timeline.heightTime / 2),
                                                width: style.timeline.widthTime, height: style.timeline.heightTime)
             scrollView.addSubview(movingMinutesLabel)
@@ -579,10 +574,10 @@ extension TimelineView: EventPageDelegate {
         }
     }
     
-    private func calculateMinutes(pointY: CGFloat) -> Int? {
+    private func calculateChangeTime(pointY: CGFloat) -> (hour: Int?, minute: Int?) {
         let times = scrollView.subviews.filter({ ($0 is TimelineLabel) }).compactMap({ $0 as? TimelineLabel })
-        guard let time = times.filter({ $0.frame.origin.y >= (pointY - 60) }).first else { return nil }
-        
+        guard let time = times.filter({ $0.frame.origin.y >= (pointY - 60) }).first else { return (nil, nil) }
+
         let firstY = time.frame.origin.y - (style.timeline.offsetTimeY + style.timeline.heightTime)
         let percent = ((pointY - 60) - firstY) / (style.timeline.offsetTimeY + style.timeline.heightTime)
         let newMinutes: Int
@@ -591,7 +586,7 @@ extension TimelineView: EventPageDelegate {
         } else {
             newMinutes = Int(60.0 * percent)
         }
-        return newMinutes
+        return (time.tag - 1, newMinutes)
     }
 }
 
@@ -609,7 +604,7 @@ extension TimelineView: CalendarSettingProtocol {
 
 extension TimelineView: AllDayEventDelegate {
     func didSelectAllDayEvent(_ event: Event, frame: CGRect?) {
-        delegate?.didSelectEventInTimeline(event, frame: frame)
+        delegate?.didSelectEvent(event, frame: frame)
     }
 }
 
@@ -647,4 +642,12 @@ private struct Parent: Equatable, Hashable {
 private struct Child: Equatable, Hashable {
     let start: TimeInterval
     let end: TimeInterval
+}
+
+protocol TimelineDelegate: AnyObject {
+    func didSelectEvent(_ event: Event, frame: CGRect?)
+    func nextDate()
+    func previousDate()
+    func swipeX(transform: CGAffineTransform, stop: Bool)
+    func didMovingEvent(_ event: Event, minutes: Int, hour: Int)
 }

@@ -24,8 +24,7 @@ final class DayViewCalendar: UIView {
                                        days: data.days,
                                        date: data.date,
                                        type: .day,
-                                       style: style,
-                                       calendar: style.calendar)
+                                       style: style)
         view.delegate = self
         return view
     }()
@@ -106,7 +105,7 @@ extension DayViewCalendar: ScrollDayHeaderDelegate {
 }
 
 extension DayViewCalendar: TimelineDelegate {
-    func didSelectEventInTimeline(_ event: Event, frame: CGRect?) {
+    func didSelectEvent(_ event: Event, frame: CGRect?) {
         delegate?.didSelectCalendarEvent(event, frame: frame)
     }
     
@@ -120,6 +119,12 @@ extension DayViewCalendar: TimelineDelegate {
     
     func swipeX(transform: CGAffineTransform, stop: Bool) {
         
+    }
+    
+    func didMovingEvent(_ event: Event, minutes: Int, hour: Int) {
+        guard let idx = data.events.firstIndex(where: { $0.compare(event) }) else { return }
+        
+        print(data.events[idx], event)
     }
 }
 
