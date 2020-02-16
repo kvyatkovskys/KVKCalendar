@@ -90,3 +90,9 @@ private struct AllDayEvent {
     let date: Date
     let color: UIColor
 }
+
+extension AllDayEvent: EventProtocol {
+    func compare(_ event: Event) -> Bool {
+        return "\(id)".hashValue == "\(event)".hashValue
+    }
+}

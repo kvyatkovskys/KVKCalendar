@@ -239,6 +239,16 @@ public struct Event {
     public init() {}
 }
 
+extension Event: EventProtocol {
+    func compare(_ event: Event) -> Bool {
+        return "\(id)".hashValue == "\(event.id)".hashValue
+    }
+}
+
+protocol EventProtocol {
+    func compare(_ event: Event) -> Bool
+}
+
 protocol CalendarSettingProtocol {
     func reloadFrame(_ frame: CGRect)
     func updateStyle(_ style: Style)
