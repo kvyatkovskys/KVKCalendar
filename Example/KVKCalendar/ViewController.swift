@@ -24,7 +24,7 @@ final class ViewController: UIViewController {
         return button
     }()
     
-    private lazy var calendarView: CalendarView = {
+    private lazy var style: Style = {
         var style = Style()
         if UIDevice.current.userInterfaceIdiom == .phone {
             style.month.isHiddenSeporator = true
@@ -45,7 +45,10 @@ final class ViewController: UIViewController {
         style.month.isPagingEnabled = false
         style.year.isPagingEnabled = false
         style.timeline.isEnableMoveEvent = true
-        
+        return style
+    }()
+    
+    private lazy var calendarView: CalendarView = {
         let calendar = CalendarView(frame: view.frame, date: selectDate, style: style)
         calendar.delegate = self
         calendar.dataSource = self
@@ -117,6 +120,23 @@ final class ViewController: UIViewController {
 }
 
 extension ViewController: CalendarDelegate {
+    func didChangeEvent(_ event: Event, start: Date?, end: Date?) {
+        var eventTemp = event
+        guard let startTemp = start, let endTemp = end else { return }
+        
+        let startTime = timeFormatter(date: startTemp)
+        let endTime = timeFormatter(date: endTemp)
+        eventTemp.start = startTemp
+        eventTemp.end = endTemp
+        eventTemp.text = "\(startTime) - \(endTime)\n new time"
+        
+        if let idx = events.firstIndex(where: { $0.compare(eventTemp) }) {
+            events.remove(at: idx)
+            events.append(eventTemp)
+            calendarView.reloadData()
+        }
+    }
+    
     func didSelectDate(_ date: Date?, type: CalendarType, frame: CGRect?) {
         selectDate = date ?? Date()
         calendarView.reloadData()

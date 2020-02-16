@@ -151,6 +151,8 @@ extension WeekViewCalendar: CalendarSettingProtocol {
     
     func updateStyle(_ style: Style) {
         self.style = style
+        scrollHeaderDay.updateStyle(style)
+        timelineView.updateStyle(style)
         setUI()
         setDate(data.date)
     }
@@ -184,7 +186,7 @@ extension WeekViewCalendar: TimelineDelegate {
         scrollHeaderDay.scrollHeaderByTransform(transform)
     }
     
-    func didMovingEvent(_ event: Event, minutes: Int, hour: Int) {
+    func didChangeEvent(_ event: Event, minutes: Int, hour: Int) {
         
     }
 }
