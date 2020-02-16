@@ -151,7 +151,11 @@ extension CalendarView: CalendarPrivateDelegate {
         delegate?.didSelectMore(date, frame: frame)
     }
     
-    func getEventViewerFrame(frame: CGRect) {
+    func didChangeCalendarEvent(_ event: Event, start: Date?, end: Date?) {
+        delegate?.didChangeEvent(event, start: start, end: end)
+    }
+    
+    func calendarEventViewerFrame(_ frame: CGRect) {
         var newFrame = frame
         newFrame.origin = .zero
         delegate?.eventViewerFrame(newFrame)
@@ -170,6 +174,10 @@ extension CalendarView: CalendarSettingProtocol {
     // work in progress
     func updateStyle(_ style: Style) {
         self.style = style
+        dayCalendar.updateStyle(style)
+        weekCalendar.updateStyle(style)
+        monthCalendar.updateStyle(style)
+        yearCalendar.updateStyle(style)
     }
 }
 
@@ -240,12 +248,12 @@ public struct Event {
 }
 
 extension Event: EventProtocol {
-    func compare(_ event: Event) -> Bool {
+    public func compare(_ event: Event) -> Bool {
         return "\(id)".hashValue == "\(event.id)".hashValue
     }
 }
 
-protocol EventProtocol {
+public protocol EventProtocol {
     func compare(_ event: Event) -> Bool
 }
 
@@ -264,7 +272,8 @@ protocol CalendarPrivateDelegate: AnyObject {
     //func didSelectCalendarEvents(_ events: [Event])
     func didSelectCalendarEvent(_ event: Event, frame: CGRect?)
     func didSelectCalendarMore(_ date: Date, frame: CGRect?)
-    func getEventViewerFrame(_ frame: CGRect)
+    func calendarEventViewerFrame(_ frame: CGRect)
+    func didChangeCalendarEvent(_ event: Event, start: Date?, end: Date?)
 }
 
 extension CalendarPrivateDelegate {
@@ -281,6 +290,7 @@ public protocol CalendarDelegate: AnyObject {
     func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?)
     func didSelectMore(_ date: Date, frame: CGRect?)
     func eventViewerFrame(_ frame: CGRect)
+    func didChangeEvent(_ event: Event, start: Date?, end: Date?)
 }
 
 public extension CalendarDelegate {
@@ -288,4 +298,5 @@ public extension CalendarDelegate {
     func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?) {}
     func didSelectMore(_ date: Date, frame: CGRect?) {}
     func eventViewerFrame(_ frame: CGRect) {}
+    func didChangeEvent(_ event: Event, start: Date?, end: Date?) {}
 }

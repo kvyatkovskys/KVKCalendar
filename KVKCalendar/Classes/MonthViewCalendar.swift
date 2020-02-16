@@ -120,6 +120,7 @@ extension MonthViewCalendar: CalendarSettingProtocol {
     
     func updateStyle(_ style: Style) {
         self.style = style
+        headerView.updateStyle(style)
         setUI()
         setDate(data.date)
     }

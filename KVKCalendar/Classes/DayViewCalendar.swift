@@ -121,10 +121,26 @@ extension DayViewCalendar: TimelineDelegate {
         
     }
     
-    func didMovingEvent(_ event: Event, minutes: Int, hour: Int) {
-        guard let idx = data.events.firstIndex(where: { $0.compare(event) }) else { return }
+    func didChangeEvent(_ event: Event, minutes: Int, hour: Int) {
+        var startComponents = DateComponents()
+        startComponents.year = event.start.year
+        startComponents.month = event.start.month
+        startComponents.day = event.start.day
+        startComponents.hour = hour
+        startComponents.minute = minutes
+        let startDate = style.calendar.date(from: startComponents)
         
-        print(data.events[idx], event)
+        let hourOffset = event.end.hour - event.start.hour
+        let minuteOffset = event.end.minute - event.start.minute
+        var endComponents = DateComponents()
+        endComponents.year = event.end.year
+        endComponents.month = event.end.month
+        endComponents.day = event.end.day
+        endComponents.hour = hour + hourOffset
+        endComponents.minute = minutes + minuteOffset
+        let endDate = style.calendar.date(from: endComponents)
+        
+        delegate?.didChangeCalendarEvent(event, start: startDate, end: endDate)
     }
 }
 
@@ -167,12 +183,15 @@ extension DayViewCalendar: CalendarSettingProtocol {
     
     func updateStyle(_ style: Style) {
         self.style = style
+        scrollHeaderDay.updateStyle(style)
+        timelineView.updateStyle(style)
         setUI()
         setDate(data.date)
     }
     
     func setUI() {
         subviews.forEach({ $0.removeFromSuperview() })
+        
         addSubview(topBackgroundView)
         topBackgroundView.addSubview(scrollHeaderDay)
         addSubview(timelineView)
