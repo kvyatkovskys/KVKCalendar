@@ -21,6 +21,10 @@ final class TimelineView: UIView {
     private var eventPreview: EventPageView?
     private var dates = [Date?]()
     private var selectedDate: Date?
+    private var isEnabledAutoScroll = true
+    private let eventPreviewXOffset: CGFloat = 50
+    private let eventPreviewYOffset: CGFloat = 60
+    private let eventPreviewSize = CGSize(width: 100, height: 100)
     
     private lazy var currentTimeLabel: TimelineLabel = {
         let label = TimelineLabel()
@@ -374,6 +378,11 @@ final class TimelineView: UIView {
     }
     
     private func scrollToCurrentTime(startHour: Int) {
+        guard isEnabledAutoScroll else {
+            isEnabledAutoScroll = true
+            return
+        }
+        
         guard let time = getTimelineLabel(hour: Date().hour), style.timeline.scrollToCurrentHour else {
             scrollView.setContentOffset(.zero, animated: true)
             return
@@ -519,13 +528,17 @@ extension TimelineView: EventPageDelegate {
         let point = gesture.location(in: scrollView)
         eventPreview = EventPageView(event: eventPage.event,
                                      style: style.timeline,
-                                     frame: CGRect(origin: CGPoint(x: point.x - 50, y: point.y - 60),
-                                                   size: CGSize(width: 100, height: 100)))
+                                     frame: CGRect(origin: CGPoint(x: point.x - eventPreviewXOffset, y: point.y - eventPreviewYOffset), size: eventPreviewSize))
         eventPreview?.alpha = 0.9
         eventPreview?.tag = tagEventPagePreview
+        eventPreview?.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
         if let eventTemp = eventPreview {
             scrollView.addSubview(eventTemp)
             showChangeMinutes(pointY: point.y)
+            UIView.animate(withDuration: 0.3) {
+                self.eventPreview?.transform = CGAffineTransform(scaleX: 1, y: 1)
+            }
+            UIImpactFeedbackGenerator().impactOccurred()
         }
     }
     
@@ -534,59 +547,60 @@ extension TimelineView: EventPageDelegate {
         eventPreview = nil
         movingMinutesLabel.removeFromSuperview()
         
-        let point = gesture.location(in: scrollView)
+        var point = gesture.location(in: scrollView)
+        let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
+        guard scrollView.frame.width >= (point.x + 30), (point.x - 10) >= leftOffset else { return }
+        
         let time = calculateChangeTime(pointY: point.y)
-        if let minutes = time.minute, let hour = time.hour {
-            delegate?.didChangeEvent(eventPage.event, minutes: minutes, hour: hour, point: point)
+        if let minute = time.minute, let hour = time.hour {
+            isEnabledAutoScroll = false
+            point.x -= 50
+            delegate?.didChangeEvent(eventPage.event, minute: minute, hour: hour, point: point)
         }
     }
     
     func didChangeMoveEventPage(_ eventPage: EventPageView, gesture: UILongPressGestureRecognizer) {
         let point = gesture.location(in: scrollView)
         let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
-        let newX = point.x - 50
-        guard scrollView.frame.width >= (point.x + 50), newX >= leftOffset else { return }
+        guard scrollView.frame.width >= (point.x + 20), (point.x - 20) >= leftOffset else { return }
         
         var offset = scrollView.contentOffset
-        if (point.y - 80) < scrollView.contentOffset.y, (point.y - 100) >= 0 {
+        if (point.y - 80) < scrollView.contentOffset.y, (point.y - eventPreviewSize.height) >= 0 {
             // scroll up
             offset.y -= 5
             scrollView.setContentOffset(offset, animated: false)
-        } else if (point.y + 80) > (scrollView.contentOffset.y + scrollView.bounds.height), point.y + 100 <= scrollView.contentSize.height {
+        } else if (point.y + 80) > (scrollView.contentOffset.y + scrollView.bounds.height), point.y + eventPreviewSize.height <= scrollView.contentSize.height {
             // scroll down
             offset.y += 5
             scrollView.setContentOffset(offset, animated: false)
         }
         
-        eventPreview?.frame.origin = CGPoint(x: newX, y: point.y - 60)
+        eventPreview?.frame.origin = CGPoint(x: point.x - eventPreviewXOffset, y: point.y - eventPreviewYOffset)
         showChangeMinutes(pointY: point.y)
     }
     
     private func showChangeMinutes(pointY: CGFloat) {
         movingMinutesLabel.removeFromSuperview()
         
-        let time = calculateChangeTime(pointY: pointY - style.timeline.offsetEvent)
-        if style.timeline.offsetTimeY > 50, let minutes = time.minute, 0...59 ~= minutes {
-            movingMinutesLabel.frame =  CGRect(x: style.timeline.offsetTimeX, y: (pointY - 60) - (style.timeline.heightTime / 2),
+        let time = calculateChangeTime(pointY: pointY)
+        if style.timeline.offsetTimeY > 50, let minute = time.minute, 0...59 ~= minute {
+            let offset = eventPreviewYOffset - style.timeline.offsetEvent - 6
+            movingMinutesLabel.frame =  CGRect(x: style.timeline.offsetTimeX, y: (pointY - offset) - (style.timeline.heightTime / 2),
                                                width: style.timeline.widthTime, height: style.timeline.heightTime)
             scrollView.addSubview(movingMinutesLabel)
-            movingMinutesLabel.text = ":\(minutes)"
+            movingMinutesLabel.text = ":\(minute)"
         }
     }
     
     private func calculateChangeTime(pointY: CGFloat) -> (hour: Int?, minute: Int?) {
+        let pointYTemp = (pointY - eventPreviewYOffset) - style.timeline.offsetEvent - 6
         let times = scrollView.subviews.filter({ ($0 is TimelineLabel) }).compactMap({ $0 as? TimelineLabel })
-        guard let time = times.filter({ $0.frame.origin.y >= (pointY - 60) }).first else { return (nil, nil) }
+        guard let time = times.filter({ $0.frame.origin.y >= pointYTemp }).first else { return (nil, nil) }
 
         let firstY = time.frame.origin.y - (style.timeline.offsetTimeY + style.timeline.heightTime)
-        let percent = ((pointY - 60) - firstY) / (style.timeline.offsetTimeY + style.timeline.heightTime)
-        let newMinutes: Int
-        if percent < 0.1 {
-            newMinutes = 0
-        } else {
-            newMinutes = Int(60.0 * percent)
-        }
-        return (time.tag - 1, newMinutes)
+        let percent = (pointYTemp - firstY) / (style.timeline.offsetTimeY + style.timeline.heightTime)
+        let newMinute = Int(60.0 * percent)
+        return (time.tag - 1, newMinute)
     }
 }
 
@@ -649,5 +663,5 @@ protocol TimelineDelegate: AnyObject {
     func nextDate()
     func previousDate()
     func swipeX(transform: CGAffineTransform, stop: Bool)
-    func didChangeEvent(_ event: Event, minutes: Int, hour: Int, point: CGPoint)
+    func didChangeEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint)
 }

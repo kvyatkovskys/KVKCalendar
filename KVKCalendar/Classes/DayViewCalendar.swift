@@ -121,13 +121,13 @@ extension DayViewCalendar: TimelineDelegate {
         
     }
     
-    func didChangeEvent(_ event: Event, minutes: Int, hour: Int, point: CGPoint) {
+    func didChangeEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint) {
         var startComponents = DateComponents()
         startComponents.year = event.start.year
         startComponents.month = event.start.month
         startComponents.day = event.start.day
         startComponents.hour = hour
-        startComponents.minute = minutes
+        startComponents.minute = minute
         let startDate = style.calendar.date(from: startComponents)
         
         let hourOffset = event.end.hour - event.start.hour
@@ -137,7 +137,7 @@ extension DayViewCalendar: TimelineDelegate {
         endComponents.month = event.end.month
         endComponents.day = event.end.day
         endComponents.hour = hour + hourOffset
-        endComponents.minute = minutes + minuteOffset
+        endComponents.minute = minute + minuteOffset
         let endDate = style.calendar.date(from: endComponents)
                 
         delegate?.didChangeCalendarEvent(event, start: startDate, end: endDate)
