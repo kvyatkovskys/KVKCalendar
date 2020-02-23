@@ -1,5 +1,5 @@
 //
-//  ScrollHeaderDayCollectionViewCell.swift
+//  ScrollHeaderDayCell.swift
 //  KVKCalendar
 //
 //  Created by Sergei Kviatkovskii on 02/01/2019.
@@ -10,7 +10,7 @@ import UIKit
 private let heightDate: CGFloat = 35
 private let heightTitle: CGFloat = 25
 
-final class ScrollHeaderDayCollectionViewCell: UICollectionViewCell {
+final class ScrollHeaderDayCell: UICollectionViewCell {
     static let cellIdentifier = #file
     
     private lazy var titleLabel: UILabel = {
