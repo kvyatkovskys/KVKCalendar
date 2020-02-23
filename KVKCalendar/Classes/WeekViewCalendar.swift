@@ -186,7 +186,7 @@ extension WeekViewCalendar: TimelineDelegate {
         scrollHeaderDay.scrollHeaderByTransform(transform)
     }
     
-    func didChangeEvent(_ event: Event, minutes: Int, hour: Int, point: CGPoint) {
+    func didChangeEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint) {
         var day = event.start.day
         if let newDate = scrollHeaderDay.getDateByPointX(point.x), day != newDate.day {
             day = newDate.day
@@ -197,7 +197,7 @@ extension WeekViewCalendar: TimelineDelegate {
         startComponents.month = event.start.month
         startComponents.day = day
         startComponents.hour = hour
-        startComponents.minute = minutes
+        startComponents.minute = minute
         let startDate = style.calendar.date(from: startComponents)
         
         let hourOffset = event.end.hour - event.start.hour
@@ -207,7 +207,7 @@ extension WeekViewCalendar: TimelineDelegate {
         endComponents.month = event.end.month
         endComponents.day = day
         endComponents.hour = hour + hourOffset
-        endComponents.minute = minutes + minuteOffset
+        endComponents.minute = minute + minuteOffset
         let endDate = style.calendar.date(from: endComponents)
         
         delegate?.didChangeCalendarEvent(event, start: startDate, end: endDate)

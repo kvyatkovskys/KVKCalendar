@@ -46,7 +46,7 @@ final class EventPageView: UIView {
         
         if event.isContainsFile {
             textFrame.size.width = frame.width - iconFileImageView.frame.width - pointX
-            iconFileImageView.frame.origin.x = frame.width - iconFileImageView.frame.width - pointX
+            iconFileImageView.frame.origin.x = frame.width - iconFileImageView.frame.width - 2
             addSubview(iconFileImageView)
         }
         
