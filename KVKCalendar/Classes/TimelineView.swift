@@ -537,7 +537,7 @@ extension TimelineView: EventPageDelegate {
         let point = gesture.location(in: scrollView)
         let time = calculateChangeTime(pointY: point.y)
         if let minutes = time.minute, let hour = time.hour {
-            delegate?.didChangeEvent(eventPage.event, minutes: minutes, hour: hour)
+            delegate?.didChangeEvent(eventPage.event, minutes: minutes, hour: hour, point: point)
         }
     }
     
@@ -649,5 +649,5 @@ protocol TimelineDelegate: AnyObject {
     func nextDate()
     func previousDate()
     func swipeX(transform: CGAffineTransform, stop: Bool)
-    func didChangeEvent(_ event: Event, minutes: Int, hour: Int)
+    func didChangeEvent(_ event: Event, minutes: Int, hour: Int, point: CGPoint)
 }

@@ -93,6 +93,14 @@ final class ScrollDayHeaderView: UIView {
         setDate(nextDate)
     }
     
+    func getDateByPointX(_ pointX: CGFloat) -> Date? {
+        let startRect = CGRect(origin: collectionView.contentOffset, size: collectionView.bounds.size)
+        guard let indexPath = collectionView.indexPathForItem(at: CGPoint(x: startRect.origin.x + pointX, y: startRect.midY)) else { return nil }
+
+        let day = days[indexPath.row]
+        return day.date
+    }
+    
     private func setDateToTitle(_ date: Date?) {
         if let date = date, !style.headerScroll.isHiddenTitleDate {
             titleLabel.text = style.headerScroll.formatterTitle.string(from: date)
@@ -107,8 +115,7 @@ final class ScrollDayHeaderView: UIView {
         collection.delegate = self
         collection.dataSource = self
         collection.isScrollEnabled = isScrollEnabled
-        collection.register(ScrollHeaderDayCollectionViewCell.self,
-                            forCellWithReuseIdentifier: ScrollHeaderDayCollectionViewCell.cellIdentifier)
+        collection.register(ScrollHeaderDayCell.self, forCellWithReuseIdentifier: ScrollHeaderDayCell.cellIdentifier)
         return collection
     }
     
@@ -234,8 +241,8 @@ extension ScrollDayHeaderView: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ScrollHeaderDayCollectionViewCell.cellIdentifier,
-                                                      for: indexPath) as? ScrollHeaderDayCollectionViewCell ?? ScrollHeaderDayCollectionViewCell()
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ScrollHeaderDayCell.cellIdentifier,
+                                                      for: indexPath) as? ScrollHeaderDayCell ?? ScrollHeaderDayCell()
         cell.style = style
         cell.day = days[indexPath.row]
         cell.selectDate = date
