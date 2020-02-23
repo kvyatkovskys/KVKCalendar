@@ -40,7 +40,7 @@ final class DayViewCalendar: UIView {
                 timelineFrame.size.width -= style.timeline.widthEventViewer
             }
         }
-        let view = TimelineView(timeHourSystem: data.timeSystem, style: style, frame: timelineFrame)
+        let view = TimelineView(type: .day, timeHourSystem: data.timeSystem, style: style, frame: timelineFrame)
         view.delegate = self
         return view
     }()

@@ -35,7 +35,7 @@ final class WeekViewCalendar: UIView {
         var timelineFrame = frame
         timelineFrame.origin.y = scrollHeaderDay.frame.height
         timelineFrame.size.height -= scrollHeaderDay.frame.height
-        let view = TimelineView(timeHourSystem: data.timeSystem, style: style, frame: timelineFrame)
+        let view = TimelineView(type: .week, timeHourSystem: data.timeSystem, style: style, frame: timelineFrame)
         view.delegate = self
         return view
     }()

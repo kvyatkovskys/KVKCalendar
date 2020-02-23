@@ -87,6 +87,8 @@ public struct TimelineStyle {
     public var isEnableMoveEvent: Bool = false
     public var minimumPressDuration: TimeInterval = 1
     public var movingMinutesColor: UIColor = .systemBlue
+    public var shadowColumnColor: UIColor = .systemTeal
+    public var shadowColumnAlpha: CGFloat = 0.1
 }
 
 public struct WeekStyle {

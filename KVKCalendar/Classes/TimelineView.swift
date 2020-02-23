@@ -13,6 +13,7 @@ final class TimelineView: UIView {
     private let tagCurrentHourLine = -10
     private let tagEventPagePreview = -20
     private let tagVerticalLine = -30
+    private let tagShadowView = -40
     private var style: Style
     private let hours: [String]
     private let timeHourSystem: TimeHourSystem
@@ -25,6 +26,15 @@ final class TimelineView: UIView {
     private let eventPreviewXOffset: CGFloat = 50
     private let eventPreviewYOffset: CGFloat = 60
     private let eventPreviewSize = CGSize(width: 100, height: 100)
+    private let type: CalendarType
+    
+    private lazy var shadowView: UIView = {
+        let view = UIView()
+        view.backgroundColor = style.timeline.shadowColumnColor
+        view.alpha = style.timeline.shadowColumnAlpha
+        view.tag = tagShadowView
+        return view
+    }()
     
     private lazy var currentTimeLabel: TimelineLabel = {
         let label = TimelineLabel()
@@ -63,7 +73,8 @@ final class TimelineView: UIView {
         return scroll
     }()
     
-    init(timeHourSystem: TimeHourSystem, style: Style, frame: CGRect) {
+    init(type: CalendarType, timeHourSystem: TimeHourSystem, style: Style, frame: CGRect) {
+        self.type = type
         self.timeHourSystem = timeHourSystem
         self.hours = timeHourSystem.hours
         self.style = style
@@ -194,6 +205,7 @@ final class TimelineView: UIView {
         let line = UIView(frame: frame)
         line.tag = tagVerticalLine
         line.backgroundColor = .systemGray
+        line.isHidden = !style.week.showVerticalDayDivider
         return line
     }
     
@@ -444,10 +456,7 @@ final class TimelineView: UIView {
             } else {
                 pointX = CGFloat(idx) * widthPage + offset
             }
-            
-            if style.week.showVerticalDayDivider {
-                scrollView.addSubview(createVerticalLine(pointX: pointX))
-            }
+            scrollView.addSubview(createVerticalLine(pointX: pointX))
             
             let eventsByDate = filteredEvents
                 .filter({ compareStartDate(event: $0, date: date) })
@@ -524,8 +533,15 @@ extension TimelineView: EventPageDelegate {
     }
     
     func didStartMoveEventPage(_ eventPage: EventPageView, gesture: UILongPressGestureRecognizer) {
-        eventPreview = nil
         let point = gesture.location(in: scrollView)
+        
+        shadowView.removeFromSuperview()
+        if let frame = moveShadowView(pointX: point.x) {
+            shadowView.frame = frame
+            scrollView.addSubview(shadowView)
+        }
+    
+        eventPreview = nil
         eventPreview = EventPageView(event: eventPage.event,
                                      style: style.timeline,
                                      frame: CGRect(origin: CGPoint(x: point.x - eventPreviewXOffset, y: point.y - eventPreviewYOffset), size: eventPreviewSize))
@@ -546,6 +562,7 @@ extension TimelineView: EventPageDelegate {
         eventPreview?.removeFromSuperview()
         eventPreview = nil
         movingMinutesLabel.removeFromSuperview()
+        shadowView.removeFromSuperview()
         
         var point = gesture.location(in: scrollView)
         let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
@@ -577,6 +594,10 @@ extension TimelineView: EventPageDelegate {
         
         eventPreview?.frame.origin = CGPoint(x: point.x - eventPreviewXOffset, y: point.y - eventPreviewYOffset)
         showChangeMinutes(pointY: point.y)
+        
+        if let frame = moveShadowView(pointX: point.x) {
+            shadowView.frame = frame
+        }
     }
     
     private func showChangeMinutes(pointY: CGFloat) {
@@ -595,12 +616,25 @@ extension TimelineView: EventPageDelegate {
     private func calculateChangeTime(pointY: CGFloat) -> (hour: Int?, minute: Int?) {
         let pointYTemp = (pointY - eventPreviewYOffset) - style.timeline.offsetEvent - 6
         let times = scrollView.subviews.filter({ ($0 is TimelineLabel) }).compactMap({ $0 as? TimelineLabel })
-        guard let time = times.filter({ $0.frame.origin.y >= pointYTemp }).first else { return (nil, nil) }
+        guard let time = times.first( where: { $0.frame.origin.y >= pointYTemp }) else { return (nil, nil) }
 
         let firstY = time.frame.origin.y - (style.timeline.offsetTimeY + style.timeline.heightTime)
         let percent = (pointYTemp - firstY) / (style.timeline.offsetTimeY + style.timeline.heightTime)
         let newMinute = Int(60.0 * percent)
         return (time.tag - 1, newMinute)
+    }
+    
+    private func moveShadowView(pointX: CGFloat) -> CGRect? {
+        guard type == .week else { return nil }
+        
+        let lines = scrollView.subviews.filter({ $0.tag == tagVerticalLine })
+        var width: CGFloat = 200
+        if let firstLine = lines[safe: 0], let secondLine = lines[safe: 1] {
+            width = secondLine.frame.origin.x - firstLine.frame.origin.x
+        }
+        guard let line = lines.first(where: { $0.frame.origin.x...($0.frame.origin.x + width) ~= pointX }) else { return nil }
+        
+        return CGRect(origin: line.frame.origin, size: CGSize(width: width, height: line.bounds.height))
     }
 }
 
