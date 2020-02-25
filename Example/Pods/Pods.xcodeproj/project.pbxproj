@@ -38,6 +38,7 @@
 		E5AB6B18086CE4068CE2EB914AAC2424 /* YearHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AA5BF91D6E7B3D804D4F228333A9425 /* YearHeaderView.swift */; };
 		F497F7388E31145CBF6B4DC15941F8FF /* Calendar+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86338698476C3784AE063E5DA4282709 /* Calendar+Extension.swift */; };
 		F959A7F6E6C0CBA5AEFE0F52D7484ADE /* Pods-KVKCalendar_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = A9624963DF6186D58BC646C877E68CDF /* Pods-KVKCalendar_Tests-dummy.m */; };
+		F98F05B62405B147000BA721 /* CalendarModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F98F05B52405B147000BA721 /* CalendarModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -110,6 +111,7 @@
 		E96421648159F6EDF2631D72F51C3DD5 /* KVKCalendar-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "KVKCalendar-dummy.m"; sourceTree = "<group>"; };
 		EA4DF389C25F06AF3824F00E2C1D6678 /* CalendarView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CalendarView.swift; path = KVKCalendar/Classes/CalendarView.swift; sourceTree = "<group>"; };
 		F0668B91C096825F6EB918E5B75E5A2D /* DayViewCalendar.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DayViewCalendar.swift; path = KVKCalendar/Classes/DayViewCalendar.swift; sourceTree = "<group>"; };
+		F98F05B52405B147000BA721 /* CalendarModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CalendarModel.swift; path = KVKCalendar/Classes/CalendarModel.swift; sourceTree = "<group>"; };
 		F9A5FE2DD23FBAFCC63D57A554B1036E /* Pods-KVKCalendar_Example-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-KVKCalendar_Example-frameworks.sh"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -205,6 +207,7 @@
 				E6E2A465E5ED65226A1F30D23636EE78 /* AllDayEventView.swift */,
 				86338698476C3784AE063E5DA4282709 /* Calendar+Extension.swift */,
 				EA4DF389C25F06AF3824F00E2C1D6678 /* CalendarView.swift */,
+				F98F05B52405B147000BA721 /* CalendarModel.swift */,
 				4924B625E941DE5A4E1125EF2FC7EF10 /* Date+Extension.swift */,
 				81BADCC92D6196BB4C45F13398D044A6 /* DayData.swift */,
 				F0668B91C096825F6EB918E5B75E5A2D /* DayViewCalendar.swift */,
@@ -445,6 +448,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				201DF9CD39797CFA764621028670265E /* AllDayEventView.swift in Sources */,
+				F98F05B62405B147000BA721 /* CalendarModel.swift in Sources */,
 				F497F7388E31145CBF6B4DC15941F8FF /* Calendar+Extension.swift in Sources */,
 				BDFC91D6CC4D87A97D8CE370307C420B /* CalendarView.swift in Sources */,
 				102BD5D98CB13D3A2E9B25534EC1FAFD /* Date+Extension.swift in Sources */,
