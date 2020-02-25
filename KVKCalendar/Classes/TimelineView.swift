@@ -85,8 +85,11 @@ final class TimelineView: UIView {
         scrollView.frame = scrollFrame
         addSubview(scrollView)
         
-        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(swipeGesure))
+        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(swipeEvent))
         addGestureRecognizer(panGesture)
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(addEvent))
+        addGestureRecognizer(tapGesture)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -97,7 +100,15 @@ final class TimelineView: UIView {
         stopTimer()
     }
     
-    @objc private func swipeGesure(gesture: UIPanGestureRecognizer) {
+    @objc private func addEvent(gesture: UITapGestureRecognizer) {
+        let point = gesture.location(in: scrollView)
+        let time = calculateChangeTime(pointY: point.y - style.timeline.offsetEvent - 6)
+        if let minute = time.minute, let hour = time.hour {
+            delegate?.didAddEvent(minute: minute, hour: hour, point: point)
+        }
+    }
+    
+    @objc private func swipeEvent(gesture: UIPanGestureRecognizer) {
         let translation = gesture.translation(in: self)
         let velocity = gesture.velocity(in: self)
         let endGesure = abs(translation.x) > (frame.width / 3.5)
@@ -568,10 +579,11 @@ extension TimelineView: EventPageDelegate {
         let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
         guard scrollView.frame.width >= (point.x + 30), (point.x - 10) >= leftOffset else { return }
         
-        let time = calculateChangeTime(pointY: point.y)
+        let pointTempY = (point.y - eventPreviewYOffset) - style.timeline.offsetEvent - 6
+        let time = calculateChangeTime(pointY: pointTempY)
         if let minute = time.minute, let hour = time.hour {
             isEnabledAutoScroll = false
-            point.x -= 50
+            point.x -= eventPreviewXOffset
             delegate?.didChangeEvent(eventPage.event, minute: minute, hour: hour, point: point)
         }
     }
@@ -603,7 +615,8 @@ extension TimelineView: EventPageDelegate {
     private func showChangeMinutes(pointY: CGFloat) {
         movingMinutesLabel.removeFromSuperview()
         
-        let time = calculateChangeTime(pointY: pointY)
+        let pointTempY = (pointY - eventPreviewYOffset) - style.timeline.offsetEvent - 6
+        let time = calculateChangeTime(pointY: pointTempY)
         if style.timeline.offsetTimeY > 50, let minute = time.minute, 0...59 ~= minute {
             let offset = eventPreviewYOffset - style.timeline.offsetEvent - 6
             movingMinutesLabel.frame =  CGRect(x: style.timeline.offsetTimeX, y: (pointY - offset) - (style.timeline.heightTime / 2),
@@ -614,12 +627,11 @@ extension TimelineView: EventPageDelegate {
     }
     
     private func calculateChangeTime(pointY: CGFloat) -> (hour: Int?, minute: Int?) {
-        let pointYTemp = (pointY - eventPreviewYOffset) - style.timeline.offsetEvent - 6
         let times = scrollView.subviews.filter({ ($0 is TimelineLabel) }).compactMap({ $0 as? TimelineLabel })
-        guard let time = times.first( where: { $0.frame.origin.y >= pointYTemp }) else { return (nil, nil) }
+        guard let time = times.first( where: { $0.frame.origin.y >= pointY }) else { return (nil, nil) }
 
         let firstY = time.frame.origin.y - (style.timeline.offsetTimeY + style.timeline.heightTime)
-        let percent = (pointYTemp - firstY) / (style.timeline.offsetTimeY + style.timeline.heightTime)
+        let percent = (pointY - firstY) / (style.timeline.offsetTimeY + style.timeline.heightTime)
         let newMinute = Int(60.0 * percent)
         return (time.tag - 1, newMinute)
     }
@@ -698,4 +710,5 @@ protocol TimelineDelegate: AnyObject {
     func previousDate()
     func swipeX(transform: CGAffineTransform, stop: Bool)
     func didChangeEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint)
+    func didAddEvent(minute: Int, hour: Int, point: CGPoint)
 }

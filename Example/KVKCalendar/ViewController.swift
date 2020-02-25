@@ -137,6 +137,10 @@ extension ViewController: CalendarDelegate {
         }
     }
     
+    func didAddEvent(_ date: Date?) {
+        print(date)
+    }
+    
     func didSelectDate(_ date: Date?, type: CalendarType, frame: CGRect?) {
         selectDate = date ?? Date()
         calendarView.reloadData()

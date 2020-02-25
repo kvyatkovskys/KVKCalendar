@@ -151,6 +151,10 @@ extension CalendarView: CalendarPrivateDelegate {
         delegate?.didSelectMore(date, frame: frame)
     }
     
+    func didAddCalendarEvent(_ date: Date?) {
+        delegate?.didAddEvent(date)
+    }
+    
     func didChangeCalendarEvent(_ event: Event, start: Date?, end: Date?) {
         delegate?.didChangeEvent(event, start: start, end: end)
     }
@@ -274,6 +278,7 @@ protocol CalendarPrivateDelegate: AnyObject {
     func didSelectCalendarMore(_ date: Date, frame: CGRect?)
     func calendarEventViewerFrame(_ frame: CGRect)
     func didChangeCalendarEvent(_ event: Event, start: Date?, end: Date?)
+    func didAddCalendarEvent(_ date: Date?)
 }
 
 extension CalendarPrivateDelegate {
@@ -291,6 +296,7 @@ public protocol CalendarDelegate: AnyObject {
     func didSelectMore(_ date: Date, frame: CGRect?)
     func eventViewerFrame(_ frame: CGRect)
     func didChangeEvent(_ event: Event, start: Date?, end: Date?)
+    func didAddEvent(_ date: Date?)
 }
 
 public extension CalendarDelegate {
@@ -299,4 +305,5 @@ public extension CalendarDelegate {
     func didSelectMore(_ date: Date, frame: CGRect?) {}
     func eventViewerFrame(_ frame: CGRect) {}
     func didChangeEvent(_ event: Event, start: Date?, end: Date?) {}
+    func didAddEvent(_ date: Date?) {}
 }
