@@ -186,6 +186,22 @@ extension WeekViewCalendar: TimelineDelegate {
         scrollHeaderDay.scrollHeaderByTransform(transform)
     }
     
+    func didAddEvent(minute: Int, hour: Int, point: CGPoint) {
+        var date = data.date
+        if let newDate = scrollHeaderDay.getDateByPointX(point.x) {
+            date = newDate
+        }
+        
+        var components = DateComponents()
+        components.year = date.year
+        components.month = date.month
+        components.day = date.day
+        components.hour = hour
+        components.minute = minute
+        let newDate = style.calendar.date(from: components)
+        delegate?.didAddCalendarEvent(newDate)
+    }
+    
     func didChangeEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint) {
         var day = event.start.day
         if let newDate = scrollHeaderDay.getDateByPointX(point.x), day != newDate.day {
