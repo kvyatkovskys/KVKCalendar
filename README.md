@@ -1,4 +1,4 @@
-<img src="Screenshots/iphone" width="300"> <img src="Screenshots/ipad" width="550">
+<img src="Screenshots/iphone.png" width="300"> <img src="Screenshots/ipad.png" width="550">
 
 [![CI Status](https://img.shields.io/travis/kvyatkovskys/KVKCalendar.svg?style=flat)](https://travis-ci.org/kvyatkovskys/KVKCalendar)
 [![Version](https://img.shields.io/cocoapods/v/KVKCalendar.svg?style=flat)](https://cocoapods.org/pods/KVKCalendar)
