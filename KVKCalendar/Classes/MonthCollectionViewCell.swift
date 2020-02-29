@@ -40,6 +40,7 @@ final class MonthCollectionViewCell: UICollectionViewCell {
     var events: [Event] = [] {
         didSet {
             subviews.filter({ $0.tag != -1 }).forEach({ $0.removeFromSuperview() })
+            guard bounds.height > dateLabel.bounds.height + 10 else { return }
             
             if UIDevice.current.userInterfaceIdiom == .phone, UIDevice.current.orientation.isLandscape {
                 return
