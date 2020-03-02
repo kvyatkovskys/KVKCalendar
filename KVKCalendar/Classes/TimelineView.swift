@@ -619,7 +619,7 @@ extension TimelineView: EventPageDelegate {
         let time = calculateChangeTime(pointY: pointTempY)
         if style.timeline.offsetTimeY > 50, let minute = time.minute, 0...59 ~= minute {
             let offset = eventPreviewYOffset - style.timeline.offsetEvent - 6
-            movingMinutesLabel.frame =  CGRect(x: style.timeline.offsetTimeX, y: (pointY - offset) - (style.timeline.heightTime / 2),
+            movingMinutesLabel.frame =  CGRect(x: style.timeline.offsetTimeX, y: (pointY - offset) - style.timeline.heightTime,
                                                width: style.timeline.widthTime, height: style.timeline.heightTime)
             scrollView.addSubview(movingMinutesLabel)
             movingMinutesLabel.text = ":\(minute)"
