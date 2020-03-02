@@ -147,7 +147,6 @@ final class ScrollDayHeaderView: UIView {
                            let idx = days.firstIndex(where: { $0.date?.year == scrollDate.year
                                && $0.date?.month == scrollDate.month
                                && $0.date?.day == scrollDate.day }) else { return }
-                
                 indexPath.row = idx
             }
         case .week:

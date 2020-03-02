@@ -69,8 +69,7 @@ struct YearData {
     func getDaysInMonth(month: Int, date: Date) -> [Day] {
         let calendar = style.calendar
         var dateComponents = DateComponents(year: date.year, month: month)
-        dateComponents.day = 2
-        
+        dateComponents.day = 1
         guard let dateMonth = calendar.date(from: dateComponents), let range = calendar.range(of: .day, in: .month, for: dateMonth) else { return [] }
         
         let formatter = ISO8601DateFormatter()

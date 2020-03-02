@@ -50,13 +50,13 @@ public extension Date {
     
     var startOfDay: Date? {
         var gregorian = Calendar(identifier: .gregorian)
-        gregorian.timeZone = TimeZone(abbreviation: "UTC")!
+        gregorian.timeZone = TimeZone.current
         return gregorian.startOfDay(for: self)
     }
     
     var endOfDay: Date? {
         var gregorian = Calendar(identifier: .gregorian)
-        gregorian.timeZone = TimeZone(abbreviation: "UTC")!
+        gregorian.timeZone = TimeZone.current
         var components = DateComponents()
         components.day = 1
         components.second = -1
@@ -75,32 +75,32 @@ public extension Date {
     
     var startSundayOfWeek: Date? {
         var gregorian = Calendar(identifier: .gregorian)
-        gregorian.timeZone = TimeZone(abbreviation: "UTC")!
+        gregorian.timeZone = TimeZone.current
         let sunday = gregorian.date(from: gregorian.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))
         return sunday
     }
     
     var endSundayOfWeek: Date? {
         var gregorian = Calendar(identifier: .gregorian)
-        gregorian.timeZone = TimeZone(abbreviation: "UTC")!
+        gregorian.timeZone = TimeZone.current
         return gregorian.date(byAdding: .day, value: 6, to: startMondayOfWeek ?? self)
     }
     
     var endSaturdayOfWeek: Date? {
         var gregorian = Calendar(identifier: .gregorian)
-        gregorian.timeZone = TimeZone(abbreviation: "UTC")!
+        gregorian.timeZone = TimeZone.current
         return gregorian.date(byAdding: .day, value: 6, to: startSundayOfWeek ?? self)
     }
     
     var startOfMonth: Date? {
         var gregorian = Calendar(identifier: .gregorian)
-        gregorian.timeZone = TimeZone(abbreviation: "UTC")!
+        gregorian.timeZone = TimeZone.current
         return gregorian.date(from: gregorian.dateComponents([.year, .month], from: self))
     }
     
     var endOfMonth: Date? {
         var gregorian = Calendar(identifier: .gregorian)
-        gregorian.timeZone = TimeZone(abbreviation: "UTC")!
+        gregorian.timeZone = TimeZone.current
         var components = DateComponents()
         components.month = 1
         components.second = -1
