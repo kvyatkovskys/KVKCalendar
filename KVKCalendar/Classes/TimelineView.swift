@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class TimelineView: UIView {
+final class TimelineView: UIView, CompareEventDateProtocol {
     weak var delegate: TimelineDelegate?
     
     private let tagCurrentHourLine = -10
@@ -283,14 +283,6 @@ final class TimelineView: UIView {
         scrollView.contentInset = UIEdgeInsets(top: offsetY, left: 0, bottom: 0, right: 0)
     }
     
-    private func compareStartDate(event: Event, date: Date?) -> Bool {
-        return event.start.year == date?.year && event.start.month == date?.month && event.start.day == date?.day
-    }
-    
-    private func compareEndDate(event: Event, date: Date?) -> Bool {
-        return event.end.year == date?.year && event.end.month == date?.month && event.end.day == date?.day
-    }
-    
     private func getTimelineLabel(hour: Int) -> TimelineLabel? {
         return scrollView.subviews .filter({ (view) -> Bool in
             guard let time = view as? TimelineLabel else { return false }
@@ -445,7 +437,6 @@ final class TimelineView: UIView {
         
         // add time label to timline
         let times = createTimesLabel(start: start)
-        
         // add seporator line
         let lines = createLines(times: times)
         
@@ -666,49 +657,4 @@ extension TimelineView: AllDayEventDelegate {
     func didSelectAllDayEvent(_ event: Event, frame: CGRect?) {
         delegate?.didSelectEvent(event, frame: frame)
     }
-}
-
-private struct CrossPageTree: Hashable {
-    let parent: Parent
-    var children: [Child]
-    var count: Int
-    
-    init(parent: Parent, children: [Child]) {
-        self.parent = parent
-        self.children = children
-        self.count = children.count + 1
-    }
-    
-    func equalToChildren(_ event: Event) -> Bool {
-        return children.contains(where: { $0.start == event.start.timeIntervalSince1970 })
-    }
-    
-    func excludeToChildren(_ event: Event) -> Bool {
-        return children.contains(where: { $0.start..<$0.end ~= event.start.timeIntervalSince1970 })
-    }
-    
-    static func == (lhs: CrossPageTree, rhs: CrossPageTree) -> Bool {
-        return lhs.parent == rhs.parent
-            && lhs.children == rhs.children
-            && lhs.count == rhs.count
-    }
-}
-
-private struct Parent: Equatable, Hashable {
-    let start: TimeInterval
-    let end: TimeInterval
-}
-
-private struct Child: Equatable, Hashable {
-    let start: TimeInterval
-    let end: TimeInterval
-}
-
-protocol TimelineDelegate: AnyObject {
-    func didSelectEvent(_ event: Event, frame: CGRect?)
-    func nextDate()
-    func previousDate()
-    func swipeX(transform: CGAffineTransform, stop: Bool)
-    func didChangeEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint)
-    func didAddEvent(minute: Int, hour: Int, point: CGPoint)
 }

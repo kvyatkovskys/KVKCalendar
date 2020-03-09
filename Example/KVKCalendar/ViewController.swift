@@ -201,7 +201,7 @@ extension ViewController {
     
     func timeFormatter(date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
+        formatter.dateFormat = style.timeHourSystem == .twelveHour ? "h:mm a" : "HH:mm"
         return formatter.string(from: date)
     }
     

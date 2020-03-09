@@ -3,23 +3,23 @@
         {
             "all_day": 1,
             "border_color": "#FFFFFF",
-            "color": "#93c47d",
+            "color": "#12c795",
             "end": "2018-12-10T09:00:00+03:00",
             "id": "40",
             "start": "2018-12-10T08:30:00+03:00",
             "text_color": "#000000",
-            "title": "Event number 1",
+            "title": "All day event number 1",
             "files": []
         },
         {
             "all_day": 1,
             "border_color": "#FFFFFF",
-            "color": "#93c47d",
+            "color": "#12c795",
             "end": "2018-12-12T09:00:00+03:00",
             "id": "0",
             "start": "2018-12-11T08:30:00+03:00",
             "text_color": "#000000",
-            "title": "Event number 2",
+            "title": "All day event number 2",
             "files": []
         },
         {

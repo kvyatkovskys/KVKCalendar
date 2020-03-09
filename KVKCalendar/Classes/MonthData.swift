@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MonthData {
+final class MonthData: CompareEventDateProtocol {
     var days: [Day]
     var date: Date
     var data: YearData
@@ -16,7 +16,7 @@ struct MonthData {
     
     init(yearData: YearData, startDay: StartDayType) {
         self.data = yearData
-        data.months = yearData.months.reduce([], { (acc, month) -> [Month] in
+        let months = yearData.months.reduce([], { (acc, month) -> [Month] in
             var daysTemp = yearData.addStartEmptyDay(days: month.days, startDay: startDay)
             if daysTemp.count < yearData.boxCount {
                 Array(1...yearData.boxCount - daysTemp.count).forEach { _ in
@@ -27,8 +27,9 @@ struct MonthData {
             monthTemp.days = daysTemp
             return acc + [monthTemp]
         })
+        data.months = months
         self.date = yearData.date
-        self.days = data.months.flatMap({ $0.days })
+        self.days = months.flatMap({ $0.days })
         self.cachedDays = days
     }
     
@@ -36,7 +37,7 @@ struct MonthData {
         return day.date?.year == date?.year && day.date?.month == date?.month
     }
     
-    mutating func reloadEventsInDays(events: [Event]) {
+    func reloadEventsInDays(events: [Event]) {
         let startDate = date.startOfMonth
         let endDate = date.endOfMonth?.startOfDay
         let startIdx = cachedDays.firstIndex(where: { $0.date?.day == startDate?.day && compareDate(day: $0, date: startDate) }) ?? 0
@@ -44,8 +45,12 @@ struct MonthData {
         let newDays = cachedDays[startIdx...endIdx].reduce([], { (acc, day) -> [Day] in
             var newDay = day
             guard newDay.events.isEmpty else { return acc + [day] }
-            let sortedByDay = events.filter({ $0.start.month == day.date?.month && $0.start.year == day.date?.year && $0.start.day == day.date?.day })
-            newDay.events = sortedByDay
+            
+            let sortedEventsByDay = events.filter({ $0.start.month == day.date?.month && $0.start.year == day.date?.year && $0.start.day == day.date?.day })
+            let filteredAllDayEvents = events.filter({ $0.isAllDay })
+            let allDayEvents = filteredAllDayEvents.filter({ compareStartDate(event: $0, date: day.date) || compareEndDate(event: $0, date: day.date) })
+            let otherEvents = sortedEventsByDay.filter({ !$0.isAllDay })
+            newDay.events = allDayEvents + otherEvents
             return acc + [newDay]
         })
         days[startIdx...endIdx] = ArraySlice(newDays)
