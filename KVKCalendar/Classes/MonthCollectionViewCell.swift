@@ -29,10 +29,18 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
+    private func timeFormatter(date: Date) -> String {
+          let formatter = DateFormatter()
+          formatter.dateFormat = style.timeHourSystem == .twelveHour ? "h:mm a" : "HH:mm"
+          return formatter.string(from: date)
+      }
+    
     private var monthStyle = MonthStyle()
+    private var allDayStyle = AllDayStyle()
     var style = Style() {
         didSet {
             monthStyle = style.month
+            allDayStyle = style.allDay
         }
     }
     weak var delegate: MonthCellDelegate?
@@ -47,20 +55,27 @@ final class MonthCollectionViewCell: UICollectionViewCell {
             }
             
             let height = (frame.height - dateLabel.bounds.height - offset) / countInCell
+            
             for (idx, event) in events.enumerated() {
+                let widthOffset: CGFloat
+                if !monthStyle.isHiddenEventStartTime, !event.isAllDay {
+                    widthOffset = 60
+                } else {
+                    widthOffset = 10
+                }
+                let width = UIDevice.current.userInterfaceIdiom == .pad ? frame.width - widthOffset : frame.width
+                
                 let count = idx + 1
-                let label = UILabel(frame: CGRect(x: 5,
-                                                  y: offset + dateLabel.bounds.height + height * CGFloat(idx),
-                                                  width: frame.width - 10,
-                                                  height: height))
+                let label = UILabel(frame: CGRect(x: 5, y: offset + dateLabel.bounds.height + height * CGFloat(idx),
+                                                  width: 0, height: height))
                 label.isUserInteractionEnabled = true
-                label.font = monthStyle.fontEventTitle
-                label.textColor = monthStyle.colorEventTitle
-                label.lineBreakMode = .byTruncatingMiddle
-                label.adjustsFontSizeToFitWidth = true
-                label.minimumScaleFactor = 0.8
                 
                 if count > MonthCollectionViewCell.titlesCount {
+                    label.frame.size.width = frame.width - 10
+                    label.font = monthStyle.fontEventTitle
+                    label.lineBreakMode = .byTruncatingMiddle
+                    label.adjustsFontSizeToFitWidth = true
+                    label.minimumScaleFactor = 0.95
                     label.textAlignment = .center
                     let tap = UITapGestureRecognizer(target: self, action: #selector(tapOnMore))
                     label.tag = event.start.day
@@ -76,18 +91,43 @@ final class MonthCollectionViewCell: UICollectionViewCell {
                         label.text = text
                     }
                     addSubview(label)
-                    return
                 } else {
+                    label.frame.size.width = width
+
+                    if !monthStyle.isHiddenEventStartTime, !event.isAllDay {
+                        let labelTimeEvent = UILabel(frame: CGRect(x: label.frame.origin.x + label.frame.width, y: label.frame.origin.y + 4,
+                                                                                      width: frame.width - label.frame.width - 5, height: height - 4))
+                        labelTimeEvent.textColor = .systemGray
+                        labelTimeEvent.text = timeFormatter(date: event.start)
+                        labelTimeEvent.font = monthStyle.fontEventTime
+                        labelTimeEvent.textAlignment = .center
+                        addSubview(labelTimeEvent)
+                        
+                        label.attributedText = addIconBeforeLabel(stringList: [event.textForMonth],
+                                                                  font: monthStyle.fontEventTitle,
+                                                                  bulletFont: monthStyle.fontEventBullet,
+                                                                  bullet: "•",
+                                                                  indentation: 0,
+                                                                  lineSpacing: 0,
+                                                                  paragraphSpacing: 0,
+                                                                  textColor: monthStyle.colorEventTitle,
+                                                                  bulletColor: event.color?.value ?? .systemGray)
+                    } else {
+                        label.font = monthStyle.fontEventTitle
+                        label.lineBreakMode = .byTruncatingTail
+                        label.adjustsFontSizeToFitWidth = true
+                        label.minimumScaleFactor = 0.95
+                        label.textAlignment = .left
+                        label.backgroundColor = event.color?.value ?? .systemGray
+                        label.textColor = allDayStyle.textColor
+                        label.text = " \(event.text) "
+                    }
+                    
                     let tap = UITapGestureRecognizer(target: self, action: #selector(tapOneEvent))
                     label.addGestureRecognizer(tap)
                     label.tag = "\(event.id)".hashValue
-                    label.attributedText = addIconBeforeLabel(stringList: [event.textForMonth],
-                                                              font: UIDevice.current.userInterfaceIdiom == .pad ? monthStyle.fontEventTitle : monthStyle.fontEventBullet,
-                                                              bullet: "•",
-                                                              textColor: monthStyle.colorEventTitle,
-                                                              bulletColor: event.color?.value ?? .systemGray)
+                    addSubview(label)
                 }
-                addSubview(label)
             }
         }
     }
@@ -130,7 +170,7 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         
         var dateFrame = frame
         if UIDevice.current.userInterfaceIdiom == .pad {
-            dateFrame.size = CGSize(width: 35, height: 35)
+            dateFrame.size = CGSize(width: 30, height: 30)
         } else {
             dateFrame.size = CGSize(width: frame.width, height: frame.width)
         }
@@ -208,9 +248,9 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         label.clipsToBounds = true
     }
     
-    private func addIconBeforeLabel(stringList: [String], font: UIFont, bullet: String = "\u{2022}", indentation: CGFloat = 10, lineSpacing: CGFloat = 2, paragraphSpacing: CGFloat = 10, textColor: UIColor, bulletColor: UIColor) -> NSAttributedString {
+    private func addIconBeforeLabel(stringList: [String], font: UIFont, bulletFont: UIFont, bullet: String = "\u{2022}", indentation: CGFloat = 10, lineSpacing: CGFloat = 2, paragraphSpacing: CGFloat = 10, textColor: UIColor, bulletColor: UIColor) -> NSAttributedString {
         let textAttributes: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: textColor]
-        let bulletAttributes: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: bulletColor]
+        let bulletAttributes: [NSAttributedString.Key: Any] = [.font: bulletFont, .foregroundColor: bulletColor]
         let paragraphStyle = NSMutableParagraphStyle()
         
         paragraphStyle.alignment = UIDevice.current.userInterfaceIdiom == .pad ? .left : .center
@@ -219,9 +259,10 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         paragraphStyle.lineSpacing = lineSpacing
         paragraphStyle.paragraphSpacing = paragraphSpacing
         paragraphStyle.headIndent = indentation
+        paragraphStyle.lineBreakMode = .byTruncatingTail
         
         return stringList.reduce(NSMutableAttributedString()) { _, string -> NSMutableAttributedString in
-            let formattedString = UIDevice.current.userInterfaceIdiom == .pad ? "\(bullet)\t\(string)\n" : bullet
+            let formattedString = UIDevice.current.userInterfaceIdiom == .pad ? "\(bullet) \(string)\n" : bullet
             let attributedString = NSMutableAttributedString(string: formattedString)
             attributedString.addAttributes([NSAttributedString.Key.paragraphStyle: paragraphStyle], range: NSMakeRange(0, attributedString.length))
             attributedString.addAttributes(textAttributes, range: NSMakeRange(0, attributedString.length))

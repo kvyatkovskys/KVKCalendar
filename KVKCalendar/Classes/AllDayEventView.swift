@@ -63,7 +63,7 @@ final class AllDayEventView: UIView {
             label.isUserInteractionEnabled = true
             label.font = style.font
             label.text = " \(event.text)"
-            label.backgroundColor = event.color.withAlphaComponent(1)
+            label.backgroundColor = event.color.withAlphaComponent(0.8)
             label.tag = "\(event.id)".hashValue
             let tap = UITapGestureRecognizer(target: self, action: #selector(tapOnEvent))
             label.addGestureRecognizer(tap)
