@@ -125,9 +125,11 @@ public struct MonthStyle {
     public var colorSelectDate: UIColor = .white
     public var colorWeekendDate: UIColor = .gray
     public var moreTitle: String = "more"
+    public var isHiddenMoreTitle: Bool = false
     public var colorMoreTitle: UIColor = .gray
     public var colorEventTitle: UIColor = .black
-    public var fontEventTitle: UIFont = .systemFont(ofSize: 14)
+    public var fontEventTitle: UIFont = .systemFont(ofSize: 15)
+    public var fontEventBullet: UIFont = .boldSystemFont(ofSize: 18)
     public var isHiddenSeporator: Bool = false
     public var widthSeporator: CGFloat = 0.7
     public var colorSeporator: UIColor = gainsboro.withAlphaComponent(0.9)
