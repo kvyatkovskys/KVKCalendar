@@ -145,6 +145,7 @@ extension ViewController: CalendarDelegate {
     }
     
     func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?) {
+        print(type, event)
         switch type {
         case .day:
             eventViewer.text = event.text

@@ -66,7 +66,15 @@ final class MonthCollectionViewCell: UICollectionViewCell {
                     label.tag = event.start.day
                     label.addGestureRecognizer(tap)
                     label.textColor = monthStyle.colorMoreTitle
-                    label.text = "\(monthStyle.moreTitle) \(events.count - MonthCollectionViewCell.titlesCount)"
+                    if !monthStyle.isHiddenMoreTitle {
+                        let text: String
+                        if monthStyle.moreTitle.isEmpty {
+                            text = "\(events.count - MonthCollectionViewCell.titlesCount)"
+                        } else {
+                            text = "\(monthStyle.moreTitle) \(events.count - MonthCollectionViewCell.titlesCount)"
+                        }
+                        label.text = text
+                    }
                     addSubview(label)
                     return
                 } else {
@@ -74,7 +82,7 @@ final class MonthCollectionViewCell: UICollectionViewCell {
                     label.addGestureRecognizer(tap)
                     label.tag = "\(event.id)".hashValue
                     label.attributedText = addIconBeforeLabel(stringList: [event.textForMonth],
-                                                              font: monthStyle.fontEventTitle,
+                                                              font: UIDevice.current.userInterfaceIdiom == .pad ? monthStyle.fontEventTitle : monthStyle.fontEventBullet,
                                                               bullet: "•",
                                                               textColor: monthStyle.colorEventTitle,
                                                               bulletColor: event.color?.value ?? .systemGray)
@@ -121,10 +129,14 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         super.init(frame: frame)
         
         var dateFrame = frame
-        dateFrame.size = CGSize(width: 35, height: 35)
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            dateFrame.size = CGSize(width: 35, height: 35)
+        } else {
+            dateFrame.size = CGSize(width: frame.width, height: frame.width)
+        }
         dateFrame.origin.y = offset
         if UIDevice.current.userInterfaceIdiom == .pad {
-            dateFrame.origin.x = (frame.width - dateFrame.width)
+            dateFrame.origin.x = (frame.width - dateFrame.width) - offset
         } else {
             dateFrame.origin.x = (frame.width / 2) - (dateFrame.width / 2)
         }

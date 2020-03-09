@@ -139,10 +139,6 @@ extension CalendarView: CalendarPrivateDelegate {
         delegate?.didSelectDate(date, type: type, frame: frame)
     }
     
-    func didSelectCalendarEvents(_ events: [Event]) {
-        //delegate?.didSelectEvents(events)
-    }
-    
     func didSelectCalendarEvent(_ event: Event, frame: CGRect?) {
         delegate?.didSelectEvent(event, type: type, frame: frame)
     }
@@ -175,7 +171,7 @@ extension CalendarView: CalendarSettingProtocol {
         yearCalendar.reloadFrame(frame)
     }
     
-    // work in progress
+    // TODO: in progress
     func updateStyle(_ style: Style) {
         self.style = style
         dayCalendar.updateStyle(style)
