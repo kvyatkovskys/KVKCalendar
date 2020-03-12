@@ -8,11 +8,14 @@
 import UIKit
 
 private let countInCell: CGFloat = 4
-private let offset: CGFloat = 5
+private let offset: CGFloat = 3
 
-protocol MonthCellDelegate: AnyObject {
+protocol MonthCellDelegate: class {
     func didSelectEvent(_ event: Event, frame: CGRect?)
     func didSelectMore(_ date: Date, frame: CGRect?)
+    func didStartMoveEventPage(_ event: Event, snapshot: UIView?, gesture: UILongPressGestureRecognizer)
+    func didEndMoveEventPage(_ event: Event, gesture: UILongPressGestureRecognizer)
+    func didChangeMoveEventPage(_ event: Event, gesture: UILongPressGestureRecognizer)
 }
 
 final class MonthCollectionViewCell: UICollectionViewCell {
@@ -54,24 +57,15 @@ final class MonthCollectionViewCell: UICollectionViewCell {
                 return
             }
             
-            let height = (frame.height - dateLabel.bounds.height - offset) / countInCell
+            let height = (frame.height - dateLabel.bounds.height - 5) / countInCell
             
             for (idx, event) in events.enumerated() {
-                let widthOffset: CGFloat
-                if !monthStyle.isHiddenEventStartTime, !event.isAllDay {
-                    widthOffset = 60
-                } else {
-                    widthOffset = 10
-                }
-                let width = UIDevice.current.userInterfaceIdiom == .pad ? frame.width - widthOffset : frame.width
-                
+                let width = frame.width - 10
                 let count = idx + 1
-                let label = UILabel(frame: CGRect(x: 5, y: offset + dateLabel.bounds.height + height * CGFloat(idx),
-                                                  width: 0, height: height))
+                let label = UILabel(frame: CGRect(x: 5, y: 5 + dateLabel.bounds.height + height * CGFloat(idx), width: width, height: height))
                 label.isUserInteractionEnabled = true
                 
                 if count > MonthCollectionViewCell.titlesCount {
-                    label.frame.size.width = frame.width - 10
                     label.font = monthStyle.fontEventTitle
                     label.lineBreakMode = .byTruncatingMiddle
                     label.adjustsFontSizeToFitWidth = true
@@ -91,30 +85,19 @@ final class MonthCollectionViewCell: UICollectionViewCell {
                         label.text = text
                     }
                     addSubview(label)
+                    return
                 } else {
-                    label.frame.size.width = width
-
-                    if !monthStyle.isHiddenEventStartTime, !event.isAllDay {
-                        let labelTimeEvent = UILabel(frame: CGRect(x: label.frame.origin.x + label.frame.width, y: label.frame.origin.y + 4,
-                                                                                      width: frame.width - label.frame.width - 5, height: height - 4))
-                        labelTimeEvent.textColor = .systemGray
-                        labelTimeEvent.text = timeFormatter(date: event.start)
-                        labelTimeEvent.font = monthStyle.fontEventTime
-                        labelTimeEvent.textAlignment = .center
-                        addSubview(labelTimeEvent)
-                        
-                        label.attributedText = addIconBeforeLabel(stringList: [event.textForMonth],
-                                                                  font: monthStyle.fontEventTitle,
-                                                                  bulletFont: monthStyle.fontEventBullet,
-                                                                  bullet: "•",
+                    if !event.isAllDay || UIDevice.current.userInterfaceIdiom == .phone {
+                        label.attributedText = addIconBeforeLabel(eventList: [event],
+                                                                  textAttributes: [.font: monthStyle.fontEventTitle, .foregroundColor: monthStyle.colorEventTitle],
+                                                                  bulletAttributes: [.font: monthStyle.fontEventBullet, .foregroundColor: event.color?.value ?? .systemGray],
+                                                                  timeAttributes: [.font: monthStyle.fontEventTime, .foregroundColor: UIColor.systemGray],
                                                                   indentation: 0,
                                                                   lineSpacing: 0,
-                                                                  paragraphSpacing: 0,
-                                                                  textColor: monthStyle.colorEventTitle,
-                                                                  bulletColor: event.color?.value ?? .systemGray)
+                                                                  paragraphSpacing: 0)
                     } else {
                         label.font = monthStyle.fontEventTitle
-                        label.lineBreakMode = .byTruncatingTail
+                        label.lineBreakMode = .byTruncatingMiddle
                         label.adjustsFontSizeToFitWidth = true
                         label.minimumScaleFactor = 0.95
                         label.textAlignment = .left
@@ -126,6 +109,11 @@ final class MonthCollectionViewCell: UICollectionViewCell {
                     let tap = UITapGestureRecognizer(target: self, action: #selector(tapOneEvent))
                     label.addGestureRecognizer(tap)
                     label.tag = "\(event.id)".hashValue
+                    if style.event.isEnableMoveEvent, UIDevice.current.userInterfaceIdiom != .phone {
+                        let longGesture = UILongPressGestureRecognizer(target: self, action: #selector(activateMoveEvent))
+                        longGesture.minimumPressDuration = style.event.minimumPressDuration
+                        label.addGestureRecognizer(longGesture)
+                    }
                     addSubview(label)
                 }
             }
@@ -172,7 +160,8 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         if UIDevice.current.userInterfaceIdiom == .pad {
             dateFrame.size = CGSize(width: 30, height: 30)
         } else {
-            dateFrame.size = CGSize(width: frame.width, height: frame.width)
+            let newWidth = frame.width > 30 ? 30 : frame.width
+            dateFrame.size = CGSize(width: newWidth, height: newWidth)
         }
         dateFrame.origin.y = offset
         if UIDevice.current.userInterfaceIdiom == .pad {
@@ -186,6 +175,32 @@ final class MonthCollectionViewCell: UICollectionViewCell {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    @objc private func activateMoveEvent(gesture: UILongPressGestureRecognizer) {
+        guard let idx = events.firstIndex(where: { "\($0.id)".hashValue == gesture.view?.tag }), let view = gesture.view else { return }
+        
+        let event = events[idx]
+        let snapshotLabel = UILabel(frame: view.frame)
+        snapshotLabel.backgroundColor = event.color?.value ?? .systemGray
+        snapshotLabel.attributedText = addIconBeforeLabel(eventList: [event],
+                                                          textAttributes: [.font: monthStyle.fontEventTitle, .foregroundColor: UIColor.white],
+                                                          bulletAttributes: [.font: monthStyle.fontEventBullet, .foregroundColor: UIColor.white],
+                                                          timeAttributes: [.font: monthStyle.fontEventTime, .foregroundColor: UIColor.white],
+                                                          indentation: 0,
+                                                          lineSpacing: 0,
+                                                          paragraphSpacing: 0)
+        let snpashot = event.isAllDay ? view.snapshotView(afterScreenUpdates: false) : snapshotLabel
+        switch gesture.state {
+        case .began:
+            delegate?.didStartMoveEventPage(event, snapshot: snpashot, gesture: gesture)
+        case .changed:
+            delegate?.didChangeMoveEventPage(event, gesture: gesture)
+        case .cancelled, .ended, .failed:
+            delegate?.didEndMoveEventPage(event, gesture: gesture)
+        default:
+            break
+        }
     }
     
     private func weekendsDays(day: Day, label: UILabel, view: UIView) {
@@ -248,27 +263,37 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         label.clipsToBounds = true
     }
     
-    private func addIconBeforeLabel(stringList: [String], font: UIFont, bulletFont: UIFont, bullet: String = "\u{2022}", indentation: CGFloat = 10, lineSpacing: CGFloat = 2, paragraphSpacing: CGFloat = 10, textColor: UIColor, bulletColor: UIColor) -> NSAttributedString {
-        let textAttributes: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: textColor]
-        let bulletAttributes: [NSAttributedString.Key: Any] = [.font: bulletFont, .foregroundColor: bulletColor]
+    private func addIconBeforeLabel(eventList: [Event], textAttributes: [NSAttributedString.Key: Any], bulletAttributes: [NSAttributedString.Key: Any], timeAttributes: [NSAttributedString.Key: Any], bullet: String = "\u{2022}", indentation: CGFloat = 10, lineSpacing: CGFloat = 2, paragraphSpacing: CGFloat = 10) -> NSAttributedString {
         let paragraphStyle = NSMutableParagraphStyle()
-        
         paragraphStyle.alignment = UIDevice.current.userInterfaceIdiom == .pad ? .left : .center
         paragraphStyle.tabStops = [NSTextTab(textAlignment: .left, location: indentation, options: [:])]
         paragraphStyle.defaultTabInterval = indentation
         paragraphStyle.lineSpacing = lineSpacing
         paragraphStyle.paragraphSpacing = paragraphSpacing
         paragraphStyle.headIndent = indentation
-        paragraphStyle.lineBreakMode = .byTruncatingTail
+        paragraphStyle.lineBreakMode = .byTruncatingMiddle
         
-        return stringList.reduce(NSMutableAttributedString()) { _, string -> NSMutableAttributedString in
-            let formattedString = UIDevice.current.userInterfaceIdiom == .pad ? "\(bullet) \(string)\n" : bullet
+        return eventList.reduce(NSMutableAttributedString()) { _, event -> NSMutableAttributedString in
+            let formattedString: String
+            let time = timeFormatter(date: event.start)
+            switch UIDevice.current.userInterfaceIdiom {
+            case .pad:
+                formattedString = "\(bullet) \(event.textForMonth) \(time)\n"
+            default:
+                formattedString = bullet
+            }
             let attributedString = NSMutableAttributedString(string: formattedString)
-            attributedString.addAttributes([NSAttributedString.Key.paragraphStyle: paragraphStyle], range: NSMakeRange(0, attributedString.length))
-            attributedString.addAttributes(textAttributes, range: NSMakeRange(0, attributedString.length))
             let string: NSString = NSString(string: formattedString)
-            let rangeForBullet: NSRange = string.range(of: bullet)
+            
+            let rangeForText = NSMakeRange(0, attributedString.length)
+            attributedString.addAttributes([NSAttributedString.Key.paragraphStyle: paragraphStyle], range: rangeForText)
+            attributedString.addAttributes(textAttributes, range: rangeForText)
+            
+            let rangeForBullet = string.range(of: bullet)
             attributedString.addAttributes(bulletAttributes, range: rangeForBullet)
+            
+            let rangeForTime = string.range(of: time)
+            attributedString.addAttributes(timeAttributes, range: rangeForTime)
             return attributedString
         }
     }

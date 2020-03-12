@@ -12,7 +12,7 @@ private let pointX: CGFloat = 5
 final class EventPageView: UIView {
     weak var delegate: EventPageDelegate?
     let event: Event
-    private let style: TimelineStyle
+    private let timelineStyle: TimelineStyle
     private let color: UIColor
     
     private let textView: UITextView = {
@@ -28,14 +28,14 @@ final class EventPageView: UIView {
     
     private lazy var iconFileImageView: UIImageView = {
         let image = UIImageView(frame: CGRect(x: 0, y: 2, width: 10, height: 10))
-        image.image = style.iconFile?.withRenderingMode(.alwaysTemplate)
-        image.tintColor = style.colorIconFile
+        image.image = timelineStyle.iconFile?.withRenderingMode(.alwaysTemplate)
+        image.tintColor = timelineStyle.colorIconFile
         return image
     }()
     
-    init(event: Event, style: TimelineStyle, frame: CGRect) {
+    init(event: Event, style: Style, frame: CGRect) {
         self.event = event
-        self.style = style
+        self.timelineStyle = style.timeline
         self.color = EventColor(event.color?.value ?? event.backgroundColor).value
         super.init(frame: frame)
         backgroundColor = event.backgroundColor
@@ -53,7 +53,7 @@ final class EventPageView: UIView {
         textFrame.size.height = textFrame.height
         textFrame.size.width = textFrame.width - pointX
         textView.frame = textFrame
-        textView.font = style.eventFont
+        textView.font = style.timeline.eventFont
         textView.textColor = event.colorText
         textView.text = event.text
         
@@ -65,9 +65,9 @@ final class EventPageView: UIView {
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapOnEvent))
         addGestureRecognizer(tap)
         
-        if style.isEnableMoveEvent {
+        if style.event.isEnableMoveEvent {
             let longGesture = UILongPressGestureRecognizer(target: self, action: #selector(activateMoveEvent))
-            longGesture.minimumPressDuration = style.minimumPressDuration
+            longGesture.minimumPressDuration = style.event.minimumPressDuration
             addGestureRecognizer(longGesture)
         }
     }

@@ -42,7 +42,7 @@ final class ViewController: UIViewController {
         style.allDay.isPinned = true
         style.startWeekDay = .sunday
         style.timeHourSystem = .twelveHour
-        style.timeline.isEnableMoveEvent = true
+        style.event.isEnableMoveEvent = true
         return style
     }()
     
@@ -152,6 +152,10 @@ extension ViewController: CalendarDelegate {
         default:
             break
         }
+    }
+    
+    func didSelectMore(_ date: Date, frame: CGRect?) {
+        print(date)
     }
     
     func eventViewerFrame(_ frame: CGRect) {
