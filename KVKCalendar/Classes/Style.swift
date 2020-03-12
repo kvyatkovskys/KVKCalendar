@@ -10,6 +10,7 @@ import UIKit
 private let gainsboro: UIColor = UIColor(red: 220 / 255, green: 220 / 255, blue: 220 / 255, alpha: 1)
 
 public struct Style {
+    public var event = EventStyle()
     public var timeline = TimelineStyle()
     public var week = WeekStyle()
     public var allDay = AllDayStyle()
@@ -84,8 +85,6 @@ public struct TimelineStyle {
     public var currentLineHourFont: UIFont = .systemFont(ofSize: 12)
     public var currentLineHourColor: UIColor = .red
     public var currentLineHourWidth: CGFloat = 50
-    public var isEnableMoveEvent: Bool = false
-    public var minimumPressDuration: TimeInterval = 1
     public var movingMinutesColor: UIColor = .systemBlue
     public var shadowColumnColor: UIColor = .systemTeal
     public var shadowColumnAlpha: CGFloat = 0.1
@@ -126,7 +125,6 @@ public struct MonthStyle {
     public var colorWeekendDate: UIColor = .gray
     public var moreTitle: String = "more"
     public var isHiddenMoreTitle: Bool = false
-    public var isHiddenEventStartTime: Bool = false
     public var colorMoreTitle: UIColor = .gray
     public var colorEventTitle: UIColor = .black
     public var fontEventTitle: UIFont = .systemFont(ofSize: 15)
@@ -139,7 +137,7 @@ public struct MonthStyle {
     public var colorBackgroundDate: UIColor = .white
     var scrollDirection: UICollectionView.ScrollDirection = .vertical
     public var selectCalendarType: CalendarType = .week
-    public var isAnimateSelection: Bool = true
+    public var isAnimateSelection: Bool = false
     public var isPagingEnabled: Bool = true
 }
 
@@ -183,6 +181,11 @@ public struct AllDayStyle {
     public var height: CGFloat = 25
     public var fontTitle: UIFont = .systemFont(ofSize: 10)
     public var isPinned: Bool = false
+}
+
+public struct EventStyle {
+    public var isEnableMoveEvent: Bool = false
+    public var minimumPressDuration: TimeInterval = 1
 }
 
 extension Style {

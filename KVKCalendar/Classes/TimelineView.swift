@@ -516,7 +516,7 @@ final class TimelineView: UIView, CompareEventDateProtocol {
                     newFrame.origin.x = newPointX
                     newFrame.size.width = newWidth - style.timeline.offsetEvent
                     
-                    let page = EventPageView(event: event, style: style.timeline, frame: newFrame)
+                    let page = EventPageView(event: event, style: style, frame: newFrame)
                     page.delegate = self
                     scrollView.addSubview(page)
                     pagesCached.append(page)
@@ -545,7 +545,7 @@ extension TimelineView: EventPageDelegate {
     
         eventPreview = nil
         eventPreview = EventPageView(event: eventPage.event,
-                                     style: style.timeline,
+                                     style: style,
                                      frame: CGRect(origin: CGPoint(x: point.x - eventPreviewXOffset, y: point.y - eventPreviewYOffset), size: eventPreviewSize))
         eventPreview?.alpha = 0.9
         eventPreview?.tag = tagEventPagePreview
