@@ -109,7 +109,7 @@ final class MonthCollectionViewCell: UICollectionViewCell {
                     let tap = UITapGestureRecognizer(target: self, action: #selector(tapOneEvent))
                     label.addGestureRecognizer(tap)
                     label.tag = "\(event.id)".hashValue
-                    if style.event.isEnableMoveEvent, UIDevice.current.userInterfaceIdiom != .phone {
+                    if style.event.isEnableMoveEvent, UIDevice.current.userInterfaceIdiom != .phone, !event.isAllDay {
                         let longGesture = UILongPressGestureRecognizer(target: self, action: #selector(activateMoveEvent))
                         longGesture.minimumPressDuration = style.event.minimumPressDuration
                         label.addGestureRecognizer(longGesture)
@@ -278,7 +278,7 @@ final class MonthCollectionViewCell: UICollectionViewCell {
             let time = timeFormatter(date: event.start)
             switch UIDevice.current.userInterfaceIdiom {
             case .pad:
-                formattedString = "\(bullet) \(event.textForMonth) \(time)\n"
+                formattedString = "\(bullet) \(event.textForMonth)  \(time)\n"
             default:
                 formattedString = bullet
             }
