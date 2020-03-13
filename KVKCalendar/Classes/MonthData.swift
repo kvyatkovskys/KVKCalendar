@@ -46,10 +46,10 @@ final class MonthData: CompareEventDateProtocol {
             var newDay = day
             guard newDay.events.isEmpty else { return acc + [day] }
             
-            let sortedEventsByDay = events.filter({ $0.start.month == day.date?.month && $0.start.year == day.date?.year && $0.start.day == day.date?.day })
+            let filteredEventsByDay = events.filter({ $0.start.month == day.date?.month && $0.start.year == day.date?.year && $0.start.day == day.date?.day })
             let filteredAllDayEvents = events.filter({ $0.isAllDay })
             let allDayEvents = filteredAllDayEvents.filter({ compareStartDate(event: $0, date: day.date) || compareEndDate(event: $0, date: day.date) })
-            let otherEvents = sortedEventsByDay.filter({ !$0.isAllDay })
+            let otherEvents = filteredEventsByDay.filter({ !$0.isAllDay }).sorted(by: { $0.start.hour < $1.start.hour })
             newDay.events = allDayEvents + otherEvents
             return acc + [newDay]
         })
