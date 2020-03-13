@@ -23,7 +23,7 @@ public struct Style {
     public var defaultType: CalendarType?
     public var timeHourSystem: TimeHourSystem = .twentyFourHour
     public var startWeekDay: StartDayType = .monday
-    public var followInInterface: Bool = false
+    public var followInSystemTheme: Bool = false
     
     public init() {}
 }
@@ -190,7 +190,7 @@ public struct EventStyle {
 
 extension Style {
     var checkStyle: Style {
-        guard followInInterface else { return self }
+        guard followInSystemTheme else { return self }
         
         var newStyle = self
         if #available(iOS 13.0, *) {

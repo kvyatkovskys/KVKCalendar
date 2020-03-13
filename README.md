@@ -183,6 +183,8 @@ style.timelineStyle.offsetTimeY = 80
 style.timelineStyle.offsetEvent = 3
 style.allDayStyle.isPinned = true
 style.timelineStyle.widthEventViewer = 500
+style.event.isEnableMoveEvent = true
+style.followInSystemTheme = true
 let calendar = CalendarView(frame: frame, style: style)
 ```
 

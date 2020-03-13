@@ -35,7 +35,7 @@ final class ViewController: UIViewController {
             style.timeline.widthEventViewer = 500
         }
         style.timeline.startFromFirstEvent = false
-        style.followInInterface = true
+        style.followInSystemTheme = true
         style.timeline.offsetTimeY = 80
         style.timeline.offsetEvent = 3
         style.timeline.currentLineHourWidth = 40
