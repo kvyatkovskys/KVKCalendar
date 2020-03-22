@@ -94,6 +94,7 @@ extension CalendarSettingProtocol {
 }
 
 protocol CalendarPrivateDelegate: AnyObject {
+    func didDisplayCalendarEvents(_ events: [Event], dates: [Date?], type: CalendarType)
     func didSelectCalendarDate(_ date: Date?, type: CalendarType, frame: CGRect?)
     func didSelectCalendarEvent(_ event: Event, frame: CGRect?)
     func didSelectCalendarMore(_ date: Date, frame: CGRect?)
@@ -117,6 +118,7 @@ public protocol CalendarDelegate: AnyObject {
     func eventViewerFrame(_ frame: CGRect)
     func didChangeEvent(_ event: Event, start: Date?, end: Date?)
     func didAddEvent(_ date: Date?)
+    func didDisplayEvents(_ events: [Event], dates: [Date?])
 }
 
 public extension CalendarDelegate {
@@ -126,4 +128,5 @@ public extension CalendarDelegate {
     func eventViewerFrame(_ frame: CGRect) {}
     func didChangeEvent(_ event: Event, start: Date?, end: Date?) {}
     func didAddEvent(_ date: Date?) {}
+    func didDisplayEvents(_ events: [Event], dates: [Date?]) {}
 }
