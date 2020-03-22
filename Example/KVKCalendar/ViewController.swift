@@ -100,13 +100,12 @@ final class ViewController: UIViewController {
     }
     
     @objc func today(sender: UIBarButtonItem) {
-        calendarView.scrollToDate(date: Date())
+        calendarView.scrollTo(Date())
     }
     
     @objc func switchCalendar(sender: UISegmentedControl) {
         let type = CalendarType.allCases[sender.selectedSegmentIndex]
         calendarView.set(type: type, date: selectDate)
-        calendarView.reloadData()
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

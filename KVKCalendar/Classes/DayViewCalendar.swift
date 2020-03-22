@@ -87,7 +87,6 @@ final class DayViewCalendar: UIView {
     func setDate(_ date: Date) {
         data.date = date
         scrollHeaderDay.setDate(date)
-        reloadData(events: data.events)
     }
     
     func reloadData(events: [Event]) {
@@ -105,6 +104,10 @@ extension DayViewCalendar: ScrollDayHeaderDelegate {
 }
 
 extension DayViewCalendar: TimelineDelegate {
+    func didDisplayEvents(_ events: [Event], dates: [Date?]) {
+        delegate?.didDisplayCalendarEvents(events, dates: dates, type: .day)
+    }
+    
     func didSelectEvent(_ event: Event, frame: CGRect?) {
         delegate?.didSelectCalendarEvent(event, frame: frame)
     }

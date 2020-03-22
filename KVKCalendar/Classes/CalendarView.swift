@@ -20,6 +20,9 @@ public final class CalendarView: UIView {
     private var weekData: WeekData
     private let monthData: MonthData
     private var dayData: DayData
+    private var events: [Event] {
+        return dataSource?.eventsForCalendar() ?? []
+    }
     
     private lazy var dayCalendar: DayViewCalendar = {
         let day = DayViewCalendar(data: dayData, frame: frame, style: style)
@@ -94,7 +97,24 @@ public final class CalendarView: UIView {
     public func set(type: CalendarType, date: Date) {
         self.type = type
         switchTypeCalendar(type: type)
-        
+        scrollTo(date)
+    }
+    
+    public func reloadData() {
+        switch type {
+        case .day:
+            dayCalendar.reloadData(events: events)
+        case .week:
+            weekCalendar.reloadData(events: events)
+        case .month:
+            monthCalendar.reloadData(events: events)
+        case .year:
+            break
+        }
+    }
+    
+    @available(*, deprecated, renamed: "scrollTo")
+    public func scrollToDate(date: Date) {
         switch type {
         case .day:
             dayCalendar.setDate(date)
@@ -107,20 +127,7 @@ public final class CalendarView: UIView {
         }
     }
     
-    public func reloadData() {
-        switch type {
-        case .day:
-            dayCalendar.reloadData(events: dataSource?.eventsForCalendar() ?? [])
-        case .week:
-            weekCalendar.reloadData(events: dataSource?.eventsForCalendar() ?? [])
-        case .month:
-            monthCalendar.reloadData(events: dataSource?.eventsForCalendar() ?? [])
-        case .year:
-            break
-        }
-    }
-    
-    public func scrollToDate(date: Date) {
+    public func scrollTo(_ date: Date) {
         switch type {
         case .day:
             dayCalendar.setDate(date)
@@ -135,6 +142,12 @@ public final class CalendarView: UIView {
 }
 
 extension CalendarView: CalendarPrivateDelegate {
+    func didDisplayCalendarEvents(_ events: [Event], dates: [Date?], type: CalendarType) {
+        guard self.type == type else { return }
+        
+        delegate?.didDisplayEvents(events, dates: dates)
+    }
+    
     func didSelectCalendarDate(_ date: Date?, type: CalendarType, frame: CGRect?) {
         delegate?.didSelectDate(date, type: type, frame: frame)
     }

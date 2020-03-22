@@ -44,6 +44,7 @@ struct Child: Equatable, Hashable {
 }
 
 protocol TimelineDelegate: AnyObject {
+    func didDisplayEvents(_ events: [Event], dates: [Date?])
     func didSelectEvent(_ event: Event, frame: CGRect?)
     func nextDate()
     func previousDate()
