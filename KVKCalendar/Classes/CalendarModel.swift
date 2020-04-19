@@ -132,7 +132,13 @@ public extension CalendarDelegate {
 }
 
 public struct DateStyle {
+    let date: Date
     let color: EventColor
+    
+    public init(date: Date, color: EventColor) {
+        self.date = date
+        self.color = color
+    }
 }
 
 typealias MonthCellStyle = (day: Day, style: DateStyle?)

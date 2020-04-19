@@ -56,3 +56,7 @@ final class MonthData: CompareEventDateProtocol {
         days[startIdx...endIdx] = ArraySlice(newDays)
     }
 }
+
+public protocol MonthDataSource: class {
+    func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle?
+}
