@@ -50,6 +50,7 @@ final class ViewController: UIViewController {
         let calendar = CalendarView(frame: view.frame, date: selectDate, style: style)
         calendar.delegate = self
         calendar.dataSource = self
+        calendar.monthDataSource = self
         return calendar
     }()
     
@@ -113,6 +114,12 @@ final class ViewController: UIViewController {
             self.events = events
             self.calendarView.reloadData()
         }
+    }
+}
+
+extension ViewController: MonthDataSource {
+    func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? {
+        return DateStyle(date: Date(), color: EventColor(.systemRed))
     }
 }
 
@@ -215,9 +222,7 @@ extension ViewController {
     }
 }
 
-extension ViewController: UIPopoverPresentationControllerDelegate {
-    
-}
+extension ViewController: UIPopoverPresentationControllerDelegate { }
 
 struct ItemData: Decodable {
     let data: [Item]
