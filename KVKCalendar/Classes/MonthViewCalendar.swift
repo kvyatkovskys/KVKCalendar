@@ -234,7 +234,7 @@ extension MonthViewCalendar: UICollectionViewDataSource {
         let day = data.days[indexPath.row]
         cell.selectDate = data.date
         cell.style = style
-        cell.day = day
+        cell.item = MonthCellStyle(day, nil)
         cell.events = day.events
         cell.delegate = self
         return cell
@@ -244,10 +244,10 @@ extension MonthViewCalendar: UICollectionViewDataSource {
 extension MonthViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {    
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         let cells = collectionView.visibleCells as? [MonthCollectionViewCell] ?? [MonthCollectionViewCell()]
-        let cellDays = cells.filter({ $0.day.type != .empty })
-        guard let newMoveDate = cellDays.filter({ $0.day.date?.day == data.date.day }).first?.day.date else {
-            let sorted = cellDays.sorted(by: { ($0.day.date?.day ?? 0) < ($1.day.date?.day ?? 0) })
-            if let lastDate = sorted.last?.day.date, lastDate.day < data.date.day {
+        let cellDays = cells.filter({ $0.item?.day.type != .empty })
+        guard let newMoveDate = cellDays.filter({ $0.item?.day.date?.day == data.date.day }).first?.item?.day.date else {
+            let sorted = cellDays.sorted(by: { ($0.item?.day.date?.day ?? 0) < ($1.item?.day.date?.day ?? 0) })
+            if let lastDate = sorted.last?.item?.day.date, lastDate.day < data.date.day {
                 data.date = lastDate
                 headerView.date = lastDate
                 delegate?.didSelectCalendarDate(lastDate, type: .month, frame: nil)
