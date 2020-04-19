@@ -130,3 +130,9 @@ public extension CalendarDelegate {
     func didAddEvent(_ date: Date?) {}
     func didDisplayEvents(_ events: [Event], dates: [Date?]) {}
 }
+
+public struct DateStyle {
+    let color: EventColor
+}
+
+typealias MonthCellStyle = (day: Day, style: DateStyle?)

@@ -120,18 +120,20 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    var day: Day = .empty() {
+    var item: MonthCellStyle? = nil {
         didSet {
-            if let tempDay = day.date?.day {
+            guard let value = item else { return }
+            
+            if let tempDay = value.day.date?.day {
                 dateLabel.text = "\(tempDay)"
             } else {
                 dateLabel.text = nil
             }
             if !monthStyle.isHiddenSeporator {
-                layer.borderWidth = day.type != .empty ? monthStyle.widthSeporator : 0
-                layer.borderColor = day.type != .empty ? monthStyle.colorSeporator.cgColor : UIColor.clear.cgColor
+                layer.borderWidth = value.day.type != .empty ? monthStyle.widthSeporator : 0
+                layer.borderColor = value.day.type != .empty ? monthStyle.colorSeporator.cgColor : UIColor.clear.cgColor
             }
-            weekendsDays(day: day, label: dateLabel, view: self)
+            populateCell(cellStyle: value, label: dateLabel, view: self)
         }
     }
     
@@ -203,19 +205,18 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    private func weekendsDays(day: Day, label: UILabel, view: UIView) {
-        isNowDate(date: day.date, weekend: day.type == .saturday || day.type == .sunday, label: label, view: view)
-    }
-    
-    private func isNowDate(date: Date?, weekend: Bool, label: UILabel, view: UIView) {
+    private func populateCell(cellStyle: MonthCellStyle, label: UILabel, view: UIView) {
+        let date = cellStyle.day.date
+        let weekend = cellStyle.day.type == .saturday || cellStyle.day.type == .sunday
+
         let nowDate = Date()
         label.backgroundColor = .clear
         
         if weekend {
             label.textColor = monthStyle.colorWeekendDate
-            view.backgroundColor = monthStyle.colorBackgroundWeekendDate
+            view.backgroundColor = cellStyle.style?.color.value ?? monthStyle.colorBackgroundWeekendDate
         } else {
-            view.backgroundColor = monthStyle.colorBackgroundDate
+            view.backgroundColor = cellStyle.style?.color.value ?? monthStyle.colorBackgroundDate
             label.textColor = monthStyle.colorDate
         }
         
@@ -262,7 +263,7 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         label.layer.cornerRadius = label.frame.height / 2
         label.clipsToBounds = true
     }
-    
+
     private func addIconBeforeLabel(eventList: [Event], textAttributes: [NSAttributedString.Key: Any], bulletAttributes: [NSAttributedString.Key: Any], timeAttributes: [NSAttributedString.Key: Any], bullet: String = "\u{2022}", indentation: CGFloat = 10, lineSpacing: CGFloat = 2, paragraphSpacing: CGFloat = 10) -> NSAttributedString {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = UIDevice.current.userInterfaceIdiom == .pad ? .left : .center
