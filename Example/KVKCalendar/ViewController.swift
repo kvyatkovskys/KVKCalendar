@@ -118,8 +118,11 @@ final class ViewController: UIViewController {
 }
 
 extension ViewController: MonthDataSource {
+    private var dates: [Date] {
+        return [1, 3, 5].compactMap({ Calendar.current.date(byAdding: .day, value: $0, to: Date()) })
+    }
+    
     func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? {
-        let dates = Array(1...3).compactMap({ Calendar.current.date(byAdding: .day, value: $0, to: Date()) })
         guard let selectDate = dates.first(where: { $0.year == date?.year && $0.month == date?.month && $0.day == date?.day }) else { return nil }
         
         return DateStyle(date: selectDate, color: EventColor(.systemRed))
