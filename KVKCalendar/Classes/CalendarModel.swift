@@ -133,11 +133,15 @@ public extension CalendarDelegate {
 
 public struct DateStyle {
     let date: Date
-    let color: EventColor
+    public var backgroundColor: EventColor
+    public var textWeekendColor: EventColor?
+    public var textColor: EventColor?
     
-    public init(date: Date, color: EventColor) {
+    public init(date: Date, backgroundColor: EventColor, textWeekendColor: EventColor? = nil, textColor: EventColor? = nil) {
         self.date = date
-        self.color = color
+        self.backgroundColor = backgroundColor
+        self.textWeekendColor = textWeekendColor
+        self.textColor = textColor
     }
 }
 

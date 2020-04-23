@@ -213,11 +213,11 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         label.backgroundColor = .clear
         
         if weekend {
-            label.textColor = monthStyle.colorWeekendDate
-            view.backgroundColor = cellStyle.style?.color.value ?? monthStyle.colorBackgroundWeekendDate
+            label.textColor = cellStyle.style?.textWeekendColor?.value ?? monthStyle.colorWeekendDate
+            view.backgroundColor = cellStyle.style?.backgroundColor.value ?? monthStyle.colorBackgroundWeekendDate
         } else {
-            view.backgroundColor = cellStyle.style?.color.value ?? monthStyle.colorBackgroundDate
-            label.textColor = monthStyle.colorDate
+            view.backgroundColor = cellStyle.style?.backgroundColor.value ?? monthStyle.colorBackgroundDate
+            label.textColor = cellStyle.style?.textColor?.value ?? monthStyle.colorDate
         }
         
         guard date?.year == nowDate.year else {

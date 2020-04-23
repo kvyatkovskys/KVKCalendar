@@ -125,7 +125,8 @@ extension ViewController: MonthDataSource {
     func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? {
         guard let selectDate = dates.first(where: { $0.year == date?.year && $0.month == date?.month && $0.day == date?.day }) else { return nil }
         
-        return DateStyle(date: selectDate, color: EventColor(.systemRed))
+        let dateStyle = DateStyle(date: selectDate, backgroundColor: EventColor(.systemOrange))
+        return dateStyle
     }
 }
 
