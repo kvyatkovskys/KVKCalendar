@@ -10,7 +10,6 @@ import UIKit
 public final class CalendarView: UIView {
     public weak var delegate: CalendarDelegate?
     public weak var dataSource: CalendarDataSource?
-    public weak var monthDataSource: MonthDataSource?
     public var selectedType: CalendarType {
         return type
     }
@@ -145,7 +144,7 @@ public final class CalendarView: UIView {
 
 extension CalendarView: MonthDataSource {
     public func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? {
-        return monthDataSource?.willDisplayDate(date, events: events)
+        return dataSource?.willDisplayDate(date, events: events)
     }
 }
 
