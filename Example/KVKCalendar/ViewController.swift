@@ -50,7 +50,6 @@ final class ViewController: UIViewController {
         let calendar = CalendarView(frame: view.frame, date: selectDate, style: style)
         calendar.delegate = self
         calendar.dataSource = self
-        calendar.monthDataSource = self
         return calendar
     }()
     
@@ -117,19 +116,6 @@ final class ViewController: UIViewController {
     }
 }
 
-extension ViewController: MonthDataSource {
-    private var dates: [Date] {
-        return [1, 3, 5].compactMap({ Calendar.current.date(byAdding: .day, value: $0, to: Date()) })
-    }
-    
-    func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? {
-        guard let selectDate = dates.first(where: { $0.year == date?.year && $0.month == date?.month && $0.day == date?.day }) else { return nil }
-        
-        let dateStyle = DateStyle(date: selectDate, backgroundColor: EventColor(.systemOrange))
-        return dateStyle
-    }
-}
-
 extension ViewController: CalendarDelegate {
     func didChangeEvent(_ event: Event, start: Date?, end: Date?) {
         var eventTemp = event
@@ -179,6 +165,17 @@ extension ViewController: CalendarDelegate {
 extension ViewController: CalendarDataSource {
     func eventsForCalendar() -> [Event] {
         return events
+    }
+    
+    private var dates: [Date] {
+        return [1, 3, 5].compactMap({ Calendar.current.date(byAdding: .day, value: $0, to: Date()) })
+    }
+    
+    func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? {
+        guard let selectDate = dates.first(where: { $0.year == date?.year && $0.month == date?.month && $0.day == date?.day }) else { return nil }
+        
+        let dateStyle = DateStyle(date: selectDate, backgroundColor: EventColor(.systemOrange))
+        return dateStyle
     }
 }
 

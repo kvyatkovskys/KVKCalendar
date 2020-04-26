@@ -57,6 +57,6 @@ final class MonthData: CompareEventDateProtocol {
     }
 }
 
-public protocol MonthDataSource: class {
+protocol MonthDataSource: class {
     func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle?
 }

@@ -63,7 +63,7 @@ public struct Event {
             colorText = UIColor(hue: hue, saturation: saturation, brightness: UIScreen.isDarkMode ? brightness : brightness * 0.4, alpha: alpha)
         }
     }
-    public var backgroundColor: UIColor = UIColor.blue.withAlphaComponent(0.3)
+    public var backgroundColor: UIColor = UIColor.systemBlue.withAlphaComponent(0.3)
     public var colorText: UIColor = .black
     public var isAllDay: Bool = false
     public var isContainsFile: Bool = false
@@ -93,7 +93,7 @@ extension CalendarSettingProtocol {
     func setUI() {}
 }
 
-protocol CalendarPrivateDelegate: AnyObject {
+protocol CalendarPrivateDelegate: class {
     func didDisplayCalendarEvents(_ events: [Event], dates: [Date?], type: CalendarType)
     func didSelectCalendarDate(_ date: Date?, type: CalendarType, frame: CGRect?)
     func didSelectCalendarEvent(_ event: Event, frame: CGRect?)
@@ -107,8 +107,13 @@ extension CalendarPrivateDelegate {
     func getEventViewerFrame(_ frame: CGRect) {}
 }
 
-public protocol CalendarDataSource: AnyObject {
+public protocol CalendarDataSource: class {
     func eventsForCalendar() -> [Event]
+    func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle?
+}
+
+extension CalendarDataSource {
+    func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? { return nil }
 }
 
 public protocol CalendarDelegate: AnyObject {
