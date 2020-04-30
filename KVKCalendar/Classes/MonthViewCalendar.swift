@@ -18,7 +18,7 @@ final class MonthViewCalendar: UIView {
     private var eventPreviewXOffset: CGFloat = 60
     
     weak var delegate: CalendarPrivateDelegate?
-    weak var dataSource: MonthDataSource?
+    weak var dataSource: DisplayDataSource?
     
     private lazy var headerView: WeekHeaderView = {
         let height: CGFloat
@@ -235,7 +235,7 @@ extension MonthViewCalendar: UICollectionViewDataSource {
         let day = data.days[indexPath.row]
         cell.selectDate = data.date
         cell.style = style
-        cell.item = cellStyleForDay(day)
+        cell.item = monthStyleForDay(day)
         cell.events = day.events
         cell.delegate = self
         return cell
@@ -314,14 +314,16 @@ extension MonthViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateF
     }
 }
 
-extension MonthViewCalendar {
-    func cellStyleForDay(_ day: Day) -> MonthCellStyle {
-        var dateStyle: DateStyle?
-        dateStyle = dataSource?.willDisplayDate(day.date, events: day.events)
-        if dateStyle?.date.year == day.date?.year, dateStyle?.date.month == day.date?.month, dateStyle?.date.day == day.date?.day {
-            return MonthCellStyle(day, dateStyle)
-        } else {
-            return MonthCellStyle(day, nil)
-        }
+extension MonthViewCalendar: DayStyleProtocol {
+    typealias Model = DateStyle?
+    
+    func styleForDay(_ date: Date?, events: [Event]) -> DateStyle? {
+        return dataSource?.willDisplayDate(date, events: events)
+    }
+    
+    func monthStyleForDay(_ day: Day) -> MonthDayStyle {
+        guard let item = styleForDay(day.date, events: day.events) else { return MonthDayStyle(day, nil) }
+        
+        return MonthDayStyle(day, item)
     }
 }

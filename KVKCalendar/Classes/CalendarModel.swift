@@ -137,17 +137,22 @@ public extension CalendarDelegate {
 }
 
 public struct DateStyle {
-    let date: Date
     public var backgroundColor: EventColor
     public var textWeekendColor: EventColor?
     public var textColor: EventColor?
     
-    public init(date: Date, backgroundColor: EventColor, textWeekendColor: EventColor? = nil, textColor: EventColor? = nil) {
-        self.date = date
+    public init(backgroundColor: EventColor, textWeekendColor: EventColor? = nil, textColor: EventColor? = nil) {
         self.backgroundColor = backgroundColor
         self.textWeekendColor = textWeekendColor
         self.textColor = textColor
     }
 }
 
-typealias MonthCellStyle = (day: Day, style: DateStyle?)
+typealias DayStyle = (date: Date?, style: DateStyle?)
+typealias MonthDayStyle = (day: Day, style: DateStyle?)
+
+protocol DayStyleProtocol: class {
+    associatedtype Model
+    
+    func styleForDay(_ date: Date?, events: [Event]) -> Model
+}

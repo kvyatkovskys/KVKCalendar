@@ -172,10 +172,9 @@ extension ViewController: CalendarDataSource {
     }
     
     func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? {
-        guard let selectDate = dates.first(where: { $0.year == date?.year && $0.month == date?.month && $0.day == date?.day }) else { return nil }
+        guard dates.first(where: { $0.year == date?.year && $0.month == date?.month && $0.day == date?.day }) != nil else { return nil }
         
-        let dateStyle = DateStyle(date: selectDate, backgroundColor: EventColor(.systemOrange))
-        return dateStyle
+        return DateStyle(backgroundColor: EventColor(.systemOrange))
     }
 }
 
