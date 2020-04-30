@@ -10,9 +10,13 @@ import UIKit
 final class WeekViewCalendar: UIView {
     private var visibleDates: [Date?] = []
     weak var delegate: CalendarPrivateDelegate?
+    weak var dataSource: DisplayDataSource?
     
     private var data: WeekData
     private var style: Style
+    private var dayStyles: [DayStyle] {
+        return visibleDates.compactMap({ styleForDay($0, events: data.events) })
+    }
     
     private lazy var scrollHeaderDay: ScrollDayHeaderView = {
         let heightView: CGFloat
@@ -74,7 +78,7 @@ final class WeekViewCalendar: UIView {
     
     func reloadData(events: [Event]) {
         data.events = events
-        timelineView.createTimelinePage(dates: visibleDates, events: events, selectedDate: data.date)
+        timelineView.createTimelinePage(dates: visibleDates, events: events, selectedDate: data.date, dayStyle: dayStyles)
     }
     
     private func addCornerLabel() {
@@ -143,7 +147,7 @@ extension WeekViewCalendar: CalendarSettingProtocol {
         timelineFrame.size.width = frame.width
         timelineFrame.size.height = frame.height - scrollHeaderDay.frame.height
         timelineView.reloadFrame(timelineFrame)
-        timelineView.createTimelinePage(dates: visibleDates, events: data.events, selectedDate: data.date)
+        timelineView.createTimelinePage(dates: visibleDates, events: data.events, selectedDate: data.date, dayStyle: dayStyles)
         
         addCornerLabel()
     }
@@ -230,5 +234,13 @@ extension WeekViewCalendar: TimelineDelegate {
         let endDate = style.calendar.date(from: endComponents)
         
         delegate?.didChangeCalendarEvent(event, start: startDate, end: endDate)
+    }
+}
+
+extension WeekViewCalendar: DayStyleProtocol {
+    typealias Model = DayStyle?
+    
+    func styleForDay(_ date: Date?, events: [Event]) -> DayStyle? {
+        return DayStyle(date, dataSource?.willDisplayDate(date, events: events))
     }
 }

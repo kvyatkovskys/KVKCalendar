@@ -120,7 +120,7 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    var item: MonthCellStyle? = nil {
+    var item: MonthDayStyle? = nil {
         didSet {
             guard let value = item else { return }
             
@@ -205,7 +205,7 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    private func populateCell(cellStyle: MonthCellStyle, label: UILabel, view: UIView) {
+    private func populateCell(cellStyle: MonthDayStyle, label: UILabel, view: UIView) {
         let date = cellStyle.day.date
         let weekend = cellStyle.day.type == .saturday || cellStyle.day.type == .sunday
 
