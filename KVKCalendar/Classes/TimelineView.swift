@@ -14,6 +14,8 @@ final class TimelineView: UIView, CompareEventDateProtocol {
     private let tagEventPagePreview = -20
     private let tagVerticalLine = -30
     private let tagShadowView = -40
+    private let tagBackgroundView = -50
+    
     private var style: Style
     private let hours: [String]
     private let timeHourSystem: TimeHourSystem
@@ -411,6 +413,7 @@ final class TimelineView: UIView, CompareEventDateProtocol {
     private func fillBackgroundDayColor(_ color: UIColor, pointX: CGFloat, width: CGFloat) -> UIView {
         let view = UIView(frame: CGRect(x: pointX, y: 0.0, width: width, height: (CGFloat(25) * (style.timeline.heightTime + style.timeline.offsetTimeY)) - 75))
         view.backgroundColor = color
+        view.tag = tagBackgroundView
         return view
     }
     
