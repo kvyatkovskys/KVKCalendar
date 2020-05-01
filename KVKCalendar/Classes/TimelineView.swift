@@ -465,7 +465,7 @@ final class TimelineView: UIView, CompareEventDateProtocol {
             } else {
                 pointX = CGFloat(idx) * widthPage + offset
             }
-            if !dayStyle.isEmpty, let color = dayStyle.first(where: { $0.date?.year == date?.year && $0.date?.month == date?.month && $0.date?.day == date?.day })?.style?.backgroundColor.value {
+            if !dayStyle.isEmpty, let color = dayStyle.first(where: { $0.date?.year == date?.year && $0.date?.month == date?.month && $0.date?.day == date?.day })?.style?.backgroundColor {
                 let view = fillBackgroundDayColor(color, pointX: pointX, width: widthPage)
                 scrollView.insertSubview(view, at: 0)
             }

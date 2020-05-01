@@ -174,7 +174,7 @@ extension ViewController: CalendarDataSource {
     func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? {
         guard dates.first(where: { $0.year == date?.year && $0.month == date?.month && $0.day == date?.day }) != nil else { return nil }
         
-        return DateStyle(backgroundColor: EventColor(.systemOrange))
+        return DateStyle(backgroundColor: .systemOrange, textColor: .green, dotBackgroundColor: .blue)
     }
 }
 

@@ -137,14 +137,14 @@ public extension CalendarDelegate {
 }
 
 public struct DateStyle {
-    public var backgroundColor: EventColor
-    public var textWeekendColor: EventColor?
-    public var textColor: EventColor?
+    public var backgroundColor: UIColor
+    public var textColor: UIColor?
+    public var dotBackgroundColor: UIColor?
     
-    public init(backgroundColor: EventColor, textWeekendColor: EventColor? = nil, textColor: EventColor? = nil) {
+    public init(backgroundColor: UIColor, textColor: UIColor? = nil, dotBackgroundColor: UIColor? = nil) {
         self.backgroundColor = backgroundColor
-        self.textWeekendColor = textWeekendColor
         self.textColor = textColor
+        self.dotBackgroundColor = dotBackgroundColor
     }
 }
 
