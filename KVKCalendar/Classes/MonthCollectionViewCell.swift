@@ -213,17 +213,17 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         label.backgroundColor = .clear
         
         if weekend {
-            label.textColor = cellStyle.style?.textWeekendColor?.value ?? monthStyle.colorWeekendDate
-            view.backgroundColor = cellStyle.style?.backgroundColor.value ?? monthStyle.colorBackgroundWeekendDate
+            label.textColor = cellStyle.style?.textColor ?? monthStyle.colorWeekendDate
+            view.backgroundColor = cellStyle.style?.backgroundColor ?? monthStyle.colorBackgroundWeekendDate
         } else {
-            view.backgroundColor = cellStyle.style?.backgroundColor.value ?? monthStyle.colorBackgroundDate
-            label.textColor = cellStyle.style?.textColor?.value ?? monthStyle.colorDate
+            view.backgroundColor = cellStyle.style?.backgroundColor ?? monthStyle.colorBackgroundDate
+            label.textColor = cellStyle.style?.textColor ?? monthStyle.colorDate
         }
         
         guard date?.year == nowDate.year else {
             if date?.year == selectDate.year && date?.month == selectDate.month && date?.day == selectDate.day {
-                label.textColor = monthStyle.colorSelectDate
-                label.backgroundColor = monthStyle.colorBackgroundSelectDate
+                label.textColor = cellStyle.style?.textColor ?? monthStyle.colorSelectDate
+                label.backgroundColor = cellStyle.style?.dotBackgroundColor ?? monthStyle.colorBackgroundSelectDate
                 label.layer.cornerRadius = label.frame.height / 2
                 label.clipsToBounds = true
             }
@@ -232,8 +232,8 @@ final class MonthCollectionViewCell: UICollectionViewCell {
 
         guard date?.month == nowDate.month else {
             if selectDate.day == date?.day && selectDate.month == date?.month {
-                label.textColor = monthStyle.colorSelectDate
-                label.backgroundColor = monthStyle.colorBackgroundSelectDate
+                label.textColor = cellStyle.style?.textColor ?? monthStyle.colorSelectDate
+                label.backgroundColor = cellStyle.style?.dotBackgroundColor ?? monthStyle.colorBackgroundSelectDate
                 label.layer.cornerRadius = label.frame.height / 2
                 label.clipsToBounds = true
             }
@@ -242,8 +242,8 @@ final class MonthCollectionViewCell: UICollectionViewCell {
 
         guard date?.day == nowDate.day else {
             if selectDate.day == date?.day && date?.month == selectDate.month {
-                label.textColor = monthStyle.colorSelectDate
-                label.backgroundColor = monthStyle.colorBackgroundSelectDate
+                label.textColor = cellStyle.style?.textColor ?? monthStyle.colorSelectDate
+                label.backgroundColor = cellStyle.style?.dotBackgroundColor ?? monthStyle.colorBackgroundSelectDate
                 label.layer.cornerRadius = label.frame.height / 2
                 label.clipsToBounds = true
             }
@@ -252,14 +252,14 @@ final class MonthCollectionViewCell: UICollectionViewCell {
 
         guard selectDate.day == date?.day && selectDate.month == date?.month else {
             if date?.day == nowDate.day {
-                label.textColor = monthStyle.colorDate
-                label.backgroundColor = .clear
+                label.textColor = cellStyle.style?.textColor ?? monthStyle.colorDate
+                label.backgroundColor = cellStyle.style?.dotBackgroundColor ?? .clear
             }
             return
         }
 
-        label.textColor = monthStyle.colorCurrentDate
-        label.backgroundColor = monthStyle.colorBackgroundCurrentDate
+        label.textColor = cellStyle.style?.textColor ?? monthStyle.colorCurrentDate
+        label.backgroundColor = cellStyle.style?.dotBackgroundColor ?? monthStyle.colorBackgroundCurrentDate
         label.layer.cornerRadius = label.frame.height / 2
         label.clipsToBounds = true
     }
