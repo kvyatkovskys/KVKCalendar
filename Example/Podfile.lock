@@ -1,5 +1,5 @@
 PODS:
-  - KVKCalendar (0.2.8)
+  - KVKCalendar (0.3.1)
 
 DEPENDENCIES:
   - KVKCalendar (from `../`)
@@ -9,7 +9,7 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  KVKCalendar: 9d7c72e9cee36192076121867a8aba8ecbc81b7a
+  KVKCalendar: 10b18ad41e601a3df45b8bef1d08ce7ca10b646b
 
 PODFILE CHECKSUM: 6cdcbea7a0ace2862d5f6d4bf2b87c4fc4ead4e4
 
