@@ -417,7 +417,7 @@ final class TimelineView: UIView, CompareEventDateProtocol {
         return view
     }
     
-    func createTimelinePage(dates: [Date?], events: [Event], selectedDate: Date?, dayStyle: [DayStyle]) {
+    func createTimelinePage(dates: [Date?], events: [Event], selectedDate: Date?) {
         delegate?.didDisplayEvents(events, dates: dates)
         self.dates = dates
         self.selectedDate = selectedDate
@@ -467,10 +467,6 @@ final class TimelineView: UIView, CompareEventDateProtocol {
                 pointX = offset
             } else {
                 pointX = CGFloat(idx) * widthPage + offset
-            }
-            if !dayStyle.isEmpty, let color = dayStyle.first(where: { $0.date?.year == date?.year && $0.date?.month == date?.month && $0.date?.day == date?.day })?.style?.backgroundColor {
-                let view = fillBackgroundDayColor(color, pointX: pointX, width: widthPage)
-                scrollView.insertSubview(view, at: 0)
             }
             scrollView.addSubview(createVerticalLine(pointX: pointX))
             

@@ -148,11 +148,10 @@ public struct DateStyle {
     }
 }
 
-typealias DayStyle = (date: Date?, style: DateStyle?)
-typealias MonthDayStyle = (day: Day, style: DateStyle?)
+typealias DayStyle = (day: Day, style: DateStyle?)
 
 protocol DayStyleProtocol: class {
     associatedtype Model
-    
-    func styleForDay(_ date: Date?, events: [Event]) -> Model
+        
+    func styleForDay(_ day: Day) -> Model
 }

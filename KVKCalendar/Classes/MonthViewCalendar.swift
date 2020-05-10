@@ -235,7 +235,7 @@ extension MonthViewCalendar: UICollectionViewDataSource {
         let day = data.days[indexPath.row]
         cell.selectDate = data.date
         cell.style = style
-        cell.item = monthStyleForDay(day)
+        cell.item = styleForDay(day)
         cell.events = day.events
         cell.delegate = self
         return cell
@@ -315,15 +315,11 @@ extension MonthViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateF
 }
 
 extension MonthViewCalendar: DayStyleProtocol {
-    typealias Model = DateStyle?
+    typealias Model = DayStyle
     
-    func styleForDay(_ date: Date?, events: [Event]) -> DateStyle? {
-        return dataSource?.willDisplayDate(date, events: events)
-    }
-    
-    func monthStyleForDay(_ day: Day) -> MonthDayStyle {
-        guard let item = styleForDay(day.date, events: day.events) else { return MonthDayStyle(day, nil) }
+    func styleForDay(_ day: Day) -> DayStyle {
+        guard let item = dataSource?.willDisplayDate(day.date, events: day.events) else { return DayStyle(day, nil) }
         
-        return MonthDayStyle(day, item)
+        return DayStyle(day, item)
     }
 }
