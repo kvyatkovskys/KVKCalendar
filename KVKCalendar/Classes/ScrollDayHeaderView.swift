@@ -22,6 +22,7 @@ final class ScrollDayHeaderView: UIView {
     private var lastContentOffset: CGFloat = 0
     
     weak var delegate: ScrollDayHeaderDelegate?
+    weak var dataSource: DisplayDataSource?
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -242,8 +243,9 @@ extension ScrollDayHeaderView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ScrollHeaderDayCell.cellIdentifier,
                                                       for: indexPath) as? ScrollHeaderDayCell ?? ScrollHeaderDayCell()
+        let day = days[indexPath.row]
         cell.style = style
-        cell.day = days[indexPath.row]
+        cell.item = styleForDay(day)
         cell.selectDate = date
         return cell
     }
@@ -310,5 +312,15 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
         let widht = collectionView.frame.width / 7
         let height = collectionView.frame.height
         return CGSize(width: widht, height: height)
+    }
+}
+
+extension ScrollDayHeaderView: DayStyleProtocol {
+    typealias Model = DayStyle
+    
+    func styleForDay(_ day: Day) -> DayStyle {
+        guard let item = dataSource?.willDisplayDate(day.date, events: day.events) else { return DayStyle(day, nil) }
+        
+        return DayStyle(day, item)
     }
 }

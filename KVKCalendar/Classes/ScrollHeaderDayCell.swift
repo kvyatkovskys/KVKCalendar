@@ -26,6 +26,7 @@ final class ScrollHeaderDayCell: UICollectionViewCell {
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 18)
         label.textColor = headerStyle.colorDate
+        label.clipsToBounds = true
         return label
     }()
     
@@ -37,52 +38,48 @@ final class ScrollHeaderDayCell: UICollectionViewCell {
         }
     }
     
-    var day: Day = .empty() {
+    var item: DayStyle = DayStyle(.empty(), nil) {
         didSet {
-            guard let tempDay = day.date?.day else {
+            guard let tempDay = item.day.date?.day else {
                 titleLabel.text = nil
                 dateLabel.text = nil
                 return
             }
             
-            if !headerStyle.titleDays.isEmpty, let title = headerStyle.titleDays[safe: day.type.shiftDay] {
+            if !headerStyle.titleDays.isEmpty, let title = headerStyle.titleDays[safe: item.day.type.shiftDay] {
                 titleLabel.text = title
             } else {
-                titleLabel.text = day.type.rawValue
+                titleLabel.text = item.day.type.rawValue
             }
             dateLabel.text = "\(tempDay)"
-            weekendDays(day: day)
+            populateWeekendDay(item)
         }
     }
     
     var selectDate: Date = Date() {
         didSet {
             let nowDate = Date()
-            guard nowDate.month != day.date?.month else {
+            guard nowDate.month != item.day.date?.month else {
                 // remove the selection if the current date (for the day) does not match the selected one
-                if selectDate.day != nowDate.day, day.date?.day == nowDate.day, day.date?.year == nowDate.year {
-                    dateLabel.textColor = headerStyle.colorBackgroundCurrentDate
-                    dateLabel.backgroundColor = .clear
+                if selectDate.day != nowDate.day, item.day.date?.day == nowDate.day, item.day.date?.year == nowDate.year {
+                    dateLabel.textColor = item.style?.textColor ?? headerStyle.colorBackgroundCurrentDate
+                    dateLabel.backgroundColor = item.style?.backgroundColor ?? .clear
                 }
                 // mark the selected date, which is not the same as the current one
-                if day.date?.month == selectDate.month, day.date?.day == selectDate.day, selectDate.day != nowDate.day {
-                    dateLabel.textColor = headerStyle.colorSelectDate
-                    dateLabel.backgroundColor = headerStyle.colorBackgroundSelectDate
-                    dateLabel.layer.cornerRadius = dateLabel.frame.width / 2
-                    dateLabel.clipsToBounds = true
+                if item.day.date?.month == selectDate.month, item.day.date?.day == selectDate.day, selectDate.day != nowDate.day {
+                    dateLabel.textColor = item.style?.textColor ?? headerStyle.colorSelectDate
+                    dateLabel.backgroundColor = item.style?.dotBackgroundColor ?? headerStyle.colorBackgroundSelectDate
                 }
                 return
             }
             
             // select date not in the current month
-            guard day.date?.month == selectDate.month, day.date?.day == selectDate.day else {
-                weekendDays(day: day)
+            guard item.day.date?.month == selectDate.month, item.day.date?.day == selectDate.day else {
+                populateWeekendDay(item)
                 return
             }
-            dateLabel.textColor = headerStyle.colorSelectDate
-            dateLabel.backgroundColor = headerStyle.colorBackgroundSelectDate
-            dateLabel.layer.cornerRadius = dateLabel.frame.width / 2
-            dateLabel.clipsToBounds = true
+            dateLabel.textColor = item.style?.textColor ?? headerStyle.colorSelectDate
+            dateLabel.backgroundColor = item.style?.dotBackgroundColor ?? headerStyle.colorBackgroundSelectDate
         }
     }
     
@@ -104,32 +101,32 @@ final class ScrollHeaderDayCell: UICollectionViewCell {
         
         addSubview(titleLabel)
         addSubview(dateLabel)
+        
+        dateLabel.layer.cornerRadius = dateLabel.frame.width / 2
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func weekendDays(day: Day) {
-        guard day.type == .saturday || day.type == .sunday else {
-            isNowDate(date: day.date, colorText: headerStyle.colorDate)
-            titleLabel.textColor = headerStyle.colorDate
+    private func populateWeekendDay(_ item: DayStyle) {
+        guard item.day.type == .saturday || item.day.type == .sunday else {
+            populateDay(date: item.day.date, colorText: item.style?.textColor ?? headerStyle.colorDate)
+            titleLabel.textColor = item.style?.textColor ?? headerStyle.colorDate
             return
         }
-        isNowDate(date: day.date, colorText: headerStyle.colorWeekendDate)
-        titleLabel.textColor = headerStyle.colorWeekendDate
+        populateDay(date: item.day.date, colorText: item.style?.textColor ?? headerStyle.colorWeekendDate)
+        titleLabel.textColor = item.style?.textColor ?? headerStyle.colorWeekendDate
     }
     
-    private func isNowDate(date: Date?, colorText: UIColor) {
+    private func populateDay(date: Date?, colorText: UIColor) {
         let nowDate = Date()
         if date?.month == nowDate.month, date?.day == nowDate.day, date?.year == nowDate.year {
-            dateLabel.textColor = headerStyle.colorCurrentDate
-            dateLabel.backgroundColor = headerStyle.colorBackgroundCurrentDate
-            dateLabel.layer.cornerRadius = dateLabel.frame.height / 2
-            dateLabel.clipsToBounds = true
+            dateLabel.textColor = item.style?.textColor ?? headerStyle.colorCurrentDate
+            dateLabel.backgroundColor = item.style?.dotBackgroundColor ?? headerStyle.colorBackgroundCurrentDate
         } else {
             dateLabel.textColor = colorText
-            dateLabel.backgroundColor = .clear
+            dateLabel.backgroundColor = item.style?.backgroundColor ?? .clear
         }
     }
 }

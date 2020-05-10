@@ -27,14 +27,14 @@ public final class CalendarView: UIView {
     private lazy var dayCalendar: DayViewCalendar = {
         let day = DayViewCalendar(data: dayData, frame: frame, style: style)
         day.delegate = self
-        day.dataSource = self
+        day.scrollHeaderDay.dataSource = self
         return day
     }()
     
     private lazy var weekCalendar: WeekViewCalendar = {
         let week = WeekViewCalendar(data: weekData, frame: frame, style: style)
         week.delegate = self
-        week.dataSource = self
+        week.scrollHeaderDay.dataSource = self
         return week
     }()
     

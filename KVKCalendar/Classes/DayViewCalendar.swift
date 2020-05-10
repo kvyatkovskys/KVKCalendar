@@ -10,16 +10,10 @@ import UIKit
 final class DayViewCalendar: UIView {
     private var style: Style
     private var data: DayData
-    private var dayStyles: [DayStyle] {
-        guard let item = styleForDay(data.date, events: data.events) else { return [] }
-        
-        return [item]
-    }
-    
+
     weak var delegate: CalendarPrivateDelegate?
-    weak var dataSource: DisplayDataSource?
     
-    private lazy var scrollHeaderDay: ScrollDayHeaderView = {
+    lazy var scrollHeaderDay: ScrollDayHeaderView = {
         let heightView: CGFloat
         if style.headerScroll.isHiddenTitleDate {
             heightView = style.headerScroll.heightHeaderWeek
@@ -97,7 +91,7 @@ final class DayViewCalendar: UIView {
     
     func reloadData(events: [Event]) {
         data.events = events
-        timelineView.createTimelinePage(dates: [data.date], events: events, selectedDate: data.date, dayStyle: dayStyles)
+        timelineView.createTimelinePage(dates: [data.date], events: events, selectedDate: data.date)
     }
 }
 
@@ -198,7 +192,7 @@ extension DayViewCalendar: CalendarSettingProtocol {
             timelineFrame.size.width = frame.width
         }
         timelineView.reloadFrame(timelineFrame)
-        timelineView.createTimelinePage(dates: [data.date], events: data.events, selectedDate: data.date, dayStyle: dayStyles)
+        timelineView.createTimelinePage(dates: [data.date], events: data.events, selectedDate: data.date)
     }
     
     func updateStyle(_ style: Style) {
@@ -215,13 +209,5 @@ extension DayViewCalendar: CalendarSettingProtocol {
         addSubview(topBackgroundView)
         topBackgroundView.addSubview(scrollHeaderDay)
         addSubview(timelineView)
-    }
-}
-
-extension DayViewCalendar: DayStyleProtocol {
-    typealias Model = DayStyle?
-    
-    func styleForDay(_ date: Date?, events: [Event]) -> DayStyle? {
-        return DayStyle(date, dataSource?.willDisplayDate(date, events: events))
     }
 }
