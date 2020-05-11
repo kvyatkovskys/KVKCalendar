@@ -91,7 +91,7 @@ final class DayViewCalendar: UIView {
     
     func reloadData(events: [Event]) {
         data.events = events
-        timelineView.createTimelinePage(dates: [data.date], events: events, selectedDate: data.date)
+        timelineView.create(dates: [data.date], events: events, selectedDate: data.date)
     }
 }
 
@@ -192,7 +192,7 @@ extension DayViewCalendar: CalendarSettingProtocol {
             timelineFrame.size.width = frame.width
         }
         timelineView.reloadFrame(timelineFrame)
-        timelineView.createTimelinePage(dates: [data.date], events: data.events, selectedDate: data.date)
+        timelineView.create(dates: [data.date], events: data.events, selectedDate: data.date)
     }
     
     func updateStyle(_ style: Style) {

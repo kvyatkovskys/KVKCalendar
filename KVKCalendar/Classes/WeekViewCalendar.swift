@@ -74,7 +74,7 @@ final class WeekViewCalendar: UIView {
     
     func reloadData(events: [Event]) {
         data.events = events
-        timelineView.createTimelinePage(dates: visibleDates, events: events, selectedDate: data.date)
+        timelineView.create(dates: visibleDates, events: events, selectedDate: data.date)
     }
     
     private func addCornerLabel() {
@@ -143,7 +143,7 @@ extension WeekViewCalendar: CalendarSettingProtocol {
         timelineFrame.size.width = frame.width
         timelineFrame.size.height = frame.height - scrollHeaderDay.frame.height
         timelineView.reloadFrame(timelineFrame)
-        timelineView.createTimelinePage(dates: visibleDates, events: data.events, selectedDate: data.date)
+        timelineView.create(dates: visibleDates, events: data.events, selectedDate: data.date)
         
         addCornerLabel()
     }

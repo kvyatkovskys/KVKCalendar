@@ -111,22 +111,22 @@ final class ScrollHeaderDayCell: UICollectionViewCell {
     
     private func populateWeekendDay(_ item: DayStyle) {
         guard item.day.type == .saturday || item.day.type == .sunday else {
-            populateDay(date: item.day.date, colorText: item.style?.textColor ?? headerStyle.colorDate)
-            titleLabel.textColor = item.style?.textColor ?? headerStyle.colorDate
+            populateDay(date: item.day.date, colorText: item.style?.textColor ?? headerStyle.colorDate, style: item.style)
+            titleLabel.textColor = headerStyle.colorDate
             return
         }
-        populateDay(date: item.day.date, colorText: item.style?.textColor ?? headerStyle.colorWeekendDate)
-        titleLabel.textColor = item.style?.textColor ?? headerStyle.colorWeekendDate
+        populateDay(date: item.day.date, colorText: item.style?.textColor ?? headerStyle.colorWeekendDate, style: item.style)
+        titleLabel.textColor = headerStyle.colorWeekendDate
     }
     
-    private func populateDay(date: Date?, colorText: UIColor) {
+    private func populateDay(date: Date?, colorText: UIColor, style: DateStyle?) {
         let nowDate = Date()
         if date?.month == nowDate.month, date?.day == nowDate.day, date?.year == nowDate.year {
             dateLabel.textColor = item.style?.textColor ?? headerStyle.colorCurrentDate
-            dateLabel.backgroundColor = item.style?.dotBackgroundColor ?? headerStyle.colorBackgroundCurrentDate
+            dateLabel.backgroundColor = style?.dotBackgroundColor ?? headerStyle.colorBackgroundCurrentDate
         } else {
             dateLabel.textColor = colorText
-            dateLabel.backgroundColor = item.style?.backgroundColor ?? .clear
+            dateLabel.backgroundColor = style?.backgroundColor ?? .clear
         }
     }
 }
