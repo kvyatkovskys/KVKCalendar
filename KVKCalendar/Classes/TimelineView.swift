@@ -417,7 +417,7 @@ final class TimelineView: UIView, CompareEventDateProtocol {
         return view
     }
     
-    func createTimelinePage(dates: [Date?], events: [Event], selectedDate: Date?) {
+    func create(dates: [Date?], events: [Event], selectedDate: Date?) {
         delegate?.didDisplayEvents(events, dates: dates)
         self.dates = dates
         self.selectedDate = selectedDate
