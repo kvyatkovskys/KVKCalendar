@@ -105,6 +105,10 @@ public struct WeekStyle {
     public var colorBackgroundSelectDate: UIColor = .black
     public var colorSelectDate: UIColor = .white
     public var colorWeekendDate: UIColor = .gray
+    
+    @available(*, deprecated, renamed: "colorWeekendBackground")
+    public var colorBackgroundWeekendDate: UIColor = gainsboro.withAlphaComponent(0.4)
+    
     public var colorWeekendBackground: UIColor = .clear
     public var colorWeekdayBackground: UIColor = .clear
     public var selectCalendarType: CalendarType = .day
