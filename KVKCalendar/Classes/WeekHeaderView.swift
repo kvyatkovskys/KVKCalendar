@@ -14,26 +14,30 @@ final class WeekHeaderView: UIView {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
+        label.tag = -999
         return label
     }()
     
     var font: UIFont = .systemFont(ofSize: 17) {
-        willSet {
+        didSet {
             subviews.filter({ $0 is UILabel }).forEach { (label) in
                 if let label = label as? UILabel {
-                    label.font = newValue
+                    label.font = font
                 }
             }
         }
     }
     
-    var backgroundColorWeekends: UIColor = .clear {
-        willSet {
+    var backgroundColorDate: (weekend: UIColor, weekday: UIColor) = (.clear, .clear) {
+        didSet {
             subviews.filter({ $0 is UILabel }).forEach { (label) in
                 if let label = label as? UILabel {
-                    if label.tag == DayType.sunday.shiftDay || label.tag == DayType.saturday.shiftDay {
-                        label.backgroundColor = newValue
-                    } else {
+                    switch label.tag {
+                    case 0...4:
+                        label.backgroundColor = backgroundColorDate.weekday
+                    case 5...6:
+                        label.backgroundColor = backgroundColorDate.weekend
+                    default:
                         label.backgroundColor = .clear
                     }
                 }
@@ -42,8 +46,8 @@ final class WeekHeaderView: UIView {
     }
     
     var date: Date? {
-        willSet {
-            setDateToTitle(date: newValue, style: style)
+        didSet {
+            setDateToTitle(date: date, style: style)
         }
     }
     
@@ -71,7 +75,19 @@ final class WeekHeaderView: UIView {
                                               height: fromYear ? frame.height : style.month.heightHeaderWeek))
             label.adjustsFontSizeToFitWidth = true
             label.textAlignment = .center
-            label.textColor = (value == .sunday || value == .saturday) ? style.week.colorWeekendDate : style.week.colorDate
+            
+            switch value {
+            case .sunday, .saturday:
+                label.textColor = style.week.colorWeekendDate
+                label.backgroundColor = style.week.colorWeekendBackground
+            case .monday, .tuesday, .wednesday, .thursday, .friday:
+                label.textColor = style.week.colorDate
+                label.backgroundColor = style.week.colorWeekdayBackground
+            default:
+                label.textColor = .clear
+                label.backgroundColor = .clear
+            }
+
             if !style.headerScroll.titleDays.isEmpty, let title = style.headerScroll.titleDays[safe: value.shiftDay] {
                 label.text = title
             } else {

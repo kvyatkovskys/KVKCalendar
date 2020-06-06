@@ -31,7 +31,6 @@ final class YearCollectionViewCell: UICollectionViewCell {
             subviews.filter({ $0 is WeekHeaderView }).forEach({ $0.removeFromSuperview() })
             let view = WeekHeaderView(frame: CGRect(x: 0, y: 40, width: frame.width, height: 30), style: style, fromYear: true)
             view.font = style.year.weekFont
-            view.backgroundColorWeekends = style.week.colorBackgroundWeekendDate
             addSubview(view)
         }
     }
