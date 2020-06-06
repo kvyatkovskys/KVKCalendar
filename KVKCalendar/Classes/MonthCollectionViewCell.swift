@@ -251,9 +251,9 @@ final class MonthCollectionViewCell: UICollectionViewCell {
         }
 
         guard selectDate.day == date?.day && selectDate.month == date?.month else {
-            if date?.day == nowDate.day {
-                label.textColor = cellStyle.style?.textColor ?? monthStyle.colorDate
-                label.backgroundColor = cellStyle.style?.dotBackgroundColor ?? .clear
+            if date?.day == nowDate.day, cellStyle.style == nil {
+                label.textColor = monthStyle.colorDate
+                label.backgroundColor = .clear
             }
             return
         }

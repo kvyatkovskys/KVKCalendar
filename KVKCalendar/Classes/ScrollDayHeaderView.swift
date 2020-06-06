@@ -112,7 +112,7 @@ final class ScrollDayHeaderView: UIView {
         let collection = UICollectionView(frame: frame, collectionViewLayout: layout)
         collection.isPagingEnabled = true
         collection.showsHorizontalScrollIndicator = false
-        collection.backgroundColor = style.headerScroll.backgroundColor
+        collection.backgroundColor = style.headerScroll.colorBackground
         collection.delegate = self
         collection.dataSource = self
         collection.isScrollEnabled = isScrollEnabled

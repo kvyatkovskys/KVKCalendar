@@ -52,7 +52,7 @@ final class ScrollHeaderDayCell: UICollectionViewCell {
                 titleLabel.text = item.day.type.rawValue
             }
             dateLabel.text = "\(tempDay)"
-            populateWeekendDay(item)
+            populateCell(item)
         }
     }
     
@@ -75,7 +75,7 @@ final class ScrollHeaderDayCell: UICollectionViewCell {
             
             // select date not in the current month
             guard item.day.date?.month == selectDate.month, item.day.date?.day == selectDate.day else {
-                populateWeekendDay(item)
+                populateCell(item)
                 return
             }
             dateLabel.textColor = item.style?.textColor ?? headerStyle.colorSelectDate
@@ -109,14 +109,17 @@ final class ScrollHeaderDayCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func populateWeekendDay(_ item: DayStyle) {
+    private func populateCell(_ item: DayStyle) {
         guard item.day.type == .saturday || item.day.type == .sunday else {
             populateDay(date: item.day.date, colorText: item.style?.textColor ?? headerStyle.colorDate, style: item.style)
             titleLabel.textColor = headerStyle.colorDate
+            backgroundColor = item.style?.backgroundColor ?? headerStyle.colorWeekdayBackground
             return
         }
+        
         populateDay(date: item.day.date, colorText: item.style?.textColor ?? headerStyle.colorWeekendDate, style: item.style)
         titleLabel.textColor = headerStyle.colorWeekendDate
+        backgroundColor = item.style?.backgroundColor ?? headerStyle.colorWeekendBackground
     }
     
     private func populateDay(date: Date?, colorText: UIColor, style: DateStyle?) {
