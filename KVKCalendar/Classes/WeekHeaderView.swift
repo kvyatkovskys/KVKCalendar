@@ -76,14 +76,13 @@ final class WeekHeaderView: UIView {
             label.adjustsFontSizeToFitWidth = true
             label.textAlignment = .center
             
-            switch value {
-            case .sunday, .saturday:
+            if value.isWeekend {
                 label.textColor = style.week.colorWeekendDate
                 label.backgroundColor = style.week.colorWeekendBackground
-            case .monday, .tuesday, .wednesday, .thursday, .friday:
+            } else if value.isWeekday {
                 label.textColor = style.week.colorDate
                 label.backgroundColor = style.week.colorWeekdayBackground
-            default:
+            } else {
                 label.textColor = .clear
                 label.backgroundColor = .clear
             }

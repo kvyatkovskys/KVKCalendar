@@ -190,6 +190,24 @@ enum DayType: String, CaseIterable {
         case .empty: return -1
         }
     }
+    
+    var isWeekend: Bool {
+        switch self {
+        case .saturday, .sunday:
+            return true
+        default:
+            return false
+        }
+    }
+    
+    var isWeekday: Bool {
+        switch self {
+        case .monday, .tuesday, .wednesday, .thursday, .friday:
+            return true
+        default:
+            return false
+        }
+    }
 }
 
 public enum StartDayType: Int {
