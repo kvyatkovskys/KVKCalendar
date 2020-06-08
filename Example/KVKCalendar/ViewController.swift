@@ -168,13 +168,13 @@ extension ViewController: CalendarDataSource {
     }
     
     private var dates: [Date] {
-        return [1, 3, 5].compactMap({ Calendar.current.date(byAdding: .day, value: $0, to: Date()) })
+        return Array(0...10).compactMap({ Calendar.current.date(byAdding: .day, value: $0, to: Date()) })
     }
     
     func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? {
         guard dates.first(where: { $0.year == date?.year && $0.month == date?.month && $0.day == date?.day }) != nil else { return nil }
         
-        return DateStyle(backgroundColor: .systemOrange, textColor: .green, dotBackgroundColor: .blue)
+        return DateStyle(backgroundColor: .orange, textColor: .black, dotBackgroundColor: .red)
     }
 }
 
