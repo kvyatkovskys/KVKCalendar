@@ -7,38 +7,28 @@
 
 import Foundation
 
-struct CrossPageTree: Hashable {
-    let parent: Parent
-    var children: [Child]
+struct CrossEvent: Hashable {
+    let eventTime: EventTime
     var count: Int
     
-    init(parent: Parent, children: [Child]) {
-        self.parent = parent
-        self.children = children
-        self.count = children.count + 1
+    init(eventTime: EventTime, count: Int = 1) {
+        self.eventTime = eventTime
+        self.count = count
     }
     
-    func equalToChildren(_ event: Event) -> Bool {
-        return children.contains(where: { $0.start == event.start.timeIntervalSince1970 })
-    }
-    
-    func excludeToChildren(_ event: Event) -> Bool {
-        return children.contains(where: { $0.start..<$0.end ~= event.start.timeIntervalSince1970 })
-    }
-    
-    static func == (lhs: CrossPageTree, rhs: CrossPageTree) -> Bool {
-        return lhs.parent == rhs.parent
-            && lhs.children == rhs.children
+    static func == (lhs: CrossEvent, rhs: CrossEvent) -> Bool {
+        return lhs.eventTime == rhs.eventTime
             && lhs.count == rhs.count
     }
 }
 
-struct Parent: Equatable, Hashable {
-    let start: TimeInterval
-    let end: TimeInterval
+extension CrossEvent {
+    var displayValue: String {
+        return "\(Date(timeIntervalSince1970: eventTime.start).toLocalTime()) - \(Date(timeIntervalSince1970: eventTime.end).toLocalTime()) = \(count)"
+    }
 }
 
-struct Child: Equatable, Hashable {
+struct EventTime: Equatable, Hashable {
     let start: TimeInterval
     let end: TimeInterval
 }
