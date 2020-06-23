@@ -39,3 +39,12 @@ extension UIScreen {
         }
     }
 }
+
+extension UIView {
+   func setRoundCorners(corners: UIRectCorner, radius: CGSize) {
+        let path = UIBezierPath(roundedRect: bounds, byRoundingCorners: corners, cornerRadii: radius)
+        let mask = CAShapeLayer()
+        mask.path = path.cgPath
+        layer.mask = mask
+    }
+}

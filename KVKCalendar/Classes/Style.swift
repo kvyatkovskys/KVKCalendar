@@ -94,6 +94,8 @@ public struct TimelineStyle {
     public var movingMinutesColor: UIColor = .systemBlue
     public var shadowColumnColor: UIColor = .systemTeal
     public var shadowColumnAlpha: CGFloat = 0.1
+    public var eventCorners: UIRectCorner = .allCorners
+    public var eventCornersRadius: CGSize = CGSize(width: 5, height: 5)
 }
 
 public struct WeekStyle {
