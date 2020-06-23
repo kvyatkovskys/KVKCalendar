@@ -472,13 +472,13 @@ final class TimelineView: UIView, CompareEventDateProtocol {
             let eventsByDate = filteredEvents
                 .filter({ compareStartDate(event: $0, date: date) })
                 .sorted(by: { $0.start < $1.start })
+                //.sorted(by: { ($0.end.timeIntervalSince1970 - $0.start.timeIntervalSince1970) < ($1.end.timeIntervalSince1970 - $1.start.timeIntervalSince1970) })
             
             let allDayEvents = filteredAllDayEvents.filter({ compareStartDate(event: $0, date: date) || compareEndDate(event: $0, date: date) })
             createAlldayEvents(events: allDayEvents, date: date, width: widthPage, originX: pointX)
             
             // count event cross in one hour
             let crossEvents = calculateCrossEvents(eventsByDate)
-            print(crossEvents.compactMap({ $0.value.displayValue }))
             var pagesCached = [EventPageView]()
             
             if !eventsByDate.isEmpty {
@@ -508,19 +508,20 @@ final class TimelineView: UIView, CompareEventDateProtocol {
                     var newPointX = pointX
                     if let crossEvent = crossEvents[event.start.timeIntervalSince1970] {
                         newWidth /= CGFloat(crossEvent.count)
+                        newWidth -= style.timeline.offsetEvent
+                        newFrame.size.width = newWidth
                         
                         if crossEvent.count > 1, !pagesCached.isEmpty {
-                            for page in pagesCached {
-                                if page.frame.origin.x.rounded() <= newPointX.rounded() && newPointX.rounded() <= (page.frame.origin.x + page.frame.width).rounded()
-                                    && page.frame.origin.y.rounded() <= newFrame.origin.y.rounded() && newFrame.origin.y <= (page.frame.origin.y + page.frame.height).rounded() {
-                                    newPointX = (page.frame.origin.x + page.frame.width + style.timeline.offsetEvent).rounded()
+                            for page in pagesCached {//where page.frame.intersects(CGRect(x: newPointX, y: newFrame.origin.y, width: newFrame.width, height: newFrame.height)) {
+                               // newPointX += (page.frame.width + style.timeline.offsetEvent).rounded()
+                                while page.frame.intersects(CGRect(x: newPointX, y: newFrame.origin.y, width: newFrame.width, height: newFrame.height)) {
+                                    newPointX += (page.frame.width + style.timeline.offsetEvent).rounded()
                                 }
                             }
                         }
                     }
                     
                     newFrame.origin.x = newPointX
-                    newFrame.size.width = newWidth - style.timeline.offsetEvent
                     
                     let page = EventPageView(event: event, style: style, frame: newFrame)
                     page.delegate = self

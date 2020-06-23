@@ -22,7 +22,6 @@ final class EventPageView: UIView {
         text.isUserInteractionEnabled = false
         text.textContainer.lineBreakMode = .byTruncatingTail
         text.textContainer.lineFragmentPadding = 0
-        text.layoutManager.allowsNonContiguousLayout = true
         return text
     }()
     
@@ -39,6 +38,7 @@ final class EventPageView: UIView {
         self.color = EventColor(event.color?.value ?? event.backgroundColor).value
         super.init(frame: frame)
         backgroundColor = event.backgroundColor
+        setRoundCorners(corners: style.timeline.eventCorners, radius: style.timeline.eventCornersRadius)
         
         var textFrame = frame
         textFrame.origin.x = pointX
