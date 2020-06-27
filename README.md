@@ -1,4 +1,4 @@
-<img src="Screenshots/iphone.png" width="280"> <img src="Screenshots/ipad.png" width="530">
+<img src="Screenshots/iphone.png" width="280"> <img src="Screenshots/ipad.png" width="530"> <img src="Screenshots/mac.png" width="500">
 
 [![CI Status](https://img.shields.io/travis/kvyatkovskys/KVKCalendar.svg?style=flat)](https://travis-ci.org/kvyatkovskys/KVKCalendar)
 [![Version](https://img.shields.io/cocoapods/v/KVKCalendar.svg?style=flat)](https://cocoapods.org/pods/KVKCalendar)
@@ -13,6 +13,7 @@
 ## Requirements
 
 - iOS 10.0+
+- MacOS 10.15+ (Supports Mac Catalyst)
 - Swift 5.0+
 
 ## Installation
@@ -83,22 +84,37 @@ extension ViewController: CalendarDataSource {
     func eventsForCalendar() -> [Event] {
         return events
     }
+    
+    // optional function
+    // control style for specific date
+    func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? {
+        // dates -> specific dates
+        guard dates.first(where: { $0.year == date?.year && $0.month == date?.month && $0.day == date?.day }) != nil else { return nil }
+        
+        return DateStyle(backgroundColor: .orange, textColor: .black, dotBackgroundColor: .red)
+    }
 }
 ```
 
-Implement `CalendarDelegate` to handle user action.
+Implement `CalendarDelegate` to handle user action and control calenadr behavior.
 
 ```swift
 calendar.delegate = self
 
-extension ViewController: CalendarDelegate {
-    func didSelectDate(date: Date?, type: CalendarType) {
-        print(date, type)
-    }
-
-    func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?) {
-        print(event)
-    }
+extension ViewController: CalendarDelegate {    
+    func didSelectDate(_ date: Date?, type: CalendarType, frame: CGRect?) {}
+    
+    func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?) {}
+    
+    func didSelectMore(_ date: Date, frame: CGRect?) {}
+    
+    func eventViewerFrame(_ frame: CGRect) {}
+    
+    func didChangeEvent(_ event: Event, start: Date?, end: Date?) {}
+    
+    func didAddEvent(_ date: Date?) {}
+    
+    func didDisplayEvents(_ events: [Event], dates: [Date?]) {}
 }
 ```
 
@@ -177,22 +193,19 @@ struct CalendarContentView_Previews: PreviewProvider {
 To customize calendar create an object `Style` and add to `init` class `CalendarView`.
 
 ```swift
-var style = Style()
-style.monthStyle.isHiddenSeporator = false
-style.timelineStyle.offsetTimeY = 80
-style.timelineStyle.offsetEvent = 3
-style.allDayStyle.isPinned = true
-style.timelineStyle.widthEventViewer = 500
-style.event.isEnableMoveEvent = true
-style.followInSystemTheme = true
-let calendar = CalendarView(frame: frame, style: style)
-```
-
-If needed to customize `Locale`, `TimeZone`.
-
-```swift
-style.locale = Locale // create any
-style.timezone = TimeZone //create any
+public struct Style {
+    public var event = EventStyle()
+    public var timeline = TimelineStyle()
+    public var week = WeekStyle()
+    public var allDay = AllDayStyle()
+    public var headerScroll = HeaderScrollStyle()
+    public var month = MonthStyle()
+    public var year = YearStyle()
+    public var defaultType: CalendarType?
+    public var timeHourSystem: TimeHourSystem = .twentyFourHour
+    public var startWeekDay: StartDayType = .monday
+    public var followInSystemTheme: Bool = false    
+}
 ```
 
 ## Author
