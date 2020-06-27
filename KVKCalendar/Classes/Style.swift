@@ -74,6 +74,7 @@ public struct TimelineStyle {
     public var offsetEvent: CGFloat = 1
     public var startHour: Int = 0
     public var heightLine: CGFloat = 0.5
+    public var widthLine: CGFloat = 0.5
     public var offsetLineLeft: CGFloat = 10
     public var offsetLineRight: CGFloat = 10
     public var backgroundColor: UIColor = .white
