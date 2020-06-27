@@ -214,7 +214,7 @@ final class TimelineView: UIView, CompareEventDateProtocol {
     }
     
     private func createVerticalLine(pointX: CGFloat) -> UIView {
-        let frame = CGRect(x: pointX, y: 0, width: 0.5, height: (CGFloat(25) * (style.timeline.heightTime + style.timeline.offsetTimeY)) - 75)
+        let frame = CGRect(x: pointX, y: 0, width: style.timeline.widthLine, height: (CGFloat(25) * (style.timeline.heightTime + style.timeline.offsetTimeY)) - 75)
         let line = UIView(frame: frame)
         line.tag = tagVerticalLine
         line.backgroundColor = .systemGray
@@ -248,7 +248,7 @@ final class TimelineView: UIView, CompareEventDateProtocol {
         return crossEvents
     }
     
-    private func createAlldayEvents(events: [Event], date: Date?, width: CGFloat, originX: CGFloat) {
+    private func createAllDayEvents(events: [Event], date: Date?, width: CGFloat, originX: CGFloat) {
         guard !events.isEmpty else { return }
         let pointY = style.allDay.isPinned ? 0 : -style.allDay.height
         let allDay = AllDayEventView(events: events,
@@ -475,7 +475,7 @@ final class TimelineView: UIView, CompareEventDateProtocol {
                 //.sorted(by: { ($0.end.timeIntervalSince1970 - $0.start.timeIntervalSince1970) < ($1.end.timeIntervalSince1970 - $1.start.timeIntervalSince1970) })
             
             let allDayEvents = filteredAllDayEvents.filter({ compareStartDate(event: $0, date: date) || compareEndDate(event: $0, date: date) })
-            createAlldayEvents(events: allDayEvents, date: date, width: widthPage, originX: pointX)
+            createAllDayEvents(events: allDayEvents, date: date, width: widthPage, originX: pointX)
             
             // count event cross in one hour
             let crossEvents = calculateCrossEvents(eventsByDate)
