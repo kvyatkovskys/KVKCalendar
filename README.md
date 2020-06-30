@@ -91,6 +91,10 @@ extension ViewController: CalendarDataSource {
         // dates -> specific dates
         guard dates.first(where: { $0.year == date?.year && $0.month == date?.month && $0.day == date?.day }) != nil else { return nil }
         
+        // DateStyle
+        // - backgroundColor = cell background color
+        // - textColor = cell text color
+        // - dotBackgroundColor = selected date dot color
         return DateStyle(backgroundColor: .orange, textColor: .black, dotBackgroundColor: .red)
     }
 }
