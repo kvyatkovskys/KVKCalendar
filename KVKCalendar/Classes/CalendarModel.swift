@@ -110,10 +110,17 @@ extension CalendarPrivateDelegate {
 public protocol CalendarDataSource: class {
     func eventsForCalendar() -> [Event]
     func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle?
+    func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventPageViewGeneral?
 }
 
-extension CalendarDataSource {
+public extension CalendarDataSource {
     func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? { return nil }
+    func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventPageViewGeneral? { return nil }
+}
+
+protocol DisplayDataSource: class {
+    func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle?
+    func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventPageViewGeneral?
 }
 
 public protocol CalendarDelegate: AnyObject {

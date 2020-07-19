@@ -9,10 +9,10 @@ import UIKit
 
 private let pointX: CGFloat = 5
 
-final class EventPageView: UIView {
-    weak var delegate: EventPageDelegate?
+final class EventPageView: EventPageViewGeneral {
     let event: Event
-    private let timelineStyle: TimelineStyle
+    let style: Style
+    
     private let color: UIColor
     
     private let textView: UITextView = {
@@ -27,16 +27,17 @@ final class EventPageView: UIView {
     
     private lazy var iconFileImageView: UIImageView = {
         let image = UIImageView(frame: CGRect(x: 0, y: 2, width: 10, height: 10))
-        image.image = timelineStyle.iconFile?.withRenderingMode(.alwaysTemplate)
-        image.tintColor = timelineStyle.colorIconFile
+        image.image = style.timeline.iconFile?.withRenderingMode(.alwaysTemplate)
+        image.tintColor = style.timeline.colorIconFile
         return image
     }()
     
     init(event: Event, style: Style, frame: CGRect) {
         self.event = event
-        self.timelineStyle = style.timeline
+        self.style = style
         self.color = EventColor(event.color?.value ?? event.backgroundColor).value
-        super.init(frame: frame)
+        super.init(style: style, event: event, frame: frame)
+        
         backgroundColor = event.backgroundColor
         setRoundCorners(corners: style.timeline.eventCorners, radius: style.timeline.eventCornersRadius)
         
@@ -60,37 +61,10 @@ final class EventPageView: UIView {
         if textView.frame.width > 20 {
             addSubview(textView)
         }
-        tag = "\(event.id)".hashValue
-        
-        let tap = UITapGestureRecognizer(target: self, action: #selector(tapOnEvent))
-        addGestureRecognizer(tap)
-        
-        if style.event.isEnableMoveEvent {
-            let longGesture = UILongPressGestureRecognizer(target: self, action: #selector(activateMoveEvent))
-            longGesture.minimumPressDuration = style.event.minimumPressDuration
-            addGestureRecognizer(longGesture)
-        }
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    @objc private func tapOnEvent(gesture: UITapGestureRecognizer) {
-        delegate?.didSelectEvent(event, gesture: gesture)
-    }
-    
-    @objc private func activateMoveEvent(gesture: UILongPressGestureRecognizer) {        
-        switch gesture.state {
-        case .began:
-            delegate?.didStartMoveEventPage(self, gesture: gesture)
-        case .changed:
-            delegate?.didChangeMoveEventPage(self, gesture: gesture)
-        case .cancelled, .ended, .failed:
-            delegate?.didEndMoveEventPage(self, gesture: gesture)
-        default:
-            break
-        }
     }
     
     override func draw(_ rect: CGRect) {
@@ -110,8 +84,51 @@ final class EventPageView: UIView {
 }
 
 protocol EventPageDelegate: class {
-    func didStartMoveEventPage(_ eventPage: EventPageView, gesture: UILongPressGestureRecognizer)
-    func didEndMoveEventPage(_ eventPage: EventPageView, gesture: UILongPressGestureRecognizer)
-    func didChangeMoveEventPage(_ eventPage: EventPageView, gesture: UILongPressGestureRecognizer)
+    func didStartMoveEvent(_ event: Event, gesture: UILongPressGestureRecognizer)
+    func didEndMoveEvent(_ event: Event, gesture: UILongPressGestureRecognizer)
+    func didChangeMoveEvent(_ event: Event, gesture: UILongPressGestureRecognizer)
     func didSelectEvent(_ event: Event, gesture: UITapGestureRecognizer)
+}
+
+public class EventPageViewGeneral: UIView {
+    weak var delegate: EventPageDelegate?
+    
+    private let event: Event
+    
+    init(style: Style, event: Event, frame: CGRect) {
+        self.event = event
+        super.init(frame: frame)
+        
+        tag = "\(event.id)".hashValue
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(tapOnEvent))
+        addGestureRecognizer(tap)
+        
+        if style.event.isEnableMoveEvent {
+            let longGesture = UILongPressGestureRecognizer(target: self, action: #selector(activateMoveEvent))
+            longGesture.minimumPressDuration = style.event.minimumPressDuration
+            addGestureRecognizer(longGesture)
+        }
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    @objc private func tapOnEvent(gesture: UITapGestureRecognizer) {
+        delegate?.didSelectEvent(event, gesture: gesture)
+    }
+    
+    @objc func activateMoveEvent(gesture: UILongPressGestureRecognizer) {
+        switch gesture.state {
+        case .began:
+            delegate?.didStartMoveEvent(event, gesture: gesture)
+        case .changed:
+            delegate?.didChangeMoveEvent(event, gesture: gesture)
+        case .cancelled, .ended, .failed:
+            delegate?.didEndMoveEvent(event, gesture: gesture)
+        default:
+            break
+        }
+    }
 }

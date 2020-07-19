@@ -9,10 +9,11 @@ import UIKit
 
 final class WeekViewCalendar: UIView {
     private var visibleDates: [Date?] = []
-    weak var delegate: CalendarPrivateDelegate?
-    
     private var data: WeekData
     private var style: Style
+    
+    weak var delegate: CalendarPrivateDelegate?
+    weak var dataSource: DisplayDataSource?
     
     lazy var scrollHeaderDay: ScrollDayHeaderView = {
         let heightView: CGFloat
@@ -37,6 +38,7 @@ final class WeekViewCalendar: UIView {
         timelineFrame.size.height -= scrollHeaderDay.frame.height
         let view = TimelineView(type: .week, timeHourSystem: data.timeSystem, style: style, frame: timelineFrame)
         view.delegate = self
+        view.dataSource = dataSource
         return view
     }()
     
