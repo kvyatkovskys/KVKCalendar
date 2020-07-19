@@ -116,7 +116,7 @@ final class ScrollDayHeaderView: UIView {
         collection.delegate = self
         collection.dataSource = self
         collection.isScrollEnabled = isScrollEnabled
-        collection.register(ScrollHeaderDayCell.self, forCellWithReuseIdentifier: ScrollHeaderDayCell.cellIdentifier)
+        collection.register(ScrollHeaderDayCell.self)
         return collection
     }
     
@@ -241,7 +241,7 @@ extension ScrollDayHeaderView: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ScrollHeaderDayCell.cellIdentifier,
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ScrollHeaderDayCell.identifier,
                                                       for: indexPath) as? ScrollHeaderDayCell ?? ScrollHeaderDayCell()
         let day = days[indexPath.row]
         cell.style = style

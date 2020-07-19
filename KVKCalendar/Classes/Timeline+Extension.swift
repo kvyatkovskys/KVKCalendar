@@ -7,10 +7,6 @@
 
 import Foundation
 
-extension TimelineView {
-    
-}
-
 extension TimelineView: EventDelegate {
     func didSelectEvent(_ event: Event, gesture: UITapGestureRecognizer) {
         delegate?.didSelectEvent(event, frame: gesture.view?.frame)
