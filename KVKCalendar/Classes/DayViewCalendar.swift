@@ -12,6 +12,7 @@ final class DayViewCalendar: UIView {
     private var data: DayData
 
     weak var delegate: CalendarPrivateDelegate?
+    weak var dataSource: DisplayDataSource?
     
     lazy var scrollHeaderDay: ScrollDayHeaderView = {
         let heightView: CGFloat
@@ -42,6 +43,7 @@ final class DayViewCalendar: UIView {
         }
         let view = TimelineView(type: .day, timeHourSystem: data.timeSystem, style: style, frame: timelineFrame)
         view.delegate = self
+        view.dataSource = dataSource
         return view
     }()
     

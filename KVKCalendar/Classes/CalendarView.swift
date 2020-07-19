@@ -27,6 +27,7 @@ public final class CalendarView: UIView {
     private lazy var dayCalendar: DayViewCalendar = {
         let day = DayViewCalendar(data: dayData, frame: frame, style: style)
         day.delegate = self
+        day.dataSource = self
         day.scrollHeaderDay.dataSource = self
         return day
     }()
@@ -34,6 +35,7 @@ public final class CalendarView: UIView {
     private lazy var weekCalendar: WeekViewCalendar = {
         let week = WeekViewCalendar(data: weekData, frame: frame, style: style)
         week.delegate = self
+        week.dataSource = self
         week.scrollHeaderDay.dataSource = self
         return week
     }()
@@ -73,7 +75,7 @@ public final class CalendarView: UIView {
     
     private func switchTypeCalendar(type: CalendarType) {
         self.type = type
-        if UIDevice.current.userInterfaceIdiom == .phone && type == .year {
+        if UIDevice.current.userInterfaceIdiom == .phone, type == .year {
             self.type = .month
         }
         subviews.filter({ $0 is DayViewCalendar
@@ -145,6 +147,10 @@ public final class CalendarView: UIView {
 }
 
 extension CalendarView: DisplayDataSource {
+    func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventPageViewGeneral? {
+        return dataSource?.willDisplayEventView(event, frame: frame, date: date)
+    }
+    
     func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? {
         return dataSource?.willDisplayDate(date, events: events)
     }
