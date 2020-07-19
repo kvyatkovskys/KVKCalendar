@@ -12,7 +12,7 @@ final class TimelineView: UIView, CompareEventDateProtocol {
     weak var delegate: TimelineDelegate?
     weak var dataSource: DisplayDataSource?
     var style: Style
-    var eventPreview: EventPageView?
+    var eventPreview: EventView?
     var isEnabledAutoScroll = true
     
     private(set) var tagCurrentHourLine = -10
@@ -49,7 +49,7 @@ final class TimelineView: UIView, CompareEventDateProtocol {
         label.adjustsFontSizeToFitWidth = true
         
         let formatter = DateFormatter()
-        formatter.dateFormat = timeHourSystem == .twentyFourHour ? "HH:mm" : "h:mm a"
+        formatter.dateFormat = timeHourSystem.format
         label.text = formatter.string(from: Date())
         label.valueHash = Date().minute.hashValue
         return label
@@ -116,7 +116,7 @@ final class TimelineView: UIView, CompareEventDateProtocol {
         let translation = gesture.translation(in: self)
         let velocity = gesture.velocity(in: self)
         let endGesure = abs(translation.x) > (frame.width / 3.5)
-        let events = scrollView.subviews.filter({ $0 is EventPageView })
+        let events = scrollView.subviews.filter({ $0 is EventView })
         var eventsAllDay: [UIView]
         
         if style.allDay.isPinned {
@@ -321,7 +321,7 @@ final class TimelineView: UIView, CompareEventDateProtocol {
             self.currentTimeLabel.valueHash = nextDate.minute.hashValue
             
             let formatter = DateFormatter()
-            formatter.dateFormat = self.timeHourSystem == .twentyFourHour ? "HH:mm" : "h:mm a"
+            formatter.dateFormat = self.timeHourSystem.format
             self.currentTimeLabel.text = formatter.string(from: nextDate)
             
             if let timeNext = self.getTimelineLabel(hour: nextDate.hour + 1) {
@@ -480,7 +480,7 @@ final class TimelineView: UIView, CompareEventDateProtocol {
             
             // count event cross in one hour
             let crossEvents = calculateCrossEvents(eventsByDate)
-            var pagesCached = [EventPageViewGeneral]()
+            var pagesCached = [EventViewGeneral]()
             
             if !eventsByDate.isEmpty {
                 // create event
@@ -523,11 +523,11 @@ final class TimelineView: UIView, CompareEventDateProtocol {
                     
                     newFrame.origin.x = newPointX
                     
-                    let page: EventPageViewGeneral
+                    let page: EventViewGeneral
                     if let pageView = dataSource?.willDisplayEventView(event, frame: newFrame, date: date) {
                         page = pageView
                     } else {
-                        page = EventPageView(event: event, style: style, frame: newFrame)
+                        page = EventView(event: event, style: style, frame: newFrame)
                     }
                     page.delegate = self
                     scrollView.addSubview(page)

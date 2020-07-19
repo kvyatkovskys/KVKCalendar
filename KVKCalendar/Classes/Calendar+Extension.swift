@@ -21,6 +21,18 @@ extension Collection {
     }
 }
 
+extension UICollectionView {
+    func register(_ cell: UICollectionViewCell.Type) {
+        register(cell, forCellWithReuseIdentifier: cell.identifier)
+    }
+}
+
+extension UICollectionViewCell {
+    static var identifier: String {
+        return String(describing: self)
+    }
+}
+
 extension UIColor {
     @available(iOS 13, *)
     static func useForStyle(dark: UIColor, white: UIColor) -> UIColor {

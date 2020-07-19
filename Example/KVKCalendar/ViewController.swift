@@ -34,6 +34,7 @@ final class ViewController: UIViewController {
         } else {
             style.timeline.widthEventViewer = 500
         }
+        style.month.isPagingEnabled = false
         style.timeline.startFromFirstEvent = false
         style.followInSystemTheme = true
         style.timeline.offsetTimeY = 80
@@ -54,12 +55,7 @@ final class ViewController: UIViewController {
     }()
     
     private lazy var segmentedControl: UISegmentedControl = {
-        let array: [CalendarType]
-        if UIDevice.current.userInterfaceIdiom == .pad {
-            array = CalendarType.allCases
-        } else {
-            array = CalendarType.allCases.filter({ $0 != .year })
-        }
+        let array = CalendarType.allCases
         let control = UISegmentedControl(items: array.map({ $0.rawValue.capitalized }))
         control.tintColor = .red
         control.selectedSegmentIndex = 0
@@ -86,9 +82,9 @@ final class ViewController: UIViewController {
         
         calendarView.addEventViewToDay(view: eventViewer)
         
-        loadEvents { [unowned self] (events) in
-            self.events = events
-            self.calendarView.reloadData()
+        loadEvents { [weak self] (events) in
+            self?.events = events
+            self?.calendarView.reloadData()
         }
     }
     
@@ -109,9 +105,9 @@ final class ViewController: UIViewController {
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        loadEvents { [unowned self] (events) in
-            self.events = events
-            self.calendarView.reloadData()
+        loadEvents { [weak self] (events) in
+            self?.events = events
+            self?.calendarView.reloadData()
         }
     }
 }
@@ -214,7 +210,7 @@ extension ViewController {
     
     func timeFormatter(date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = style.timeHourSystem == .twelveHour ? "h:mm a" : "HH:mm"
+        formatter.dateFormat = style.timeHourSystem.format
         return formatter.string(from: date)
     }
     
@@ -239,6 +235,7 @@ struct ItemData: Decodable {
         data = try container.decode([Item].self, forKey: CodingKeys.data)
     }
 }
+
 struct Item: Decodable {
     let id: String
     let title: String
@@ -250,13 +247,8 @@ struct Item: Decodable {
     let allDay: Bool
     
     enum CodingKeys: String, CodingKey {
-        case id
-        case title
-        case start
-        case end
-        case color
+        case id, title, start, end, color, files
         case colorText = "text_color"
-        case files
         case allDay = "all_day"
     }
     
@@ -284,7 +276,7 @@ extension UIColor {
         }
         
         if cString.count != 6 {
-            return UIColor.gray
+            return .gray
         }
         var rgbValue: UInt32 = 0
         Scanner(string: cString).scanHexInt32(&rgbValue)
@@ -292,7 +284,6 @@ extension UIColor {
         return UIColor(red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
                        green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
                        blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
-                       alpha: CGFloat(1.0)
-        )
+                       alpha: CGFloat(1.0))
     }
 }

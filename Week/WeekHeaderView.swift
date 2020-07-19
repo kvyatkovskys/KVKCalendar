@@ -18,33 +18,6 @@ final class WeekHeaderView: UIView {
         return label
     }()
     
-    var font: UIFont = .systemFont(ofSize: 17) {
-        didSet {
-            subviews.filter({ $0 is UILabel }).forEach { (label) in
-                if let label = label as? UILabel {
-                    label.font = font
-                }
-            }
-        }
-    }
-    
-    var backgroundColorDate: (weekend: UIColor, weekday: UIColor) = (.clear, .clear) {
-        didSet {
-            subviews.filter({ $0 is UILabel }).forEach { (label) in
-                if let label = label as? UILabel {
-                    switch label.tag {
-                    case 0...4:
-                        label.backgroundColor = backgroundColorDate.weekday
-                    case 5...6:
-                        label.backgroundColor = backgroundColorDate.weekend
-                    default:
-                        label.backgroundColor = .clear
-                    }
-                }
-            }
-        }
-    }
-    
     var date: Date? {
         didSet {
             setDateToTitle(date: date, style: style)
@@ -75,6 +48,7 @@ final class WeekHeaderView: UIView {
                                               height: fromYear ? frame.height : style.month.heightHeaderWeek))
             label.adjustsFontSizeToFitWidth = true
             label.textAlignment = .center
+            label.font = style.year.weekFont
             
             if value.isWeekend {
                 label.textColor = style.week.colorWeekendDate

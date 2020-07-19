@@ -7,10 +7,8 @@
 
 import UIKit
 
-private let daysInWeek = 7
-
-final class YearCollectionViewCell: UICollectionViewCell {
-    static let cellIdentifier = #file
+final class YearPadCell: UICollectionViewCell {
+    private let daysInWeek = 7
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -30,7 +28,6 @@ final class YearCollectionViewCell: UICollectionViewCell {
             
             subviews.filter({ $0 is WeekHeaderView }).forEach({ $0.removeFromSuperview() })
             let view = WeekHeaderView(frame: CGRect(x: 0, y: 40, width: frame.width, height: 30), style: style, fromYear: true)
-            view.font = style.year.weekFont
             addSubview(view)
         }
     }

@@ -34,7 +34,7 @@ final class MonthCollectionViewCell: UICollectionViewCell {
     
     private func timeFormatter(date: Date) -> String {
           let formatter = DateFormatter()
-          formatter.dateFormat = style.timeHourSystem == .twelveHour ? "h:mm a" : "HH:mm"
+        formatter.dateFormat = style.timeHourSystem.format
           return formatter.string(from: date)
       }
     
