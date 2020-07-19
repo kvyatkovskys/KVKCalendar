@@ -7,11 +7,10 @@
 
 import UIKit
 
-private let heightDate: CGFloat = 35
-private let heightTitle: CGFloat = 25
-
 final class ScrollHeaderDayCell: UICollectionViewCell {
-    static let cellIdentifier = #file
+    
+    private let heightDate: CGFloat = 35
+    private let heightTitle: CGFloat = 25
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()

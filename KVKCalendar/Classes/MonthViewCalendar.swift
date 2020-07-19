@@ -242,7 +242,7 @@ extension MonthViewCalendar: UICollectionViewDataSource {
     }
 }
 
-extension MonthViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {    
+extension MonthViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         let cells = collectionView.visibleCells as? [MonthCollectionViewCell] ?? [MonthCollectionViewCell()]
         let cellDays = cells.filter({ $0.item?.day.type != .empty })
