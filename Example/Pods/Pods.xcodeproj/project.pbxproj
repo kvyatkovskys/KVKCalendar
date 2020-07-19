@@ -250,19 +250,19 @@
 		E7572DAC7755FE0D6AE3DD110369A25E /* KVKCalendar */ = {
 			isa = PBXGroup;
 			children = (
-				F96C175524C487ED00A3AEAC /* All Day */,
 				5C652A55F40FD0931CDABC9F715D87B7 /* Calendar+Extension.swift */,
 				EC6DE6D920E86D8FF9359BEEDE97488E /* CalendarModel.swift */,
 				5FACE83B726EC456724A55DD247846A9 /* CalendarView.swift */,
 				0125FECD2025832488BAD129F879C902 /* Date+Extension.swift */,
 				CD1B56681DFC9C60D79D98BDFB6E1980 /* Style.swift */,
-				F96C175324C4878500A3AEAC /* Day */,
-				F96C175624C4881C00A3AEAC /* Event View */,
-				F96C175124C4875100A3AEAC /* Month */,
-				F96C175224C4876200A3AEAC /* Header Week  */,
-				F96C175424C487A000A3AEAC /* Timeline */,
-				F96C175024C4874200A3AEAC /* Week */,
-				F96C174F24C485B600A3AEAC /* Year */,
+				F905C8CF24C4D80400E48E6A /* Year View */,
+				F905C8CE24C4D7E300E48E6A /* Week View */,
+				F905C8CD24C4D7A700E48E6A /* Timeline View */,
+				F905C8CC24C4D78D00E48E6A /* Header Week */,
+				F905C8CB24C4D76E00E48E6A /* Month View */,
+				F905C8CA24C4D75100E48E6A /* Event View */,
+				F905C8C824C4D71100E48E6A /* All Day View */,
+				F905C8C924C4D72E00E48E6A /* Day View */,
 				39BF6116127626E211E143115E4DCC64 /* Pod */,
 				071660E8BF5F9B8B65347296D0468D75 /* Support Files */,
 			);
@@ -287,7 +287,74 @@
 			path = "Target Support Files/Pods-KVKCalendar_Example";
 			sourceTree = "<group>";
 		};
-		F96C174F24C485B600A3AEAC /* Year */ = {
+		F905C8C824C4D71100E48E6A /* All Day View */ = {
+			isa = PBXGroup;
+			children = (
+				EA97D15FF13B61D48447F067695DB919 /* AllDayEventView.swift */,
+			);
+			name = "All Day View";
+			sourceTree = "<group>";
+		};
+		F905C8C924C4D72E00E48E6A /* Day View */ = {
+			isa = PBXGroup;
+			children = (
+				AC2AC73B9A14BB7107E02047EB4AB341 /* DayViewCalendar.swift */,
+				EE1229C259C9DC360208CF279ED1DC43 /* DayData.swift */,
+			);
+			name = "Day View";
+			sourceTree = "<group>";
+		};
+		F905C8CA24C4D75100E48E6A /* Event View */ = {
+			isa = PBXGroup;
+			children = (
+				F96C175724C4888400A3AEAC /* EventViewGeneral.swift */,
+				F2440E5C28E1D2E752F4B4EB0AA7C002 /* EventView.swift */,
+				509D4509C1AA76876A794FFE56D608B5 /* EventListView.swift */,
+			);
+			name = "Event View";
+			sourceTree = "<group>";
+		};
+		F905C8CB24C4D76E00E48E6A /* Month View */ = {
+			isa = PBXGroup;
+			children = (
+				48170AC4E74F37D5487BCF7F93B6B18A /* MonthViewCalendar.swift */,
+				60A8B737696574C8011ED6452BEE0FD1 /* MonthData.swift */,
+				AFD0B0AADCBB110E5B97BD8C1921A26E /* MonthCollectionViewCell.swift */,
+			);
+			name = "Month View";
+			sourceTree = "<group>";
+		};
+		F905C8CC24C4D78D00E48E6A /* Header Week */ = {
+			isa = PBXGroup;
+			children = (
+				999631586E927091101EBB5058E38C1B /* ScrollHeaderDayCell.swift */,
+				9CF6DB2E58183313978C6F29EFFE7468 /* ScrollDayHeaderView.swift */,
+			);
+			path = "Header Week";
+			sourceTree = "<group>";
+		};
+		F905C8CD24C4D7A700E48E6A /* Timeline View */ = {
+			isa = PBXGroup;
+			children = (
+				A8EC404CC56ADECDF7E56F1C29F40208 /* TimelineModel.swift */,
+				CE241B6510F5824673C13496A4601765 /* TimelineView.swift */,
+				F96C174B24C4581400A3AEAC /* TimelineView+Extension.swift */,
+				773094C7CFDB8D473EAE68F4C3B71C50 /* TimelineLabel.swift */,
+			);
+			path = "Timeline View";
+			sourceTree = "<group>";
+		};
+		F905C8CE24C4D7E300E48E6A /* Week View */ = {
+			isa = PBXGroup;
+			children = (
+				22923AC28C4BBD58707E19FFFAA8388B /* WeekData.swift */,
+				C1236E37B1B6906B72DFB4BBF194FF03 /* WeekHeaderView.swift */,
+				BA26D3880A6C8DEACC8E49876FE67771 /* WeekViewCalendar.swift */,
+			);
+			path = "Week View";
+			sourceTree = "<group>";
+		};
+		F905C8CF24C4D80400E48E6A /* Year View */ = {
 			isa = PBXGroup;
 			children = (
 				5AA2F6ED5492457C0790CCEB730B856C /* YearPadCell.swift */,
@@ -296,74 +363,7 @@
 				02C618114D910556D6CA23F4FC12FA46 /* YearHeaderView.swift */,
 				BB25B616835EAEDC1F4DA3AC92C85DA6 /* YearViewCalendar.swift */,
 			);
-			path = Year;
-			sourceTree = "<group>";
-		};
-		F96C175024C4874200A3AEAC /* Week */ = {
-			isa = PBXGroup;
-			children = (
-				22923AC28C4BBD58707E19FFFAA8388B /* WeekData.swift */,
-				C1236E37B1B6906B72DFB4BBF194FF03 /* WeekHeaderView.swift */,
-				BA26D3880A6C8DEACC8E49876FE67771 /* WeekViewCalendar.swift */,
-			);
-			path = Week;
-			sourceTree = "<group>";
-		};
-		F96C175124C4875100A3AEAC /* Month */ = {
-			isa = PBXGroup;
-			children = (
-				AFD0B0AADCBB110E5B97BD8C1921A26E /* MonthCollectionViewCell.swift */,
-				60A8B737696574C8011ED6452BEE0FD1 /* MonthData.swift */,
-				48170AC4E74F37D5487BCF7F93B6B18A /* MonthViewCalendar.swift */,
-			);
-			path = Month;
-			sourceTree = "<group>";
-		};
-		F96C175224C4876200A3AEAC /* Header Week  */ = {
-			isa = PBXGroup;
-			children = (
-				9CF6DB2E58183313978C6F29EFFE7468 /* ScrollDayHeaderView.swift */,
-				999631586E927091101EBB5058E38C1B /* ScrollHeaderDayCell.swift */,
-			);
-			path = "Header Week ";
-			sourceTree = "<group>";
-		};
-		F96C175324C4878500A3AEAC /* Day */ = {
-			isa = PBXGroup;
-			children = (
-				EE1229C259C9DC360208CF279ED1DC43 /* DayData.swift */,
-				AC2AC73B9A14BB7107E02047EB4AB341 /* DayViewCalendar.swift */,
-			);
-			path = Day;
-			sourceTree = "<group>";
-		};
-		F96C175424C487A000A3AEAC /* Timeline */ = {
-			isa = PBXGroup;
-			children = (
-				773094C7CFDB8D473EAE68F4C3B71C50 /* TimelineLabel.swift */,
-				A8EC404CC56ADECDF7E56F1C29F40208 /* TimelineModel.swift */,
-				CE241B6510F5824673C13496A4601765 /* TimelineView.swift */,
-				F96C174B24C4581400A3AEAC /* TimelineView+Extension.swift */,
-			);
-			path = Timeline;
-			sourceTree = "<group>";
-		};
-		F96C175524C487ED00A3AEAC /* All Day */ = {
-			isa = PBXGroup;
-			children = (
-				EA97D15FF13B61D48447F067695DB919 /* AllDayEventView.swift */,
-			);
-			path = "All Day";
-			sourceTree = "<group>";
-		};
-		F96C175624C4881C00A3AEAC /* Event View */ = {
-			isa = PBXGroup;
-			children = (
-				509D4509C1AA76876A794FFE56D608B5 /* EventListView.swift */,
-				F2440E5C28E1D2E752F4B4EB0AA7C002 /* EventView.swift */,
-				F96C175724C4888400A3AEAC /* EventViewGeneral.swift */,
-			);
-			path = "Event View";
+			path = "Year View";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
