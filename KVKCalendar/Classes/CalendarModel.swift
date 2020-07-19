@@ -33,6 +33,15 @@ public enum TimeHourSystem: Int {
             return array
         }
     }
+    
+    public var format: String {
+        switch self {
+        case .twelveHour:
+            return "h:mm a"
+        case .twentyFourHour:
+            return "HH:mm"
+        }
+    }
 }
 
 public enum CalendarType: String, CaseIterable {
@@ -110,17 +119,17 @@ extension CalendarPrivateDelegate {
 public protocol CalendarDataSource: class {
     func eventsForCalendar() -> [Event]
     func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle?
-    func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventPageViewGeneral?
+    func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral?
 }
 
 public extension CalendarDataSource {
     func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? { return nil }
-    func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventPageViewGeneral? { return nil }
+    func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? { return nil }
 }
 
 protocol DisplayDataSource: class {
     func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle?
-    func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventPageViewGeneral?
+    func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral?
 }
 
 public protocol CalendarDelegate: AnyObject {

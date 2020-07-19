@@ -75,9 +75,9 @@ public final class CalendarView: UIView {
     
     private func switchTypeCalendar(type: CalendarType) {
         self.type = type
-        if UIDevice.current.userInterfaceIdiom == .phone, type == .year {
-            self.type = .month
-        }
+//        if UIDevice.current.userInterfaceIdiom == .phone, type == .year {
+//            self.type = .month
+//        }
         subviews.filter({ $0 is DayViewCalendar
             || $0 is WeekViewCalendar
             || $0 is MonthViewCalendar
@@ -147,7 +147,7 @@ public final class CalendarView: UIView {
 }
 
 extension CalendarView: DisplayDataSource {
-    func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventPageViewGeneral? {
+    func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? {
         return dataSource?.willDisplayEventView(event, frame: frame, date: date)
     }
     

@@ -48,8 +48,8 @@ final class YearViewCalendar: UIView {
         collection.isPagingEnabled = style.isPagingEnabled
         collection.dataSource = self
         collection.delegate = self
-        collection.register(YearCollectionViewCell.self,
-                            forCellWithReuseIdentifier: YearCollectionViewCell.cellIdentifier)
+        collection.register(YearPadCell.self)
+        collection.register(YearPhoneCell.self)
         return collection
     }
     
@@ -138,8 +138,12 @@ extension YearViewCalendar: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: YearCollectionViewCell.cellIdentifier,
-                                                      for: indexPath) as? YearCollectionViewCell ?? YearCollectionViewCell()
+        guard UIDevice.current.userInterfaceIdiom != .phone else {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: YearPhoneCell.identifier, for: indexPath) as? YearPhoneCell ?? YearPhoneCell()
+            return cell
+        }
+        
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: YearPadCell.identifier, for: indexPath) as? YearPadCell ?? YearPadCell()
         let month = data.months[indexPath.row]
         cell.style = style
         cell.selectDate = data.date
@@ -151,7 +155,7 @@ extension YearViewCalendar: UICollectionViewDataSource {
 
 extension YearViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        let cells = collectionView.visibleCells as? [YearCollectionViewCell] ?? [YearCollectionViewCell()]
+        let cells = collectionView.visibleCells as? [YearPadCell] ?? [YearPadCell()]
         let newMoveDate = cells.reduce([]) { (acc, month) -> [Date?] in
             var resultDate = acc
             guard UIDevice.current.userInterfaceIdiom == .pad else {
@@ -164,9 +168,9 @@ extension YearViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFl
                 resultDate = [day.date]
             }
             return resultDate
-            }
-            .compactMap({ $0 })
-            .first
+        }
+        .compactMap({ $0 })
+        .first
         data.date = newMoveDate ?? Date()
         headerView.date = newMoveDate
         delegate?.didSelectCalendarDate(newMoveDate, type: .year, frame: nil)

@@ -11,7 +11,7 @@ extension TimelineView {
     
 }
 
-extension TimelineView: EventPageDelegate {
+extension TimelineView: EventDelegate {
     func didSelectEvent(_ event: Event, gesture: UITapGestureRecognizer) {
         delegate?.didSelectEvent(event, frame: gesture.view?.frame)
     }
@@ -26,9 +26,9 @@ extension TimelineView: EventPageDelegate {
         }
     
         eventPreview = nil
-        eventPreview = EventPageView(event: event,
-                                     style: style,
-                                     frame: CGRect(origin: CGPoint(x: point.x - eventPreviewXOffset, y: point.y - eventPreviewYOffset), size: eventPreviewSize))
+        eventPreview = EventView(event: event,
+                                 style: style,
+                                 frame: CGRect(origin: CGPoint(x: point.x - eventPreviewXOffset, y: point.y - eventPreviewYOffset), size: eventPreviewSize))
         eventPreview?.alpha = 0.9
         eventPreview?.tag = tagEventPagePreview
         eventPreview?.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
