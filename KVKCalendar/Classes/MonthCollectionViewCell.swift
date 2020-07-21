@@ -108,7 +108,7 @@ final class MonthCollectionViewCell: UICollectionViewCell {
                     
                     let tap = UITapGestureRecognizer(target: self, action: #selector(tapOneEvent))
                     label.addGestureRecognizer(tap)
-                    label.tag = "\(event.id)".hashValue
+                    label.tag = event.hash
                     if style.event.isEnableMoveEvent, UIDevice.current.userInterfaceIdiom != .phone, !event.isAllDay {
                         let longGesture = UILongPressGestureRecognizer(target: self, action: #selector(activateMoveEvent))
                         longGesture.minimumPressDuration = style.event.minimumPressDuration
@@ -140,7 +140,7 @@ final class MonthCollectionViewCell: UICollectionViewCell {
     var selectDate: Date = Date()
     
     @objc private func tapOneEvent(gesture: UITapGestureRecognizer) {
-        if let idx = events.firstIndex(where: { "\($0.id)".hashValue == gesture.view?.tag }) {
+        if let idx = events.firstIndex(where: { $0.hash == gesture.view?.tag }) {
             let location = gesture.location(in: superview)
             let newFrame = CGRect(x: location.x, y: location.y, width: gesture.view?.frame.width ?? 0, height: gesture.view?.frame.size.height ?? 0)
             delegate?.didSelectEvent(events[idx], frame: newFrame)
@@ -180,7 +180,7 @@ final class MonthCollectionViewCell: UICollectionViewCell {
     }
     
     @objc private func activateMoveEvent(gesture: UILongPressGestureRecognizer) {
-        guard let idx = events.firstIndex(where: { "\($0.id)".hashValue == gesture.view?.tag }), let view = gesture.view else { return }
+        guard let idx = events.firstIndex(where: { $0.hash == gesture.view?.tag }), let view = gesture.view else { return }
         
         let event = events[idx]
         let snapshotLabel = UILabel(frame: view.frame)

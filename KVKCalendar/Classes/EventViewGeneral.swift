@@ -12,14 +12,15 @@ public class EventViewGeneral: UIView {
     
     private let event: Event
     private let color: UIColor
+    private let style: Style
     
     init(style: Style, event: Event, frame: CGRect) {
+        self.style = style
         self.event = event
         self.color = EventColor(event.color?.value ?? event.backgroundColor).value
         super.init(frame: frame)
         
-        tag = "\(event.id)".hashValue
-        
+        tag = event.hash
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapOnEvent))
         addGestureRecognizer(tap)
         
@@ -41,10 +42,12 @@ public class EventViewGeneral: UIView {
     @objc func activateMoveEvent(gesture: UILongPressGestureRecognizer) {
         switch gesture.state {
         case .began:
+            alpha = style.event.alphaWhileMoving
             delegate?.didStartMoveEvent(event, gesture: gesture)
         case .changed:
             delegate?.didChangeMoveEvent(event, gesture: gesture)
         case .cancelled, .ended, .failed:
+            alpha = 1.0
             delegate?.didEndMoveEvent(event, gesture: gesture)
         default:
             break
@@ -53,6 +56,7 @@ public class EventViewGeneral: UIView {
     
     public override func draw(_ rect: CGRect) {
         guard let context = UIGraphicsGetCurrentContext() else { return }
+        
         context.interpolationQuality = .none
         context.saveGState()
         context.setStrokeColor(color.cgColor)

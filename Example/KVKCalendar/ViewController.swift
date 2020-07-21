@@ -190,7 +190,7 @@ extension ViewController {
             let endTime = self.timeFormatter(date: endDate)
             
             var event = Event()
-            event.id = idx
+            event.ID = "\(idx)"
             event.start = startDate
             event.end = endDate
             event.color = EventColor(item.color)

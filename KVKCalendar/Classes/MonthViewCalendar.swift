@@ -244,6 +244,8 @@ extension MonthViewCalendar: UICollectionViewDataSource {
 
 extension MonthViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        guard style.month.isAutoSelectDateScrolling else { return }
+        
         let cells = collectionView.visibleCells as? [MonthCollectionViewCell] ?? [MonthCollectionViewCell()]
         let cellDays = cells.filter({ $0.item?.day.type != .empty })
         guard let newMoveDate = cellDays.filter({ $0.item?.day.date?.day == data.date.day }).first?.item?.day.date else {
