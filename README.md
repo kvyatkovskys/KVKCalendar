@@ -57,25 +57,24 @@ class ViewController: UIViewController {
 extension ViewController {
     func createEvents(completion: ([Event]) -> Void) {
         let models = // Get events from storage / API
-        var events = [Event]()
         
-        for model in models {
+        let events = models.compactMap({ (item) in
             var event = Event()
-            event.ID = model.id
-            event.start = model.startDate // start date event
-            event.end = model.endDate // end date event
-            event.color = model.color
-            event.isAllDay = model.allDay
-            event.isContainsFile = !model.files.isEmpty
+            event.ID = item.id
+            event.start = item.startDate // start date event
+            event.end = item.endDate // end date event
+            event.color = item.color
+            event.isAllDay = item.allDay
+            event.isContainsFile = !item.files.isEmpty
         
             // Add text event (title, info, location, time)
-            if model.allDay {
+            if item.allDay {
                 event.text = "\(model.title)"
             } else {
-                event.text = "\(startTime) - \(endTime)\n\(model.title)"
+                event.text = "\(startTime) - \(endTime)\n\(item.title)"
             }
-            events.append(event)
-        }
+            return event
+        })
         completion(events)
     }
 }

@@ -174,27 +174,28 @@ extension ViewController: CalendarDataSource {
     }
     
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? {
-        return nil
+        guard event.ID == "2" else { return nil }
+        
+        return CustomViewEvent(style: style, event: event, frame: frame)
     }
 }
 
 extension ViewController {
     func loadEvents(completion: ([Event]) -> Void) {
-        var events = [Event]()
         let decoder = JSONDecoder()
                 
         guard let path = Bundle.main.path(forResource: "events", ofType: "json"),
             let data = try? Data(contentsOf: URL(fileURLWithPath: path), options: .mappedIfSafe),
             let result = try? decoder.decode(ItemData.self, from: data) else { return }
         
-        for (idx, item) in result.data.enumerated() {
+        let events = result.data.compactMap({ (item) -> Event in
             let startDate = self.formatter(date: item.start)
             let endDate = self.formatter(date: item.end)
             let startTime = self.timeFormatter(date: startDate)
             let endTime = self.timeFormatter(date: endDate)
             
             var event = Event()
-            event.ID = "\(idx)"
+            event.ID = item.id
             event.start = startDate
             event.end = endDate
             event.color = EventColor(item.color)
@@ -207,8 +208,8 @@ extension ViewController {
             } else {
                 event.text = "\(startTime) - \(endTime)\n\(item.title)"
             }
-            events.append(event)
-        }
+            return event
+        })
         completion(events)
     }
     
@@ -296,9 +297,11 @@ final class CustomViewEvent: EventViewGeneral {
     override init(style: Style, event: Event, frame: CGRect) {
         super.init(style: style, event: event, frame: frame)
         
-        let imageView = UIImageView(image: UIImage(named: ""))
-        imageView.frame = CGRect(origin: .zero, size: frame.size)
+        let imageView = UIImageView(image: UIImage(named: "ic_stub"))
+        imageView.frame = CGRect(origin: CGPoint(x: 3, y: 1), size: CGSize(width: frame.width - 6, height: frame.height - 2))
+        imageView.contentMode = .scaleAspectFit
         addSubview(imageView)
+        backgroundColor = event.backgroundColor
     }
     
     required init?(coder: NSCoder) {

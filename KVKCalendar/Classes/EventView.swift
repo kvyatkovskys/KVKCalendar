@@ -35,9 +35,6 @@ final class EventView: EventViewGeneral {
         self.style = style
         super.init(style: style, event: event, frame: frame)
         
-        backgroundColor = event.backgroundColor
-        setRoundCorners(style.timeline.eventCorners, radius: style.timeline.eventCornersRadius)
-        
         var textFrame = frame
         textFrame.origin.x = pointX
         textFrame.origin.y = 0
