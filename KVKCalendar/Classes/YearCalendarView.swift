@@ -155,6 +155,8 @@ extension YearViewCalendar: UICollectionViewDataSource {
 
 extension YearViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        guard style.year.isAutoSelectDateScrolling else { return }
+        
         let cells = collectionView.visibleCells as? [YearPadCell] ?? [YearPadCell()]
         let newMoveDate = cells.reduce([]) { (acc, month) -> [Date?] in
             var resultDate = acc
@@ -171,6 +173,7 @@ extension YearViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFl
         }
         .compactMap({ $0 })
         .first
+        
         data.date = newMoveDate ?? Date()
         headerView.date = newMoveDate
         delegate?.didSelectCalendarDate(newMoveDate, type: .year, frame: nil)

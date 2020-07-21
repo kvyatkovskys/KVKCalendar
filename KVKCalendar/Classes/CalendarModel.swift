@@ -59,13 +59,17 @@ public struct EventColor {
 }
 
 public struct Event {
+    @available(swift, obsoleted: 0.3.4, message: "This will be removed in v0.3.5; please migrate to a ID.")
+
     public var id: Any = 0
+    public var ID: String = "0"
     public var text: String = ""
     public var start: Date = Date()
     public var end: Date = Date()
     public var color: EventColor? = nil {
         didSet {
             guard let valueColor = color else { return }
+            
             backgroundColor = valueColor.value.withAlphaComponent(valueColor.alpha)
             var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 0
             valueColor.value.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
@@ -82,9 +86,15 @@ public struct Event {
     public init() {}
 }
 
+extension Event {
+    var hash: Int {
+        return ID.hashValue
+    }
+}
+
 extension Event: EventProtocol {
     public func compare(_ event: Event) -> Bool {
-        return "\(id)".hashValue == "\(event.id)".hashValue
+        return hash == event.hash
     }
 }
 

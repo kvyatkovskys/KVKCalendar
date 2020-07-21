@@ -42,8 +42,8 @@ final class AllDayEventView: UIView {
         super.init(frame: frame)
         backgroundColor = style.backgroundColor
         
-        let startEvents = events.map({ AllDayEvent(id: $0.id, text: $0.text, date: $0.start, color: EventColor($0.color?.value ?? $0.backgroundColor).value) })
-        let endEvents = events.map({ AllDayEvent(id: $0.id, text: $0.text, date: $0.end, color: EventColor($0.color?.value ?? $0.backgroundColor).value) })
+        let startEvents = events.map({ AllDayEvent(id: $0.ID, text: $0.text, date: $0.start, color: EventColor($0.color?.value ?? $0.backgroundColor).value) })
+        let endEvents = events.map({ AllDayEvent(id: $0.ID, text: $0.text, date: $0.end, color: EventColor($0.color?.value ?? $0.backgroundColor).value) })
         let result = startEvents + endEvents
         let distinct = result.reduce([]) { (acc, event) -> [AllDayEvent] in
             guard acc.contains(where: { $0.date.day == event.date.day && "\($0.id)".hashValue == "\(event.id)".hashValue }) else {
@@ -65,6 +65,7 @@ final class AllDayEventView: UIView {
             label.text = " \(event.text)"
             label.backgroundColor = event.color.withAlphaComponent(0.8)
             label.tag = "\(event.id)".hashValue
+            label.setRoundCorners(style.eventCorners, radius: style.eventCornersRadius)
             let tap = UITapGestureRecognizer(target: self, action: #selector(tapOnEvent))
             label.addGestureRecognizer(tap)
             addSubview(label)
@@ -73,7 +74,8 @@ final class AllDayEventView: UIView {
     
     @objc private func tapOnEvent(gesture: UITapGestureRecognizer) {
         guard let hashValue = gesture.view?.tag else { return }
-        if let idx = events.firstIndex(where: { "\($0.id)".hashValue == hashValue }) {
+        
+        if let idx = events.firstIndex(where: { $0.hash == hashValue }) {
             let event = events[idx]
             delegate?.didSelectAllDayEvent(event, frame: gesture.view?.frame)
         }
@@ -85,7 +87,7 @@ final class AllDayEventView: UIView {
 }
 
 private struct AllDayEvent {
-    let id: Any
+    let id: String
     let text: String
     let date: Date
     let color: UIColor
@@ -93,6 +95,6 @@ private struct AllDayEvent {
 
 extension AllDayEvent: EventProtocol {
     func compare(_ event: Event) -> Bool {
-        return "\(id)".hashValue == "\(event)".hashValue
+        return id.hashValue == event.hash
     }
 }

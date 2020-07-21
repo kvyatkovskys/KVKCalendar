@@ -153,6 +153,7 @@ public struct MonthStyle {
     public var selectCalendarType: CalendarType = .week
     public var isAnimateSelection: Bool = false
     public var isPagingEnabled: Bool = true
+    public var isAutoSelectDateScrolling: Bool = true
 }
 
 public struct YearStyle {
@@ -182,6 +183,7 @@ public struct YearStyle {
     public var selectCalendarType: CalendarType = .month
     public var isAnimateSelection: Bool = true
     public var isPagingEnabled: Bool = true
+    public var isAutoSelectDateScrolling: Bool = true
 }
 
 public struct AllDayStyle {
@@ -195,11 +197,14 @@ public struct AllDayStyle {
     public var height: CGFloat = 25
     public var fontTitle: UIFont = .systemFont(ofSize: 10)
     public var isPinned: Bool = false
+    public var eventCorners: UIRectCorner = .allCorners
+    public var eventCornersRadius: CGSize = CGSize(width: 5, height: 5)
 }
 
 public struct EventStyle {
     public var isEnableMoveEvent: Bool = false
     public var minimumPressDuration: TimeInterval = 1
+    public var alphaWhileMoving: CGFloat = 0.5
 }
 
 extension Style {
