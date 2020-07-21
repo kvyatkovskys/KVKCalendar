@@ -121,7 +121,7 @@ extension ViewController: CalendarDelegate {
 }
 ```
 
-To use a custom event view for specific event or date you need to create a new view of class `EventViewGeneral` and return the view in function.
+To use a custom view for specific event or date you need to create a new view of class `EventViewGeneral` and return the view in function.
 
 ```swift
 class CustomViewEvent: EventViewGeneral {
