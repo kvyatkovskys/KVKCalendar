@@ -20,6 +20,8 @@ open class EventViewGeneral: UIView {
         self.color = EventColor(event.color?.value ?? event.backgroundColor).value
         super.init(frame: frame)
         
+        setRoundCorners(style.timeline.eventCorners, radius: style.timeline.eventCornersRadius)
+        backgroundColor = event.backgroundColor
         tag = event.hash
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapOnEvent))
         addGestureRecognizer(tap)
