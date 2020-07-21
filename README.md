@@ -83,19 +83,6 @@ extension ViewController: CalendarDataSource {
     func eventsForCalendar() -> [Event] {
         return events
     }
-    
-    // optional function
-    // control style for specific date
-    func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? {
-        // dates -> specific dates
-        guard dates.first(where: { $0.year == date?.year && $0.month == date?.month && $0.day == date?.day }) != nil else { return nil }
-        
-        // DateStyle
-        // - backgroundColor = cell background color
-        // - textColor = cell text color
-        // - dotBackgroundColor = selected date dot color
-        return DateStyle(backgroundColor: .orange, textColor: .black, dotBackgroundColor: .red)
-    }
 }
 ```
 
@@ -130,8 +117,26 @@ class CustomViewEvent: EventViewGeneral {
     }
 }
 
+// optional function from CalendarDataSource
 func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? {
     return CustomEventView
+}
+```
+
+<img src="Screenshots/custom_event_view.png" width="300">
+
+Control a specific style for date.
+```swift
+// optional function from CalendarDataSource
+func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? {
+    // dates -> specific dates
+    guard dates.first(where: { $0.year == date?.year && $0.month == date?.month && $0.day == date?.day }) != nil else { return nil }
+        
+    // DateStyle
+    // - backgroundColor = cell background color
+    // - textColor = cell text color
+    // - dotBackgroundColor = selected date dot color
+    return DateStyle(backgroundColor: .orange, textColor: .black, dotBackgroundColor: .red)
 }
 ```
 
