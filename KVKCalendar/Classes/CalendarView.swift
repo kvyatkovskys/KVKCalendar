@@ -24,31 +24,31 @@ public final class CalendarView: UIView {
         return dataSource?.eventsForCalendar() ?? []
     }
     
-    private lazy var dayCalendar: DayViewCalendar = {
-        let day = DayViewCalendar(data: dayData, frame: frame, style: style)
+    private lazy var dayView: DayView = {
+        let day = DayView(data: dayData, frame: frame, style: style)
         day.delegate = self
         day.dataSource = self
         day.scrollHeaderDay.dataSource = self
         return day
     }()
     
-    private lazy var weekCalendar: WeekViewCalendar = {
-        let week = WeekViewCalendar(data: weekData, frame: frame, style: style)
+    private lazy var weekView: WeekView = {
+        let week = WeekView(data: weekData, frame: frame, style: style)
         week.delegate = self
         week.dataSource = self
         week.scrollHeaderDay.dataSource = self
         return week
     }()
     
-    private lazy var monthCalendar: MonthViewCalendar = {
-        let month = MonthViewCalendar(data: monthData, frame: frame, style: style)
+    private lazy var monthView: MonthView = {
+        let month = MonthView(data: monthData, frame: frame, style: style)
         month.delegate = self
         month.dataSource = self
         return month
     }()
     
-    private lazy var yearCalendar: YearViewCalendar = {
-        let year = YearViewCalendar(data: monthData.data, frame: frame, style: style)
+    private lazy var yearView: YearView = {
+        let year = YearView(data: monthData.data, frame: frame, style: style)
         year.delegate = self
         return year
     }()
@@ -63,10 +63,8 @@ public final class CalendarView: UIView {
         
         if let defaultType = style.defaultType {
             type = defaultType
-            set(type: type, date: date)
-        } else {
-            set(type: type, date: date)
         }
+        set(type: type, date: date)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -75,28 +73,25 @@ public final class CalendarView: UIView {
     
     private func switchTypeCalendar(type: CalendarType) {
         self.type = type
-//        if UIDevice.current.userInterfaceIdiom == .phone, type == .year {
-//            self.type = .month
-//        }
-        subviews.filter({ $0 is DayViewCalendar
-            || $0 is WeekViewCalendar
-            || $0 is MonthViewCalendar
-            || $0 is YearViewCalendar }).forEach({ $0.removeFromSuperview() })
+        subviews.filter({ $0 is DayView
+            || $0 is WeekView
+            || $0 is MonthView
+            || $0 is YearView }).forEach({ $0.removeFromSuperview() })
         
         switch self.type {
         case .day:
-            addSubview(dayCalendar)
+            addSubview(dayView)
         case .week:
-            addSubview(weekCalendar)
+            addSubview(weekView)
         case .month:
-            addSubview(monthCalendar)
+            addSubview(monthView)
         case .year:
-            addSubview(yearCalendar)
+            addSubview(yearView)
         }
     }
     
     public func addEventViewToDay(view: UIView) {
-        dayCalendar.addEventView(view: view)
+        dayView.addEventView(view: view)
     }
     
     public func set(type: CalendarType, date: Date) {
@@ -108,11 +103,11 @@ public final class CalendarView: UIView {
     public func reloadData() {
         switch type {
         case .day:
-            dayCalendar.reloadData(events: events)
+            dayView.reloadData(events: events)
         case .week:
-            weekCalendar.reloadData(events: events)
+            weekView.reloadData(events: events)
         case .month:
-            monthCalendar.reloadData(events: events)
+            monthView.reloadData(events: events)
         case .year:
             break
         }
@@ -122,26 +117,26 @@ public final class CalendarView: UIView {
     public func scrollToDate(date: Date) {
         switch type {
         case .day:
-            dayCalendar.setDate(date)
+            dayView.setDate(date)
         case .week:
-            weekCalendar.setDate(date)
+            weekView.setDate(date)
         case .month:
-            monthCalendar.setDate(date)
+            monthView.setDate(date)
         case .year:
-            yearCalendar.setDate(date)
+            yearView.setDate(date)
         }
     }
     
     public func scrollTo(_ date: Date) {
         switch type {
         case .day:
-            dayCalendar.setDate(date)
+            dayView.setDate(date)
         case .week:
-            weekCalendar.setDate(date)
+            weekView.setDate(date)
         case .month:
-            monthCalendar.setDate(date)
+            monthView.setDate(date)
         case .year:
-            yearCalendar.setDate(date)
+            yearView.setDate(date)
         }
     }
 }
@@ -193,18 +188,18 @@ extension CalendarView: CalendarPrivateDelegate {
 extension CalendarView: CalendarSettingProtocol {
     public func reloadFrame(_ frame: CGRect) {
         self.frame = frame
-        dayCalendar.reloadFrame(frame)
-        weekCalendar.reloadFrame(frame)
-        monthCalendar.reloadFrame(frame)
-        yearCalendar.reloadFrame(frame)
+        dayView.reloadFrame(frame)
+        weekView.reloadFrame(frame)
+        monthView.reloadFrame(frame)
+        yearView.reloadFrame(frame)
     }
     
     // TODO: in progress
     func updateStyle(_ style: Style) {
         self.style = style
-        dayCalendar.updateStyle(style)
-        weekCalendar.updateStyle(style)
-        monthCalendar.updateStyle(style)
-        yearCalendar.updateStyle(style)
+        dayView.updateStyle(style)
+        weekView.updateStyle(style)
+        monthView.updateStyle(style)
+        yearView.updateStyle(style)
     }
 }

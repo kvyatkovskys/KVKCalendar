@@ -172,6 +172,10 @@ extension ViewController: CalendarDataSource {
         
         return DateStyle(backgroundColor: .orange, textColor: .black, dotBackgroundColor: .red)
     }
+    
+    func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? {
+        return nil
+    }
 }
 
 extension ViewController {
@@ -285,5 +289,19 @@ extension UIColor {
                        green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
                        blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
                        alpha: CGFloat(1.0))
+    }
+}
+
+final class CustomViewEvent: EventViewGeneral {
+    override init(style: Style, event: Event, frame: CGRect) {
+        super.init(style: style, event: event, frame: frame)
+        
+        let imageView = UIImageView(image: UIImage(named: ""))
+        imageView.frame = CGRect(origin: .zero, size: frame.size)
+        addSubview(imageView)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }

@@ -1,14 +1,11 @@
 //
-//  MonthCollectionViewCell.swift
+//  MonthCell.swift
 //  KVKCalendar
 //
 //  Created by Sergei Kviatkovskii on 02/01/2019.
 //
 
 import UIKit
-
-private let countInCell: CGFloat = 4
-private let offset: CGFloat = 3
 
 protocol MonthCellDelegate: class {
     func didSelectEvent(_ event: Event, frame: CGRect?)
@@ -18,9 +15,12 @@ protocol MonthCellDelegate: class {
     func didChangeMoveEventPage(_ event: Event, gesture: UILongPressGestureRecognizer)
 }
 
-final class MonthCollectionViewCell: UICollectionViewCell {
+final class MonthCell: UICollectionViewCell {
     static let cellIdentifier = #file
     static let titlesCount = 3
+    
+    private let countInCell: CGFloat = 4
+    private let offset: CGFloat = 3
     
     private lazy var dateLabel: UILabel = {
         let label = UILabel()
@@ -65,7 +65,7 @@ final class MonthCollectionViewCell: UICollectionViewCell {
                 let label = UILabel(frame: CGRect(x: 5, y: 5 + dateLabel.bounds.height + height * CGFloat(idx), width: width, height: height))
                 label.isUserInteractionEnabled = true
                 
-                if count > MonthCollectionViewCell.titlesCount {
+                if count > MonthCell.titlesCount {
                     label.font = monthStyle.fontEventTitle
                     label.lineBreakMode = .byTruncatingMiddle
                     label.adjustsFontSizeToFitWidth = true
@@ -78,9 +78,9 @@ final class MonthCollectionViewCell: UICollectionViewCell {
                     if !monthStyle.isHiddenMoreTitle {
                         let text: String
                         if monthStyle.moreTitle.isEmpty {
-                            text = "\(events.count - MonthCollectionViewCell.titlesCount)"
+                            text = "\(events.count - MonthCell.titlesCount)"
                         } else {
-                            text = "\(monthStyle.moreTitle) \(events.count - MonthCollectionViewCell.titlesCount)"
+                            text = "\(monthStyle.moreTitle) \(events.count - MonthCell.titlesCount)"
                         }
                         label.text = text
                     }

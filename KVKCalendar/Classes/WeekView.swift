@@ -1,5 +1,5 @@
 //
-//  WeekViewCalendar.swift
+//  WeekView.swift
 //  KVKCalendar
 //
 //  Created by Sergei Kviatkovskii on 02/01/2019.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class WeekViewCalendar: UIView {
+final class WeekView: UIView {
     private var visibleDates: [Date?] = []
     private var data: WeekData
     private var style: Style
@@ -38,7 +38,7 @@ final class WeekViewCalendar: UIView {
         timelineFrame.size.height -= scrollHeaderDay.frame.height
         let view = TimelineView(type: .week, timeHourSystem: data.timeSystem, style: style, frame: timelineFrame)
         view.delegate = self
-        view.dataSource = dataSource
+        view.dataSource = self
         return view
     }()
     
@@ -124,7 +124,13 @@ final class WeekViewCalendar: UIView {
     }
 }
 
-extension WeekViewCalendar: ScrollDayHeaderDelegate {
+extension WeekView: DisplayDataSource {
+    func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? {
+        return dataSource?.willDisplayEventView(event, frame: frame, date: date)
+    }
+}
+
+extension WeekView: ScrollDayHeaderDelegate {
     func didSelectDateScrollHeader(_ date: Date?, type: CalendarType) {
         guard let selectDate = date else { return }
         
@@ -135,7 +141,7 @@ extension WeekViewCalendar: ScrollDayHeaderDelegate {
     }
 }
 
-extension WeekViewCalendar: CalendarSettingProtocol {
+extension WeekView: CalendarSettingProtocol {
     func reloadFrame(_ frame: CGRect) {
         self.frame = frame
         topBackgroundView.frame.size.width = frame.width
@@ -168,7 +174,7 @@ extension WeekViewCalendar: CalendarSettingProtocol {
     }
 }
 
-extension WeekViewCalendar: TimelineDelegate {
+extension WeekView: TimelineDelegate {
     func didDisplayEvents(_ events: [Event], dates: [Date?]) {
         delegate?.didDisplayCalendarEvents(events, dates: dates, type: .week)
     }

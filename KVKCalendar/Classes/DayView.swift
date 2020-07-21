@@ -1,5 +1,5 @@
 //
-//  DayViewCalendar.swift
+//  DayView.swift
 //  KVKCalendar
 //
 //  Created by Sergei Kviatkovskii on 02/01/2019.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class DayViewCalendar: UIView {
+final class DayView: UIView {
     private var style: Style
     private var data: DayData
 
@@ -43,7 +43,7 @@ final class DayViewCalendar: UIView {
         }
         let view = TimelineView(type: .day, timeHourSystem: data.timeSystem, style: style, frame: timelineFrame)
         view.delegate = self
-        view.dataSource = dataSource
+        view.dataSource = self
         return view
     }()
     
@@ -97,15 +97,22 @@ final class DayViewCalendar: UIView {
     }
 }
 
-extension DayViewCalendar: ScrollDayHeaderDelegate {
+extension DayView: DisplayDataSource {
+    func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? {
+        return dataSource?.willDisplayEventView(event, frame: frame, date: date)
+    }
+}
+
+extension DayView: ScrollDayHeaderDelegate {
     func didSelectDateScrollHeader(_ date: Date?, type: CalendarType) {
         guard let selectDate = date else { return }
+        
         data.date = selectDate
         delegate?.didSelectCalendarDate(selectDate, type: type, frame: nil)
     }
 }
 
-extension DayViewCalendar: TimelineDelegate {
+extension DayView: TimelineDelegate {
     func didDisplayEvents(_ events: [Event], dates: [Date?]) {
         delegate?.didDisplayCalendarEvents(events, dates: dates, type: .day)
     }
@@ -160,7 +167,7 @@ extension DayViewCalendar: TimelineDelegate {
     }
 }
 
-extension DayViewCalendar: CalendarSettingProtocol {
+extension DayView: CalendarSettingProtocol {
     func reloadFrame(_ frame: CGRect) {
         self.frame = frame
         topBackgroundView.frame.size.width = frame.width

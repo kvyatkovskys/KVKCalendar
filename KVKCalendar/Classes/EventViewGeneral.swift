@@ -7,14 +7,14 @@
 
 import UIKit
 
-public class EventViewGeneral: UIView {
+open class EventViewGeneral: UIView {
     weak var delegate: EventDelegate?
     
     private let event: Event
     private let color: UIColor
     private let style: Style
     
-    init(style: Style, event: Event, frame: CGRect) {
+    public init(style: Style, event: Event, frame: CGRect) {
         self.style = style
         self.event = event
         self.color = EventColor(event.color?.value ?? event.backgroundColor).value
@@ -31,15 +31,15 @@ public class EventViewGeneral: UIView {
         }
     }
     
-    required init?(coder: NSCoder) {
+    required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    @objc private func tapOnEvent(gesture: UITapGestureRecognizer) {
+    @objc public func tapOnEvent(gesture: UITapGestureRecognizer) {
         delegate?.didSelectEvent(event, gesture: gesture)
     }
     
-    @objc func activateMoveEvent(gesture: UILongPressGestureRecognizer) {
+    @objc public func activateMoveEvent(gesture: UILongPressGestureRecognizer) {
         switch gesture.state {
         case .began:
             alpha = style.event.alphaWhileMoving

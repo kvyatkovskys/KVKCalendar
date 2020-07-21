@@ -21,29 +21,29 @@
 		D1ABA35AB7D1D22E432E40FC8AA07C7A /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FACE83B726EC456724A55DD247846A9 /* CalendarView.swift */; };
 		DD2C3A2B5C06CEB0F2E8A6248A8A06AB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3212113385A8FBBDB272BD23C409FF61 /* Foundation.framework */; };
 		F905C8EC24C4E01900E48E6A /* ScrollDayViewHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C8EB24C4E01900E48E6A /* ScrollDayViewHeader.swift */; };
-		F905C8EE24C4E06E00E48E6A /* ScrollHeaderViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C8ED24C4E06E00E48E6A /* ScrollHeaderViewCell.swift */; };
+		F905C8EE24C4E06E00E48E6A /* ScrollHeaderDayCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C8ED24C4E06E00E48E6A /* ScrollHeaderDayCell.swift */; };
 		F905C91424C4E55C00E48E6A /* YearData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C91324C4E55C00E48E6A /* YearData.swift */; };
 		F905C91624C4E5AA00E48E6A /* YearPhoneCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C91524C4E5AA00E48E6A /* YearPhoneCell.swift */; };
 		F905C91824C4E5C800E48E6A /* YearPadCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C91724C4E5C800E48E6A /* YearPadCell.swift */; };
 		F905C91A24C4E5E700E48E6A /* YearHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C91924C4E5E700E48E6A /* YearHeaderView.swift */; };
-		F905C91C24C4E60300E48E6A /* YearCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C91B24C4E60300E48E6A /* YearCalendarView.swift */; };
+		F905C91C24C4E60300E48E6A /* YearView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C91B24C4E60300E48E6A /* YearView.swift */; };
 		F905C91E24C4E63500E48E6A /* AllDayEventView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C91D24C4E63500E48E6A /* AllDayEventView.swift */; };
 		F905C92024C4E65300E48E6A /* EventViewList.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C91F24C4E65300E48E6A /* EventViewList.swift */; };
 		F905C92224C4E66C00E48E6A /* EventViewGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C92124C4E66C00E48E6A /* EventViewGeneral.swift */; };
 		F905C92424C4E68500E48E6A /* EventView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C92324C4E68500E48E6A /* EventView.swift */; };
-		F905C92624C4E6A700E48E6A /* MonthCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C92524C4E6A700E48E6A /* MonthCollectionViewCell.swift */; };
 		F905C92824C4E6CF00E48E6A /* MonthData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C92724C4E6CF00E48E6A /* MonthData.swift */; };
 		F905C92A24C4E6F600E48E6A /* WeekHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C92924C4E6F600E48E6A /* WeekHeaderView.swift */; };
 		F905C92C24C4E71700E48E6A /* WeekData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C92B24C4E71700E48E6A /* WeekData.swift */; };
-		F905C92E24C4E73500E48E6A /* WeekViewCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C92D24C4E73500E48E6A /* WeekViewCalendar.swift */; };
+		F905C92E24C4E73500E48E6A /* WeekView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C92D24C4E73500E48E6A /* WeekView.swift */; };
 		F905C93024C4E74A00E48E6A /* DayData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C92F24C4E74A00E48E6A /* DayData.swift */; };
-		F905C93224C4E76500E48E6A /* DayViewCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C93124C4E76500E48E6A /* DayViewCalendar.swift */; };
+		F905C93224C4E76500E48E6A /* DayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C93124C4E76500E48E6A /* DayView.swift */; };
 		F905C93424C4E78300E48E6A /* TimelineLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C93324C4E78300E48E6A /* TimelineLabel.swift */; };
 		F905C93624C4E7A400E48E6A /* Timeline+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C93524C4E7A400E48E6A /* Timeline+Extension.swift */; };
 		F905C93824C4E7BE00E48E6A /* TimelineModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C93724C4E7BE00E48E6A /* TimelineModel.swift */; };
 		F905C93A24C4E7DA00E48E6A /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C93924C4E7DA00E48E6A /* TimelineView.swift */; };
-		F905C93C24C4E82200E48E6A /* MonthViewCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C93B24C4E82200E48E6A /* MonthViewCalendar.swift */; };
 		F959A7F6E6C0CBA5AEFE0F52D7484ADE /* Pods-KVKCalendar_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = A9624963DF6186D58BC646C877E68CDF /* Pods-KVKCalendar_Tests-dummy.m */; };
+		F9BEF87024C73B2D0064992F /* MonthCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9BEF86F24C73B2D0064992F /* MonthCell.swift */; };
+		F9BEF87224C73B6F0064992F /* MonthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9BEF87124C73B6F0064992F /* MonthView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -100,29 +100,29 @@
 		E59D00A75DBE423A0CE5B67793E5470B /* Pods-KVKCalendar_Tests-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-KVKCalendar_Tests-Info.plist"; sourceTree = "<group>"; };
 		EC6DE6D920E86D8FF9359BEEDE97488E /* CalendarModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CalendarModel.swift; path = KVKCalendar/Classes/CalendarModel.swift; sourceTree = "<group>"; };
 		F905C8EB24C4E01900E48E6A /* ScrollDayViewHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScrollDayViewHeader.swift; path = KVKCalendar/Classes/ScrollDayViewHeader.swift; sourceTree = "<group>"; };
-		F905C8ED24C4E06E00E48E6A /* ScrollHeaderViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScrollHeaderViewCell.swift; path = KVKCalendar/Classes/ScrollHeaderViewCell.swift; sourceTree = "<group>"; };
+		F905C8ED24C4E06E00E48E6A /* ScrollHeaderDayCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScrollHeaderDayCell.swift; path = KVKCalendar/Classes/ScrollHeaderDayCell.swift; sourceTree = "<group>"; };
 		F905C91324C4E55C00E48E6A /* YearData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = YearData.swift; path = KVKCalendar/Classes/YearData.swift; sourceTree = "<group>"; };
 		F905C91524C4E5AA00E48E6A /* YearPhoneCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = YearPhoneCell.swift; path = KVKCalendar/Classes/YearPhoneCell.swift; sourceTree = "<group>"; };
 		F905C91724C4E5C800E48E6A /* YearPadCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = YearPadCell.swift; path = KVKCalendar/Classes/YearPadCell.swift; sourceTree = "<group>"; };
 		F905C91924C4E5E700E48E6A /* YearHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = YearHeaderView.swift; path = KVKCalendar/Classes/YearHeaderView.swift; sourceTree = "<group>"; };
-		F905C91B24C4E60300E48E6A /* YearCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = YearCalendarView.swift; path = KVKCalendar/Classes/YearCalendarView.swift; sourceTree = "<group>"; };
+		F905C91B24C4E60300E48E6A /* YearView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = YearView.swift; path = KVKCalendar/Classes/YearView.swift; sourceTree = "<group>"; };
 		F905C91D24C4E63500E48E6A /* AllDayEventView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AllDayEventView.swift; path = KVKCalendar/Classes/AllDayEventView.swift; sourceTree = "<group>"; };
 		F905C91F24C4E65300E48E6A /* EventViewList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EventViewList.swift; path = KVKCalendar/Classes/EventViewList.swift; sourceTree = "<group>"; };
 		F905C92124C4E66C00E48E6A /* EventViewGeneral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EventViewGeneral.swift; path = KVKCalendar/Classes/EventViewGeneral.swift; sourceTree = "<group>"; };
 		F905C92324C4E68500E48E6A /* EventView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EventView.swift; path = KVKCalendar/Classes/EventView.swift; sourceTree = "<group>"; };
-		F905C92524C4E6A700E48E6A /* MonthCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MonthCollectionViewCell.swift; path = KVKCalendar/Classes/MonthCollectionViewCell.swift; sourceTree = "<group>"; };
 		F905C92724C4E6CF00E48E6A /* MonthData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MonthData.swift; path = KVKCalendar/Classes/MonthData.swift; sourceTree = "<group>"; };
 		F905C92924C4E6F600E48E6A /* WeekHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WeekHeaderView.swift; path = KVKCalendar/Classes/WeekHeaderView.swift; sourceTree = "<group>"; };
 		F905C92B24C4E71700E48E6A /* WeekData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WeekData.swift; path = KVKCalendar/Classes/WeekData.swift; sourceTree = "<group>"; };
-		F905C92D24C4E73500E48E6A /* WeekViewCalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WeekViewCalendar.swift; path = KVKCalendar/Classes/WeekViewCalendar.swift; sourceTree = "<group>"; };
+		F905C92D24C4E73500E48E6A /* WeekView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WeekView.swift; path = KVKCalendar/Classes/WeekView.swift; sourceTree = "<group>"; };
 		F905C92F24C4E74A00E48E6A /* DayData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DayData.swift; path = KVKCalendar/Classes/DayData.swift; sourceTree = "<group>"; };
-		F905C93124C4E76500E48E6A /* DayViewCalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DayViewCalendar.swift; path = KVKCalendar/Classes/DayViewCalendar.swift; sourceTree = "<group>"; };
+		F905C93124C4E76500E48E6A /* DayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DayView.swift; path = KVKCalendar/Classes/DayView.swift; sourceTree = "<group>"; };
 		F905C93324C4E78300E48E6A /* TimelineLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TimelineLabel.swift; path = KVKCalendar/Classes/TimelineLabel.swift; sourceTree = "<group>"; };
 		F905C93524C4E7A400E48E6A /* Timeline+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Timeline+Extension.swift"; path = "KVKCalendar/Classes/Timeline+Extension.swift"; sourceTree = "<group>"; };
 		F905C93724C4E7BE00E48E6A /* TimelineModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TimelineModel.swift; path = KVKCalendar/Classes/TimelineModel.swift; sourceTree = "<group>"; };
 		F905C93924C4E7DA00E48E6A /* TimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TimelineView.swift; path = KVKCalendar/Classes/TimelineView.swift; sourceTree = "<group>"; };
-		F905C93B24C4E82200E48E6A /* MonthViewCalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MonthViewCalendar.swift; path = KVKCalendar/Classes/MonthViewCalendar.swift; sourceTree = "<group>"; };
 		F9A5FE2DD23FBAFCC63D57A554B1036E /* Pods-KVKCalendar_Example-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-KVKCalendar_Example-frameworks.sh"; sourceTree = "<group>"; };
+		F9BEF86F24C73B2D0064992F /* MonthCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MonthCell.swift; path = KVKCalendar/Classes/MonthCell.swift; sourceTree = "<group>"; };
+		F9BEF87124C73B6F0064992F /* MonthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MonthView.swift; path = KVKCalendar/Classes/MonthView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -256,24 +256,24 @@
 				0125FECD2025832488BAD129F879C902 /* Date+Extension.swift */,
 				CD1B56681DFC9C60D79D98BDFB6E1980 /* Style.swift */,
 				F905C8EB24C4E01900E48E6A /* ScrollDayViewHeader.swift */,
-				F905C8ED24C4E06E00E48E6A /* ScrollHeaderViewCell.swift */,
+				F905C8ED24C4E06E00E48E6A /* ScrollHeaderDayCell.swift */,
 				F905C91324C4E55C00E48E6A /* YearData.swift */,
 				F905C91524C4E5AA00E48E6A /* YearPhoneCell.swift */,
 				F905C91724C4E5C800E48E6A /* YearPadCell.swift */,
 				F905C91924C4E5E700E48E6A /* YearHeaderView.swift */,
-				F905C91B24C4E60300E48E6A /* YearCalendarView.swift */,
+				F905C91B24C4E60300E48E6A /* YearView.swift */,
 				F905C91D24C4E63500E48E6A /* AllDayEventView.swift */,
 				F905C91F24C4E65300E48E6A /* EventViewList.swift */,
 				F905C92124C4E66C00E48E6A /* EventViewGeneral.swift */,
 				F905C92324C4E68500E48E6A /* EventView.swift */,
-				F905C92524C4E6A700E48E6A /* MonthCollectionViewCell.swift */,
 				F905C92724C4E6CF00E48E6A /* MonthData.swift */,
-				F905C93B24C4E82200E48E6A /* MonthViewCalendar.swift */,
+				F9BEF86F24C73B2D0064992F /* MonthCell.swift */,
+				F9BEF87124C73B6F0064992F /* MonthView.swift */,
 				F905C92924C4E6F600E48E6A /* WeekHeaderView.swift */,
 				F905C92B24C4E71700E48E6A /* WeekData.swift */,
-				F905C92D24C4E73500E48E6A /* WeekViewCalendar.swift */,
+				F905C92D24C4E73500E48E6A /* WeekView.swift */,
 				F905C92F24C4E74A00E48E6A /* DayData.swift */,
-				F905C93124C4E76500E48E6A /* DayViewCalendar.swift */,
+				F905C93124C4E76500E48E6A /* DayView.swift */,
 				F905C93324C4E78300E48E6A /* TimelineLabel.swift */,
 				F905C93524C4E7A400E48E6A /* Timeline+Extension.swift */,
 				F905C93724C4E7BE00E48E6A /* TimelineModel.swift */,
@@ -465,21 +465,20 @@
 				F905C91E24C4E63500E48E6A /* AllDayEventView.swift in Sources */,
 				6650F931A32A529C8E9445F9D66C3AC5 /* Calendar+Extension.swift in Sources */,
 				F905C91424C4E55C00E48E6A /* YearData.swift in Sources */,
+				F9BEF87224C73B6F0064992F /* MonthView.swift in Sources */,
 				9E779304BCE849C42046FBAE71518A1E /* CalendarModel.swift in Sources */,
 				D1ABA35AB7D1D22E432E40FC8AA07C7A /* CalendarView.swift in Sources */,
-				F905C91C24C4E60300E48E6A /* YearCalendarView.swift in Sources */,
+				F905C91C24C4E60300E48E6A /* YearView.swift in Sources */,
 				F905C92A24C4E6F600E48E6A /* WeekHeaderView.swift in Sources */,
-				F905C8EE24C4E06E00E48E6A /* ScrollHeaderViewCell.swift in Sources */,
+				F905C8EE24C4E06E00E48E6A /* ScrollHeaderDayCell.swift in Sources */,
 				F905C93024C4E74A00E48E6A /* DayData.swift in Sources */,
 				F905C93424C4E78300E48E6A /* TimelineLabel.swift in Sources */,
 				041F5B567C80F0BB2BA43B42AC29404D /* Date+Extension.swift in Sources */,
-				F905C93C24C4E82200E48E6A /* MonthViewCalendar.swift in Sources */,
 				85128E13C693351B6F11CA241936333C /* KVKCalendar-dummy.m in Sources */,
-				F905C93224C4E76500E48E6A /* DayViewCalendar.swift in Sources */,
+				F905C93224C4E76500E48E6A /* DayView.swift in Sources */,
 				F905C91624C4E5AA00E48E6A /* YearPhoneCell.swift in Sources */,
 				F905C93824C4E7BE00E48E6A /* TimelineModel.swift in Sources */,
 				F905C93A24C4E7DA00E48E6A /* TimelineView.swift in Sources */,
-				F905C92624C4E6A700E48E6A /* MonthCollectionViewCell.swift in Sources */,
 				F905C92224C4E66C00E48E6A /* EventViewGeneral.swift in Sources */,
 				F905C92824C4E6CF00E48E6A /* MonthData.swift in Sources */,
 				F905C91A24C4E5E700E48E6A /* YearHeaderView.swift in Sources */,
@@ -487,10 +486,11 @@
 				A66F1A03F44DF4E692AF1E7027FE7748 /* Style.swift in Sources */,
 				F905C92024C4E65300E48E6A /* EventViewList.swift in Sources */,
 				F905C92424C4E68500E48E6A /* EventView.swift in Sources */,
-				F905C92E24C4E73500E48E6A /* WeekViewCalendar.swift in Sources */,
+				F905C92E24C4E73500E48E6A /* WeekView.swift in Sources */,
 				F905C8EC24C4E01900E48E6A /* ScrollDayViewHeader.swift in Sources */,
 				F905C91824C4E5C800E48E6A /* YearPadCell.swift in Sources */,
 				F905C92C24C4E71700E48E6A /* WeekData.swift in Sources */,
+				F9BEF87024C73B2D0064992F /* MonthCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
