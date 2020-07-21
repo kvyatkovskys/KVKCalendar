@@ -119,7 +119,9 @@ class CustomViewEvent: EventViewGeneral {
 
 // optional function from CalendarDataSource
 func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? {
-    return CustomEventView
+    guard event.ID == id else { return nil }
+    
+    return customEventView
 }
 ```
 
