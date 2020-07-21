@@ -1,5 +1,5 @@
 //
-//  MonthViewCalendar.swift
+//  MonthView.swift
 //  KVKCalendar
 //
 //  Created by Sergei Kviatkovskii on 02/01/2019.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class MonthViewCalendar: UIView {
+final class MonthView: UIView {
     private var data: MonthData
     private var style: Style
     private var collectionView: UICollectionView!
@@ -65,8 +65,7 @@ final class MonthViewCalendar: UIView {
         collection.isPagingEnabled = style.isPagingEnabled
         collection.dataSource = self
         collection.delegate = self
-        collection.register(MonthCollectionViewCell.self,
-                            forCellWithReuseIdentifier: MonthCollectionViewCell.cellIdentifier)
+        collection.register(MonthCell.self)
         return collection
     }
     
@@ -98,7 +97,7 @@ final class MonthViewCalendar: UIView {
     }
 }
 
-extension MonthViewCalendar: MonthCellDelegate {
+extension MonthView: MonthCellDelegate {
     func didSelectEvent(_ event: Event, frame: CGRect?) {
         delegate?.didSelectCalendarEvent(event, frame: frame)
     }
@@ -176,7 +175,7 @@ extension MonthViewCalendar: MonthCellDelegate {
     }
 }
 
-extension MonthViewCalendar: CalendarSettingProtocol {
+extension MonthView: CalendarSettingProtocol {
     func reloadFrame(_ frame: CGRect) {
         self.frame = frame
         headerView.reloadFrame(frame)
@@ -220,7 +219,7 @@ extension MonthViewCalendar: CalendarSettingProtocol {
     }
 }
 
-extension MonthViewCalendar: UICollectionViewDataSource {
+extension MonthView: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
@@ -230,8 +229,8 @@ extension MonthViewCalendar: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MonthCollectionViewCell.cellIdentifier,
-                                                      for: indexPath) as? MonthCollectionViewCell ?? MonthCollectionViewCell()
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MonthCell.identifier,
+                                                      for: indexPath) as? MonthCell ?? MonthCell()
         let day = data.days[indexPath.row]
         cell.selectDate = data.date
         cell.style = style
@@ -242,11 +241,11 @@ extension MonthViewCalendar: UICollectionViewDataSource {
     }
 }
 
-extension MonthViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         guard style.month.isAutoSelectDateScrolling else { return }
         
-        let cells = collectionView.visibleCells as? [MonthCollectionViewCell] ?? [MonthCollectionViewCell()]
+        let cells = collectionView.visibleCells as? [MonthCell] ?? [MonthCell()]
         let cellDays = cells.filter({ $0.item?.day.type != .empty })
         guard let newMoveDate = cellDays.filter({ $0.item?.day.date?.day == data.date.day }).first?.item?.day.date else {
             let sorted = cellDays.sorted(by: { ($0.item?.day.date?.day ?? 0) < ($1.item?.day.date?.day ?? 0) })
@@ -316,7 +315,7 @@ extension MonthViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateF
     }
 }
 
-extension MonthViewCalendar: DayStyleProtocol {
+extension MonthView: DayStyleProtocol {
     typealias Model = DayStyle
     
     func styleForDay(_ day: Day) -> DayStyle {

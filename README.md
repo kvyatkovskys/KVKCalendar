@@ -61,7 +61,7 @@ extension ViewController {
         
         for model in models {
             var event = Event()
-            event.id = model.id
+            event.ID = model.id
             event.start = model.startDate // start date event
             event.end = model.endDate // end date event
             event.color = model.color
@@ -119,6 +119,20 @@ extension ViewController: CalendarDelegate {
     func didAddEvent(_ date: Date?) {}
     
     func didDisplayEvents(_ events: [Event], dates: [Date?]) {}
+}
+```
+
+To use a custom event view for specific event or date you need to create a new view of class `EventViewGeneral` and return the view in function.
+
+```swift
+class CustomViewEvent: EventViewGeneral {
+    override init(style: Style, event: Event, frame: CGRect) {
+        super.init(style: style, event: event, frame: frame)
+    }
+}
+
+func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? {
+    return CustomEventView
 }
 ```
 

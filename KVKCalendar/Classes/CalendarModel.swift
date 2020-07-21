@@ -141,6 +141,11 @@ protocol DisplayDataSource: class {
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral?
 }
 
+extension DisplayDataSource {
+    func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? { return nil }
+    func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? { return nil }
+}
+
 public protocol CalendarDelegate: AnyObject {
     func didSelectDate(_ date: Date?, type: CalendarType, frame: CGRect?)
     func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?)

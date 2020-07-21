@@ -1,5 +1,5 @@
 //
-//  YearViewCalendar.swift
+//  YearView.swift
 //  KVKCalendar
 //
 //  Created by Sergei Kviatkovskii on 02/01/2019.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class YearViewCalendar: UIView {
+final class YearView: UIView {
     private var data: YearData
     private var style: Style
     private var animated: Bool = false
@@ -80,7 +80,7 @@ final class YearViewCalendar: UIView {
     }
 }
 
-extension YearViewCalendar: CalendarSettingProtocol {
+extension YearView: CalendarSettingProtocol {
     func reloadFrame(_ frame: CGRect) {
         self.frame = frame
         headerView.reloadFrame(self.frame)
@@ -128,7 +128,7 @@ extension YearViewCalendar: CalendarSettingProtocol {
     }
 }
 
-extension YearViewCalendar: UICollectionViewDataSource {
+extension YearView: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
@@ -153,7 +153,7 @@ extension YearViewCalendar: UICollectionViewDataSource {
     }
 }
 
-extension YearViewCalendar: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+extension YearView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         guard style.year.isAutoSelectDateScrolling else { return }
         
