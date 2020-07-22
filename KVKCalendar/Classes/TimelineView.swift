@@ -13,7 +13,7 @@ final class TimelineView: UIView, CompareEventDateProtocol {
     weak var dataSource: DisplayDataSource?
     var style: Style
     var eventPreview: EventView?
-    var isEnabledAutoScroll = true
+    var firstAutoScrollIsCompleted = false
     
     private(set) var tagCurrentHourLine = -10
     private(set) var tagEventPagePreview = -20
@@ -396,19 +396,17 @@ final class TimelineView: UIView, CompareEventDateProtocol {
     }
     
     private func scrollToCurrentTime(startHour: Int) {
-        guard isEnabledAutoScroll else {
-            isEnabledAutoScroll = true
-            return
-        }
-        
         guard let time = getTimelineLabel(hour: Date().hour), style.timeline.scrollToCurrentHour else {
             scrollView.setContentOffset(.zero, animated: true)
             return
         }
         
+        guard !firstAutoScrollIsCompleted else { return }
+        
         var frame = scrollView.frame
         frame.origin.y = time.frame.origin.y
         scrollView.scrollRectToVisible(frame, animated: true)
+        firstAutoScrollIsCompleted = true
     }
     
     private func fillBackgroundDayColor(_ color: UIColor, pointX: CGFloat, width: CGFloat) -> UIView {
