@@ -51,7 +51,6 @@ extension TimelineView: EventDelegate {
         let pointTempY = (point.y - eventPreviewYOffset) - style.timeline.offsetEvent - 6
         let time = calculateChangeTime(pointY: pointTempY)
         if let minute = time.minute, let hour = time.hour {
-            isEnabledAutoScroll = false
             point.x -= eventPreviewXOffset
             delegate?.didChangeEvent(event, minute: minute, hour: hour, point: point)
         }

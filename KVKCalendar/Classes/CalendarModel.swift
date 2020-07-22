@@ -59,7 +59,7 @@ public struct EventColor {
 }
 
 public struct Event {
-    @available(swift, obsoleted: 0.3.4, message: "This will be removed in v0.3.5; please migrate to a ID.")
+    @available(swift, obsoleted: 0.3.4, message: "This will be removed in v0.3.5, please migrate to a ID.")
     public var id: Any = 0
     public var ID: String = "0"
     public var text: String = ""

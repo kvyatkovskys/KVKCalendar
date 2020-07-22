@@ -113,7 +113,7 @@ public final class CalendarView: UIView {
         }
     }
     
-    @available(*, deprecated, renamed: "scrollTo")
+    @available(swift, obsoleted: 0.3.4, message: "This will be removed in v0.3.5, please migrate to a scrollTo(_:)", renamed: "scrollTo")
     public func scrollToDate(date: Date) {
         switch type {
         case .day:
