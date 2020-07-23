@@ -47,8 +47,9 @@ final class WeekHeaderView: UIView {
                                               width: width,
                                               height: fromYear ? frame.height : style.month.heightHeaderWeek))
             label.adjustsFontSizeToFitWidth = true
+            label.minimumScaleFactor = 0.8
             label.textAlignment = .center
-            label.font = style.year.weekFont
+            label.font = fromYear ? style.year.weekFont : style.month.weekFont
             
             if value.isWeekend {
                 label.textColor = style.week.colorWeekendDate

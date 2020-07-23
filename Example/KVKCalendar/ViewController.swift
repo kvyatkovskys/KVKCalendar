@@ -34,7 +34,6 @@ final class ViewController: UIViewController {
         } else {
             style.timeline.widthEventViewer = 500
         }
-        style.month.isPagingEnabled = false
         style.timeline.startFromFirstEvent = false
         style.followInSystemTheme = true
         style.timeline.offsetTimeY = 80
@@ -83,8 +82,10 @@ final class ViewController: UIViewController {
         calendarView.addEventViewToDay(view: eventViewer)
         
         loadEvents { [weak self] (events) in
-            self?.events = events
-            self?.calendarView.reloadData()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                self?.events = events
+                self?.calendarView.reloadData()
+            }
         }
     }
     

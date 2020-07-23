@@ -303,9 +303,14 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
                 widht = (collectionView.frame.width / 7) - 0.2
                 height = collectionView.frame.height / 6
             } else {
-                let value: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 6 : 7
-                widht = (collectionView.frame.width / 7) - 0.2
-                height = collectionView.frame.height / value
+                switch UIDevice.current.userInterfaceIdiom {
+                case .phone:
+                    widht = (collectionView.frame.width / 7) - 0.2
+                    height = collectionView.frame.height / 7
+                default:
+                    widht = (collectionView.frame.width / 7) - 0.2
+                    height = collectionView.frame.height / 6
+                }
             }
         @unknown default:
             fatalError()
