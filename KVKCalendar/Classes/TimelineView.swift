@@ -396,11 +396,6 @@ final class TimelineView: UIView, CompareEventDateProtocol {
     }
     
     private func scrollToCurrentTime(startHour: Int) {
-        guard isEnabledAutoScroll else {
-            isEnabledAutoScroll = true
-            return
-        }
-        
         guard style.timeline.scrollToCurrentHour else { return }
         
         guard let time = getTimelineLabel(hour: Date().hour)else {
