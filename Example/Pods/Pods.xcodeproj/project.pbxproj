@@ -23,7 +23,6 @@
 		F905C8EC24C4E01900E48E6A /* ScrollDayViewHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C8EB24C4E01900E48E6A /* ScrollDayViewHeader.swift */; };
 		F905C8EE24C4E06E00E48E6A /* ScrollHeaderDayCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C8ED24C4E06E00E48E6A /* ScrollHeaderDayCell.swift */; };
 		F905C91424C4E55C00E48E6A /* YearData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C91324C4E55C00E48E6A /* YearData.swift */; };
-		F905C91624C4E5AA00E48E6A /* YearPhoneCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C91524C4E5AA00E48E6A /* YearPhoneCell.swift */; };
 		F905C91824C4E5C800E48E6A /* YearPadCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C91724C4E5C800E48E6A /* YearPadCell.swift */; };
 		F905C91A24C4E5E700E48E6A /* YearHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C91924C4E5E700E48E6A /* YearHeaderView.swift */; };
 		F905C91C24C4E60300E48E6A /* YearView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C91B24C4E60300E48E6A /* YearView.swift */; };
@@ -102,7 +101,6 @@
 		F905C8EB24C4E01900E48E6A /* ScrollDayViewHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScrollDayViewHeader.swift; path = KVKCalendar/Classes/ScrollDayViewHeader.swift; sourceTree = "<group>"; };
 		F905C8ED24C4E06E00E48E6A /* ScrollHeaderDayCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScrollHeaderDayCell.swift; path = KVKCalendar/Classes/ScrollHeaderDayCell.swift; sourceTree = "<group>"; };
 		F905C91324C4E55C00E48E6A /* YearData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = YearData.swift; path = KVKCalendar/Classes/YearData.swift; sourceTree = "<group>"; };
-		F905C91524C4E5AA00E48E6A /* YearPhoneCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = YearPhoneCell.swift; path = KVKCalendar/Classes/YearPhoneCell.swift; sourceTree = "<group>"; };
 		F905C91724C4E5C800E48E6A /* YearPadCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = YearPadCell.swift; path = KVKCalendar/Classes/YearPadCell.swift; sourceTree = "<group>"; };
 		F905C91924C4E5E700E48E6A /* YearHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = YearHeaderView.swift; path = KVKCalendar/Classes/YearHeaderView.swift; sourceTree = "<group>"; };
 		F905C91B24C4E60300E48E6A /* YearView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = YearView.swift; path = KVKCalendar/Classes/YearView.swift; sourceTree = "<group>"; };
@@ -258,7 +256,6 @@
 				F905C8EB24C4E01900E48E6A /* ScrollDayViewHeader.swift */,
 				F905C8ED24C4E06E00E48E6A /* ScrollHeaderDayCell.swift */,
 				F905C91324C4E55C00E48E6A /* YearData.swift */,
-				F905C91524C4E5AA00E48E6A /* YearPhoneCell.swift */,
 				F905C91724C4E5C800E48E6A /* YearPadCell.swift */,
 				F905C91924C4E5E700E48E6A /* YearHeaderView.swift */,
 				F905C91B24C4E60300E48E6A /* YearView.swift */,
@@ -476,7 +473,6 @@
 				041F5B567C80F0BB2BA43B42AC29404D /* Date+Extension.swift in Sources */,
 				85128E13C693351B6F11CA241936333C /* KVKCalendar-dummy.m in Sources */,
 				F905C93224C4E76500E48E6A /* DayView.swift in Sources */,
-				F905C91624C4E5AA00E48E6A /* YearPhoneCell.swift in Sources */,
 				F905C93824C4E7BE00E48E6A /* TimelineModel.swift in Sources */,
 				F905C93A24C4E7DA00E48E6A /* TimelineView.swift in Sources */,
 				F905C92224C4E66C00E48E6A /* EventViewGeneral.swift in Sources */,

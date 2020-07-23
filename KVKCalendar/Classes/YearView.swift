@@ -22,6 +22,22 @@ final class YearView: UIView {
         return layout
     }()
     
+    private func scrollDirection(month: Int) -> UICollectionView.ScrollPosition {
+        switch UIDevice.current.userInterfaceIdiom {
+        case .phone:
+            switch month {
+            case 1...4:
+                return .top
+            case 5...8:
+                return .centeredVertically
+            default:
+                return .bottom
+            }
+        default:
+            return .top
+        }
+    }
+    
     private lazy var headerView: YearHeaderView = {
         let view = YearHeaderView(frame: CGRect(x: 0, y: 0, width: frame.width, height: style.year.heightTitleHeader))
         view.style = style
@@ -49,24 +65,15 @@ final class YearView: UIView {
         collection.dataSource = self
         collection.delegate = self
         collection.register(YearPadCell.self)
-        collection.register(YearPhoneCell.self)
         return collection
     }
     
     private func scrollToDate(date: Date, animated: Bool) {
         delegate?.didSelectCalendarDate(date, type: .year, frame: nil)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            guard UIDevice.current.userInterfaceIdiom == .pad else {
-                if let idx = self.data.months.firstIndex(where: { $0.date.year == date.year && $0.date.month == date.month }) {
-                    self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
-                                                     at: .top,
-                                                     animated: animated)
-                }
-                return
-            }
-            if let idx = self.data.months.firstIndex(where: { $0.date.year == date.year }) {
+            if let idx = self.data.months.firstIndex(where: { $0.date.year == date.year && $0.date.month == date.month }) {
                 self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
-                                                 at: .top,
+                                                 at: self.scrollDirection(month: date.month),
                                                  animated: animated)
             }
         }
@@ -92,17 +99,9 @@ extension YearView: CalendarSettingProtocol {
         addSubview(collectionView)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            guard UIDevice.current.userInterfaceIdiom == .pad else {
-                if let idx = self.data.months.firstIndex(where: { $0.date.year == self.data.date.year && $0.date.month == self.data.date.month }) {
-                    self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
-                                                     at: .top,
-                                                     animated: false)
-                }
-                return
-            }
-            if let idx = self.data.months.firstIndex(where: { $0.date.year == self.data.date.year }) {
+            if let idx = self.data.months.firstIndex(where: { $0.date.year == self.data.date.year && $0.date.month == self.data.date.month }) {
                 self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
-                                                 at: .top,
+                                                 at: self.scrollDirection(month: self.data.date.month),
                                                  animated: false)
             }
         }
@@ -138,11 +137,6 @@ extension YearView: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard UIDevice.current.userInterfaceIdiom != .phone else {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: YearPhoneCell.identifier, for: indexPath) as? YearPhoneCell ?? YearPhoneCell()
-            return cell
-        }
-        
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: YearPadCell.identifier, for: indexPath) as? YearPadCell ?? YearPadCell()
         let month = data.months[indexPath.row]
         cell.style = style
@@ -160,12 +154,6 @@ extension YearView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
         let cells = collectionView.visibleCells as? [YearPadCell] ?? [YearPadCell()]
         let newMoveDate = cells.reduce([]) { (acc, month) -> [Date?] in
             var resultDate = acc
-            guard UIDevice.current.userInterfaceIdiom == .pad else {
-                if let day = month.days.filter({ $0.date?.day == data.date.day }).first {
-                    resultDate = [day.date]
-                }
-                return resultDate
-            }
             if let day = month.days.filter({ $0.date?.month == data.date.month && $0.date?.day == data.date.day }).first {
                 resultDate = [day.date]
             }
@@ -181,7 +169,6 @@ extension YearView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard UIDevice.current.userInterfaceIdiom == .pad else { return }
         let date = data.months[indexPath.row].date
         let formatter = DateFormatter()
         formatter.dateFormat = "dd.MM.yyyy"
@@ -197,7 +184,7 @@ extension YearView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
     }
     
     func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
-        guard UIDevice.current.userInterfaceIdiom == .pad, style.month.isAnimateSelection else { return }
+        guard style.month.isAnimateSelection else { return }
         
         let cell = collectionView.cellForItem(at: indexPath)
         UIView.animate(withDuration: 0.4,
@@ -210,7 +197,7 @@ extension YearView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
     }
     
     func collectionView(_ collectionView: UICollectionView, didUnhighlightItemAt indexPath: IndexPath) {
-        guard UIDevice.current.userInterfaceIdiom == .pad, style.month.isAnimateSelection else { return }
+        guard style.month.isAnimateSelection else { return }
         
         let cell = collectionView.cellForItem(at: indexPath)
         UIView.animate(withDuration: 0.1) {
@@ -225,8 +212,8 @@ extension YearView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
             widht = collectionView.frame.width / 4
             height = collectionView.frame.height / 3
         } else {
-            widht = collectionView.frame.width
-            height = collectionView.frame.height
+            widht = collectionView.frame.width / 3
+            height = collectionView.frame.height / 4
         }
         return CGSize(width: widht - 10, height: height - 10)
     }

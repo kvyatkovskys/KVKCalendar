@@ -27,7 +27,7 @@ final class YearPadCell: UICollectionViewCell {
             titleLabel.textColor = style.year.colorTitle
             
             subviews.filter({ $0 is WeekHeaderView }).forEach({ $0.removeFromSuperview() })
-            let view = WeekHeaderView(frame: CGRect(x: 0, y: 40, width: frame.width, height: 30), style: style, fromYear: true)
+            let view = WeekHeaderView(frame: CGRect(x: 0, y: 35, width: frame.width, height: 30), style: style, fromYear: true)
             addSubview(view)
         }
     }
@@ -90,6 +90,8 @@ final class YearPadCell: UICollectionViewCell {
             label.textAlignment = .center
             label.font = style.year.fontDayTitle
             label.textColor = style.year.colorDayTitle
+            label.adjustsFontSizeToFitWidth = true
+            label.minimumScaleFactor = 0.8
             if let tempDay = day.date?.day {
                 label.text = "\(tempDay)"
             } else {

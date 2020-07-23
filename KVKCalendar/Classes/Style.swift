@@ -141,6 +141,7 @@ public struct MonthStyle {
     public var isHiddenMoreTitle: Bool = false
     public var colorMoreTitle: UIColor = .gray
     public var colorEventTitle: UIColor = .black
+    public var weekFont: UIFont = .boldSystemFont(ofSize: 14)
     public var fontEventTitle: UIFont = .systemFont(ofSize: 15)
     public var fontEventTime: UIFont = .systemFont(ofSize: 10)
     public var fontEventBullet: UIFont = .boldSystemFont(ofSize: 18)
@@ -170,7 +171,16 @@ public struct YearStyle {
     public var colorSelectDate: UIColor = .white
     public var colorWeekendDate: UIColor = .gray
     public var colorBackgroundWeekendDate: UIColor = gainsboro.withAlphaComponent(0.4)
-    public var weekFont: UIFont = .boldSystemFont(ofSize: 14)
+    public var weekFontPad: UIFont = .boldSystemFont(ofSize: 14)
+    public var weekFontPhone: UIFont = .boldSystemFont(ofSize: 8)
+    public var weekFont: UIFont {
+        switch UIDevice.current.userInterfaceIdiom {
+        case .phone:
+            return weekFontPhone
+        default:
+            return weekFontPad
+        }
+    }
     public var fontTitle: UIFont = .systemFont(ofSize: 19)
     public var colorTitle: UIColor = .black
     public var colorBackgroundHeader: UIColor = gainsboro.withAlphaComponent(0.4)
@@ -178,7 +188,16 @@ public struct YearStyle {
     public var colorTitleHeader: UIColor = .black
     public var heightTitleHeader: CGFloat = 50
     public var aligmentTitleHeader: NSTextAlignment = .center
-    public var fontDayTitle: UIFont = .systemFont(ofSize: 15)
+    public var fontDayTitlePad: UIFont = .systemFont(ofSize: 15)
+    public var fontDayTitlePhone: UIFont = .systemFont(ofSize: 11)
+    public var fontDayTitle: UIFont {
+        switch UIDevice.current.userInterfaceIdiom {
+        case .phone:
+            return fontDayTitlePhone
+        default:
+            return fontDayTitlePad
+        }
+    }
     public var colorDayTitle: UIColor = .black
     public var selectCalendarType: CalendarType = .month
     public var isAnimateSelection: Bool = true
