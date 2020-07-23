@@ -101,6 +101,11 @@ extension DayView: DisplayDataSource {
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? {
         return dataSource?.willDisplayEventView(event, frame: frame, date: date)
     }
+    
+    @available(iOS 13.0, *)
+    func willDisplayContextMenu(_ event: Event, date: Date?) -> UIContextMenuConfiguration? {
+        return dataSource?.willDisplayContextMenu(event, date: date)
+    }
 }
 
 extension DayView: ScrollDayHeaderDelegate {

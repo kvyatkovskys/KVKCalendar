@@ -224,6 +224,7 @@ public struct EventStyle {
     public var isEnableMoveEvent: Bool = false
     public var minimumPressDuration: TimeInterval = 1
     public var alphaWhileMoving: CGFloat = 0.5
+    var isEnableContextMenu: Bool = false
 }
 
 extension Style {

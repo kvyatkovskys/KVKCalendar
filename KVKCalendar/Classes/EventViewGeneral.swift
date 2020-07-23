@@ -9,6 +9,7 @@ import UIKit
 
 open class EventViewGeneral: UIView {
     weak var delegate: EventDelegate?
+    weak var dataSource: EventDataSource?
     
     private let event: Event
     private let color: UIColor
@@ -44,8 +45,13 @@ open class EventViewGeneral: UIView {
     @objc public func activateMoveEvent(gesture: UILongPressGestureRecognizer) {
         switch gesture.state {
         case .began:
-            alpha = style.event.alphaWhileMoving
-            delegate?.didStartMoveEvent(event, gesture: gesture)
+            UIView.animate(withDuration: 0.3, animations: {
+                self.transform = CGAffineTransform(scaleX: 1.12, y: 1.12)
+            }) { (_) in
+                self.alpha = self.style.event.alphaWhileMoving
+                self.transform = .identity
+                self.delegate?.didStartMoveEvent(self.event, gesture: gesture)
+            }
         case .changed:
             delegate?.didChangeMoveEvent(event, gesture: gesture)
         case .cancelled, .ended, .failed:
@@ -73,9 +79,30 @@ open class EventViewGeneral: UIView {
     }
 }
 
+@available(iOS 13, *)
+extension EventViewGeneral: UIContextMenuInteractionDelegate {
+    var interaction: UIContextMenuInteraction {
+        return UIContextMenuInteraction(delegate: self)
+    }
+    
+    public func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
+        return dataSource?.willDisplayContextMenu(event, date: event.start)
+    }
+}
+
 protocol EventDelegate: class {
     func didStartMoveEvent(_ event: Event, gesture: UILongPressGestureRecognizer)
     func didEndMoveEvent(_ event: Event, gesture: UILongPressGestureRecognizer)
     func didChangeMoveEvent(_ event: Event, gesture: UILongPressGestureRecognizer)
     func didSelectEvent(_ event: Event, gesture: UITapGestureRecognizer)
+}
+
+protocol EventDataSource: class {
+    @available(iOS 13.0, *)
+    func willDisplayContextMenu(_ event: Event, date: Date?) -> UIContextMenuConfiguration?
+}
+
+extension EventDataSource {
+    @available(iOS 13.0, *)
+    func willDisplayContextMenu(_ event: Event, date: Date?) -> UIContextMenuConfiguration? { return nil }
 }

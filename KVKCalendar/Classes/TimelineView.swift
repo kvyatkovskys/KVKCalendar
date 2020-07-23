@@ -528,6 +528,7 @@ final class TimelineView: UIView, CompareEventDateProtocol {
                         page = EventView(event: event, style: style, frame: newFrame)
                     }
                     page.delegate = self
+                    page.dataSource = self
                     scrollView.addSubview(page)
                     pagesCached.append(page)
                 }

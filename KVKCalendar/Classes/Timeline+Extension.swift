@@ -7,6 +7,13 @@
 
 import Foundation
 
+extension TimelineView: EventDataSource {
+    @available(iOS 13, *)
+    func willDisplayContextMenu(_ event: Event, date: Date?) -> UIContextMenuConfiguration? {
+        return dataSource?.willDisplayContextMenu(event, date: date)
+    }
+}
+
 extension TimelineView: EventDelegate {
     func didSelectEvent(_ event: Event, gesture: UITapGestureRecognizer) {
         delegate?.didSelectEvent(event, frame: gesture.view?.frame)
