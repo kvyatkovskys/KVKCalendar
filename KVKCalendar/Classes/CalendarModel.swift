@@ -139,11 +139,15 @@ public extension CalendarDataSource {
 protocol DisplayDataSource: class {
     func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle?
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral?
+    @available(iOS 13.0, *)
+    func willDisplayContextMenu(_ event: Event, date: Date?) -> UIContextMenuConfiguration?
 }
 
 extension DisplayDataSource {
     func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? { return nil }
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? { return nil }
+    @available(iOS 13.0, *)
+    func willDisplayContextMenu(_ event: Event, date: Date?) -> UIContextMenuConfiguration? { return nil }
 }
 
 public protocol CalendarDelegate: AnyObject {

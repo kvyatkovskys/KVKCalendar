@@ -149,6 +149,11 @@ extension CalendarView: DisplayDataSource {
     func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? {
         return dataSource?.willDisplayDate(date, events: events)
     }
+    
+    @available(iOS 13.0, *)
+    func willDisplayContextMenu(_ event: Event, date: Date?) -> UIContextMenuConfiguration? {
+        return nil //dataSource?.willDisplayContextMenu(event, date: date)
+    }
 }
 
 extension CalendarView: CalendarPrivateDelegate {
