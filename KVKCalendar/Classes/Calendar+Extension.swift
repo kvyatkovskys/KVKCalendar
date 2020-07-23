@@ -59,4 +59,12 @@ extension UIView {
         mask.path = path.cgPath
         layer.mask = mask
     }
+    
+    func snapshot(size: CGSize) -> UIImage {
+        let renderer = UIGraphicsImageRenderer(size: size)
+        let image = renderer.image { ctx in
+            drawHierarchy(in: bounds, afterScreenUpdates: false)
+        }
+        return image
+    }
 }

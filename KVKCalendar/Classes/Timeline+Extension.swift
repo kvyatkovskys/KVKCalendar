@@ -19,7 +19,7 @@ extension TimelineView: EventDelegate {
         delegate?.didSelectEvent(event, frame: gesture.view?.frame)
     }
     
-    func didStartMoveEvent(_ event: Event, gesture: UILongPressGestureRecognizer) {
+    func didStartMoveEvent(_ event: Event, gesture: UILongPressGestureRecognizer, view: UIView) {
         let point = gesture.location(in: scrollView)
         
         shadowView.removeFromSuperview()
@@ -31,7 +31,8 @@ extension TimelineView: EventDelegate {
         eventPreview = nil
         eventPreview = EventView(event: event,
                                  style: style,
-                                 frame: CGRect(origin: CGPoint(x: point.x - eventPreviewXOffset, y: point.y - eventPreviewYOffset), size: eventPreviewSize))
+                                 frame: CGRect(origin: CGPoint(x: point.x - eventPreviewXOffset, y: point.y - eventPreviewYOffset),
+                                               size: eventPreviewSize))
         eventPreview?.alpha = 0.9
         eventPreview?.tag = tagEventPagePreview
         eventPreview?.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
