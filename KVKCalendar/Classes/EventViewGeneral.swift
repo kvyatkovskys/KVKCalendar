@@ -50,7 +50,7 @@ open class EventViewGeneral: UIView {
             }) { (_) in
                 self.alpha = self.style.event.alphaWhileMoving
                 self.transform = .identity
-                self.delegate?.didStartMoveEvent(self.event, gesture: gesture)
+                self.delegate?.didStartMoveEvent(self.event, gesture: gesture, view: self)
             }
         case .changed:
             delegate?.didChangeMoveEvent(event, gesture: gesture)
@@ -79,6 +79,14 @@ open class EventViewGeneral: UIView {
     }
 }
 
+extension EventViewGeneral: NSCopying {
+    public func copy(with zone: NSZone? = nil) -> Any {
+        return EventViewGeneral(style: style,
+                                event: event,
+                                frame: frame)
+    }
+}
+
 @available(iOS 13, *)
 extension EventViewGeneral: UIContextMenuInteractionDelegate {
     var interaction: UIContextMenuInteraction {
@@ -91,7 +99,7 @@ extension EventViewGeneral: UIContextMenuInteractionDelegate {
 }
 
 protocol EventDelegate: class {
-    func didStartMoveEvent(_ event: Event, gesture: UILongPressGestureRecognizer)
+    func didStartMoveEvent(_ event: Event, gesture: UILongPressGestureRecognizer, view: UIView)
     func didEndMoveEvent(_ event: Event, gesture: UILongPressGestureRecognizer)
     func didChangeMoveEvent(_ event: Event, gesture: UILongPressGestureRecognizer)
     func didSelectEvent(_ event: Event, gesture: UITapGestureRecognizer)

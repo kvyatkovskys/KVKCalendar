@@ -12,7 +12,7 @@ final class TimelineView: UIView, CompareEventDateProtocol {
     weak var delegate: TimelineDelegate?
     weak var dataSource: DisplayDataSource?
     var style: Style
-    var eventPreview: EventView?
+    var eventPreview: UIView?
     var firstAutoScrollIsCompleted = false
     
     private(set) var tagCurrentHourLine = -10
