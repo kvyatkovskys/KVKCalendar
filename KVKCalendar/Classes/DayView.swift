@@ -32,8 +32,12 @@ final class DayView: UIView {
     
     private lazy var timelineView: TimelineView = {
         var timelineFrame = frame
-        timelineFrame.origin.y = scrollHeaderDay.frame.height
-        timelineFrame.size.height -= scrollHeaderDay.frame.height
+        
+        if !style.headerScroll.isHidden {
+            timelineFrame.origin.y = scrollHeaderDay.frame.height
+            timelineFrame.size.height -= scrollHeaderDay.frame.height
+        }
+        
         if UIDevice.current.userInterfaceIdiom == .pad {
             if UIDevice.current.orientation.isPortrait {
                 timelineFrame.size.width = UIScreen.main.bounds.width * 0.5
@@ -176,11 +180,16 @@ extension DayView: TimelineDelegate {
 extension DayView: CalendarSettingProtocol {
     func reloadFrame(_ frame: CGRect) {
         self.frame = frame
-        topBackgroundView.frame.size.width = frame.width
-        scrollHeaderDay.reloadFrame(frame)
-        
         var timelineFrame = timelineView.frame
-        timelineFrame.size.height = frame.height - scrollHeaderDay.frame.height
+        
+        if !style.headerScroll.isHidden {
+            topBackgroundView.frame.size.width = frame.width
+            scrollHeaderDay.reloadFrame(frame)
+            timelineFrame.size.height = frame.height - scrollHeaderDay.frame.height
+        } else {
+            timelineFrame.size.height = frame.height
+        }
+        
         if UIDevice.current.userInterfaceIdiom == .pad {
             timelineFrame.size.width = frame.width - style.timeline.widthEventViewer
             if let idx = subviews.firstIndex(where: { $0.tag == -1 }) {
@@ -221,8 +230,10 @@ extension DayView: CalendarSettingProtocol {
     func setUI() {
         subviews.forEach({ $0.removeFromSuperview() })
         
-        addSubview(topBackgroundView)
-        topBackgroundView.addSubview(scrollHeaderDay)
+        if !style.headerScroll.isHidden {
+            addSubview(topBackgroundView)
+            topBackgroundView.addSubview(scrollHeaderDay)
+        }
         addSubview(timelineView)
     }
 }

@@ -66,6 +66,7 @@ public struct HeaderScrollStyle {
     public var isScrollEnabled: Bool = true
     public var colorWeekdayBackground: UIColor = .clear
     public var colorWeekendBackground: UIColor = .clear
+    public var isHidden: Bool = false
 }
 
 public struct TimelineStyle {
