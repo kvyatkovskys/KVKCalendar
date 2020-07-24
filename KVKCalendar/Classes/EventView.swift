@@ -8,9 +8,6 @@
 import UIKit
 
 final class EventView: EventViewGeneral {
-    let event: Event
-    let style: Style
-    
     private let pointX: CGFloat = 5
         
     private let textView: UITextView = {
@@ -31,8 +28,6 @@ final class EventView: EventViewGeneral {
     }()
     
     init(event: Event, style: Style, frame: CGRect) {
-        self.event = event
-        self.style = style
         super.init(style: style, event: event, frame: frame)
         
         var textFrame = frame
