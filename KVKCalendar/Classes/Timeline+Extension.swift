@@ -29,10 +29,17 @@ extension TimelineView: EventDelegate {
         }
     
         eventPreview = nil
-        eventPreview = EventView(event: event,
-                                 style: style,
-                                 frame: CGRect(origin: CGPoint(x: point.x - eventPreviewXOffset, y: point.y - eventPreviewYOffset),
-                                               size: eventPreviewSize))
+        
+        if view is EventView {
+            eventPreview = EventView(event: event,
+                                     style: style,
+                                     frame: CGRect(origin: CGPoint(x: point.x - eventPreviewXOffset, y: point.y - eventPreviewYOffset),
+                                                   size: eventPreviewSize))
+        } else {
+            eventPreview = view.snapshotView(afterScreenUpdates: false)
+            eventPreview?.frame.origin = CGPoint(x: point.x - eventPreviewXOffset, y: point.y - eventPreviewYOffset)
+        }
+        
         eventPreview?.alpha = 0.9
         eventPreview?.tag = tagEventPagePreview
         eventPreview?.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)

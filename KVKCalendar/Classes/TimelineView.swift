@@ -28,7 +28,7 @@ final class TimelineView: UIView, CompareEventDateProtocol {
     private var dates = [Date?]()
     private var selectedDate: Date?
     private(set) var eventPreviewXOffset: CGFloat = 50
-    private(set) var eventPreviewYOffset: CGFloat = 60
+    private(set) var eventPreviewYOffset: CGFloat = 70
     private(set) var eventPreviewSize = CGSize(width: 100, height: 100)
     private(set) var type: CalendarType
     
