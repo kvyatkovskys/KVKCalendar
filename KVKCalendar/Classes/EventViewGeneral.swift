@@ -11,16 +11,15 @@ open class EventViewGeneral: UIView {
     weak var delegate: EventDelegate?
     weak var dataSource: EventDataSource?
     
-    let event: Event
-    let color: UIColor
-    let style: Style
+    public var event: Event
+    public var color: UIColor
+    public var style: Style
     
     public init(style: Style, event: Event, frame: CGRect) {
         self.style = style
         self.event = event
         self.color = EventColor(event.color?.value ?? event.backgroundColor).value
         super.init(frame: frame)
-        
         setup()
     }
     
@@ -29,10 +28,9 @@ open class EventViewGeneral: UIView {
         self.style = Style()
         self.color = Event().backgroundColor
         super.init(coder: coder)
-        setup()
     }
     
-    private func setup() {
+    public func setup() {
         setRoundCorners(style.timeline.eventCorners, radius: style.timeline.eventCornersRadius)
         backgroundColor = event.backgroundColor
         tag = event.hash
@@ -54,7 +52,7 @@ open class EventViewGeneral: UIView {
         switch gesture.state {
         case .began:
             UIView.animate(withDuration: 0.3, animations: {
-                self.transform = CGAffineTransform(scaleX: 1.12, y: 1.12)
+                self.transform = CGAffineTransform(scaleX: 1.11, y: 1.11)
             }) { (_) in
                 self.alpha = self.style.event.alphaWhileMoving
                 self.transform = .identity
