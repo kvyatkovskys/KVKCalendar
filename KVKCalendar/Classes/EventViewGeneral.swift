@@ -11,9 +11,9 @@ open class EventViewGeneral: UIView {
     weak var delegate: EventDelegate?
     weak var dataSource: EventDataSource?
     
-    private let event: Event
-    private let color: UIColor
-    private let style: Style
+    let event: Event
+    let color: UIColor
+    let style: Style
     
     public init(style: Style, event: Event, frame: CGRect) {
         self.style = style
@@ -21,6 +21,18 @@ open class EventViewGeneral: UIView {
         self.color = EventColor(event.color?.value ?? event.backgroundColor).value
         super.init(frame: frame)
         
+        setup()
+    }
+    
+    required public init?(coder: NSCoder) {
+        self.event = Event()
+        self.style = Style()
+        self.color = Event().backgroundColor
+        super.init(coder: coder)
+        setup()
+    }
+    
+    private func setup() {
         setRoundCorners(style.timeline.eventCorners, radius: style.timeline.eventCornersRadius)
         backgroundColor = event.backgroundColor
         tag = event.hash
@@ -32,10 +44,6 @@ open class EventViewGeneral: UIView {
             longGesture.minimumPressDuration = style.event.minimumPressDuration
             addGestureRecognizer(longGesture)
         }
-    }
-    
-    required public init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
     
     @objc public func tapOnEvent(gesture: UITapGestureRecognizer) {
@@ -76,14 +84,6 @@ open class EventViewGeneral: UIView {
         context.addLine(to: CGPoint(x: x, y: bounds.height))
         context.strokePath()
         context.restoreGState()
-    }
-}
-
-extension EventViewGeneral: NSCopying {
-    public func copy(with zone: NSZone? = nil) -> Any {
-        return EventViewGeneral(style: style,
-                                event: event,
-                                frame: frame)
     }
 }
 
