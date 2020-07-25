@@ -15,6 +15,14 @@ extension TimelineView: EventDataSource {
 }
 
 extension TimelineView: EventDelegate {
+    var eventPreviewXOffset: CGFloat {
+        return eventPreviewSize.width * 0.5
+    }
+    
+    var eventPreviewYOffset: CGFloat {
+        return eventPreviewSize.height * 0.7
+    }
+    
     func didSelectEvent(_ event: Event, gesture: UITapGestureRecognizer) {
         delegate?.didSelectEvent(event, frame: gesture.view?.frame)
     }
@@ -31,12 +39,16 @@ extension TimelineView: EventDelegate {
         eventPreview = nil
         
         if view is EventView {
+            eventPreviewSize = CGSize(width: 100, height: 100)
             eventPreview = EventView(event: event,
                                      style: style,
                                      frame: CGRect(origin: CGPoint(x: point.x - eventPreviewXOffset, y: point.y - eventPreviewYOffset),
                                                    size: eventPreviewSize))
         } else {
             eventPreview = view.snapshotView(afterScreenUpdates: false)
+            if let size = eventPreview?.frame.size {
+                eventPreviewSize = size
+            }
             eventPreview?.frame.origin = CGPoint(x: point.x - eventPreviewXOffset, y: point.y - eventPreviewYOffset)
         }
         
