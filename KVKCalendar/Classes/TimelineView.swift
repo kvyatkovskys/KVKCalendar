@@ -14,6 +14,7 @@ final class TimelineView: UIView, CompareEventDateProtocol {
     var style: Style
     var eventPreview: UIView?
     var firstAutoScrollIsCompleted = false
+    var eventPreviewSize = CGSize(width: 100, height: 100)
     
     private(set) var tagCurrentHourLine = -10
     private(set) var tagEventPagePreview = -20
@@ -27,9 +28,6 @@ final class TimelineView: UIView, CompareEventDateProtocol {
     private var timer: Timer?
     private var dates = [Date?]()
     private var selectedDate: Date?
-    private(set) var eventPreviewXOffset: CGFloat = 50
-    private(set) var eventPreviewYOffset: CGFloat = 70
-    private(set) var eventPreviewSize = CGSize(width: 100, height: 100)
     private(set) var type: CalendarType
     
     private(set) lazy var shadowView: UIView = {
