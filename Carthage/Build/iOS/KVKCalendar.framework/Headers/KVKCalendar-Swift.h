@@ -220,6 +220,30 @@ SWIFT_CLASS("_TtC11KVKCalendar12CalendarView")
 
 
 
+@class UITapGestureRecognizer;
+@class UILongPressGestureRecognizer;
+
+SWIFT_CLASS("_TtC11KVKCalendar16EventViewGeneral")
+@interface EventViewGeneral : UIView
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
+- (void)tapOnEventWithGesture:(UITapGestureRecognizer * _Nonnull)gesture;
+- (void)activateMoveEventWithGesture:(UILongPressGestureRecognizer * _Nonnull)gesture;
+- (void)drawRect:(CGRect)rect;
+- (nonnull instancetype)initWithFrame:(CGRect)frame SWIFT_UNAVAILABLE;
+@end
+
+@class UIContextMenuInteraction;
+@class UIContextMenuConfiguration;
+
+SWIFT_AVAILABILITY(ios,introduced=13)
+@interface EventViewGeneral (SWIFT_EXTENSION(KVKCalendar)) <UIContextMenuInteractionDelegate>
+- (UIContextMenuConfiguration * _Nullable)contextMenuInteraction:(UIContextMenuInteraction * _Nonnull)interaction configurationForMenuAtLocation:(CGPoint)location SWIFT_WARN_UNUSED_RESULT;
+@end
+
+
+
+
+
 
 
 
@@ -443,6 +467,30 @@ SWIFT_CLASS("_TtC11KVKCalendar12CalendarView")
 @end
 
 
+
+
+
+
+
+@class UITapGestureRecognizer;
+@class UILongPressGestureRecognizer;
+
+SWIFT_CLASS("_TtC11KVKCalendar16EventViewGeneral")
+@interface EventViewGeneral : UIView
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
+- (void)tapOnEventWithGesture:(UITapGestureRecognizer * _Nonnull)gesture;
+- (void)activateMoveEventWithGesture:(UILongPressGestureRecognizer * _Nonnull)gesture;
+- (void)drawRect:(CGRect)rect;
+- (nonnull instancetype)initWithFrame:(CGRect)frame SWIFT_UNAVAILABLE;
+@end
+
+@class UIContextMenuInteraction;
+@class UIContextMenuConfiguration;
+
+SWIFT_AVAILABILITY(ios,introduced=13)
+@interface EventViewGeneral (SWIFT_EXTENSION(KVKCalendar)) <UIContextMenuInteractionDelegate>
+- (UIContextMenuConfiguration * _Nullable)contextMenuInteraction:(UIContextMenuInteraction * _Nonnull)interaction configurationForMenuAtLocation:(CGPoint)location SWIFT_WARN_UNUSED_RESULT;
+@end
 
 
 
@@ -680,6 +728,30 @@ SWIFT_CLASS("_TtC11KVKCalendar12CalendarView")
 
 
 
+@class UITapGestureRecognizer;
+@class UILongPressGestureRecognizer;
+
+SWIFT_CLASS("_TtC11KVKCalendar16EventViewGeneral")
+@interface EventViewGeneral : UIView
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
+- (void)tapOnEventWithGesture:(UITapGestureRecognizer * _Nonnull)gesture;
+- (void)activateMoveEventWithGesture:(UILongPressGestureRecognizer * _Nonnull)gesture;
+- (void)drawRect:(CGRect)rect;
+- (nonnull instancetype)initWithFrame:(CGRect)frame SWIFT_UNAVAILABLE;
+@end
+
+@class UIContextMenuInteraction;
+@class UIContextMenuConfiguration;
+
+SWIFT_AVAILABILITY(ios,introduced=13)
+@interface EventViewGeneral (SWIFT_EXTENSION(KVKCalendar)) <UIContextMenuInteractionDelegate>
+- (UIContextMenuConfiguration * _Nullable)contextMenuInteraction:(UIContextMenuInteraction * _Nonnull)interaction configurationForMenuAtLocation:(CGPoint)location SWIFT_WARN_UNUSED_RESULT;
+@end
+
+
+
+
+
 
 
 
@@ -903,6 +975,30 @@ SWIFT_CLASS("_TtC11KVKCalendar12CalendarView")
 @end
 
 
+
+
+
+
+
+@class UITapGestureRecognizer;
+@class UILongPressGestureRecognizer;
+
+SWIFT_CLASS("_TtC11KVKCalendar16EventViewGeneral")
+@interface EventViewGeneral : UIView
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
+- (void)tapOnEventWithGesture:(UITapGestureRecognizer * _Nonnull)gesture;
+- (void)activateMoveEventWithGesture:(UILongPressGestureRecognizer * _Nonnull)gesture;
+- (void)drawRect:(CGRect)rect;
+- (nonnull instancetype)initWithFrame:(CGRect)frame SWIFT_UNAVAILABLE;
+@end
+
+@class UIContextMenuInteraction;
+@class UIContextMenuConfiguration;
+
+SWIFT_AVAILABILITY(ios,introduced=13)
+@interface EventViewGeneral (SWIFT_EXTENSION(KVKCalendar)) <UIContextMenuInteractionDelegate>
+- (UIContextMenuConfiguration * _Nullable)contextMenuInteraction:(UIContextMenuInteraction * _Nonnull)interaction configurationForMenuAtLocation:(CGPoint)location SWIFT_WARN_UNUSED_RESULT;
+@end
 
 
 
