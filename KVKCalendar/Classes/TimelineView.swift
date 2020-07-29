@@ -425,8 +425,7 @@ final class TimelineView: UIView, CompareEventDateProtocol {
         scrollView.subviews.filter({ $0.tag != tagCurrentHourLine }).forEach({ $0.removeFromSuperview() })
         
         allEvents = events.filter { (event) -> Bool in
-            let date = event.start
-            return dates.contains(where: { $0?.day == date.day && $0?.month == date.month && $0?.year == date.year })
+            return dates.contains(where: { compareStartDate(event: event, date: $0) || compareEndDate(event: event, date: $0) })
         }
         let filteredEvents = allEvents.filter({ !$0.isAllDay })
         let filteredAllDayEvents = events.filter({ $0.isAllDay })
@@ -470,7 +469,7 @@ final class TimelineView: UIView, CompareEventDateProtocol {
             scrollView.addSubview(createVerticalLine(pointX: pointX))
             
             let eventsByDate = filteredEvents
-                .filter({ compareStartDate(event: $0, date: date) })
+                .filter({ compareStartDate(event: $0, date: date) || compareEndDate(event: $0, date: date) })
                 .sorted(by: { $0.start < $1.start })
             
             let allDayEvents = filteredAllDayEvents.filter({ compareStartDate(event: $0, date: date) || compareEndDate(event: $0, date: date) })
@@ -484,13 +483,16 @@ final class TimelineView: UIView, CompareEventDateProtocol {
                 // create event
                 var newFrame = CGRect(x: 0, y: 0, width: 0, height: heightPage)
                 eventsByDate.forEach { (event) in
-                    times.forEach({ (time) in
+                    times.forEach({ (time) in                        
                         // calculate position 'y'
-                        if event.start.hour.hashValue == time.valueHash {
+                        if event.start.hour.hashValue == time.valueHash, event.start.day == date?.day {
                             newFrame.origin.y = calculatePointYByMinute(event.start.minute, time: time)
+                        } else if let firstTimeLabel = getTimelineLabel(hour: start), event.start.day != date?.day {
+                            newFrame.origin.y = calculatePointYByMinute(start, time: firstTimeLabel)
                         }
+                        
                         // calculate 'height' event
-                        if event.end.hour.hashValue == time.valueHash {
+                        if event.end.hour.hashValue == time.valueHash, event.end.day == date?.day {
                             let summHeight = (CGFloat(time.tag) * (style.timeline.offsetTimeY + time.frame.height)) - newFrame.origin.y + (time.frame.height / 2)
                             if 0..<59 ~= event.end.minute {
                                 let minutePercent = 59.0 / CGFloat(event.end.minute)
@@ -499,6 +501,8 @@ final class TimelineView: UIView, CompareEventDateProtocol {
                             } else {
                                 newFrame.size.height = summHeight - style.timeline.offsetEvent
                             }
+                        } else if event.end.day != date?.day {
+                            newFrame.size.height = (CGFloat(time.tag) * (style.timeline.offsetTimeY + time.frame.height)) - newFrame.origin.y + (time.frame.height / 2)
                         }
                     })
                     
