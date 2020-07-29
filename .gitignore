@@ -9,3 +9,5 @@ fastlane/xcov_report/
 .scannerwork
 *.xcuserstate
 Example/build/*
+
+Example/.DS_Store
