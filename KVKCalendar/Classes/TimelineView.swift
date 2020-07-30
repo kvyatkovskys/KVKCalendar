@@ -425,7 +425,7 @@ final class TimelineView: UIView, CompareEventDateProtocol {
         scrollView.subviews.filter({ $0.tag != tagCurrentHourLine }).forEach({ $0.removeFromSuperview() })
         
         allEvents = events.filter { (event) -> Bool in
-            return dates.contains(where: { compareStartDate(event: event, date: $0) || compareEndDate(event: event, date: $0) })
+            return dates.contains(where: { compareStartDate(event: event, date: $0) || compareEndDate(event: event, date: $0) || (event.start.day != event.end.day && event.start.day...event.end.day ~= ($0?.day ?? 0) && type == .day) })
         }
         let filteredEvents = allEvents.filter({ !$0.isAllDay })
         let filteredAllDayEvents = events.filter({ $0.isAllDay })
@@ -468,10 +468,7 @@ final class TimelineView: UIView, CompareEventDateProtocol {
             }
             scrollView.addSubview(createVerticalLine(pointX: pointX))
             
-            let eventsByDate = filteredEvents
-                .filter({ compareStartDate(event: $0, date: date) || compareEndDate(event: $0, date: date) })
-                .sorted(by: { $0.start < $1.start })
-            
+            let eventsByDate = filteredEvents.filter({ compareStartDate(event: $0, date: date) || compareEndDate(event: $0, date: date) || ($0.start.day != $0.end.day && $0.start.day...$0.end.day ~= date?.day ?? 0 ) }).sorted(by: { $0.start < $1.start })
             let allDayEvents = filteredAllDayEvents.filter({ compareStartDate(event: $0, date: date) || compareEndDate(event: $0, date: date) })
             createAllDayEvents(events: allDayEvents, date: date, width: widthPage, originX: pointX)
             
