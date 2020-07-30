@@ -233,7 +233,11 @@ extension WeekView: TimelineDelegate {
         var endComponents = DateComponents()
         endComponents.year = event.end.year
         endComponents.month = event.end.month
-        endComponents.day = day
+        if event.end.day != event.start.day {
+            endComponents.day = event.end.day
+        } else {
+            endComponents.day = day
+        }
         endComponents.hour = hour + hourOffset
         endComponents.minute = minute + minuteOffset
         let endDate = style.calendar.date(from: endComponents)
