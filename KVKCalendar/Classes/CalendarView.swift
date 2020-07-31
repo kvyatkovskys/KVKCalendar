@@ -112,21 +112,7 @@ public final class CalendarView: UIView {
             break
         }
     }
-    
-    @available(swift, obsoleted: 0.3.4, message: "This will be removed in v0.3.5, please migrate to a scrollTo(_:)", renamed: "scrollTo")
-    public func scrollToDate(date: Date) {
-        switch type {
-        case .day:
-            dayView.setDate(date)
-        case .week:
-            weekView.setDate(date)
-        case .month:
-            monthView.setDate(date)
-        case .year:
-            yearView.setDate(date)
-        }
-    }
-    
+
     public func scrollTo(_ date: Date) {
         switch type {
         case .day:

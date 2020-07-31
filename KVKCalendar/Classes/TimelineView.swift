@@ -24,7 +24,6 @@ final class TimelineView: UIView, EventDateProtocol {
     
     private let hours: [String]
     private let timeHourSystem: TimeHourSystem
-    private var allEvents = [Event]()
     private var timer: Timer?
     private var dates = [Date?]()
     private var selectedDate: Date?
@@ -424,10 +423,11 @@ final class TimelineView: UIView, EventDateProtocol {
         subviews.filter({ $0 is AllDayEventView || $0 is AllDayTitleView }).forEach({ $0.removeFromSuperview() })
         scrollView.subviews.filter({ $0.tag != tagCurrentHourLine }).forEach({ $0.removeFromSuperview() })
         
-        allEvents = events.filter { (event) -> Bool in
+        let recurringEvents = events.filter({ $0.recurringType == .everyDay || $0.recurringType == .everyWeek })
+        let allEventsForDates = events.filter { (event) -> Bool in
             return dates.contains(where: { compareStartDate($0, with: event) || compareEndDate($0, with: event) || (checkMultipleDate($0, with: event) && type == .day) })
         }
-        let filteredEvents = allEvents.filter({ !$0.isAllDay })
+        let filteredEvents = allEventsForDates.filter({ !$0.isAllDay })
         let filteredAllDayEvents = events.filter({ $0.isAllDay })
 
         let start: Int

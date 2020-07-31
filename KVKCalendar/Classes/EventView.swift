@@ -44,7 +44,7 @@ final class EventView: EventViewGeneral {
         textFrame.size.width = textFrame.width - pointX
         textView.frame = textFrame
         textView.font = style.timeline.eventFont
-        textView.textColor = event.colorText
+        textView.textColor = event.textColor
         textView.text = event.text
         
         if textView.frame.width > 20 {

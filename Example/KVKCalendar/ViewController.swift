@@ -209,6 +209,10 @@ extension ViewController {
             } else {
                 event.text = "\(startTime) - \(endTime)\n\(item.title)"
             }
+            
+            if item.id == "14" {
+                event.recurringType = .everyDay
+            }
             return event
         })
         completion(events)
