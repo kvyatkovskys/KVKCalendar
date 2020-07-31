@@ -59,36 +59,54 @@ public struct EventColor {
 }
 
 public struct Event {
-    @available(swift, obsoleted: 0.3.4, message: "This will be removed in v0.3.5, please migrate to a ID.")
-    public var id: Any = 0
-    public var ID: String = "0"
-    public var text: String = ""
-    public var start: Date = Date()
-    public var end: Date = Date()
-    public var color: EventColor? = nil {
+    public var ID: String
+    public var text: String
+    public var start: Date
+    public var end: Date
+    public var color: EventColor? {
         didSet {
             guard let valueColor = color else { return }
             
             backgroundColor = valueColor.value.withAlphaComponent(valueColor.alpha)
             var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 0
             valueColor.value.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
-            colorText = UIColor(hue: hue, saturation: saturation, brightness: UIScreen.isDarkMode ? brightness : brightness * 0.4, alpha: alpha)
+            textColor = UIColor(hue: hue, saturation: saturation, brightness: UIScreen.isDarkMode ? brightness : brightness * 0.4, alpha: alpha)
         }
     }
-    public var backgroundColor: UIColor = UIColor.systemBlue.withAlphaComponent(0.3)
+    public var backgroundColor: UIColor
+    @available(swift, deprecated: 0.3.5, obsoleted: 0.3.6, message: "This will be removed in v0.3.6, please migrate to a `textColor`", renamed: "textColor")
     public var colorText: UIColor = .black
-    public var isAllDay: Bool = false
-    public var isContainsFile: Bool = false
-    public var textForMonth: String = ""
+    public var textColor: UIColor
+    public var isAllDay: Bool
+    public var isContainsFile: Bool
+    public var textForMonth: String
     public var eventData: Any?
+    public var recurringType: RecurringType?
     
-    public init() {}
+    public init(ID: String = "0", text: String = "", start: Date = Date(), end: Date = Date(), color: EventColor? = nil, backgroundColor: UIColor = UIColor.systemBlue.withAlphaComponent(0.3), textColor: UIColor = .black, isAllDay: Bool = false, isContainsFile: Bool = false, textForMonth: String = "", eventData: Any? = nil, recurringType: RecurringType? = nil) {
+        self.ID = ID
+        self.text = text
+        self.start = start
+        self.end = end
+        self.color = color
+        self.backgroundColor = backgroundColor
+        self.textColor = textColor
+        self.isAllDay = isAllDay
+        self.isContainsFile = isContainsFile
+        self.textForMonth = textForMonth
+        self.eventData = eventData
+        self.recurringType = recurringType
+    }
 }
 
 extension Event {
     var hash: Int {
         return ID.hashValue
     }
+}
+
+public enum RecurringType: Int {
+    case everyDay, everyWeek, everyMonth, everyYear
 }
 
 extension Event: EventProtocol {
