@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class TimelineView: UIView, CompareEventDateProtocol {
+final class TimelineView: UIView, EventDateProtocol {
     
     weak var delegate: TimelineDelegate?
     weak var dataSource: DisplayDataSource?
@@ -425,7 +425,7 @@ final class TimelineView: UIView, CompareEventDateProtocol {
         scrollView.subviews.filter({ $0.tag != tagCurrentHourLine }).forEach({ $0.removeFromSuperview() })
         
         allEvents = events.filter { (event) -> Bool in
-            return dates.contains(where: { compareStartDate(event: event, date: $0) || compareEndDate(event: event, date: $0) || (event.start.day != event.end.day && event.start.day...event.end.day ~= ($0?.day ?? 0) && type == .day) })
+            return dates.contains(where: { compareStartDate($0, with: event) || compareEndDate($0, with: event) || (checkMultipleDate($0, with: event) && type == .day) })
         }
         let filteredEvents = allEvents.filter({ !$0.isAllDay })
         let filteredAllDayEvents = events.filter({ $0.isAllDay })
@@ -437,7 +437,7 @@ final class TimelineView: UIView, CompareEventDateProtocol {
             if dates.count > 1 {
                 start = filteredEvents.sorted(by: { $0.start.hour < $1.start.hour }).first?.start.hour ?? style.timeline.startHour
             } else {
-                start = filteredEvents.filter({ compareStartDate(event: $0, date: selectedDate) })
+                start = filteredEvents.filter({ compareStartDate(selectedDate, with: $0) })
                     .sorted(by: { $0.start.hour < $1.start.hour })
                     .first?.start.hour ?? style.timeline.startHour
             }
@@ -468,8 +468,8 @@ final class TimelineView: UIView, CompareEventDateProtocol {
             }
             scrollView.addSubview(createVerticalLine(pointX: pointX))
             
-            let eventsByDate = filteredEvents.filter({ compareStartDate(event: $0, date: date) || compareEndDate(event: $0, date: date) || ($0.start.day != $0.end.day && $0.start.day...$0.end.day ~= date?.day ?? 0 ) }).sorted(by: { $0.start < $1.start })
-            let allDayEvents = filteredAllDayEvents.filter({ compareStartDate(event: $0, date: date) || compareEndDate(event: $0, date: date) })
+            let eventsByDate = filteredEvents.filter({ compareStartDate(date, with: $0) || compareEndDate(date, with: $0) || checkMultipleDate(date, with: $0) }).sorted(by: { $0.start < $1.start })
+            let allDayEvents = filteredAllDayEvents.filter({ compareStartDate(date, with: $0) || compareEndDate(date, with: $0) })
             createAllDayEvents(events: allDayEvents, date: date, width: widthPage, originX: pointX)
             
             // count event cross in one hour

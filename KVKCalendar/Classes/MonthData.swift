@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class MonthData: CompareEventDateProtocol {
+final class MonthData: EventDateProtocol {
     var days: [Day]
     var date: Date
     var data: YearData
@@ -48,7 +48,7 @@ final class MonthData: CompareEventDateProtocol {
             
             let filteredEventsByDay = events.filter({ $0.start.month == day.date?.month && $0.start.year == day.date?.year && $0.start.day == day.date?.day })
             let filteredAllDayEvents = events.filter({ $0.isAllDay })
-            let allDayEvents = filteredAllDayEvents.filter({ compareStartDate(event: $0, date: day.date) || compareEndDate(event: $0, date: day.date) })
+            let allDayEvents = filteredAllDayEvents.filter({ compareStartDate(day.date, with: $0) || compareEndDate(day.date, with: $0) })
             let otherEvents = filteredEventsByDay.filter({ !$0.isAllDay }).sorted(by: { $0.start.hour < $1.start.hour })
             newDay.events = allDayEvents + otherEvents
             return acc + [newDay]

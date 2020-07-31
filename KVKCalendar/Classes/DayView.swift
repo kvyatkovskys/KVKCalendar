@@ -26,7 +26,9 @@ final class DayView: UIView {
                                        date: data.date,
                                        type: .day,
                                        style: style)
-        view.delegate = self
+        view.didSelectDate = { [weak self] (date, type) in
+            self?.didSelectDateScrollHeader(date, type: type)
+        }
         return view
     }()
     
@@ -112,7 +114,7 @@ extension DayView: DisplayDataSource {
     }
 }
 
-extension DayView: ScrollDayHeaderDelegate {
+extension DayView {
     func didSelectDateScrollHeader(_ date: Date?, type: CalendarType) {
         guard let selectDate = date else { return }
         
