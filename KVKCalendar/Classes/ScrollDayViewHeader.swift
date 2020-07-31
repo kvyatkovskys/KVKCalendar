@@ -7,11 +7,10 @@
 
 import UIKit
 
-protocol ScrollDayHeaderDelegate: class {
-    func didSelectDateScrollHeader(_ date: Date?, type: CalendarType)
-}
-
 final class ScrollDayHeaderView: UIView {
+    var didTrackScrollOffset: ((CGFloat) -> Void)?
+    var didSelectDate: ((Date?, CalendarType) -> Void)?
+    
     private let days: [Day]
     private var date: Date
     private var style: Style
@@ -21,7 +20,6 @@ final class ScrollDayHeaderView: UIView {
     private let calendar: Calendar
     private var lastContentOffset: CGFloat = 0
     
-    weak var delegate: ScrollDayHeaderDelegate?
     weak var dataSource: DisplayDataSource?
     
     private lazy var titleLabel: UILabel = {
@@ -121,7 +119,7 @@ final class ScrollDayHeaderView: UIView {
     }
     
     private func scrollToDate(_ date: Date, isAnimate: Bool) {
-        delegate?.didSelectDateScrollHeader(date, type: type)
+        didSelectDate?(date, type)
         setDateToTitle(date)
         
         guard var indexPath = getMiddleIndexPath(), let middleDate = days[indexPath.row].date else { return }
@@ -280,7 +278,7 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
         guard let newMoveDate = days[indexPath.row].date else { return }
         
         date = newMoveDate
-        delegate?.didSelectDateScrollHeader(newMoveDate, type: type)
+        didSelectDate?(newMoveDate, type)
         setDateToTitle(newMoveDate)
         collectionView.reloadData()
         
@@ -293,14 +291,14 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
             guard date != days[indexPath.row].date, let dateNew = days[indexPath.row].date else { return }
             
             date = dateNew
-            delegate?.didSelectDateScrollHeader(date, type: .day)
+            didSelectDate?(date, .day)
             setDateToTitle(date)
             collectionView.reloadData()
         case .week:
             guard let dateTemp = days[indexPath.row].date else { return }
             
             date = dateTemp
-            delegate?.didSelectDateScrollHeader(date, type: style.week.selectCalendarType)
+            didSelectDate?(date, style.week.selectCalendarType)
             setDateToTitle(date)
             collectionView.reloadData()
         default:

@@ -43,17 +43,20 @@ protocol TimelineDelegate: AnyObject {
     func didAddEvent(minute: Int, hour: Int, point: CGPoint)
 }
 
-protocol CompareEventDateProtocol {
-    func compareStartDate(event: Event, date: Date?) -> Bool
-    func compareEndDate(event: Event, date: Date?) -> Bool
-}
+protocol EventDateProtocol {}
 
-extension CompareEventDateProtocol {
-    func compareStartDate(event: Event, date: Date?) -> Bool {
+extension EventDateProtocol {
+    func compareStartDate(_ date: Date?, with event: Event) -> Bool {
         return event.start.year == date?.year && event.start.month == date?.month && event.start.day == date?.day
     }
     
-    func compareEndDate(event: Event, date: Date?) -> Bool {
+    func compareEndDate(_ date: Date?, with event: Event) -> Bool {
         return event.end.year == date?.year && event.end.month == date?.month && event.end.day == date?.day
+    }
+    
+    func checkMultipleDate(_ date: Date?, with event: Event) -> Bool {
+        guard let day = date?.day else { return false }
+        
+        return event.start.day != event.end.day && event.start.day...event.end.day ~= day
     }
 }

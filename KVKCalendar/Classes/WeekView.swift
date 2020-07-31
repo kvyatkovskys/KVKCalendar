@@ -28,7 +28,12 @@ final class WeekView: UIView {
                                        date: data.date,
                                        type: .week,
                                        style: style)
-        view.delegate = self
+        view.didSelectDate = { [weak self] (date, type) in
+            self?.didSelectDateScrollHeader(date, type: type)
+        }
+        view.didTrackScrollOffset = { [weak self] (offset) in
+            print(offset)
+        }
         return view
     }()
     
@@ -131,7 +136,7 @@ extension WeekView: DisplayDataSource {
     }
 }
 
-extension WeekView: ScrollDayHeaderDelegate {
+extension WeekView {
     func didSelectDateScrollHeader(_ date: Date?, type: CalendarType) {
         guard let selectDate = date else { return }
         
@@ -234,7 +239,8 @@ extension WeekView: TimelineDelegate {
         endComponents.year = event.end.year
         endComponents.month = event.end.month
         if event.end.day != event.start.day {
-            endComponents.day = event.end.day
+            let offset = event.end.day - event.start.day
+            endComponents.day = day + offset
         } else {
             endComponents.day = day
         }
