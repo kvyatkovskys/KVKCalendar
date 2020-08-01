@@ -113,7 +113,7 @@ final class TimelineView: UIView, EventDateProtocol {
         let translation = gesture.translation(in: self)
         let velocity = gesture.velocity(in: self)
         let endGesure = abs(translation.x) > (frame.width / 3.5)
-        let events = scrollView.subviews.filter({ $0 is EventView })
+        let events = scrollView.subviews.filter({ $0 is EventViewGeneral })
         var eventsAllDay: [UIView]
         
         if style.allDay.isPinned {
@@ -423,7 +423,7 @@ final class TimelineView: UIView, EventDateProtocol {
         subviews.filter({ $0 is AllDayEventView || $0 is AllDayTitleView }).forEach({ $0.removeFromSuperview() })
         scrollView.subviews.filter({ $0.tag != tagCurrentHourLine }).forEach({ $0.removeFromSuperview() })
         
-        let recurringEvents = events.filter({ $0.recurringType == .everyDay || $0.recurringType == .everyWeek })
+        let recurringEvents = events.filter({ $0.recurringType != .none })
         let allEventsForDates = events.filter { (event) -> Bool in
             return dates.contains(where: { compareStartDate($0, with: event) || compareEndDate($0, with: event) || (checkMultipleDate($0, with: event) && type == .day) })
         }
@@ -468,18 +468,31 @@ final class TimelineView: UIView, EventDateProtocol {
             }
             scrollView.addSubview(createVerticalLine(pointX: pointX))
             
-            let eventsByDate = filteredEvents.filter({ compareStartDate(date, with: $0) || compareEndDate(date, with: $0) || checkMultipleDate(date, with: $0) }).sorted(by: { $0.start < $1.start })
+            let eventsByDate = filteredEvents.filter({ compareStartDate(date, with: $0) || compareEndDate(date, with: $0) || checkMultipleDate(date, with: $0) })
             let allDayEvents = filteredAllDayEvents.filter({ compareStartDate(date, with: $0) || compareEndDate(date, with: $0) })
+            
+            let recurringEventByDate: [Event]
+            if !recurringEvents.isEmpty {
+                recurringEventByDate = recurringEvents.reduce([], { (acc, event) -> [Event] in
+                    guard let recurringEvent = event.updateDate(newDate: date, calendar: style.calendar) else { return acc }
+                    
+                    return acc + [recurringEvent]
+                    
+                })
+            } else {
+                recurringEventByDate = []
+            }
+            let sortedEventsByDate = (eventsByDate + recurringEventByDate).sorted(by: { $0.start < $1.start })
             createAllDayEvents(events: allDayEvents, date: date, width: widthPage, originX: pointX)
             
             // count event cross in one hour
-            let crossEvents = calculateCrossEvents(eventsByDate)
+            let crossEvents = calculateCrossEvents(sortedEventsByDate)
             var pagesCached = [EventViewGeneral]()
             
-            if !eventsByDate.isEmpty {
+            if !sortedEventsByDate.isEmpty {
                 // create event
                 var newFrame = CGRect(x: 0, y: 0, width: 0, height: heightPage)
-                eventsByDate.forEach { (event) in
+                sortedEventsByDate.forEach { (event) in
                     times.forEach({ (time) in                        
                         // calculate position 'y'
                         if event.start.hour.hashValue == time.valueHash, event.start.day == date?.day {
