@@ -81,9 +81,9 @@ public struct Event {
     public var isContainsFile: Bool
     public var textForMonth: String
     public var eventData: Any?
-    public var recurringType: RecurringType?
+    public var recurringType: RecurringType
     
-    public init(ID: String = "0", text: String = "", start: Date = Date(), end: Date = Date(), color: EventColor? = nil, backgroundColor: UIColor = UIColor.systemBlue.withAlphaComponent(0.3), textColor: UIColor = .black, isAllDay: Bool = false, isContainsFile: Bool = false, textForMonth: String = "", eventData: Any? = nil, recurringType: RecurringType? = nil) {
+    public init(ID: String = "0", text: String = "", start: Date = Date(), end: Date = Date(), color: EventColor? = nil, backgroundColor: UIColor = UIColor.systemBlue.withAlphaComponent(0.3), textColor: UIColor = .black, isAllDay: Bool = false, isContainsFile: Bool = false, textForMonth: String = "", eventData: Any? = nil, recurringType: RecurringType = .none) {
         self.ID = ID
         self.text = text
         self.start = start
@@ -106,12 +106,68 @@ extension Event {
 }
 
 public enum RecurringType: Int {
-    case everyDay, everyWeek, everyMonth, everyYear
+    case everyDay, everyWeek, everyMonth, everyYear, none
 }
 
 extension Event: EventProtocol {
     public func compare(_ event: Event) -> Bool {
         return hash == event.hash
+    }
+}
+
+extension Event {
+    func updateDate(newDate: Date?, calendar: Calendar = Calendar.current) -> Event? {
+        var startComponents = DateComponents()
+        startComponents.year = start.year
+        startComponents.month = start.month
+        startComponents.hour = start.hour
+        startComponents.minute = start.minute
+        
+        var endComponents = DateComponents()
+        endComponents.year = end.year
+        endComponents.month = end.month
+        endComponents.hour = end.hour
+        endComponents.minute = end.minute
+        
+        switch recurringType {
+        case .everyDay where newDate?.day != start.day:
+            startComponents.day = newDate?.day
+        case .everyWeek where newDate?.weekday == start.weekday && newDate?.day != start.day:
+            startComponents.day = newDate?.day
+            startComponents.weekday = newDate?.weekday
+            
+            endComponents.weekday = newDate?.weekday
+        case .everyMonth where newDate?.month != start.month && newDate?.day == start.day:
+            startComponents.day = newDate?.day
+            startComponents.month = newDate?.month
+            
+            endComponents.month = newDate?.month
+        case .everyYear where newDate?.year != start.year && newDate?.month == start.month && newDate?.day == start.day:
+            startComponents.day = newDate?.day
+            startComponents.month = newDate?.month
+            startComponents.year = newDate?.year
+            
+            endComponents.month = newDate?.month
+            endComponents.year = newDate?.year
+        default:
+            return nil
+        }
+        
+        let offsetDay = end.day - start.day
+        if start.day == end.day {
+            endComponents.day = newDate?.day
+        } else if let newDay = newDate?.day {
+            endComponents.day = newDay + offsetDay
+        } else {
+            endComponents.day = newDate?.day
+        }
+        
+        guard let newStart = calendar.date(from: startComponents), let newEnd = calendar.date(from: endComponents) else { return nil }
+        
+        var newEvent = self
+        newEvent.start = newStart
+        newEvent.end = newEnd
+        return newEvent
     }
 }
 
