@@ -7,32 +7,6 @@
 
 import UIKit
 
-final class AllDayTitleView: UIView {
-    init(frame: CGRect, style: AllDayStyle) {
-        super.init(frame: frame)
-        backgroundColor = style.backgroundColor
-        
-        let label = UILabel(frame: frame)
-        label.frame.size.width = frame.width - 4
-        label.frame.origin.x = 2
-        label.frame.origin.y = 0
-        label.textAlignment = .center
-        label.numberOfLines = 2
-        label.font = style.fontTitle
-        label.textColor = style.titleColor
-        label.text = style.titleText
-        addSubview(label)
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
-
-protocol AllDayEventDelegate: AnyObject {
-    func didSelectAllDayEvent(_ event: Event, frame: CGRect?)
-}
-
 final class AllDayEventView: UIView {
     private let events: [Event]
     weak var delegate: AllDayEventDelegate?
@@ -97,4 +71,30 @@ extension AllDayEvent: EventProtocol {
     func compare(_ event: Event) -> Bool {
         return id.hashValue == event.hash
     }
+}
+
+final class AllDayTitleView: UIView {
+    init(frame: CGRect, style: AllDayStyle) {
+        super.init(frame: frame)
+        backgroundColor = style.backgroundColor
+        
+        let label = UILabel(frame: frame)
+        label.frame.size.width = frame.width - 4
+        label.frame.origin.x = 2
+        label.frame.origin.y = 0
+        label.textAlignment = .center
+        label.numberOfLines = 2
+        label.font = style.fontTitle
+        label.textColor = style.titleColor
+        label.text = style.titleText
+        addSubview(label)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+protocol AllDayEventDelegate: AnyObject {
+    func didSelectAllDayEvent(_ event: Event, frame: CGRect?)
 }
