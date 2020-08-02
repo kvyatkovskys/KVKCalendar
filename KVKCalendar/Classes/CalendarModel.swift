@@ -130,9 +130,9 @@ extension Event {
         endComponents.minute = end.minute
         
         switch recurringType {
-        case .everyDay where newDate?.day != start.day:
+        case .everyDay:
             startComponents.day = newDate?.day
-        case .everyWeek where newDate?.weekday == start.weekday && newDate?.day != start.day:
+        case .everyWeek where newDate?.weekday == start.weekday:
             startComponents.day = newDate?.day
             startComponents.weekday = newDate?.weekday
             
