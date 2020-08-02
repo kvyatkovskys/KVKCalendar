@@ -156,6 +156,8 @@ public struct MonthStyle {
     public var isAnimateSelection: Bool = false
     public var isPagingEnabled: Bool = true
     public var isAutoSelectDateScrolling: Bool = true
+    public var eventCorners: UIRectCorner = .allCorners
+    public var eventCornersRadius: CGSize = CGSize(width: 5, height: 5)
 }
 
 public struct YearStyle {
@@ -213,7 +215,14 @@ public struct AllDayStyle {
     public var textColor: UIColor = .black
     public var backgroundColorEvent: UIColor = .clear
     public var font: UIFont = .systemFont(ofSize: 12)
-    public var offset: CGFloat = 2
+    @available(*, deprecated, renamed: "offsetWidth")
+    public var offset: CGFloat = 2 {
+        didSet {
+            offsetWidth = offset
+        }
+    }
+    public var offsetWidth: CGFloat = 2
+    public var offsetHeight: CGFloat = 4
     public var height: CGFloat = 25
     public var fontTitle: UIFont = .systemFont(ofSize: 10)
     public var isPinned: Bool = false

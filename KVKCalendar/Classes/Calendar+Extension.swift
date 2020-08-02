@@ -7,6 +7,15 @@
 
 import UIKit
 
+extension UIStackView {
+    func addBackground(color: UIColor) {
+        let view = UIView(frame: bounds)
+        view.backgroundColor = color
+        view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        insertSubview(view, at: 0)
+    }
+}
+
 extension Array {
     func split(half: Int) -> (left: [Element], right: [Element]) {
         let leftSplit = self[0..<half]

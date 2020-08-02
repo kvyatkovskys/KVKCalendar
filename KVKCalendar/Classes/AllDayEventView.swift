@@ -20,7 +20,7 @@ final class AllDayEventView: UIView {
         let endEvents = events.map({ AllDayEvent(id: $0.ID, text: $0.text, date: $0.end, color: EventColor($0.color?.value ?? $0.backgroundColor).value) })
         let result = startEvents + endEvents
         let distinct = result.reduce([]) { (acc, event) -> [AllDayEvent] in
-            guard acc.contains(where: { $0.date.day == event.date.day && "\($0.id)".hashValue == "\(event.id)".hashValue }) else {
+            guard acc.contains(where: { $0.date.day == event.date.day && $0.id.hashValue == event.id.hashValue }) else {
                 return acc + [event]
             }
             return acc
@@ -29,16 +29,16 @@ final class AllDayEventView: UIView {
         
         let eventWidth = frame.width / CGFloat(filtered.count)
         for (idx, event) in filtered.enumerated() {
-            let label = UILabel(frame: CGRect(x: (CGFloat(idx) * eventWidth) + style.offset,
-                                              y: style.offset,
-                                              width: eventWidth - (style.offset * 2),
-                                              height: frame.height - (style.offset * 2)))
+            let label = UILabel(frame: CGRect(x: (CGFloat(idx) * eventWidth) + style.offsetWidth,
+                                              y: style.offsetHeight,
+                                              width: eventWidth - (style.offsetWidth * 2),
+                                              height: frame.height - (style.offsetHeight * 2)))
             label.textColor = style.textColor
             label.isUserInteractionEnabled = true
             label.font = style.font
             label.text = " \(event.text)"
             label.backgroundColor = event.color.withAlphaComponent(0.8)
-            label.tag = "\(event.id)".hashValue
+            label.tag = event.id.hashValue
             label.setRoundCorners(style.eventCorners, radius: style.eventCornersRadius)
             let tap = UITapGestureRecognizer(target: self, action: #selector(tapOnEvent))
             label.addGestureRecognizer(tap)

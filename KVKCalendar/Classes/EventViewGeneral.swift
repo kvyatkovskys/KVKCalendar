@@ -51,13 +51,8 @@ open class EventViewGeneral: UIView {
     @objc public func activateMoveEvent(gesture: UILongPressGestureRecognizer) {
         switch gesture.state {
         case .began:
-            UIView.animate(withDuration: 0.3, animations: {
-                self.transform = CGAffineTransform(scaleX: 1.11, y: 1.11)
-            }) { (_) in
-                self.alpha = self.style.event.alphaWhileMoving
-                self.transform = .identity
-                self.delegate?.didStartMoveEvent(self.event, gesture: gesture, view: self)
-            }
+            alpha = style.event.alphaWhileMoving
+            delegate?.didStartMoveEvent(event, gesture: gesture, view: self)
         case .changed:
             delegate?.didChangeMoveEvent(event, gesture: gesture)
         case .cancelled, .ended, .failed:

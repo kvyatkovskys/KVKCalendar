@@ -16,7 +16,6 @@ protocol MonthCellDelegate: class {
 }
 
 final class MonthCell: UICollectionViewCell {
-    static let cellIdentifier = #file
     static let titlesCount = 3
     
     private let countInCell: CGFloat = 4
@@ -104,6 +103,7 @@ final class MonthCell: UICollectionViewCell {
                         label.backgroundColor = event.color?.value ?? .systemGray
                         label.textColor = allDayStyle.textColor
                         label.text = " \(event.text) "
+                        label.setRoundCorners(monthStyle.eventCorners, radius: monthStyle.eventCornersRadius)
                     }
                     
                     let tap = UITapGestureRecognizer(target: self, action: #selector(tapOneEvent))
@@ -184,6 +184,7 @@ final class MonthCell: UICollectionViewCell {
         
         let event = events[idx]
         let snapshotLabel = UILabel(frame: view.frame)
+        snapshotLabel.setRoundCorners(monthStyle.eventCorners, radius: monthStyle.eventCornersRadius)
         snapshotLabel.backgroundColor = event.color?.value ?? .systemGray
         snapshotLabel.attributedText = addIconBeforeLabel(eventList: [event],
                                                           textAttributes: [.font: monthStyle.fontEventTitle, .foregroundColor: UIColor.white],
