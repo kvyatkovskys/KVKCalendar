@@ -66,10 +66,11 @@ extension ViewController {
             event.color = item.color
             event.isAllDay = item.allDay
             event.isContainsFile = !item.files.isEmpty
+            event.recurringType = // recurring event type - .everyDay, .everyWeek
         
             // Add text event (title, info, location, time)
             if item.allDay {
-                event.text = "\(model.title)"
+                event.text = "\(item.title)"
             } else {
                 event.text = "\(startTime) - \(endTime)\n\(item.title)"
             }
@@ -91,19 +92,20 @@ Implement `CalendarDelegate` to handle user action and control calenadr behavior
 ```swift
 calendar.delegate = self
 
-extension ViewController: CalendarDelegate {    
+extension ViewController: CalendarDelegate {
+    // get a selecting date
     func didSelectDate(_ date: Date?, type: CalendarType, frame: CGRect?) {}
-    
+    // get a selecting event
     func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?) {}
-    
+    // tap on more fro month view
     func didSelectMore(_ date: Date, frame: CGRect?) {}
-    
+    // event's viewer for iPad
     func eventViewerFrame(_ frame: CGRect) {}
-    
+    // drag & drop events
     func didChangeEvent(_ event: Event, start: Date?, end: Date?) {}
-    
+    // tap on timeline or month cell
     func didAddEvent(_ date: Date?) {}
-    
+    // get current displaying events
     func didDisplayEvents(_ events: [Event], dates: [Date?]) {}
 }
 ```
