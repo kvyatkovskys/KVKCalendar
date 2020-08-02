@@ -211,8 +211,7 @@ extension ViewController {
             }
             
             if item.id == "14" {
-                event.recurringType = .everyWeek
-                
+                event.recurringType = .everyYear
             }
             return event
         })

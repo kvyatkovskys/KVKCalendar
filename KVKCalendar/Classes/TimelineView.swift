@@ -474,7 +474,11 @@ final class TimelineView: UIView, EventDateProtocol {
             let recurringEventByDate: [Event]
             if !recurringEvents.isEmpty {
                 recurringEventByDate = recurringEvents.reduce([], { (acc, event) -> [Event] in
-                    guard let recurringEvent = event.updateDate(newDate: date, calendar: style.calendar) else { return acc }
+                    guard !eventsByDate.contains(where: { $0.ID == event.ID }) else { return acc }
+                    
+                    guard let recurringEvent = event.updateDate(newDate: date, calendar: style.calendar) else {
+                        return acc
+                    }
                     
                     return acc + [recurringEvent]
                     
