@@ -169,7 +169,7 @@ extension CalendarView: CalendarPrivateDelegate {
         delegate?.didChangeEvent(event, start: start, end: end)
     }
     
-    func calendarEventViewerFrame(_ frame: CGRect) {
+    func getEventViewerFrame(_ frame: CGRect) {
         var newFrame = frame
         newFrame.origin = .zero
         delegate?.eventViewerFrame(newFrame)
