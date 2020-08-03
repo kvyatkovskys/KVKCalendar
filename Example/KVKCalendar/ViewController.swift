@@ -20,7 +20,7 @@ final class ViewController: UIViewController {
     
     private lazy var todayButton: UIBarButtonItem = {
         let button = UIBarButtonItem(title: "Today", style: .done, target: self, action: #selector(today))
-        button.tintColor = .red
+        button.tintColor = .systemRed
         return button
     }()
     
@@ -56,7 +56,7 @@ final class ViewController: UIViewController {
     private lazy var segmentedControl: UISegmentedControl = {
         let array = CalendarType.allCases
         let control = UISegmentedControl(items: array.map({ $0.rawValue.capitalized }))
-        control.tintColor = .red
+        control.tintColor = .systemRed
         control.selectedSegmentIndex = 0
         control.addTarget(self, action: #selector(switchCalendar), for: .valueChanged)
         return control
@@ -129,10 +129,6 @@ extension ViewController: CalendarDelegate {
             events.append(eventTemp)
             calendarView.reloadData()
         }
-    }
-    
-    func didAddEvent(_ date: Date?) {
-        print(date)
     }
     
     func didSelectDate(_ date: Date?, type: CalendarType, frame: CGRect?) {
@@ -250,12 +246,8 @@ struct ItemData: Decodable {
 }
 
 struct Item: Decodable {
-    let id: String
-    let title: String
-    let start: String
-    let end: String
-    let color: UIColor
-    let colorText: UIColor
+    let id: String, title: String, start: String, end: String
+    let color: UIColor, colorText: UIColor
     let files: [String]
     let allDay: Bool
     
@@ -297,7 +289,7 @@ extension UIColor {
         return UIColor(red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
                        green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
                        blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
-                       alpha: CGFloat(1.0))
+                       alpha: 1.0)
     }
 }
 

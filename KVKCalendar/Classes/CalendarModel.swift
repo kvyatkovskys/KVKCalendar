@@ -190,7 +190,7 @@ protocol CalendarPrivateDelegate: class {
     func didSelectCalendarDate(_ date: Date?, type: CalendarType, frame: CGRect?)
     func didSelectCalendarEvent(_ event: Event, frame: CGRect?)
     func didSelectCalendarMore(_ date: Date, frame: CGRect?)
-    func calendarEventViewerFrame(_ frame: CGRect)
+    func getEventViewerFrame(_ frame: CGRect)
     func didChangeCalendarEvent(_ event: Event, start: Date?, end: Date?)
     func didAddCalendarEvent(_ date: Date?)
 }

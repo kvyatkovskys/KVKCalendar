@@ -31,7 +31,6 @@ final class EventViewer: UIView {
         } else {
             backgroundColor = .white
         }
-        textLabel.frame = frame
         addSubview(textLabel)
     }
     
