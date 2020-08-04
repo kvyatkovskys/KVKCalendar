@@ -250,6 +250,8 @@ SWIFT_AVAILABILITY(ios,introduced=13)
 
 
 
+
+
 #if __has_attribute(external_source_symbol)
 # pragma clang attribute pop
 #endif
@@ -491,6 +493,8 @@ SWIFT_AVAILABILITY(ios,introduced=13)
 @interface EventViewGeneral (SWIFT_EXTENSION(KVKCalendar)) <UIContextMenuInteractionDelegate>
 - (UIContextMenuConfiguration * _Nullable)contextMenuInteraction:(UIContextMenuInteraction * _Nonnull)interaction configurationForMenuAtLocation:(CGPoint)location SWIFT_WARN_UNUSED_RESULT;
 @end
+
+
 
 
 
@@ -758,6 +762,8 @@ SWIFT_AVAILABILITY(ios,introduced=13)
 
 
 
+
+
 #if __has_attribute(external_source_symbol)
 # pragma clang attribute pop
 #endif
@@ -999,6 +1005,8 @@ SWIFT_AVAILABILITY(ios,introduced=13)
 @interface EventViewGeneral (SWIFT_EXTENSION(KVKCalendar)) <UIContextMenuInteractionDelegate>
 - (UIContextMenuConfiguration * _Nullable)contextMenuInteraction:(UIContextMenuInteraction * _Nonnull)interaction configurationForMenuAtLocation:(CGPoint)location SWIFT_WARN_UNUSED_RESULT;
 @end
+
+
 
 
 
