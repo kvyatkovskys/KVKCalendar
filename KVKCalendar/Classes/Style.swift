@@ -147,6 +147,7 @@ public struct MonthStyle {
     public var fontEventTime: UIFont = .systemFont(ofSize: 10)
     public var fontEventBullet: UIFont = .boldSystemFont(ofSize: 18)
     public var isHiddenSeporator: Bool = false
+    public var isHiddenSeporatorOnEmptyDate: Bool = false
     public var widthSeporator: CGFloat = 0.7
     public var colorSeporator: UIColor = gainsboro.withAlphaComponent(0.9)
     public var colorBackgroundWeekendDate: UIColor = gainsboro.withAlphaComponent(0.4)
