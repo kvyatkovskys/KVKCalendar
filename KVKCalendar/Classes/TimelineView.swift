@@ -46,6 +46,7 @@ final class TimelineView: UIView, EventDateProtocol {
         label.textAlignment = .center
         label.font = style.timeline.currentLineHourFont
         label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.6
         
         let formatter = DateFormatter()
         formatter.dateFormat = timeHourSystem.format
@@ -349,11 +350,11 @@ final class TimelineView: UIView, EventDateProtocol {
         
         pointY = calculatePointYByMinute(date.minute, time: time)
         
-        currentTimeLabel.frame = CGRect(x: style.timeline.offsetTimeX,
+        currentTimeLabel.frame = CGRect(x: 0,
                                         y: pointY - 8,
                                         width: style.timeline.currentLineHourWidth,
                                         height: 15)
-        currentLineView.frame = CGRect(x: currentTimeLabel.frame.width + style.timeline.offsetTimeX + style.timeline.offsetLineLeft,
+        currentLineView.frame = CGRect(x: currentTimeLabel.frame.width,
                                        y: pointY,
                                        width: scrollView.frame.width - style.timeline.offsetTimeX,
                                        height: 1)
@@ -511,17 +512,25 @@ final class TimelineView: UIView, EventDateProtocol {
                     times.forEach({ (time) in                        
                         // calculate position 'y'
                         if event.start.hour.hashValue == time.valueHash, event.start.day == date?.day {
-                            newFrame.origin.y = calculatePointYByMinute(event.start.minute, time: time)
+                            if time.tag == 24, let newTime = times.first(where: { $0.tag == 0 }) {
+                                newFrame.origin.y = calculatePointYByMinute(event.start.minute, time: newTime)
+                            } else {
+                                newFrame.origin.y = calculatePointYByMinute(event.start.minute, time: time)
+                            }
                         } else if let firstTimeLabel = getTimelineLabel(hour: startHour), event.start.day != date?.day {
                             newFrame.origin.y = calculatePointYByMinute(startHour, time: firstTimeLabel)
                         }
                         
                         // calculate 'height' event
                         if event.end.hour.hashValue == time.valueHash, event.end.day == date?.day {
-                            let summHeight = (CGFloat(time.tag) * (style.timeline.offsetTimeY + time.frame.height)) - newFrame.origin.y + (time.frame.height / 2)
+                            var timeTemp = time
+                            if time.tag == 24, let newTime = times.first(where: { $0.tag == 0 }) {
+                                timeTemp = newTime
+                            }
+                            let summHeight = (CGFloat(timeTemp.tag) * (style.timeline.offsetTimeY + timeTemp.frame.height)) - newFrame.origin.y + (timeTemp.frame.height / 2)
                             if 0..<59 ~= event.end.minute {
                                 let minutePercent = 59.0 / CGFloat(event.end.minute)
-                                let newY = (style.timeline.offsetTimeY + time.frame.height) / minutePercent
+                                let newY = (style.timeline.offsetTimeY + timeTemp.frame.height) / minutePercent
                                 newFrame.size.height = summHeight + newY - style.timeline.offsetEvent
                             } else {
                                 newFrame.size.height = summHeight - style.timeline.offsetEvent

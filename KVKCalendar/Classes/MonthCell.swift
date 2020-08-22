@@ -16,7 +16,7 @@ protocol MonthCellDelegate: class {
 }
 
 final class MonthCell: UICollectionViewCell {
-    static let titlesCount = 3
+    private let titlesCount = 3
     
     private let countInCell: CGFloat = 4
     private let offset: CGFloat = 3
@@ -64,7 +64,7 @@ final class MonthCell: UICollectionViewCell {
                 let label = UILabel(frame: CGRect(x: 5, y: 5 + dateLabel.bounds.height + height * CGFloat(idx), width: width, height: height))
                 label.isUserInteractionEnabled = true
                 
-                if count > MonthCell.titlesCount {
+                if count > titlesCount {
                     label.font = monthStyle.fontEventTitle
                     label.lineBreakMode = .byTruncatingMiddle
                     label.adjustsFontSizeToFitWidth = true
@@ -77,9 +77,11 @@ final class MonthCell: UICollectionViewCell {
                     if !monthStyle.isHiddenMoreTitle {
                         let text: String
                         if monthStyle.moreTitle.isEmpty {
-                            text = "\(events.count - MonthCell.titlesCount)"
+                            text = "\(events.count - titlesCount)"
+                        } else if frame.height > 80 {
+                            text = "\(monthStyle.moreTitle) \(events.count - titlesCount)"
                         } else {
-                            text = "\(monthStyle.moreTitle) \(events.count - MonthCell.titlesCount)"
+                            text = ""
                         }
                         label.text = text
                     }
@@ -110,7 +112,7 @@ final class MonthCell: UICollectionViewCell {
                     label.addGestureRecognizer(tap)
                     label.tag = event.hash
                     if style.event.isEnableMoveEvent, UIDevice.current.userInterfaceIdiom != .phone, !event.isAllDay {
-                        let longGesture = UILongPressGestureRecognizer(target: self, action: #selector(activateMoveEvent))
+                        let longGesture = UILongPressGestureRecognizer(target: self, action: #selector(activateMovingEvent))
                         longGesture.minimumPressDuration = style.event.minimumPressDuration
                         label.addGestureRecognizer(longGesture)
                     }
@@ -130,8 +132,15 @@ final class MonthCell: UICollectionViewCell {
                 dateLabel.text = nil
             }
             if !monthStyle.isHiddenSeporator {
-                layer.borderWidth = value.day.type != .empty ? monthStyle.widthSeporator : 0
-                layer.borderColor = value.day.type != .empty ? monthStyle.colorSeporator.cgColor : UIColor.clear.cgColor
+                if UIDevice.current.userInterfaceIdiom == .phone {
+                    let topLineLayer = CALayer()
+                    topLineLayer.frame = CGRect(x: 0, y: 0, width: frame.width, height: monthStyle.widthSeporator)
+                    topLineLayer.backgroundColor = monthStyle.colorSeporator.cgColor
+                    layer.addSublayer(topLineLayer)
+                } else {
+                    layer.borderWidth = value.day.type != .empty ? monthStyle.widthSeporator : 0
+                    layer.borderColor = value.day.type != .empty ? monthStyle.colorSeporator.cgColor : UIColor.clear.cgColor
+                }
             }
             populateCell(cellStyle: value, label: dateLabel, view: self)
         }
@@ -161,16 +170,13 @@ final class MonthCell: UICollectionViewCell {
         var dateFrame = frame
         if UIDevice.current.userInterfaceIdiom == .pad {
             dateFrame.size = CGSize(width: 30, height: 30)
+            dateFrame.origin.x = (frame.width - dateFrame.width) - offset
         } else {
             let newWidth = frame.width > 30 ? 30 : frame.width
             dateFrame.size = CGSize(width: newWidth, height: newWidth)
-        }
-        dateFrame.origin.y = offset
-        if UIDevice.current.userInterfaceIdiom == .pad {
-            dateFrame.origin.x = (frame.width - dateFrame.width) - offset
-        } else {
             dateFrame.origin.x = (frame.width / 2) - (dateFrame.width / 2)
         }
+        dateFrame.origin.y = offset
         dateLabel.frame = dateFrame
         addSubview(dateLabel)
     }
@@ -179,7 +185,7 @@ final class MonthCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    @objc private func activateMoveEvent(gesture: UILongPressGestureRecognizer) {
+    @objc private func activateMovingEvent(gesture: UILongPressGestureRecognizer) {
         guard let idx = events.firstIndex(where: { $0.hash == gesture.view?.tag }), let view = gesture.view else { return }
         
         let event = events[idx]
