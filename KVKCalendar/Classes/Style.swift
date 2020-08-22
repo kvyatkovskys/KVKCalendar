@@ -92,7 +92,7 @@ public struct TimelineStyle {
     public var showCurrentLineHour: Bool = true
     public var currentLineHourFont: UIFont = .systemFont(ofSize: 12)
     public var currentLineHourColor: UIColor = .red
-    public var currentLineHourWidth: CGFloat = 50
+    public var currentLineHourWidth: CGFloat = 60
     public var movingMinutesColor: UIColor = .systemBlue
     public var shadowColumnColor: UIColor = .systemTeal
     public var shadowColumnAlpha: CGFloat = 0.1

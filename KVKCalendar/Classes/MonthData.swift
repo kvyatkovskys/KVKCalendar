@@ -70,7 +70,7 @@ final class MonthData: EventDateProtocol {
                 recurringEventByDate = []
             }
             let sortedEvents = (otherEvents + recurringEventByDate).sorted(by: { $0.start.hour < $1.start.hour })
-            newDay.events = allDayEvents + sortedEvents
+            newDay.events = allDayEvents + sortedEvents.sorted(by: { $0.isAllDay && !$1.isAllDay })
             return acc + [newDay]
         })
         days[startIdx...endIdx] = ArraySlice(newDays)

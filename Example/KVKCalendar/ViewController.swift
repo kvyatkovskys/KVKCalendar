@@ -27,8 +27,8 @@ final class ViewController: UIViewController {
     private lazy var style: Style = {
         var style = Style()
         if UIDevice.current.userInterfaceIdiom == .phone {
-            style.month.isHiddenSeporator = true
             style.timeline.widthTime = 40
+            style.timeline.currentLineHourWidth = 45
             style.timeline.offsetTimeX = 2
             style.timeline.offsetLineLeft = 2
         } else {
@@ -38,7 +38,6 @@ final class ViewController: UIViewController {
         style.followInSystemTheme = true
         style.timeline.offsetTimeY = 80
         style.timeline.offsetEvent = 3
-        style.timeline.currentLineHourWidth = 40
         style.allDay.isPinned = true
         style.startWeekDay = .sunday
         style.timeHourSystem = .twelveHour

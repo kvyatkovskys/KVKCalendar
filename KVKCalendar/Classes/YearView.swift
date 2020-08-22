@@ -17,8 +17,17 @@ final class YearView: UIView {
     
     private let layout: UICollectionViewLayout = {
         let layout = UICollectionViewFlowLayout()
-        layout.minimumLineSpacing = 10
-        layout.minimumInteritemSpacing = 10
+        
+        let offset: CGFloat
+        switch UIDevice.current.userInterfaceIdiom {
+        case .phone:
+            offset = 5
+        default:
+            offset = 10
+        }
+        
+        layout.minimumLineSpacing = offset
+        layout.minimumInteritemSpacing = offset
         return layout
     }()
     
@@ -209,12 +218,12 @@ extension YearView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
         let widht: CGFloat
         let height: CGFloat
         if UIDevice.current.userInterfaceIdiom == .pad {
-            widht = collectionView.frame.width / 4
-            height = collectionView.frame.height / 3
+            widht = (collectionView.frame.width / 4) - 10
+            height = (collectionView.frame.height / 3) - 10
         } else {
-            widht = collectionView.frame.width / 3
-            height = collectionView.frame.height / 4
+            widht = (collectionView.frame.width / 3) - 5
+            height = (collectionView.frame.height / 4) - 5
         }
-        return CGSize(width: widht - 10, height: height - 10)
+        return CGSize(width: widht, height: height)
     }
 }
