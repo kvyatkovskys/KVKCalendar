@@ -43,6 +43,7 @@
 		F959A7F6E6C0CBA5AEFE0F52D7484ADE /* Pods-KVKCalendar_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = A9624963DF6186D58BC646C877E68CDF /* Pods-KVKCalendar_Tests-dummy.m */; };
 		F9BEF87024C73B2D0064992F /* MonthCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9BEF86F24C73B2D0064992F /* MonthCell.swift */; };
 		F9BEF87224C73B6F0064992F /* MonthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9BEF87124C73B6F0064992F /* MonthView.swift */; };
+		F9DFA12524F1842500A3E6F7 /* CurrentLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9DFA12424F1842500A3E6F7 /* CurrentLineView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -121,6 +122,7 @@
 		F9A5FE2DD23FBAFCC63D57A554B1036E /* Pods-KVKCalendar_Example-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-KVKCalendar_Example-frameworks.sh"; sourceTree = "<group>"; };
 		F9BEF86F24C73B2D0064992F /* MonthCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MonthCell.swift; path = KVKCalendar/Classes/MonthCell.swift; sourceTree = "<group>"; };
 		F9BEF87124C73B6F0064992F /* MonthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MonthView.swift; path = KVKCalendar/Classes/MonthView.swift; sourceTree = "<group>"; };
+		F9DFA12424F1842500A3E6F7 /* CurrentLineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CurrentLineView.swift; path = KVKCalendar/Classes/CurrentLineView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -275,6 +277,7 @@
 				F905C93524C4E7A400E48E6A /* Timeline+Extension.swift */,
 				F905C93724C4E7BE00E48E6A /* TimelineModel.swift */,
 				F905C93924C4E7DA00E48E6A /* TimelineView.swift */,
+				F9DFA12424F1842500A3E6F7 /* CurrentLineView.swift */,
 				39BF6116127626E211E143115E4DCC64 /* Pod */,
 				071660E8BF5F9B8B65347296D0468D75 /* Support Files */,
 			);
@@ -466,6 +469,7 @@
 				9E779304BCE849C42046FBAE71518A1E /* CalendarModel.swift in Sources */,
 				D1ABA35AB7D1D22E432E40FC8AA07C7A /* CalendarView.swift in Sources */,
 				F905C91C24C4E60300E48E6A /* YearView.swift in Sources */,
+				F9DFA12524F1842500A3E6F7 /* CurrentLineView.swift in Sources */,
 				F905C92A24C4E6F600E48E6A /* WeekHeaderView.swift in Sources */,
 				F905C8EE24C4E06E00E48E6A /* ScrollHeaderDayCell.swift in Sources */,
 				F905C93024C4E74A00E48E6A /* DayData.swift in Sources */,
