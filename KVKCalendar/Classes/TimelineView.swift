@@ -464,6 +464,7 @@ final class TimelineView: UIView, EventDateProtocol {
         let offset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
         let widthPage = (frame.width - offset) / CGFloat(dates.count)
         let heightPage = (CGFloat(times.count) * (style.timeline.heightTime + style.timeline.offsetTimeY)) - 75
+        let midnight = 24
         
         // horror
         for (idx, date) in dates.enumerated() {
@@ -512,7 +513,7 @@ final class TimelineView: UIView, EventDateProtocol {
                     times.forEach({ (time) in                        
                         // calculate position 'y'
                         if event.start.hour.hashValue == time.valueHash, event.start.day == date?.day {
-                            if time.tag == 24, let newTime = times.first(where: { $0.tag == 0 }) {
+                            if time.tag == midnight, let newTime = times.first(where: { $0.tag == 0 }) {
                                 newFrame.origin.y = calculatePointYByMinute(event.start.minute, time: newTime)
                             } else {
                                 newFrame.origin.y = calculatePointYByMinute(event.start.minute, time: time)
@@ -524,7 +525,7 @@ final class TimelineView: UIView, EventDateProtocol {
                         // calculate 'height' event
                         if event.end.hour.hashValue == time.valueHash, event.end.day == date?.day {
                             var timeTemp = time
-                            if time.tag == 24, let newTime = times.first(where: { $0.tag == 0 }) {
+                            if time.tag == midnight, let newTime = times.first(where: { $0.tag == 0 }) {
                                 timeTemp = newTime
                             }
                             let summHeight = (CGFloat(timeTemp.tag) * (style.timeline.offsetTimeY + timeTemp.frame.height)) - newFrame.origin.y + (timeTemp.frame.height / 2)
