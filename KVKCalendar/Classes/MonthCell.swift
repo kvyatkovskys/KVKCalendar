@@ -138,8 +138,13 @@ final class MonthCell: UICollectionViewCell {
                     topLineLayer.backgroundColor = monthStyle.colorSeporator.cgColor
                     layer.addSublayer(topLineLayer)
                 } else {
-                    layer.borderWidth = value.day.type != .empty ? monthStyle.widthSeporator : 0
-                    layer.borderColor = value.day.type != .empty ? monthStyle.colorSeporator.cgColor : UIColor.clear.cgColor
+                    if value.day.type != .empty {
+                        layer.borderWidth = monthStyle.isHiddenSeporatorOnEmptyDate ? 0 : monthStyle.widthSeporator
+                        layer.borderColor = monthStyle.isHiddenSeporatorOnEmptyDate ? UIColor.clear.cgColor : monthStyle.colorSeporator.cgColor
+                    } else {
+                        layer.borderWidth = monthStyle.widthSeporator
+                        layer.borderColor = monthStyle.colorSeporator.cgColor
+                    }
                 }
             }
             populateCell(cellStyle: value, label: dateLabel, view: self)

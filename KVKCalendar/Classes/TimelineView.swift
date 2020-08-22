@@ -351,7 +351,7 @@ final class TimelineView: UIView, EventDateProtocol {
         pointY = calculatePointYByMinute(date.minute, time: time)
         
         currentTimeLabel.frame = CGRect(x: 0,
-                                        y: pointY - 8,
+                                        y: pointY - 7.5,
                                         width: style.timeline.currentLineHourWidth,
                                         height: 15)
         currentLineView.frame = CGRect(x: currentTimeLabel.frame.width,
