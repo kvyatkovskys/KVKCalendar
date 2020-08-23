@@ -39,6 +39,8 @@ final class CurrentLineView: UIView {
         return view
     }()
     
+    var valueHash: Int?
+    
     var time: String? {
         didSet {
             timeLabel.text = time
@@ -49,6 +51,12 @@ final class CurrentLineView: UIView {
         self.style = style
         self.timeHourSystem = timeHourSystem
         super.init(frame: frame)
+        
+        timeLabel.frame = CGRect(x: 0, y: 0, width: style.timeline.currentLineHourWidth, height: frame.height)
+        dotView.frame = CGRect(x: style.timeline.currentLineHourWidth - 2, y: (frame.height * 0.5) - 2, width: 5, height: 5)
+        lineView.frame = CGRect(x: style.timeline.currentLineHourWidth, y: frame.height * 0.5, width: frame.width - style.timeline.currentLineHourWidth, height: style.timeline.currentLineHourHeight)
+        [timeLabel, lineView, dotView].forEach({ addSubview($0) })
+        dotView.setRoundCorners(radius: CGSize(width: 2.5, height: 2.5))
     }
     
     required init?(coder: NSCoder) {
