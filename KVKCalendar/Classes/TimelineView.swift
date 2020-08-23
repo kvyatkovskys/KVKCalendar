@@ -48,7 +48,7 @@ final class TimelineView: UIView, EventDateProtocol {
         return label
     }()
     
-    private lazy var currentLineView: CurrentLineView = {
+    private(set) lazy var currentLineView: CurrentLineView = {
         let view = CurrentLineView(style: style,
                                    frame: CGRect(x: 0, y: 0, width: scrollView.frame.width, height: 15),
                                    timeHourSystem: timeHourSystem)
@@ -74,11 +74,14 @@ final class TimelineView: UIView, EventDateProtocol {
         scrollView.frame = scrollFrame
         addSubview(scrollView)
         
+        // moving events
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(swipeEvent))
         addGestureRecognizer(panGesture)
         
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(addEvent))
-        addGestureRecognizer(tapGesture)
+        // long tap to create a new event preview
+        let longTap = UILongPressGestureRecognizer(target: self, action: #selector(addNewEvent))
+        longTap.minimumPressDuration = style.timeline.minimumPressDuration
+        addGestureRecognizer(longTap)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -87,6 +90,14 @@ final class TimelineView: UIView, EventDateProtocol {
     
     deinit {
         stopTimer()
+    }
+    
+    @objc private func addNewEvent(gesture: UILongPressGestureRecognizer) {
+        guard gesture.state == .began else { return }
+        
+        let point = gesture.location(in: scrollView)
+        let time = calculateChangeTime(pointY: point.y - style.timeline.offsetEvent - 6)
+        print(time, point)
     }
     
     @objc private func addEvent(gesture: UITapGestureRecognizer) {

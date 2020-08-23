@@ -99,6 +99,7 @@ public struct TimelineStyle {
     public var shadowColumnAlpha: CGFloat = 0.1
     public var eventCorners: UIRectCorner = .allCorners
     public var eventCornersRadius: CGSize = CGSize(width: 5, height: 5)
+    public var minimumPressDuration: TimeInterval = 0.5
 }
 
 public struct WeekStyle {
@@ -234,7 +235,7 @@ public struct AllDayStyle {
 
 public struct EventStyle {
     public var isEnableMoveEvent: Bool = false
-    public var minimumPressDuration: TimeInterval = 1
+    public var minimumPressDuration: TimeInterval = 0.5
     public var alphaWhileMoving: CGFloat = 0.5
     var isEnableContextMenu: Bool = false
 }
