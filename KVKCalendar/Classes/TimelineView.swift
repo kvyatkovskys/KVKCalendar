@@ -39,22 +39,6 @@ final class TimelineView: UIView, EventDateProtocol {
         return view
     }()
     
-    private lazy var currentTimeLabel: TimelineLabel = {
-        let label = TimelineLabel()
-        label.tag = tagCurrentHourLine
-        label.textColor = style.timeline.currentLineHourColor
-        label.textAlignment = .center
-        label.font = style.timeline.currentLineHourFont
-        label.adjustsFontSizeToFitWidth = true
-        label.minimumScaleFactor = 0.6
-        
-        let formatter = DateFormatter()
-        formatter.dateFormat = timeHourSystem.format
-        label.text = formatter.string(from: Date())
-        label.valueHash = Date().minute.hashValue
-        return label
-    }()
-    
     private(set) lazy var movingMinutesLabel: TimelineLabel = {
         let label = TimelineLabel()
         label.adjustsFontSizeToFitWidth = true
@@ -64,10 +48,11 @@ final class TimelineView: UIView, EventDateProtocol {
         return label
     }()
     
-    private lazy var currentLineView: UIView = {
-        let view = UIView()
+    private lazy var currentLineView: CurrentLineView = {
+        let view = CurrentLineView(style: style,
+                                   frame: CGRect(x: 0, y: 0, width: scrollView.frame.width, height: 15),
+                                   timeHourSystem: timeHourSystem)
         view.tag = tagCurrentHourLine
-        view.backgroundColor = style.timeline.currentLineHourColor
         return view
     }()
     
@@ -306,8 +291,7 @@ final class TimelineView: UIView, EventDateProtocol {
             guard let self = self else { return }
             
             let nextDate = Date()
-            guard self.currentTimeLabel.valueHash != nextDate.minute.hashValue else { return }
-            guard let time = self.getTimelineLabel(hour: nextDate.hour) else { return }
+            guard self.currentLineView.valueHash != nextDate.minute.hashValue, let time = self.getTimelineLabel(hour: nextDate.hour) else { return }
             
             var pointY = time.frame.origin.y
             if !self.subviews.filter({ $0 is AllDayTitleView }).isEmpty, self.style.allDay.isPinned {
@@ -316,18 +300,17 @@ final class TimelineView: UIView, EventDateProtocol {
             
             pointY = self.calculatePointYByMinute(nextDate.minute, time: time)
             
-            self.currentTimeLabel.frame.origin.y = pointY - 7.5
-            self.currentLineView.frame.origin.y = pointY
-            self.currentTimeLabel.valueHash = nextDate.minute.hashValue
+            self.currentLineView.frame.origin.y = pointY - (self.currentLineView.frame.height * 0.5)
+            self.currentLineView.valueHash = nextDate.minute.hashValue
             
             let formatter = DateFormatter()
             formatter.dateFormat = self.timeHourSystem.format
-            self.currentTimeLabel.text = formatter.string(from: nextDate)
+            self.currentLineView.time = formatter.string(from: nextDate)
             
             if let timeNext = self.getTimelineLabel(hour: nextDate.hour + 1) {
-                timeNext.isHidden = self.currentTimeLabel.frame.intersects(timeNext.frame)
+                timeNext.isHidden = self.currentLineView.frame.intersects(timeNext.frame)
             }
-            time.isHidden = time.frame.intersects(self.currentTimeLabel.frame)
+            time.isHidden = time.frame.intersects(self.currentLineView.frame)
         }
         
         guard let timer = timer else { return }
@@ -338,7 +321,6 @@ final class TimelineView: UIView, EventDateProtocol {
         let date = Date()
         guard style.timeline.showCurrentLineHour, let time = getTimelineLabel(hour: date.hour) else {
             currentLineView.removeFromSuperview()
-            currentTimeLabel.removeFromSuperview()
             timer?.invalidate()
             return
         }
@@ -349,24 +331,14 @@ final class TimelineView: UIView, EventDateProtocol {
         }
         
         pointY = calculatePointYByMinute(date.minute, time: time)
-        
-        currentTimeLabel.frame = CGRect(x: 0,
-                                        y: pointY - 7.5,
-                                        width: style.timeline.currentLineHourWidth,
-                                        height: 15)
-        currentLineView.frame = CGRect(x: currentTimeLabel.frame.width,
-                                       y: pointY,
-                                       width: scrollView.frame.width - style.timeline.offsetTimeX,
-                                       height: 1)
-        
-        scrollView.addSubview(currentTimeLabel)
+        currentLineView.frame.origin.y = pointY - (currentLineView.frame.height * 0.5)
         scrollView.addSubview(currentLineView)
         movingCurrentLineHour()
         
         if let timeNext = getTimelineLabel(hour: date.hour + 1) {
-            timeNext.isHidden = currentTimeLabel.frame.intersects(timeNext.frame)
+            timeNext.isHidden = currentLineView.frame.intersects(timeNext.frame)
         }
-        time.isHidden = currentTimeLabel.frame.intersects(time.frame)
+        time.isHidden = currentLineView.frame.intersects(time.frame)
     }
     
     private func calculatePointYByMinute(_ minute: Int, time: TimelineLabel) -> CGFloat {
