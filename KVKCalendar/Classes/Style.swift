@@ -237,6 +237,7 @@ public struct EventStyle {
     public var isEnableMoveEvent: Bool = false
     public var minimumPressDuration: TimeInterval = 0.5
     public var alphaWhileMoving: CGFloat = 0.5
+    public var textForNewEvent: String = "New Event"
     var isEnableContextMenu: Bool = false
 }
 
