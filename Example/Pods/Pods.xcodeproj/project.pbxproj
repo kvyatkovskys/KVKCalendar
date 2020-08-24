@@ -40,6 +40,8 @@
 		F905C93624C4E7A400E48E6A /* Timeline+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C93524C4E7A400E48E6A /* Timeline+Extension.swift */; };
 		F905C93824C4E7BE00E48E6A /* TimelineModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C93724C4E7BE00E48E6A /* TimelineModel.swift */; };
 		F905C93A24C4E7DA00E48E6A /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905C93924C4E7DA00E48E6A /* TimelineView.swift */; };
+		F928E3B424F3D8DF00D624EE /* ShadowDayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F928E3B324F3D8DF00D624EE /* ShadowDayView.swift */; };
+		F928E3B824F3D96E00D624EE /* VerticalLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F928E3B724F3D96E00D624EE /* VerticalLineView.swift */; };
 		F959A7F6E6C0CBA5AEFE0F52D7484ADE /* Pods-KVKCalendar_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = A9624963DF6186D58BC646C877E68CDF /* Pods-KVKCalendar_Tests-dummy.m */; };
 		F9BEF87024C73B2D0064992F /* MonthCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9BEF86F24C73B2D0064992F /* MonthCell.swift */; };
 		F9BEF87224C73B6F0064992F /* MonthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9BEF87124C73B6F0064992F /* MonthView.swift */; };
@@ -119,6 +121,8 @@
 		F905C93524C4E7A400E48E6A /* Timeline+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Timeline+Extension.swift"; path = "KVKCalendar/Classes/Timeline+Extension.swift"; sourceTree = "<group>"; };
 		F905C93724C4E7BE00E48E6A /* TimelineModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TimelineModel.swift; path = KVKCalendar/Classes/TimelineModel.swift; sourceTree = "<group>"; };
 		F905C93924C4E7DA00E48E6A /* TimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TimelineView.swift; path = KVKCalendar/Classes/TimelineView.swift; sourceTree = "<group>"; };
+		F928E3B324F3D8DF00D624EE /* ShadowDayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ShadowDayView.swift; path = KVKCalendar/Classes/ShadowDayView.swift; sourceTree = "<group>"; };
+		F928E3B724F3D96E00D624EE /* VerticalLineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = VerticalLineView.swift; path = KVKCalendar/Classes/VerticalLineView.swift; sourceTree = "<group>"; };
 		F9A5FE2DD23FBAFCC63D57A554B1036E /* Pods-KVKCalendar_Example-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-KVKCalendar_Example-frameworks.sh"; sourceTree = "<group>"; };
 		F9BEF86F24C73B2D0064992F /* MonthCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MonthCell.swift; path = KVKCalendar/Classes/MonthCell.swift; sourceTree = "<group>"; };
 		F9BEF87124C73B6F0064992F /* MonthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MonthView.swift; path = KVKCalendar/Classes/MonthView.swift; sourceTree = "<group>"; };
@@ -278,6 +282,8 @@
 				F905C93724C4E7BE00E48E6A /* TimelineModel.swift */,
 				F905C93924C4E7DA00E48E6A /* TimelineView.swift */,
 				F9DFA12424F1842500A3E6F7 /* CurrentLineView.swift */,
+				F928E3B324F3D8DF00D624EE /* ShadowDayView.swift */,
+				F928E3B724F3D96E00D624EE /* VerticalLineView.swift */,
 				39BF6116127626E211E143115E4DCC64 /* Pod */,
 				071660E8BF5F9B8B65347296D0468D75 /* Support Files */,
 			);
@@ -476,11 +482,13 @@
 				F905C93424C4E78300E48E6A /* TimelineLabel.swift in Sources */,
 				041F5B567C80F0BB2BA43B42AC29404D /* Date+Extension.swift in Sources */,
 				85128E13C693351B6F11CA241936333C /* KVKCalendar-dummy.m in Sources */,
+				F928E3B824F3D96E00D624EE /* VerticalLineView.swift in Sources */,
 				F905C93224C4E76500E48E6A /* DayView.swift in Sources */,
 				F905C93824C4E7BE00E48E6A /* TimelineModel.swift in Sources */,
 				F905C93A24C4E7DA00E48E6A /* TimelineView.swift in Sources */,
 				F905C92224C4E66C00E48E6A /* EventViewGeneral.swift in Sources */,
 				F905C92824C4E6CF00E48E6A /* MonthData.swift in Sources */,
+				F928E3B424F3D8DF00D624EE /* ShadowDayView.swift in Sources */,
 				F905C91A24C4E5E700E48E6A /* YearHeaderView.swift in Sources */,
 				F905C93624C4E7A400E48E6A /* Timeline+Extension.swift in Sources */,
 				A66F1A03F44DF4E692AF1E7027FE7748 /* Style.swift in Sources */,

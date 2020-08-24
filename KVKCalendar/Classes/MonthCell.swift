@@ -32,10 +32,10 @@ final class MonthCell: UICollectionViewCell {
     }()
     
     private func timeFormatter(date: Date) -> String {
-          let formatter = DateFormatter()
+        let formatter = DateFormatter()
         formatter.dateFormat = style.timeHourSystem.format
-          return formatter.string(from: date)
-      }
+        return formatter.string(from: date)
+    }
     
     private var monthStyle = MonthStyle()
     private var allDayStyle = AllDayStyle()
@@ -220,7 +220,7 @@ final class MonthCell: UICollectionViewCell {
     private func populateCell(cellStyle: DayStyle, label: UILabel, view: UIView) {
         let date = cellStyle.day.date
         let weekend = cellStyle.day.type == .saturday || cellStyle.day.type == .sunday
-
+        
         let nowDate = Date()
         label.backgroundColor = .clear
         
@@ -241,7 +241,7 @@ final class MonthCell: UICollectionViewCell {
             }
             return
         }
-
+        
         guard date?.month == nowDate.month else {
             if selectDate.day == date?.day && selectDate.month == date?.month {
                 label.textColor = cellStyle.style?.textColor ?? monthStyle.colorSelectDate
@@ -251,7 +251,7 @@ final class MonthCell: UICollectionViewCell {
             }
             return
         }
-
+        
         guard date?.day == nowDate.day else {
             if selectDate.day == date?.day && date?.month == selectDate.month {
                 label.textColor = cellStyle.style?.textColor ?? monthStyle.colorSelectDate
@@ -261,7 +261,7 @@ final class MonthCell: UICollectionViewCell {
             }
             return
         }
-
+        
         guard selectDate.day == date?.day && selectDate.month == date?.month else {
             if date?.day == nowDate.day, cellStyle.style == nil {
                 label.textColor = monthStyle.colorDate
@@ -269,13 +269,13 @@ final class MonthCell: UICollectionViewCell {
             }
             return
         }
-
+        
         label.textColor = cellStyle.style?.textColor ?? monthStyle.colorCurrentDate
         label.backgroundColor = cellStyle.style?.dotBackgroundColor ?? monthStyle.colorBackgroundCurrentDate
         label.layer.cornerRadius = label.frame.height / 2
         label.clipsToBounds = true
     }
-
+    
     private func addIconBeforeLabel(eventList: [Event], textAttributes: [NSAttributedString.Key: Any], bulletAttributes: [NSAttributedString.Key: Any], timeAttributes: [NSAttributedString.Key: Any], bullet: String = "\u{2022}", indentation: CGFloat = 10, lineSpacing: CGFloat = 2, paragraphSpacing: CGFloat = 10) -> NSAttributedString {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = UIDevice.current.userInterfaceIdiom == .pad ? .left : .center

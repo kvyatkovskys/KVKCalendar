@@ -152,6 +152,21 @@ extension ViewController: CalendarDelegate {
     func eventViewerFrame(_ frame: CGRect) {
         eventViewer.reloadFrame(frame: frame)
     }
+    
+    func didAddNewEvent(_ event: Event, _ date: Date?) {
+        var newEvent = event
+        
+        guard let start = date, let end = Calendar.current.date(byAdding: .minute, value: 30, to: start) else { return }
+
+        let startTime = timeFormatter(date: start)
+        let endTime = timeFormatter(date: end)
+        newEvent.start = start
+        newEvent.end = end
+        newEvent.ID = "\(events.count + 1)"
+        newEvent.text = "\(startTime) - \(endTime)\n new event"
+        events.append(newEvent)
+        calendarView.reloadData()
+    }
 }
 
 extension ViewController: CalendarDataSource {

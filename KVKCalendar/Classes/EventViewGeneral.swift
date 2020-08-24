@@ -52,12 +52,12 @@ open class EventViewGeneral: UIView {
         switch gesture.state {
         case .began:
             alpha = style.event.alphaWhileMoving
-            delegate?.didStartMoveEvent(event, gesture: gesture, view: self)
+            delegate?.didStartMovingEvent(event, gesture: gesture, view: self)
         case .changed:
-            delegate?.didChangeMoveEvent(event, gesture: gesture)
+            delegate?.didChangeMovingEvent(event, gesture: gesture)
         case .cancelled, .ended, .failed:
             alpha = 1.0
-            delegate?.didEndMoveEvent(event, gesture: gesture)
+            delegate?.didEndMovingEvent(event, gesture: gesture)
         default:
             break
         }
@@ -92,9 +92,9 @@ extension EventViewGeneral: UIContextMenuInteractionDelegate {
 }
 
 protocol EventDelegate: class {
-    func didStartMoveEvent(_ event: Event, gesture: UILongPressGestureRecognizer, view: UIView)
-    func didEndMoveEvent(_ event: Event, gesture: UILongPressGestureRecognizer)
-    func didChangeMoveEvent(_ event: Event, gesture: UILongPressGestureRecognizer)
+    func didStartMovingEvent(_ event: Event, gesture: UILongPressGestureRecognizer, view: UIView)
+    func didEndMovingEvent(_ event: Event, gesture: UILongPressGestureRecognizer)
+    func didChangeMovingEvent(_ event: Event, gesture: UILongPressGestureRecognizer)
     func didSelectEvent(_ event: Event, gesture: UITapGestureRecognizer)
 }
 

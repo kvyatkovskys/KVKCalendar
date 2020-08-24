@@ -104,7 +104,7 @@ extension ViewController: CalendarDelegate {
     // drag & drop events
     func didChangeEvent(_ event: Event, start: Date?, end: Date?) {}
     // tap on timeline or month cell
-    func didAddEvent(_ date: Date?) {}
+    func didAddNewEvent(_ event: Event, _ date: Date?) {}
     // get current displaying events
     func didDisplayEvents(_ events: [Event], dates: [Date?]) {}
 }
