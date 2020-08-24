@@ -52,7 +52,7 @@ final class CurrentLineView: UIView {
         self.timeHourSystem = timeHourSystem
         super.init(frame: frame)
         
-        timeLabel.frame = CGRect(x: 0, y: 0, width: style.timeline.currentLineHourWidth, height: frame.height)
+        timeLabel.frame = CGRect(x: 2, y: 0, width: style.timeline.currentLineHourWidth - 4, height: frame.height)
         dotView.frame = CGRect(origin: CGPoint(x: style.timeline.currentLineHourWidth - 2, y: (frame.height * 0.5) - 2), size: style.timeline.currentLineHourDotSize)
         lineView.frame = CGRect(x: style.timeline.currentLineHourWidth, y: frame.height * 0.5, width: frame.width - style.timeline.currentLineHourWidth, height: style.timeline.currentLineHourHeight)
         [timeLabel, lineView, dotView].forEach({ addSubview($0) })
