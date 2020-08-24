@@ -53,13 +53,24 @@ final class CurrentLineView: UIView {
         super.init(frame: frame)
         
         timeLabel.frame = CGRect(x: 0, y: 0, width: style.timeline.currentLineHourWidth, height: frame.height)
-        dotView.frame = CGRect(x: style.timeline.currentLineHourWidth - 2, y: (frame.height * 0.5) - 2, width: 5, height: 5)
+        dotView.frame = CGRect(origin: CGPoint(x: style.timeline.currentLineHourWidth - 2, y: (frame.height * 0.5) - 2), size: style.timeline.currentLineHourDotSize)
         lineView.frame = CGRect(x: style.timeline.currentLineHourWidth, y: frame.height * 0.5, width: frame.width - style.timeline.currentLineHourWidth, height: style.timeline.currentLineHourHeight)
         [timeLabel, lineView, dotView].forEach({ addSubview($0) })
-        dotView.setRoundCorners(radius: CGSize(width: 2.5, height: 2.5))
+        dotView.setRoundCorners(radius: style.timeline.currentLineHourDotCornersRadius)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension CurrentLineView: CalendarSettingProtocol {
+    func updateStyle(_ style: Style) {
+        
+    }
+    
+    func reloadFrame(_ frame: CGRect) {
+        self.frame.size.width = frame.width
+        lineView.frame.size.width = frame.width
     }
 }
