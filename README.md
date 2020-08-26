@@ -144,7 +144,7 @@ func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? {
 }
 ```
 
-To add a new event subcribe on this method from `CalendarDelegate` and just press & hold on empty space.
+To add a new event, you need to subcribe on this method from `CalendarDelegate` and just press & hold on empty space in the calendar.
 
 ```swift
 func didAddNewEvent(_ event: Event, _ date: Date?) {
