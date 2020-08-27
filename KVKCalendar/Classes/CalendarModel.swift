@@ -67,12 +67,11 @@ public struct Event {
     public var end: Date
     public var color: EventColor? {
         didSet {
-            guard let valueColor = color else { return }
+            guard let tempColor = color else { return }
             
-            backgroundColor = valueColor.value.withAlphaComponent(valueColor.alpha)
-            var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 0
-            valueColor.value.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
-            textColor = UIColor(hue: hue, saturation: saturation, brightness: UIScreen.isDarkMode ? brightness : brightness * 0.4, alpha: alpha)
+            let value = prepareColor(tempColor)
+            backgroundColor = value.background
+            textColor = value.text
         }
     }
     public var backgroundColor: UIColor
@@ -85,7 +84,7 @@ public struct Event {
     public var eventData: Any?
     public var recurringType: RecurringType
     
-    public init(ID: String = "0", text: String = "", start: Date = Date(), end: Date = Date(), color: EventColor? = nil, backgroundColor: UIColor = UIColor.systemBlue.withAlphaComponent(0.3), textColor: UIColor = .white, isAllDay: Bool = false, isContainsFile: Bool = false, textForMonth: String = "", eventData: Any? = nil, recurringType: RecurringType = .none) {
+    public init(ID: String = "0", text: String = "", start: Date = Date(), end: Date = Date(), color: EventColor? = EventColor(UIColor.systemBlue), backgroundColor: UIColor = UIColor.systemBlue.withAlphaComponent(0.3), textColor: UIColor = .white, isAllDay: Bool = false, isContainsFile: Bool = false, textForMonth: String = "", eventData: Any? = nil, recurringType: RecurringType = .none) {
         self.ID = ID
         self.text = text
         self.start = start
@@ -98,6 +97,21 @@ public struct Event {
         self.textForMonth = textForMonth
         self.eventData = eventData
         self.recurringType = recurringType
+        
+        guard let tempColor = color else { return }
+        
+        let value = prepareColor(tempColor)
+        self.backgroundColor = value.background
+        self.textColor = value.text
+    }
+    
+    func prepareColor(_ color: EventColor) -> (background: UIColor, text: UIColor) {
+        let bgColor = color.value.withAlphaComponent(color.alpha)
+        var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 0
+        color.value.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
+        let txtColor = UIColor(hue: hue, saturation: saturation, brightness: UIScreen.isDarkMode ? brightness : brightness * 0.4, alpha: alpha)
+        
+        return (bgColor, txtColor)
     }
 }
 
