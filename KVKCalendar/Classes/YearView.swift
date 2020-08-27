@@ -32,18 +32,13 @@ final class YearView: UIView {
     }()
     
     private func scrollDirection(month: Int) -> UICollectionView.ScrollPosition {
-        switch UIDevice.current.userInterfaceIdiom {
-        case .phone:
-            switch month {
-            case 1...4:
-                return .top
-            case 5...8:
-                return .centeredVertically
-            default:
-                return .bottom
-            }
-        default:
+        switch month {
+        case 1...4:
             return .top
+        case 5...8:
+            return .centeredVertically
+        default:
+            return .bottom
         }
     }
     
