@@ -59,18 +59,19 @@ public struct EventColor {
 }
 
 public struct Event {
+    static let idForNewEvent = "-999"
+    
     public var ID: String
     public var text: String
     public var start: Date
     public var end: Date
     public var color: EventColor? {
         didSet {
-            guard let valueColor = color else { return }
+            guard let tempColor = color else { return }
             
-            backgroundColor = valueColor.value.withAlphaComponent(valueColor.alpha)
-            var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 0
-            valueColor.value.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
-            textColor = UIColor(hue: hue, saturation: saturation, brightness: UIScreen.isDarkMode ? brightness : brightness * 0.4, alpha: alpha)
+            let value = prepareColor(tempColor)
+            backgroundColor = value.background
+            textColor = value.text
         }
     }
     public var backgroundColor: UIColor
@@ -83,7 +84,7 @@ public struct Event {
     public var eventData: Any?
     public var recurringType: RecurringType
     
-    public init(ID: String = "0", text: String = "", start: Date = Date(), end: Date = Date(), color: EventColor? = nil, backgroundColor: UIColor = UIColor.systemBlue.withAlphaComponent(0.3), textColor: UIColor = .black, isAllDay: Bool = false, isContainsFile: Bool = false, textForMonth: String = "", eventData: Any? = nil, recurringType: RecurringType = .none) {
+    public init(ID: String = "0", text: String = "", start: Date = Date(), end: Date = Date(), color: EventColor? = EventColor(UIColor.systemBlue), backgroundColor: UIColor = UIColor.systemBlue.withAlphaComponent(0.3), textColor: UIColor = .white, isAllDay: Bool = false, isContainsFile: Bool = false, textForMonth: String = "", eventData: Any? = nil, recurringType: RecurringType = .none) {
         self.ID = ID
         self.text = text
         self.start = start
@@ -96,12 +97,31 @@ public struct Event {
         self.textForMonth = textForMonth
         self.eventData = eventData
         self.recurringType = recurringType
+        
+        guard let tempColor = color else { return }
+        
+        let value = prepareColor(tempColor)
+        self.backgroundColor = value.background
+        self.textColor = value.text
+    }
+    
+    func prepareColor(_ color: EventColor) -> (background: UIColor, text: UIColor) {
+        let bgColor = color.value.withAlphaComponent(color.alpha)
+        var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 0
+        color.value.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
+        let txtColor = UIColor(hue: hue, saturation: saturation, brightness: UIScreen.isDarkMode ? brightness : brightness * 0.4, alpha: alpha)
+        
+        return (bgColor, txtColor)
     }
 }
 
 extension Event {
     var hash: Int {
         return ID.hashValue
+    }
+    
+    var isNew: Bool {
+        return ID == Event.idForNewEvent
     }
 }
 
@@ -171,9 +191,13 @@ extension Event {
     }
 }
 
+// MARK: - Event protocol
+
 public protocol EventProtocol {
     func compare(_ event: Event) -> Bool
 }
+
+// MARK: - Settings protocol
 
 protocol CalendarSettingProtocol {
     func reloadFrame(_ frame: CGRect)
@@ -185,6 +209,8 @@ extension CalendarSettingProtocol {
     func setUI() {}
 }
 
+// MARK: - Calendar private protocol
+
 protocol CalendarPrivateDelegate: class {
     func didDisplayCalendarEvents(_ events: [Event], dates: [Date?], type: CalendarType)
     func didSelectCalendarDate(_ date: Date?, type: CalendarType, frame: CGRect?)
@@ -192,12 +218,14 @@ protocol CalendarPrivateDelegate: class {
     func didSelectCalendarMore(_ date: Date, frame: CGRect?)
     func getEventViewerFrame(_ frame: CGRect)
     func didChangeCalendarEvent(_ event: Event, start: Date?, end: Date?)
-    func didAddCalendarEvent(_ date: Date?)
+    func didAddCalendarEvent(_ event: Event, _ date: Date?)
 }
 
 extension CalendarPrivateDelegate {
     func getEventViewerFrame(_ frame: CGRect) {}
 }
+
+// MARK: - Data source protocol
 
 public protocol CalendarDataSource: class {
     func eventsForCalendar() -> [Event]
@@ -209,6 +237,8 @@ public extension CalendarDataSource {
     func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? { return nil }
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? { return nil }
 }
+
+// MARK: - Display data source
 
 protocol DisplayDataSource: class {
     func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle?
@@ -224,13 +254,19 @@ extension DisplayDataSource {
     func willDisplayContextMenu(_ event: Event, date: Date?) -> UIContextMenuConfiguration? { return nil }
 }
 
+// MARK: - Delegate protocol
+
 public protocol CalendarDelegate: AnyObject {
     func didSelectDate(_ date: Date?, type: CalendarType, frame: CGRect?)
     func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?)
     func didSelectMore(_ date: Date, frame: CGRect?)
     func eventViewerFrame(_ frame: CGRect)
     func didChangeEvent(_ event: Event, start: Date?, end: Date?)
+    
+    @available(*, deprecated, renamed: "didAddNewEvent")
     func didAddEvent(_ date: Date?)
+    func didAddNewEvent(_ event: Event, _ date: Date?)
+    
     func didDisplayEvents(_ events: [Event], dates: [Date?])
 }
 
@@ -241,8 +277,11 @@ public extension CalendarDelegate {
     func eventViewerFrame(_ frame: CGRect) {}
     func didChangeEvent(_ event: Event, start: Date?, end: Date?) {}
     func didAddEvent(_ date: Date?) {}
+    func didAddNewEvent(_ event: Event, _ date: Date?) {}
     func didDisplayEvents(_ events: [Event], dates: [Date?]) {}
 }
+
+// MARK: - Date style protocol
 
 public struct DateStyle {
     public var backgroundColor: UIColor

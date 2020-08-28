@@ -203,25 +203,22 @@ extension WeekView: TimelineDelegate {
         scrollHeaderDay.scrollHeaderByTransform(transform)
     }
     
-    func didAddEvent(minute: Int, hour: Int, point: CGPoint) {
-        var date = data.date
-        if let newDate = scrollHeaderDay.getDateByPointX(point.x) {
-            date = newDate
-        }
-        
+    func didAddNewEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint) {
         var components = DateComponents()
-        components.year = date.year
-        components.month = date.month
-        components.day = date.day
+        components.year = event.start.year
+        components.month = event.start.month
+        components.day = event.start.day
         components.hour = hour
         components.minute = minute
         let newDate = style.calendar.date(from: components)
-        delegate?.didAddCalendarEvent(newDate)
+        delegate?.didAddCalendarEvent(event, newDate)
     }
     
-    func didChangeEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint) {
+    func didChangeEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint, newDay: Int?) {
         var day = event.start.day
-        if let newDate = scrollHeaderDay.getDateByPointX(point.x), day != newDate.day {
+        if let newDayEvent = newDay {
+            day = newDayEvent
+        } else if let newDate = scrollHeaderDay.getDateByPointX(point.x), day != newDate.day {
             day = newDate.day
         }
         

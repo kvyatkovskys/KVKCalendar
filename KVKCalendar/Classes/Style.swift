@@ -92,12 +92,16 @@ public struct TimelineStyle {
     public var showCurrentLineHour: Bool = true
     public var currentLineHourFont: UIFont = .systemFont(ofSize: 12)
     public var currentLineHourColor: UIColor = .red
-    public var currentLineHourWidth: CGFloat = 50
+    public var currentLineHourDotSize: CGSize = CGSize(width: 5, height: 5)
+    public var currentLineHourDotCornersRadius: CGSize = CGSize(width: 2.5, height: 2.5)
+    public var currentLineHourWidth: CGFloat = 60
+    public var currentLineHourHeight: CGFloat = 1
     public var movingMinutesColor: UIColor = .systemBlue
     public var shadowColumnColor: UIColor = .systemTeal
     public var shadowColumnAlpha: CGFloat = 0.1
     public var eventCorners: UIRectCorner = .allCorners
     public var eventCornersRadius: CGSize = CGSize(width: 5, height: 5)
+    public var minimumPressDuration: TimeInterval = 0.5
 }
 
 public struct WeekStyle {
@@ -147,6 +151,7 @@ public struct MonthStyle {
     public var fontEventTime: UIFont = .systemFont(ofSize: 10)
     public var fontEventBullet: UIFont = .boldSystemFont(ofSize: 18)
     public var isHiddenSeporator: Bool = false
+    public var isHiddenSeporatorOnEmptyDate: Bool = false
     public var widthSeporator: CGFloat = 0.7
     public var colorSeporator: UIColor = gainsboro.withAlphaComponent(0.9)
     public var colorBackgroundWeekendDate: UIColor = gainsboro.withAlphaComponent(0.4)
@@ -232,8 +237,9 @@ public struct AllDayStyle {
 
 public struct EventStyle {
     public var isEnableMoveEvent: Bool = false
-    public var minimumPressDuration: TimeInterval = 1
+    public var minimumPressDuration: TimeInterval = 0.5
     public var alphaWhileMoving: CGFloat = 0.5
+    public var textForNewEvent: String = "New Event"
     var isEnableContextMenu: Bool = false
 }
 

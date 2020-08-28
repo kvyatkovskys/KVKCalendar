@@ -27,8 +27,8 @@ final class ViewController: UIViewController {
     private lazy var style: Style = {
         var style = Style()
         if UIDevice.current.userInterfaceIdiom == .phone {
-            style.month.isHiddenSeporator = true
             style.timeline.widthTime = 40
+            style.timeline.currentLineHourWidth = 45
             style.timeline.offsetTimeX = 2
             style.timeline.offsetLineLeft = 2
         } else {
@@ -38,7 +38,6 @@ final class ViewController: UIViewController {
         style.followInSystemTheme = true
         style.timeline.offsetTimeY = 80
         style.timeline.offsetEvent = 3
-        style.timeline.currentLineHourWidth = 40
         style.allDay.isPinned = true
         style.startWeekDay = .sunday
         style.timeHourSystem = .twelveHour
@@ -152,6 +151,21 @@ extension ViewController: CalendarDelegate {
     
     func eventViewerFrame(_ frame: CGRect) {
         eventViewer.reloadFrame(frame: frame)
+    }
+    
+    func didAddNewEvent(_ event: Event, _ date: Date?) {
+        var newEvent = event
+        
+        guard let start = date, let end = Calendar.current.date(byAdding: .minute, value: 30, to: start) else { return }
+
+        let startTime = timeFormatter(date: start)
+        let endTime = timeFormatter(date: end)
+        newEvent.start = start
+        newEvent.end = end
+        newEvent.ID = "\(events.count + 1)"
+        newEvent.text = "\(startTime) - \(endTime)\n new event"
+        events.append(newEvent)
+        calendarView.reloadData()
     }
 }
 

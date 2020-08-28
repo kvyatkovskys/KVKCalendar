@@ -161,8 +161,8 @@ extension CalendarView: CalendarPrivateDelegate {
         delegate?.didSelectMore(date, frame: frame)
     }
     
-    func didAddCalendarEvent(_ date: Date?) {
-        delegate?.didAddEvent(date)
+    func didAddCalendarEvent(_ event: Event, _ date: Date?) {
+        delegate?.didAddNewEvent(event, date)
     }
     
     func didChangeCalendarEvent(_ event: Event, start: Date?, end: Date?) {

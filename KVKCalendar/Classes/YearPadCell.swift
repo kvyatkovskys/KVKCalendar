@@ -12,8 +12,19 @@ final class YearPadCell: UICollectionViewCell {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.6
         return label
     }()
+    
+    private var topHeight: CGFloat {
+        switch UIDevice.current.userInterfaceIdiom {
+        case .phone:
+            return 15
+        default:
+            return 30
+        }
+    }
     
     var title: String? {
         didSet {
@@ -27,7 +38,7 @@ final class YearPadCell: UICollectionViewCell {
             titleLabel.textColor = style.year.colorTitle
             
             subviews.filter({ $0 is WeekHeaderView }).forEach({ $0.removeFromSuperview() })
-            let view = WeekHeaderView(frame: CGRect(x: 0, y: 35, width: frame.width, height: 30), style: style, fromYear: true)
+            let view = WeekHeaderView(frame: CGRect(x: 0, y: topHeight + 5, width: frame.width, height: topHeight), style: style, fromYear: true)
             addSubview(view)
         }
     }
@@ -54,7 +65,7 @@ final class YearPadCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        titleLabel.frame = CGRect(x: 3, y: 3, width: frame.width, height: 30)
+        titleLabel.frame = CGRect(x: 3, y: 3, width: frame.width - 6, height: topHeight)
         addSubview(titleLabel)
     }
     
@@ -64,7 +75,7 @@ final class YearPadCell: UICollectionViewCell {
     
     private func addDayToLabel(days: ArraySlice<Day>, step: Int) {
         let width = frame.width / CGFloat(daysInWeek)
-        let newY: CGFloat = 70
+        let newY: CGFloat = (topHeight * 2) + 10
         let height: CGFloat = (frame.height - newY) / CGFloat(daysInWeek - 1)
         
         for (idx, day) in days.enumerated() {

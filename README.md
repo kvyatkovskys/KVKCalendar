@@ -104,7 +104,7 @@ extension ViewController: CalendarDelegate {
     // drag & drop events
     func didChangeEvent(_ event: Event, start: Date?, end: Date?) {}
     // tap on timeline or month cell
-    func didAddEvent(_ date: Date?) {}
+    func didAddNewEvent(_ event: Event, _ date: Date?) {}
     // get current displaying events
     func didDisplayEvents(_ events: [Event], dates: [Date?]) {}
 }
@@ -143,6 +143,27 @@ func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? {
     return DateStyle(backgroundColor: .orange, textColor: .black, dotBackgroundColor: .red)
 }
 ```
+
+To add a new event, you need to subcribe on this method from `CalendarDelegate` and just press & hold on empty space in the calendar.
+
+```swift
+func didAddNewEvent(_ event: Event, _ date: Date?) {
+    var newEvent = event
+        
+    guard let start = date, let end = Calendar.current.date(byAdding: .minute, value: 30, to: start) else { return }
+
+    let startTime = timeFormatter(date: start)
+    let endTime = timeFormatter(date: end)
+    newEvent.start = start
+    newEvent.end = end
+    newEvent.ID = "\(events.count + 1)"
+    newEvent.text = "\(startTime) - \(endTime)\n new event"
+    events.append(newEvent)
+    calendarView.reloadData()
+}
+```
+
+<img src="https://media.giphy.com/media/TgOLYW3U48MMhBv3vV/giphy.gif" width="250">
 
 ## Usage for SwiftUI
 Add a new `SwiftUI` file and import `KVKCalendar`.
