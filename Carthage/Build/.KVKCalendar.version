@@ -8,10 +8,10 @@
   "tvOS" : [
 
   ],
-  "commitish" : "420ebd28df5a9b7b0a8a125358eaefbd83a64d09",
+  "commitish" : "8e1f726ce68c934cedf0b42dd852ec6d9fc53d4e",
   "iOS" : [
     {
-      "hash" : "360396b374c446cd8b85994c2833d6afa2c6f425d51cd4a662d3f22b25ebfd2b",
+      "hash" : "2a6cc8839c969765bd47c7547f8dcec7fdef4add917d6e20f1feb9ee4e23b39c",
       "name" : "KVKCalendar",
       "linking" : "dynamic",
       "swiftToolchainVersion" : "5.1.3 (swiftlang-1100.0.282.1 clang-1100.0.33.15)"
