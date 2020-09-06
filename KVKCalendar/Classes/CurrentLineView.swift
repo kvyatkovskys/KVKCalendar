@@ -22,6 +22,7 @@ final class CurrentLineView: UIView {
         
         let formatter = DateFormatter()
         formatter.dateFormat = timeHourSystem.format
+        formatter.timeZone = style.timeline.currentLineHourTimeZone
         label.text = formatter.string(from: Date())
         label.valueHash = Date().minute.hashValue
         return label
