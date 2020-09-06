@@ -160,6 +160,7 @@ final class TimelineView: UIView, EventDateProtocol {
             
             let formatter = DateFormatter()
             formatter.dateFormat = self.timeHourSystem.format
+            formatter.timeZone = self.style.timeline.currentLineHourTimeZone
             self.currentLineView.time = formatter.string(from: nextDate)
             
             if let timeNext = self.getTimelineLabel(hour: nextDate.hour + 1) {
