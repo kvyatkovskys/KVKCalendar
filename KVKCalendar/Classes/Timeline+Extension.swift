@@ -51,7 +51,6 @@ extension TimelineView {
             time.text = hour
             let formatter = DateFormatter()
             formatter.dateFormat = "HH:mm"
-            formatter.timeZone = style.timeline.currentLineHourTimeZone
             let hourTmp = TimeHourSystem.twentyFourHour.hours[idx]
             time.valueHash = formatter.date(from: hourTmp)?.hour.hashValue
             time.tag = idx - start
