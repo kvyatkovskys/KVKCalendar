@@ -33,7 +33,7 @@ final class MonthCell: UICollectionViewCell {
     
     private func timeFormatter(date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = style.timeHourSystem.format
+        formatter.dateFormat = style.timeSystem.format
         return formatter.string(from: date)
     }
     

@@ -56,8 +56,8 @@ public final class CalendarView: UIView {
     public init(frame: CGRect, date: Date = Date(), style: Style = Style(), years: Int = 4) {
         self.style = style.checkStyle
         self.yearData = YearData(date: date, years: years, style: style)
-        self.dayData = DayData(yearData: yearData, timeSystem: style.timeHourSystem, startDay: style.startWeekDay)
-        self.weekData = WeekData(yearData: yearData, timeSystem: style.timeHourSystem, startDay: style.startWeekDay)
+        self.dayData = DayData(yearData: yearData, timeSystem: style.timeSystem, startDay: style.startWeekDay)
+        self.weekData = WeekData(yearData: yearData, timeSystem: style.timeSystem, startDay: style.startWeekDay)
         self.monthData = MonthData(yearData: yearData, startDay: style.startWeekDay, calendar: style.calendar)
         super.init(frame: frame)
         
