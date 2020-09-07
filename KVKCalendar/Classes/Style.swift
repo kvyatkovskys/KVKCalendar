@@ -103,7 +103,6 @@ public struct TimelineStyle {
     public var eventCorners: UIRectCorner = .allCorners
     public var eventCornersRadius: CGSize = CGSize(width: 5, height: 5)
     public var minimumPressDuration: TimeInterval = 0.5
-    public var currentLineHourTimeZone: TimeZone = TimeZone.current
 }
 
 public struct WeekStyle {
