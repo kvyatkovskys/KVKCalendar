@@ -145,7 +145,7 @@ final class TimelineView: UIView, EventDateProtocol {
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             guard let self = self else { return }
             
-            let nextDate = Date().convertTimeZone(TimeZone.current, to: self.style.timeline.currentLineHourTimeZone)
+            let nextDate = Date().convertTimeZone(TimeZone.current, to: self.style.timezone)
             guard self.currentLineView.valueHash != nextDate.minute.hashValue, let time = self.getTimelineLabel(hour: nextDate.hour) else { return }
             
             var pointY = time.frame.origin.y
@@ -173,7 +173,7 @@ final class TimelineView: UIView, EventDateProtocol {
     }
     
     private func showCurrentLineHour() {
-        let date = Date().convertTimeZone(TimeZone.current, to: self.style.timeline.currentLineHourTimeZone)
+        let date = Date().convertTimeZone(TimeZone.current, to: self.style.timezone)
         guard style.timeline.showCurrentLineHour, let time = getTimelineLabel(hour: date.hour) else {
             currentLineView.removeFromSuperview()
             timer?.invalidate()
@@ -215,7 +215,7 @@ final class TimelineView: UIView, EventDateProtocol {
     
     private func scrollToCurrentTime(_ startHour: Int) {
         guard style.timeline.scrollToCurrentHour else { return }
-        let date = Date().convertTimeZone(TimeZone.current, to: style.timeline.currentLineHourTimeZone)
+        let date = Date().convertTimeZone(TimeZone.current, to: style.timezone)
         guard let time = getTimelineLabel(hour: date.hour)else {
             scrollView.setContentOffset(.zero, animated: true)
             return
