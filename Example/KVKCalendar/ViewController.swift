@@ -40,7 +40,7 @@ final class ViewController: UIViewController {
         style.timeline.offsetEvent = 3
         style.allDay.isPinned = true
         style.startWeekDay = .sunday
-        style.timeHourSystem = .twelveHour
+        style.timeSystem = TimeHourSystem.currentSystemOnDevice ?? .twelve
         style.event.isEnableMoveEvent = true
         return style
     }()
@@ -233,7 +233,7 @@ extension ViewController {
     
     func timeFormatter(date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = style.timeHourSystem.format
+        formatter.dateFormat = style.timeSystem.format
         return formatter.string(from: date)
     }
     

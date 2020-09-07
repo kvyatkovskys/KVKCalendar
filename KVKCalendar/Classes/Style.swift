@@ -21,7 +21,9 @@ public struct Style {
     public var calendar = Calendar.current
     public var timezone = TimeZone.current
     public var defaultType: CalendarType?
-    public var timeHourSystem: TimeHourSystem = .twentyFourHour
+    @available(swift, deprecated: 0.3.6, obsoleted: 0.3.7, renamed: "timeSystem")
+    public var timeHourSystem: TimeHourSystem = .twentyFour
+    public var timeSystem: TimeHourSystem = .twentyFour
     public var startWeekDay: StartDayType = .monday
     public var followInSystemTheme: Bool = false
     
@@ -46,7 +48,7 @@ public struct HeaderScrollStyle {
     public var heightHeaderWeek: CGFloat = 70
     public var heightTitleDate: CGFloat = 30
     
-    @available(*, deprecated, renamed: "colorBackground")
+    @available(swift, deprecated: 0.3.6, obsoleted: 0.3.7, renamed: "colorBackground")
     public var backgroundColor: UIColor = gainsboro.withAlphaComponent(0.4)
     public var colorBackground: UIColor = gainsboro.withAlphaComponent(0.4)
     
@@ -114,10 +116,6 @@ public struct WeekStyle {
     public var colorBackgroundSelectDate: UIColor = .black
     public var colorSelectDate: UIColor = .white
     public var colorWeekendDate: UIColor = .gray
-    
-    @available(*, deprecated, renamed: "colorWeekendBackground")
-    public var colorBackgroundWeekendDate: UIColor = gainsboro.withAlphaComponent(0.4)
-    
     public var colorWeekendBackground: UIColor = .clear
     public var colorWeekdayBackground: UIColor = .clear
     public var selectCalendarType: CalendarType = .day
@@ -221,12 +219,6 @@ public struct AllDayStyle {
     public var textColor: UIColor = .black
     public var backgroundColorEvent: UIColor = .clear
     public var font: UIFont = .systemFont(ofSize: 12)
-    @available(*, deprecated, renamed: "offsetWidth")
-    public var offset: CGFloat = 2 {
-        didSet {
-            offsetWidth = offset
-        }
-    }
     public var offsetWidth: CGFloat = 2
     public var offsetHeight: CGFloat = 4
     public var height: CGFloat = 25

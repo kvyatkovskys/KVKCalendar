@@ -8,12 +8,17 @@
 import UIKit
 
 public enum TimeHourSystem: Int {
-    case twelveHour = 12
-    case twentyFourHour = 24
+    @available(swift, deprecated: 0.3.6, obsoleted: 0.3.7, renamed: "twelve")
+    case twelveHour = 0
+    @available(swift, deprecated: 0.3.6, obsoleted: 0.3.7, renamed: "twentyFour")
+    case twentyFourHour = 1
+    
+    case twelve = 12
+    case twentyFour = 24
     
     var hours: [String] {
         switch self {
-        case .twelveHour:
+        case .twelveHour, .twelve:
             let array = ["12"] + Array(1...11).map({ String($0) })
             let am = array.map { $0 + " AM" } + ["Noon"]
             var pm = array.map { $0 + " PM" }
@@ -23,7 +28,7 @@ public enum TimeHourSystem: Int {
                 pm.append(item)
             }
             return am + pm
-        case .twentyFourHour:
+        case .twentyFourHour, .twentyFour:
             let array = ["00:00"] + Array(1...24).map({ (i) -> String in
                 let i = i % 24
                 var string = i < 10 ? "0" + "\(i)" : "\(i)"
@@ -34,11 +39,22 @@ public enum TimeHourSystem: Int {
         }
     }
     
+    public static var currentSystemOnDevice: TimeHourSystem? {
+        let locale = NSLocale.current
+        guard let formatter = DateFormatter.dateFormat(fromTemplate: "j", options: 0, locale: locale) else { return nil }
+        
+        if formatter.contains("a") {
+            return .twelve
+        } else {
+            return .twentyFour
+        }
+    }
+    
     public var format: String {
         switch self {
-        case .twelveHour:
+        case .twelveHour, .twelve:
             return "h:mm a"
-        case .twentyFourHour:
+        case .twentyFourHour, .twentyFour:
             return "HH:mm"
         }
     }
@@ -75,8 +91,6 @@ public struct Event {
         }
     }
     public var backgroundColor: UIColor
-    @available(swift, deprecated: 0.3.5, obsoleted: 0.3.6, message: "This will be removed in v0.3.6, please migrate to a `textColor`", renamed: "textColor")
-    public var colorText: UIColor = .black
     public var textColor: UIColor
     public var isAllDay: Bool
     public var isContainsFile: Bool
@@ -262,11 +276,7 @@ public protocol CalendarDelegate: AnyObject {
     func didSelectMore(_ date: Date, frame: CGRect?)
     func eventViewerFrame(_ frame: CGRect)
     func didChangeEvent(_ event: Event, start: Date?, end: Date?)
-    
-    @available(*, deprecated, renamed: "didAddNewEvent")
-    func didAddEvent(_ date: Date?)
     func didAddNewEvent(_ event: Event, _ date: Date?)
-    
     func didDisplayEvents(_ events: [Event], dates: [Date?])
 }
 

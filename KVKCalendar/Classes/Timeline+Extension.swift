@@ -51,7 +51,7 @@ extension TimelineView {
             time.text = hour
             let formatter = DateFormatter()
             formatter.dateFormat = "HH:mm"
-            let hourTmp = TimeHourSystem.twentyFourHour.hours[idx]
+            let hourTmp = TimeHourSystem.twentyFour.hours[idx]
             time.valueHash = formatter.date(from: hourTmp)?.hour.hashValue
             time.tag = idx - start
             times.append(time)
