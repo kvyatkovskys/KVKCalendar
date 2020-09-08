@@ -11,11 +11,7 @@ final class MonthView: UIView {
     private var data: MonthData
     private var style: Style
     private var collectionView: UICollectionView!
-    private var isAnimate: Bool = false
     private var eventPreview: UIView?
-    private let tagEventPagePreview = -20
-    private let eventPreviewYOffset: CGFloat = 30
-    private var eventPreviewXOffset: CGFloat = 60
     
     weak var delegate: CalendarPrivateDelegate?
     weak var dataSource: DisplayDataSource?
@@ -50,7 +46,7 @@ final class MonthView: UIView {
     func setDate(_ date: Date) {
         headerView.date = date
         data.date = date
-        scrollToDate(date, animated: isAnimate)
+        scrollToDate(date, animated: data.isAnimate)
         collectionView.reloadData()
     }
     
@@ -76,8 +72,9 @@ final class MonthView: UIView {
                 self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0), at: .top, animated: animated)
             }
         }
-        if !self.isAnimate {
-            self.isAnimate = true
+        
+        if !data.isAnimate {
+            data.isAnimate = true
         }
     }
     
@@ -90,6 +87,19 @@ final class MonthView: UIView {
         
         delegate?.didSelectCalendarDate(date, type: style.month.selectCalendarType, frame: frame)
         collectionView.reloadData()
+    }
+    
+    private func getVisibaleDate() -> Date? {
+        let cells = collectionView.visibleCells as? [MonthCell] ?? [MonthCell()]
+        let cellDays = cells.filter({ $0.item?.day.type != .empty })
+        guard let newMoveDate = cellDays.filter({ $0.item?.day.date?.day == data.date.day }).first?.item?.day.date else {
+            let sorted = cellDays.sorted(by: { ($0.item?.day.date?.day ?? 0) < ($1.item?.day.date?.day ?? 0) })
+            if let lastDate = sorted.last?.item?.day.date, lastDate.day < data.date.day {
+                return lastDate
+            }
+            return nil
+        }
+        return newMoveDate
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -111,18 +121,18 @@ extension MonthView: MonthCellDelegate {
         
         eventPreview = nil
         eventPreview = snapshot
-        eventPreviewXOffset = (snapshot?.bounds.width ?? eventPreviewXOffset) / 2
-        eventPreview?.frame.origin = CGPoint(x: point.x - eventPreviewXOffset, y: point.y - eventPreviewYOffset)
+        data.eventPreviewXOffset = (snapshot?.bounds.width ?? data.eventPreviewXOffset) / 2
+        eventPreview?.frame.origin = CGPoint(x: point.x - data.eventPreviewXOffset, y: point.y - data.eventPreviewYOffset)
         eventPreview?.alpha = 0.9
-        eventPreview?.tag = tagEventPagePreview
+        eventPreview?.tag = data.tagEventPagePreview
         eventPreview?.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-        if let eventTemp = eventPreview {
-            collectionView.addSubview(eventTemp)
-            UIView.animate(withDuration: 0.3) {
-                self.eventPreview?.transform = CGAffineTransform(scaleX: 1, y: 1)
-            }
-            UIImpactFeedbackGenerator().impactOccurred()
+        guard let eventTemp = eventPreview else { return }
+        
+        collectionView.addSubview(eventTemp)
+        UIView.animate(withDuration: 0.3) {
+            self.eventPreview?.transform = CGAffineTransform(scaleX: 1, y: 1)
         }
+        UIImpactFeedbackGenerator().impactOccurred()
     }
     
     func didEndMoveEventPage(_ event: Event, gesture: UILongPressGestureRecognizer) {
@@ -171,7 +181,7 @@ extension MonthView: MonthCellDelegate {
             collectionView.setContentOffset(offset, animated: false)
         }
         
-        eventPreview?.frame.origin = CGPoint(x: point.x - eventPreviewXOffset, y: point.y - eventPreviewYOffset)
+        eventPreview?.frame.origin = CGPoint(x: point.x - data.eventPreviewXOffset, y: point.y - data.eventPreviewYOffset)
     }
 }
 
@@ -242,21 +252,16 @@ extension MonthView: UICollectionViewDataSource {
 }
 
 extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        guard style.month.isAutoSelectDateScrolling else { return }
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard let newMoveDate = getVisibaleDate(), data.willSelectDate?.month != newMoveDate.month, data.date != newMoveDate else { return }
         
-        let cells = collectionView.visibleCells as? [MonthCell] ?? [MonthCell()]
-        let cellDays = cells.filter({ $0.item?.day.type != .empty })
-        guard let newMoveDate = cellDays.filter({ $0.item?.day.date?.day == data.date.day }).first?.item?.day.date else {
-            let sorted = cellDays.sorted(by: { ($0.item?.day.date?.day ?? 0) < ($1.item?.day.date?.day ?? 0) })
-            if let lastDate = sorted.last?.item?.day.date, lastDate.day < data.date.day {
-                data.date = lastDate
-                headerView.date = lastDate
-                delegate?.didSelectCalendarDate(lastDate, type: .month, frame: nil)
-                collectionView.reloadData()
-            }
-            return
-        }
+        print(newMoveDate)
+        data.willSelectDate = newMoveDate
+    }
+        
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        guard style.month.isAutoSelectDateScrolling, let newMoveDate = getVisibaleDate() else { return }
+        
         data.date = newMoveDate
         headerView.date = newMoveDate
         delegate?.didSelectCalendarDate(newMoveDate, type: .month, frame: nil)

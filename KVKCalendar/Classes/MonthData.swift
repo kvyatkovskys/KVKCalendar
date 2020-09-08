@@ -11,6 +11,11 @@ final class MonthData: EventDateProtocol {
     var days: [Day]
     var date: Date
     var data: YearData
+    var isAnimate: Bool = false
+    let tagEventPagePreview = -20
+    let eventPreviewYOffset: CGFloat = 30
+    var eventPreviewXOffset: CGFloat = 60
+    var willSelectDate: Date?
     
     private let cachedDays: [Day]
     private let calendar: Calendar
