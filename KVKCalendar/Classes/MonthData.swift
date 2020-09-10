@@ -16,6 +16,8 @@ final class MonthData: EventDateProtocol {
     let eventPreviewYOffset: CGFloat = 30
     var eventPreviewXOffset: CGFloat = 60
     var willSelectDate: Date?
+    let rows = 6
+    let columns = 7
     
     private let cachedDays: [Day]
     private let calendar: Calendar

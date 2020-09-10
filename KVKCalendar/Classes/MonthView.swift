@@ -68,8 +68,9 @@ final class MonthView: UIView {
     private func scrollToDate(_ date: Date, animated: Bool) {
         delegate?.didSelectCalendarDate(date, type: .month, frame: nil)
         if let idx = data.days.firstIndex(where: { $0.date?.month == date.month && $0.date?.year == date.year }) {
+            let index = getIndexForDirection(style.month.scrollDirection, indexPath: IndexPath(row: idx, section: 0))
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0), at: .top, animated: animated)
+                self.collectionView.scrollToItem(at: index, at: .top, animated: animated)
             }
         }
         
@@ -82,7 +83,8 @@ final class MonthView: UIView {
         data.date = date
         headerView.date = date
         
-        let attributes = collectionView.layoutAttributesForItem(at: indexPath)
+        let index = getIndexForDirection(style.month.scrollDirection, indexPath: indexPath)
+        let attributes = collectionView.layoutAttributesForItem(at: index)
         let frame = collectionView.convert(attributes?.frame ?? .zero, to: collectionView)
         
         delegate?.didSelectCalendarDate(date, type: style.month.selectCalendarType, frame: frame)
@@ -142,7 +144,8 @@ extension MonthView: MonthCellDelegate {
         let point = gesture.location(in: collectionView)
         guard let indexPath = collectionView.indexPathForItem(at: point) else { return }
         
-        let day = data.days[indexPath.row]
+        let index = getIndexForDirection(style.month.scrollDirection, indexPath: indexPath)
+        let day = data.days[index.row]
         let newDate = day.date ?? event.start
 
         var startComponents = DateComponents()
@@ -163,7 +166,7 @@ extension MonthView: MonthCellDelegate {
 
         delegate?.didChangeCalendarEvent(event, start: startDate, end: endDate)
         scrollToDate(newDate, animated: true)
-        didSelectDate(newDate, indexPath: indexPath)
+        didSelectDate(newDate, indexPath: index)
     }
     
     func didChangeMoveEventPage(_ event: Event, gesture: UILongPressGestureRecognizer) {
@@ -200,8 +203,9 @@ extension MonthView: CalendarSettingProtocol {
         addSubview(collectionView)
         
         if let idx = data.days.firstIndex(where: { $0.date?.month == data.date.month && $0.date?.year == data.date.year }) {
+            let index = getIndexForDirection(style.month.scrollDirection, indexPath: IndexPath(row: idx, section: 0))
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0),
+                self.collectionView.scrollToItem(at: index,
                                                  at: .top,
                                                  animated: false)
             }
@@ -227,21 +231,44 @@ extension MonthView: CalendarSettingProtocol {
         collectionView.frame = collectionFrame
         addSubview(collectionView)
     }
+    
+    private func getIndexForDirection(_ direction: UICollectionView.ScrollDirection, indexPath: IndexPath) -> IndexPath {
+        switch direction {
+        case .horizontal:
+            let row = indexPath.row % data.rows
+            let column = floor(Double(indexPath.row / data.rows))
+            let newIndex = (indexPath.section * data.rows * data.columns) + Int(column) + row * data.columns
+            return IndexPath(row: newIndex, section: indexPath.section)
+        default:
+            return indexPath
+        }
+    }
 }
 
 extension MonthView: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
+        switch style.month.scrollDirection {
+        case .horizontal:
+            return Int(ceil(Float(data.days.count) / Float(data.rows * data.columns)))
+        default:
+            return 1
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return data.days.count
+        switch style.month.scrollDirection {
+        case .horizontal:
+            return data.rows * data.columns
+        default:
+            return data.days.count
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MonthCell.identifier,
                                                       for: indexPath) as? MonthCell ?? MonthCell()
-        let day = data.days[indexPath.row]
+        let index = getIndexForDirection(style.month.scrollDirection, indexPath: indexPath)
+        let day = data.days[index.row]
         cell.selectDate = data.date
         cell.style = style
         cell.item = styleForDay(day)
@@ -269,8 +296,9 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let date = data.days[indexPath.row].date
-        didSelectDate(date ?? data.date, indexPath: indexPath)
+        let index = getIndexForDirection(style.month.scrollDirection, indexPath: indexPath)
+        let date = data.days[index.row].date
+        didSelectDate(date ?? data.date, indexPath: index)
     }
     
     func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
@@ -289,7 +317,8 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
     func collectionView(_ collectionView: UICollectionView, didUnhighlightItemAt indexPath: IndexPath) {
         guard style.month.isAnimateSelection else { return }
         
-        let cell = collectionView.cellForItem(at: indexPath)
+        let index = getIndexForDirection(style.month.scrollDirection, indexPath: indexPath)
+        let cell = collectionView.cellForItem(at: index)
         UIView.animate(withDuration: 0.1) {
             cell?.transform = CGAffineTransform(scaleX: 1, y: 1)
         }
