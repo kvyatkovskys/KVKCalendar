@@ -278,6 +278,7 @@ public protocol CalendarDelegate: AnyObject {
     func didChangeEvent(_ event: Event, start: Date?, end: Date?)
     func didAddNewEvent(_ event: Event, _ date: Date?)
     func didDisplayEvents(_ events: [Event], dates: [Date?])
+    func willSelectDate(_ date: Date, type: CalendarType)
 }
 
 public extension CalendarDelegate {
@@ -289,6 +290,7 @@ public extension CalendarDelegate {
     func didAddEvent(_ date: Date?) {}
     func didAddNewEvent(_ event: Event, _ date: Date?) {}
     func didDisplayEvents(_ events: [Event], dates: [Date?]) {}
+    func willSelectDate(_ date: Date, type: CalendarType) {}
 }
 
 // MARK: - Date style protocol

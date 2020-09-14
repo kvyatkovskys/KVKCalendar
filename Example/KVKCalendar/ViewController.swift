@@ -145,6 +145,10 @@ extension ViewController: CalendarDelegate {
         }
     }
     
+    func willSelectDate(_ date: Date, type: CalendarType) {
+        print(date, type)
+    }
+    
     func didSelectMore(_ date: Date, frame: CGRect?) {
         print(date)
     }
