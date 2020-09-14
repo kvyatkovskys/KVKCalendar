@@ -16,6 +16,8 @@ final class MonthView: UIView {
     weak var delegate: CalendarPrivateDelegate?
     weak var dataSource: DisplayDataSource?
     
+    var willSelectDate: ((Date) -> Void)?
+    
     private lazy var headerView: WeekHeaderView = {
         let height: CGFloat
         if style.month.isHiddenTitleDate {
@@ -68,14 +70,18 @@ final class MonthView: UIView {
     private func scrollToDate(_ date: Date, animated: Bool) {
         delegate?.didSelectCalendarDate(date, type: .month, frame: nil)
         if let idx = data.days.firstIndex(where: { $0.date?.month == date.month && $0.date?.year == date.year }) {
-            let index = getIndexForDirection(style.month.scrollDirection, indexPath: IndexPath(row: idx, section: 0))
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                self.collectionView.scrollToItem(at: index, at: .top, animated: animated)
-            }
+            scrollToIndex(idx, animated: animated)
         }
         
         if !data.isAnimate {
             data.isAnimate = true
+        }
+    }
+    
+    private func scrollToIndex(_ idx: Int, animated: Bool) {
+        let index = getIndexForDirection(style.month.scrollDirection, indexPath: IndexPath(row: idx, section: 0))
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+            self?.collectionView.scrollToItem(at: index, at: .top, animated: animated)
         }
     }
     
@@ -203,12 +209,7 @@ extension MonthView: CalendarSettingProtocol {
         addSubview(collectionView)
         
         if let idx = data.days.firstIndex(where: { $0.date?.month == data.date.month && $0.date?.year == data.date.year }) {
-            let index = getIndexForDirection(style.month.scrollDirection, indexPath: IndexPath(row: idx, section: 0))
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                self.collectionView.scrollToItem(at: index,
-                                                 at: .top,
-                                                 animated: false)
-            }
+            scrollToIndex(idx, animated: false)
         }
         collectionView.reloadData()
     }
@@ -282,8 +283,8 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         guard let newMoveDate = getVisibaleDate(), data.willSelectDate?.month != newMoveDate.month, data.date != newMoveDate else { return }
         
-        print(newMoveDate)
         data.willSelectDate = newMoveDate
+        willSelectDate?(newMoveDate)
     }
         
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {

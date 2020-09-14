@@ -44,6 +44,9 @@ public final class CalendarView: UIView {
         let month = MonthView(data: monthData, frame: frame, style: style)
         month.delegate = self
         month.dataSource = self
+        month.willSelectDate = { [weak self] (date) in
+            self?.delegate?.willSelectDate(date, type: .month)
+        }
         return month
     }()
     
