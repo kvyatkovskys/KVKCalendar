@@ -5,7 +5,7 @@
 //  Created by Sergei Kviatkovskii on 02/01/2019.
 //
 
-import Foundation
+import UIKit
 
 final class MonthData: EventDateProtocol {
     var days: [Day]
@@ -18,13 +18,18 @@ final class MonthData: EventDateProtocol {
     var willSelectDate: Date?
     let rows = 6
     let columns = 7
+    var isFirstLoad = true
+    var movingEvent: EventViewGeneral?
     
     private let cachedDays: [Day]
     private let calendar: Calendar
+    private let scrollDirection: UICollectionView.ScrollDirection
     
-    init(yearData: YearData, startDay: StartDayType, calendar: Calendar) {
+    init(yearData: YearData, startDay: StartDayType, calendar: Calendar, scrollDirection: UICollectionView.ScrollDirection) {
         self.data = yearData
         self.calendar = calendar
+        self.scrollDirection = scrollDirection
+        
         let months = yearData.months.reduce([], { (acc, month) -> [Month] in
             var daysTemp = yearData.addStartEmptyDay(days: month.days, startDay: startDay)
             if daysTemp.count < yearData.boxCount {

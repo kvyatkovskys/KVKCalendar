@@ -145,10 +145,6 @@ extension ViewController: CalendarDelegate {
         }
     }
     
-    func willSelectDate(_ date: Date, type: CalendarType) {
-        print(date, type)
-    }
-    
     func didSelectMore(_ date: Date, frame: CGRect?) {
         print(date)
     }
@@ -216,7 +212,7 @@ extension ViewController {
             event.color = EventColor(item.color)
             event.isAllDay = item.allDay
             event.isContainsFile = !item.files.isEmpty
-            event.textForMonth = item.title
+            event.textForMonth = "\(item.title) \(startTime)"
             
             if item.allDay {
                 event.text = "\(item.title)"

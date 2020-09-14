@@ -10,9 +10,9 @@ import UIKit
 protocol MonthCellDelegate: class {
     func didSelectEvent(_ event: Event, frame: CGRect?)
     func didSelectMore(_ date: Date, frame: CGRect?)
-    func didStartMoveEventPage(_ event: Event, snapshot: UIView?, gesture: UILongPressGestureRecognizer)
-    func didEndMoveEventPage(_ event: Event, gesture: UILongPressGestureRecognizer)
-    func didChangeMoveEventPage(_ event: Event, gesture: UILongPressGestureRecognizer)
+    func didStartMoveEvent(_ event: EventViewGeneral, snapshot: UIView?, gesture: UILongPressGestureRecognizer)
+    func didEndMoveEvent(gesture: UILongPressGestureRecognizer)
+    func didChangeMoveEvent(gesture: UIPanGestureRecognizer)
 }
 
 final class MonthCell: UICollectionViewCell {
@@ -39,6 +39,13 @@ final class MonthCell: UICollectionViewCell {
     
     private var monthStyle = MonthStyle()
     private var allDayStyle = AllDayStyle()
+    
+    private lazy var panGesture: UIPanGestureRecognizer = {
+        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(processMovingEvent))
+        panGesture.delegate = self
+        return panGesture
+    }()
+    
     var style = Style() {
         didSet {
             monthStyle = style.month
@@ -90,9 +97,12 @@ final class MonthCell: UICollectionViewCell {
                 } else {
                     if !event.isAllDay || UIDevice.current.userInterfaceIdiom == .phone {
                         label.attributedText = addIconBeforeLabel(eventList: [event],
-                                                                  textAttributes: [.font: monthStyle.fontEventTitle, .foregroundColor: monthStyle.colorEventTitle],
-                                                                  bulletAttributes: [.font: monthStyle.fontEventBullet, .foregroundColor: event.color?.value ?? .systemGray],
-                                                                  timeAttributes: [.font: monthStyle.fontEventTime, .foregroundColor: UIColor.systemGray],
+                                                                  textAttributes: [.font: monthStyle.fontEventTitle,
+                                                                                   .foregroundColor: monthStyle.colorEventTitle],
+                                                                  bulletAttributes: [.font: monthStyle.fontEventBullet,
+                                                                                     .foregroundColor: event.color?.value ?? .systemGray],
+                                                                  timeAttributes: [.font: monthStyle.fontEventTime,
+                                                                                   .foregroundColor: UIColor.systemGray],
                                                                   indentation: 0,
                                                                   lineSpacing: 0,
                                                                   paragraphSpacing: 0)
@@ -113,8 +123,10 @@ final class MonthCell: UICollectionViewCell {
                     label.tag = event.hash
                     if style.event.isEnableMoveEvent, UIDevice.current.userInterfaceIdiom != .phone, !event.isAllDay {
                         let longGesture = UILongPressGestureRecognizer(target: self, action: #selector(activateMovingEvent))
+                        longGesture.delegate = self
                         longGesture.minimumPressDuration = style.event.minimumPressDuration
                         label.addGestureRecognizer(longGesture)
+                        label.addGestureRecognizer(panGesture)
                     }
                     addSubview(label)
                 }
@@ -190,28 +202,41 @@ final class MonthCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    @objc private func processMovingEvent(gesture: UIPanGestureRecognizer) {
+        switch gesture.state {
+        case .changed:
+            delegate?.didChangeMoveEvent(gesture: gesture)
+        default:
+            break
+        }
+    }
+    
     @objc private func activateMovingEvent(gesture: UILongPressGestureRecognizer) {
-        guard let idx = events.firstIndex(where: { $0.hash == gesture.view?.tag }), let view = gesture.view else { return }
-        
-        let event = events[idx]
-        let snapshotLabel = UILabel(frame: view.frame)
-        snapshotLabel.setRoundCorners(monthStyle.eventCorners, radius: monthStyle.eventCornersRadius)
-        snapshotLabel.backgroundColor = event.color?.value ?? .systemGray
-        snapshotLabel.attributedText = addIconBeforeLabel(eventList: [event],
-                                                          textAttributes: [.font: monthStyle.fontEventTitle, .foregroundColor: UIColor.white],
-                                                          bulletAttributes: [.font: monthStyle.fontEventBullet, .foregroundColor: UIColor.white],
-                                                          timeAttributes: [.font: monthStyle.fontEventTime, .foregroundColor: UIColor.white],
-                                                          indentation: 0,
-                                                          lineSpacing: 0,
-                                                          paragraphSpacing: 0)
-        let snpashot = event.isAllDay ? view.snapshotView(afterScreenUpdates: false) : snapshotLabel
         switch gesture.state {
         case .began:
-            delegate?.didStartMoveEventPage(event, snapshot: snpashot, gesture: gesture)
-        case .changed:
-            delegate?.didChangeMoveEventPage(event, gesture: gesture)
+            guard let idx = events.firstIndex(where: { $0.hash == gesture.view?.tag }), let view = gesture.view else {
+                return
+            }
+            
+            let event = events[idx]
+            let snapshotLabel = UILabel(frame: view.frame)
+            snapshotLabel.setRoundCorners(monthStyle.eventCorners, radius: monthStyle.eventCornersRadius)
+            snapshotLabel.backgroundColor = event.color?.value ?? .systemGray
+            snapshotLabel.attributedText = addIconBeforeLabel(eventList: [event],
+                                                              textAttributes: [.font: monthStyle.fontEventTitle,
+                                                                               .foregroundColor: UIColor.white],
+                                                              bulletAttributes: [.font: monthStyle.fontEventBullet,
+                                                                                 .foregroundColor: UIColor.white],
+                                                              timeAttributes: [.font: monthStyle.fontEventTime,
+                                                                               .foregroundColor: UIColor.white],
+                                                              indentation: 0,
+                                                              lineSpacing: 0,
+                                                              paragraphSpacing: 0)
+            let snpashot = event.isAllDay ? view.snapshotView(afterScreenUpdates: false) : snapshotLabel
+            let eventView = EventViewGeneral(style: style, event: event, frame: view.frame)
+            delegate?.didStartMoveEvent(eventView, snapshot: snpashot, gesture: gesture)
         case .cancelled, .ended, .failed:
-            delegate?.didEndMoveEventPage(event, gesture: gesture)
+            delegate?.didEndMoveEvent(gesture: gesture)
         default:
             break
         }
@@ -288,12 +313,10 @@ final class MonthCell: UICollectionViewCell {
         
         return eventList.reduce(NSMutableAttributedString()) { _, event -> NSMutableAttributedString in
             let formattedString: String
-            let time = timeFormatter(date: event.start)
-            switch UIDevice.current.userInterfaceIdiom {
-            case .pad:
-                formattedString = "\(bullet) \(event.textForMonth)  \(time)\n"
-            default:
-                formattedString = bullet
+            if !monthStyle.isHiddenDotInTitle {
+                formattedString = "\(bullet) \(event.textForMonth)\n"
+            } else {
+                formattedString = "\(event.textForMonth)\n"
             }
             let attributedString = NSMutableAttributedString(string: formattedString)
             let string: NSString = NSString(string: formattedString)
@@ -302,12 +325,18 @@ final class MonthCell: UICollectionViewCell {
             attributedString.addAttributes([NSAttributedString.Key.paragraphStyle: paragraphStyle], range: rangeForText)
             attributedString.addAttributes(textAttributes, range: rangeForText)
             
-            let rangeForBullet = string.range(of: bullet)
-            attributedString.addAttributes(bulletAttributes, range: rangeForBullet)
+            if !monthStyle.isHiddenDotInTitle {
+                let rangeForBullet = string.range(of: bullet)
+                attributedString.addAttributes(bulletAttributes, range: rangeForBullet)
+            }
             
-            let rangeForTime = string.range(of: time)
-            attributedString.addAttributes(timeAttributes, range: rangeForTime)
             return attributedString
         }
+    }
+}
+
+extension MonthCell: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
     }
 }
