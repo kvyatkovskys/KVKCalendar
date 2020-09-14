@@ -61,7 +61,7 @@ public final class CalendarView: UIView {
         self.yearData = YearData(date: date, years: years, style: style)
         self.dayData = DayData(yearData: yearData, timeSystem: style.timeSystem, startDay: style.startWeekDay)
         self.weekData = WeekData(yearData: yearData, timeSystem: style.timeSystem, startDay: style.startWeekDay)
-        self.monthData = MonthData(yearData: yearData, startDay: style.startWeekDay, calendar: style.calendar)
+        self.monthData = MonthData(yearData: yearData, startDay: style.startWeekDay, calendar: style.calendar, scrollDirection: style.month.scrollDirection)
         super.init(frame: frame)
         
         if let defaultType = style.defaultType {

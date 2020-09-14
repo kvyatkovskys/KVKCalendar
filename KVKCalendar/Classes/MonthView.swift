@@ -43,6 +43,7 @@ final class MonthView: UIView {
         self.style = style
         super.init(frame: frame)
         setUI()
+        scrollToDate(data.date, animated: false)
     }
     
     func setDate(_ date: Date) {
@@ -124,9 +125,10 @@ extension MonthView: MonthCellDelegate {
         delegate?.didSelectCalendarMore(date, frame: frame)
     }
     
-    func didStartMoveEventPage(_ event: Event, snapshot: UIView?, gesture: UILongPressGestureRecognizer) {
+    func didStartMoveEvent(_ event: EventViewGeneral, snapshot: UIView?, gesture: UILongPressGestureRecognizer) {
         let point = gesture.location(in: collectionView)
         
+        data.movingEvent = event
         eventPreview = nil
         eventPreview = snapshot
         data.eventPreviewXOffset = (snapshot?.bounds.width ?? data.eventPreviewXOffset) / 2
@@ -141,15 +143,17 @@ extension MonthView: MonthCellDelegate {
             self.eventPreview?.transform = CGAffineTransform(scaleX: 1, y: 1)
         }
         UIImpactFeedbackGenerator().impactOccurred()
+        collectionView.isScrollEnabled = false
     }
     
-    func didEndMoveEventPage(_ event: Event, gesture: UILongPressGestureRecognizer) {
+    func didEndMoveEvent(gesture: UILongPressGestureRecognizer) {
         eventPreview?.removeFromSuperview()
         eventPreview = nil
         
         let point = gesture.location(in: collectionView)
-        guard let indexPath = collectionView.indexPathForItem(at: point) else { return }
+        guard let indexPath = collectionView.indexPathForItem(at: point), let event = data.movingEvent?.event else { return }
         
+        data.movingEvent = nil
         let index = getIndexForDirection(style.month.scrollDirection, indexPath: indexPath)
         let day = data.days[index.row]
         let newDate = day.date ?? event.start
@@ -173,9 +177,10 @@ extension MonthView: MonthCellDelegate {
         delegate?.didChangeCalendarEvent(event, start: startDate, end: endDate)
         scrollToDate(newDate, animated: true)
         didSelectDate(newDate, indexPath: index)
+        collectionView.isScrollEnabled = true
     }
     
-    func didChangeMoveEventPage(_ event: Event, gesture: UILongPressGestureRecognizer) {
+    func didChangeMoveEvent(gesture: UIPanGestureRecognizer) {
         let point = gesture.location(in: collectionView)
         guard collectionView.frame.width >= (point.x + 20), (point.x - 20) >= 0 else { return }
         
@@ -281,7 +286,14 @@ extension MonthView: UICollectionViewDataSource {
 
 extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        guard let newMoveDate = getVisibaleDate(), data.willSelectDate?.month != newMoveDate.month, data.date != newMoveDate else { return }
+        if data.isFirstLoad {
+            data.isFirstLoad = false
+            return
+        }
+        
+        guard let newMoveDate = getVisibaleDate(), data.willSelectDate?.month != newMoveDate.month, data.date != newMoveDate else {
+            return
+        }
         
         data.willSelectDate = newMoveDate
         willSelectDate?(newMoveDate)
@@ -334,16 +346,15 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
             widht = collectionView.frame.width / 7
             height = collectionView.frame.height / 6
         case .vertical:
+            widht = (collectionView.frame.width / 7) - 0.2
+            
             if style.month.isPagingEnabled {
-                widht = (collectionView.frame.width / 7) - 0.2
                 height = collectionView.frame.height / 6
-            } else {
+            } else {                
                 switch UIDevice.current.userInterfaceIdiom {
                 case .phone:
-                    widht = (collectionView.frame.width / 7) - 0.2
                     height = collectionView.frame.height / 7
                 default:
-                    widht = (collectionView.frame.width / 7) - 0.2
                     height = collectionView.frame.height / 6
                 }
             }

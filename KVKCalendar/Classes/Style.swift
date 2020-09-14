@@ -162,6 +162,7 @@ public struct MonthStyle {
     public var isAutoSelectDateScrolling: Bool = true
     public var eventCorners: UIRectCorner = .allCorners
     public var eventCornersRadius: CGSize = CGSize(width: 5, height: 5)
+    public var isHiddenDotInTitle: Bool = false
 }
 
 public struct YearStyle {
