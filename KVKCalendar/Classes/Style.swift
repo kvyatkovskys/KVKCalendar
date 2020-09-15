@@ -96,6 +96,7 @@ public struct TimelineStyle {
     public var currentLineHourDotCornersRadius: CGSize = CGSize(width: 2.5, height: 2.5)
     public var currentLineHourWidth: CGFloat = 60
     public var currentLineHourHeight: CGFloat = 1
+    public var separatorLineColor: UIColor = .gray
     public var movingMinutesColor: UIColor = .systemBlue
     public var shadowColumnColor: UIColor = .systemTeal
     public var shadowColumnAlpha: CGFloat = 0.1
