@@ -68,7 +68,7 @@ extension TimelineView {
                                    width: frame.width - xLine,
                                    height: style.timeline.heightLine)
             let line = UIView(frame: lineFrame)
-            line.backgroundColor = .gray
+            line.backgroundColor = style.timeline.separatorLineColor
             line.tag = idx
             lines.append(line)
         }
