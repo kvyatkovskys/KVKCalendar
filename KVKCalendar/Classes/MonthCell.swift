@@ -46,6 +46,13 @@ final class MonthCell: UICollectionViewCell {
         return panGesture
     }()
     
+    private lazy var longGesture: UILongPressGestureRecognizer = {
+        let longGesture = UILongPressGestureRecognizer(target: self, action: #selector(activateMovingEvent))
+        longGesture.delegate = self
+        longGesture.minimumPressDuration = style.event.minimumPressDuration
+        return longGesture
+    }()
+    
     var style = Style() {
         didSet {
             monthStyle = style.month
@@ -122,9 +129,6 @@ final class MonthCell: UICollectionViewCell {
                     label.addGestureRecognizer(tap)
                     label.tag = event.hash
                     if style.event.isEnableMoveEvent, UIDevice.current.userInterfaceIdiom != .phone, !event.isAllDay {
-                        let longGesture = UILongPressGestureRecognizer(target: self, action: #selector(activateMovingEvent))
-                        longGesture.delegate = self
-                        longGesture.minimumPressDuration = style.event.minimumPressDuration
                         label.addGestureRecognizer(longGesture)
                         label.addGestureRecognizer(panGesture)
                     }
