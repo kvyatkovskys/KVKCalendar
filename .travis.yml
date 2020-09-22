@@ -8,5 +8,5 @@ language: swift
 # - gem install cocoapods # Since Travis is not always on latest version
 # - pod install --project-directory=Example
 script:
-- set -o pipefail && xcodebuild test -workspace Example/KVKCalendar.xcworkspace -scheme KVKCalendar-Example -destination 'platform=iOS Simulator,name=iPhone 11,OS=14.0' ONLY_ACTIVE_ARCH=NO | xcpretty
+- set -o pipefail && xcodebuild test -workspace Example/KVKCalendar.xcworkspace -scheme KVKCalendar-Example -destination 'platform=iOS Simulator,name=iPhone 11,OS=13.0' ONLY_ACTIVE_ARCH=NO | xcpretty
 - pod lib lint
