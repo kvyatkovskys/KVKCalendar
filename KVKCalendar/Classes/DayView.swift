@@ -29,6 +29,9 @@ final class DayView: UIView {
         view.didSelectDate = { [weak self] (date, type) in
             self?.didSelectDateScrollHeader(date, type: type)
         }
+        view.didTrackScrollOffset = { [weak self] (offset, stop) in
+            self?.timelineView.moveEvents(offset: offset, stop: stop)
+        }
         return view
     }()
     
