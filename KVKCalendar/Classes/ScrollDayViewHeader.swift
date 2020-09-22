@@ -19,7 +19,7 @@ final class ScrollDayHeaderView: UIView {
     private let type: CalendarType
     private let calendar: Calendar
     private var lastContentOffset: CGFloat = 0
-    private var trackingOfset: CGFloat?
+    private var trackingTranslation: CGFloat?
     
     weak var dataSource: DisplayDataSource?
     
@@ -81,9 +81,9 @@ final class ScrollDayHeaderView: UIView {
         collectionView.contentOffset.x = lastContentOffset - transform.tx
     }
     
-    func setDate(_ date: Date) {
+    func setDate(_ date: Date, isDelay: Bool = true) {
         self.date = date
-        scrollToDate(date, isAnimate: isAnimate)
+        scrollToDate(date, isAnimate: isAnimate, isDelay: isDelay)
         collectionView.reloadData()
     }
     
@@ -131,49 +131,21 @@ final class ScrollDayHeaderView: UIView {
         return collection
     }
     
-    private func scrollToDate(_ date: Date, isAnimate: Bool) {
+    private func scrollToDate(_ date: Date, isAnimate: Bool, isDelay: Bool = true) {
         didSelectDate?(date, type)
         setDateToTitle(date)
         
-        guard var indexPath = getMiddleIndexPath(), let middleDate = days[indexPath.row].date else { return }
+        guard let scrollDate = getScrollDate(date),
+              let idx = days.firstIndex(where: { $0.date?.year == scrollDate.year
+                                            && $0.date?.month == scrollDate.month
+                                            && $0.date?.day == scrollDate.day }) else { return }
         
-        switch type {
-        case .day:
-            let minOffset = 4
-            let maxOffset = 5
-            guard middleDate.day - date.day >= minOffset || date.day - middleDate.day >= minOffset else {
-                guard let scrollDate = getScrollDate(date),
-                    let idx = days.firstIndex(where: { $0.date?.year == scrollDate.year
-                        && $0.date?.month == scrollDate.month
-                        && $0.date?.day == scrollDate.day }) else { return }
-                indexPath.row = idx
-                break
+        if isDelay {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                self.collectionView.scrollToItem(at: IndexPath(row: idx, section: 0), at: .left, animated: isAnimate)
             }
-            
-            if middleDate.day > date.day, minOffset...maxOffset ~= middleDate.day - date.day {
-                indexPath.row -= 10
-            } else if date.day > middleDate.day, minOffset...maxOffset ~= date.day - middleDate.day {
-                indexPath.row += 4
-            } else {
-                guard let scrollDate = getScrollDate(date),
-                           let idx = days.firstIndex(where: { $0.date?.year == scrollDate.year
-                               && $0.date?.month == scrollDate.month
-                               && $0.date?.day == scrollDate.day }) else { return }
-                indexPath.row = idx
-            }
-        case .week:
-            guard let scrollDate = getScrollDate(date),
-                       let idx = days.firstIndex(where: { $0.date?.year == scrollDate.year
-                           && $0.date?.month == scrollDate.month
-                           && $0.date?.day == scrollDate.day }) else { return }
-
-            indexPath.row = idx
-        default:
-            return
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            self.collectionView.scrollToItem(at: indexPath, at: .left, animated: isAnimate)
+        } else {
+            collectionView.scrollToItem(at: IndexPath(row: idx, section: 0), at: .left, animated: isAnimate)
         }
         
         if !self.isAnimate {
@@ -267,20 +239,21 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
         let translation = scrollView.panGestureRecognizer.translation(in: collectionView)
         let velocity = scrollView.panGestureRecognizer.velocity(in: collectionView)
         
-        if trackingOfset != translation.x {
-            trackingOfset = nil
+        if trackingTranslation != translation.x {
+            print(translation.x, velocity.x)
+            trackingTranslation = nil
             didTrackScrollOffset?(translation.x, false)
             
-            let translationLimit: CGFloat = UIDevice.current.userInterfaceIdiom == .phone ? 170 : 300
-            let velocityLimit: CGFloat = 1500
+            let translationLimit: CGFloat = UIDevice.current.userInterfaceIdiom == .phone ? 160 : 300
+            let velocityLimit: CGFloat = 500
             
             if translation.x > translationLimit || velocity.x > velocityLimit {
-                selectDate(offset: -7)
                 scrollView.panGestureRecognizer.state = .cancelled
+                selectDate(offset: -7)
                 lastContentOffset = scrollView.contentOffset.x
             } else if translation.x < -translationLimit || velocity.x < -velocityLimit {
-                selectDate(offset: 7)
                 scrollView.panGestureRecognizer.state = .cancelled
+                selectDate(offset: 7)
                 lastContentOffset = scrollView.contentOffset.x
             }
         }
@@ -292,7 +265,7 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         let value = scrollView.panGestureRecognizer.translation(in: collectionView)
         didTrackScrollOffset?(value.x, true)
-        trackingOfset = value.x
+        trackingTranslation = value.x
     }
     
     func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
