@@ -8,6 +8,12 @@
 import Foundation
 
 extension TimelineView {
+    var eventViews: [UIView] {
+        return getAllDisplayableEvents()
+    }
+}
+
+extension TimelineView {
     func createAllDayEvents(events: [Event], date: Date?, width: CGFloat, originX: CGFloat) {
         guard !events.isEmpty else { return }
         let pointY = style.allDay.isPinned ? 0 : -style.allDay.height
@@ -122,22 +128,35 @@ extension TimelineView {
         }
     }
     
+    func moveEvents(offset: CGFloat, stop: Bool = false) {
+        guard !stop else {
+            identityViews(eventViews)
+            return
+        }
+        
+        eventViews.forEach { (view) in
+            view.transform = CGAffineTransform(translationX: offset, y: 0)
+        }
+    }
+    
+    private func getAllDisplayableEvents() -> [UIView] {
+        let events = scrollView.subviews.filter({ $0 is EventViewGeneral })
+        let eventsAllDay: [UIView]
+        
+        if style.allDay.isPinned {
+            eventsAllDay = subviews.filter({ $0 is AllDayEventView || $0 is AllDayTitleView })
+        } else {
+            eventsAllDay = scrollView.subviews.filter({ $0 is AllDayEventView || $0 is AllDayTitleView })
+        }
+        
+        let eventViews = events + eventsAllDay
+        return eventViews
+    }
+    
     @objc func swipeEvent(gesture: UIPanGestureRecognizer) {
         let translation = gesture.translation(in: self)
         let velocity = gesture.velocity(in: self)
         let endGesure = abs(translation.x) > (frame.width / 3.5)
-        let events = scrollView.subviews.filter({ $0 is EventViewGeneral })
-        var eventsAllDay: [UIView]
-        
-        if style.allDay.isPinned {
-            eventsAllDay = subviews.filter({ $0 is AllDayEventView })
-            eventsAllDay += subviews.filter({ $0 is AllDayTitleView })
-        } else {
-            eventsAllDay = scrollView.subviews.filter({ $0 is AllDayEventView })
-            eventsAllDay += scrollView.subviews.filter({ $0 is AllDayTitleView })
-        }
-        
-        let eventViews = events + eventsAllDay
         
         switch gesture.state {
         case .began, .changed:
@@ -167,10 +186,7 @@ extension TimelineView {
             
             UIView.animate(withDuration: 0.2, animations: { [weak delegate = self.delegate] in
                 delegate?.swipeX(transform: CGAffineTransform(translationX: translationX * 0.8, y: 0), stop: true)
-                
-                eventViews.forEach { (view) in
-                    view.transform = CGAffineTransform(translationX: translationX, y: 0)
-                }
+                self.moveEvents(offset: translation.x)
             }) { [weak delegate = self.delegate] (_) in
                 guard previousDay else {
                     delegate?.nextDate()
@@ -192,7 +208,7 @@ extension TimelineView {
                 view.transform = .identity
             }
             action()
-        }, completion: nil)
+        })
     }
 }
 

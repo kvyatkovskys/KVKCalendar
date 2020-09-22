@@ -8,7 +8,7 @@
 import UIKit
 
 final class ScrollDayHeaderView: UIView {
-    var didTrackScrollOffset: ((CGFloat) -> Void)?
+    var didTrackScrollOffset: ((CGFloat, Bool) -> Void)?
     var didSelectDate: ((Date?, CalendarType) -> Void)?
     
     private let days: [Day]
@@ -19,6 +19,7 @@ final class ScrollDayHeaderView: UIView {
     private let type: CalendarType
     private let calendar: Calendar
     private var lastContentOffset: CGFloat = 0
+    private var trackingOfset: CGFloat?
     
     weak var dataSource: DisplayDataSource?
     
@@ -89,6 +90,18 @@ final class ScrollDayHeaderView: UIView {
     func selectDate(offset: Int) {
         guard let nextDate = calendar.date(byAdding: .day, value: offset, to: date) else { return }
         
+        if !style.headerScroll.isHiddenTitleDate {
+            let value: CGFloat
+            if offset < 0 {
+                value = -40
+            } else {
+                value = 40
+            }
+            titleLabel.transform = CGAffineTransform(translationX: value, y: 0)
+            UIView.animate(withDuration: 0.3, delay: 0, options: .curveLinear) {
+                self.titleLabel.transform = .identity
+            }
+        }
         setDate(nextDate)
     }
     
@@ -251,37 +264,34 @@ extension ScrollDayHeaderView: UICollectionViewDataSource {
 
 extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let value = scrollView.panGestureRecognizer.translation(in: collectionView)
+        
+        if trackingOfset != value.x {
+            trackingOfset = nil
+            didTrackScrollOffset?(value.x, false)
+            
+            if value.x > 300 {
+                selectDate(offset: -7)
+                scrollView.panGestureRecognizer.state = .cancelled
+                lastContentOffset = scrollView.contentOffset.x
+            } else if value.x < -300 {
+                selectDate(offset: 7)
+                scrollView.panGestureRecognizer.state = .cancelled
+                lastContentOffset = scrollView.contentOffset.x
+            }
+        }
+        
         guard lastContentOffset == 0 else { return }
         lastContentOffset = scrollView.contentOffset.x
     }
     
-    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
-        lastContentOffset = scrollView.contentOffset.x
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        let value = scrollView.panGestureRecognizer.translation(in: collectionView)
+        didTrackScrollOffset?(value.x, true)
+        trackingOfset = value.x
     }
     
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        guard var indexPath = getMiddleIndexPath(), let scrollDate = days[indexPath.row].date else { return }
-        
-        if date.isSunday {
-            switch style.startWeekDay {
-            case .monday:
-                indexPath.row += 3
-            case .sunday:
-                indexPath.row -= 3
-            }
-        } else if date.weekday > scrollDate.weekday {
-            indexPath.row += date.weekday - scrollDate.weekday
-        } else if scrollDate.weekday > date.weekday {
-            indexPath.row -= scrollDate.weekday - date.weekday
-        }
-        
-        guard let newMoveDate = days[indexPath.row].date else { return }
-        
-        date = newMoveDate
-        didSelectDate?(newMoveDate, type)
-        setDateToTitle(newMoveDate)
-        collectionView.reloadData()
-        
+    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
         lastContentOffset = scrollView.contentOffset.x
     }
     
