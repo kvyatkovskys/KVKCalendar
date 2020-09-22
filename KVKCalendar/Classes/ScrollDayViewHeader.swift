@@ -99,7 +99,7 @@ final class ScrollDayHeaderView: UIView {
             }
             titleLabel.transform = CGAffineTransform(translationX: value, y: 0)
             UIView.animate(withDuration: 0.3, delay: 0, options: .curveLinear) {
-                self.titleLabel.transform = .identity
+                self.titleLabel.transform = CGAffineTransform.identity
             }
         }
         setDate(nextDate)
