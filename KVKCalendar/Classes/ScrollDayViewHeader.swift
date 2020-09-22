@@ -98,9 +98,9 @@ final class ScrollDayHeaderView: UIView {
                 value = 40
             }
             titleLabel.transform = CGAffineTransform(translationX: value, y: 0)
-            UIView.animate(withDuration: 0.3, delay: 0, options: .curveLinear) {
+            UIView.animate(withDuration: 0.3, delay: 0, options: .curveLinear, animations: {
                 self.titleLabel.transform = CGAffineTransform.identity
-            } completion: { (_) in }
+            })
         }
         setDate(nextDate)
     }
