@@ -29,6 +29,11 @@ final class ScrollHeaderDayCell: UICollectionViewCell {
         return label
     }()
     
+    var dotView: UIView = {
+        let view = UIView()
+        return view
+    }()
+    
     private var headerStyle = HeaderScrollStyle()
     
     var style = Style() {
@@ -62,12 +67,12 @@ final class ScrollHeaderDayCell: UICollectionViewCell {
                 // remove the selection if the current date (for the day) does not match the selected one
                 if selectDate.day != nowDate.day, item.day.date?.day == nowDate.day, item.day.date?.year == nowDate.year {
                     dateLabel.textColor = item.style?.textColor ?? headerStyle.colorBackgroundCurrentDate
-                    dateLabel.backgroundColor = item.style?.backgroundColor ?? .clear
+                    dotView.backgroundColor = item.style?.backgroundColor ?? .clear
                 }
                 // mark the selected date, which is not the same as the current one
                 if item.day.date?.month == selectDate.month, item.day.date?.day == selectDate.day, selectDate.day != nowDate.day {
                     dateLabel.textColor = item.style?.textColor ?? headerStyle.colorSelectDate
-                    dateLabel.backgroundColor = item.style?.dotBackgroundColor ?? headerStyle.colorBackgroundSelectDate
+                    dotView.backgroundColor = item.style?.dotBackgroundColor ?? headerStyle.colorBackgroundSelectDate
                 }
                 return
             }
@@ -78,7 +83,7 @@ final class ScrollHeaderDayCell: UICollectionViewCell {
                 return
             }
             dateLabel.textColor = item.style?.textColor ?? headerStyle.colorSelectDate
-            dateLabel.backgroundColor = item.style?.dotBackgroundColor ?? headerStyle.colorBackgroundSelectDate
+            dotView.backgroundColor = item.style?.dotBackgroundColor ?? headerStyle.colorBackgroundSelectDate
         }
     }
     
@@ -96,12 +101,19 @@ final class ScrollHeaderDayCell: UICollectionViewCell {
         dateFrame.size.width = heightDate
         dateFrame.origin.y = titleFrame.height
         dateFrame.origin.x = (frame.width / 2) - (dateFrame.width / 2)
-        dateLabel.frame = dateFrame
+        dotView.frame = dateFrame
+        dateLabel.frame = CGRect(origin: .zero, size: dateFrame.size)
         
+        dotView.addSubview(dateLabel)
         addSubview(titleLabel)
-        addSubview(dateLabel)
+        addSubview(dotView)
         
-        dateLabel.layer.cornerRadius = dateLabel.frame.width / 2
+        if let radius = headerStyle.dotCornersRadius {
+            dotView.setRoundCorners(headerStyle.dotCorners, radius: radius)
+        } else {
+            let value = dotView.frame.width / 2
+            dotView.setRoundCorners(headerStyle.dotCorners, radius: CGSize(width: value, height: value))
+        }
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -125,10 +137,10 @@ final class ScrollHeaderDayCell: UICollectionViewCell {
         let nowDate = Date()
         if date?.month == nowDate.month, date?.day == nowDate.day, date?.year == nowDate.year {
             dateLabel.textColor = item.style?.textColor ?? headerStyle.colorCurrentDate
-            dateLabel.backgroundColor = style?.dotBackgroundColor ?? headerStyle.colorBackgroundCurrentDate
+            dotView.backgroundColor = style?.dotBackgroundColor ?? headerStyle.colorBackgroundCurrentDate
         } else {
             dateLabel.textColor = colorText
-            dateLabel.backgroundColor = style?.backgroundColor ?? .clear
+            dotView.backgroundColor = style?.backgroundColor ?? .clear
         }
     }
 }
