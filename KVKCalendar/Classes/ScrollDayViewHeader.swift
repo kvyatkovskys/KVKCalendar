@@ -151,24 +151,8 @@ final class ScrollDayHeaderView: UIView {
         if !self.isAnimate {
             self.isAnimate = true
         }
+    }
         
-        if type == .day, !style.headerScroll.isHiddenTitleDate {
-            UIView.animate(withDuration: 0.3) {
-                self.titleLabel.transform = .identity
-                self.titleLabel.alpha = 1
-            }
-        }
-    }
-    
-    private func identityViews(duration: TimeInterval = 0.4, delay: TimeInterval = 0.07, _ views: [UIView], action: @escaping (() -> Void) = {}) {
-        UIView.animate(withDuration: duration, delay: delay, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.8, options: .curveLinear, animations: {
-            views.forEach { (view) in
-                view.transform = .identity
-            }
-            action()
-        }, completion: nil)
-    }
-    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -240,21 +224,17 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
         let velocity = scrollView.panGestureRecognizer.velocity(in: collectionView)
         
         if trackingTranslation != translation.x {
-            print(translation.x, velocity.x)
-            trackingTranslation = nil
+            trackingTranslation = translation.x
+            
             didTrackScrollOffset?(translation.x, false)
             
             let translationLimit: CGFloat = UIDevice.current.userInterfaceIdiom == .phone ? 160 : 300
-            let velocityLimit: CGFloat = 500
+            let velocityLimit: CGFloat = 1000
             
             if translation.x > translationLimit || velocity.x > velocityLimit {
                 scrollView.panGestureRecognizer.state = .cancelled
-                selectDate(offset: -7)
-                lastContentOffset = scrollView.contentOffset.x
             } else if translation.x < -translationLimit || velocity.x < -velocityLimit {
                 scrollView.panGestureRecognizer.state = .cancelled
-                selectDate(offset: 7)
-                lastContentOffset = scrollView.contentOffset.x
             }
         }
         
@@ -263,9 +243,24 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        let value = scrollView.panGestureRecognizer.translation(in: collectionView)
-        didTrackScrollOffset?(value.x, true)
-        trackingTranslation = value.x
+        let translation = scrollView.panGestureRecognizer.translation(in: collectionView)
+        let velocity = scrollView.panGestureRecognizer.velocity(in: collectionView)
+        
+        didTrackScrollOffset?(0, true)
+        lastContentOffset = scrollView.contentOffset.x
+        
+        let translationLimit: CGFloat = UIDevice.current.userInterfaceIdiom == .phone ? 160 : 300
+        let velocityLimit: CGFloat = 300
+        
+        guard let value = trackingTranslation else { return }
+        
+        if value > translationLimit || velocity.x > velocityLimit  {
+            selectDate(offset: -7)
+        } else if value < -translationLimit || velocity.x < -velocityLimit {
+            selectDate(offset: 7)
+        }
+        
+        trackingTranslation = translation.x
     }
     
     func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {

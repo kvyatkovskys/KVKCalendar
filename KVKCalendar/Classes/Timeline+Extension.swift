@@ -182,11 +182,10 @@ extension TimelineView {
             }
             
             let previousDay = translation.x > 0
-            let translationX = previousDay ? frame.width : -frame.width
+            delegate?.swipeX(transform: CGAffineTransform(translationX: 0, y: 0), stop: true)
             
-            UIView.animate(withDuration: 0.2, animations: { [weak delegate = self.delegate] in
-                delegate?.swipeX(transform: CGAffineTransform(translationX: translationX * 0.8, y: 0), stop: true)
-                self.moveEvents(offset: translation.x)
+            UIView.animate(withDuration: 0.3, animations: {
+                self.moveEvents(offset: translation.x * 10)
             }) { [weak delegate = self.delegate] (_) in
                 guard previousDay else {
                     delegate?.nextDate()
@@ -202,7 +201,7 @@ extension TimelineView {
         }
     }
     
-    func identityViews(duration: TimeInterval = 0.4, delay: TimeInterval = 0.07, _ views: [UIView], action: @escaping (() -> Void) = {}) {
+    func identityViews(duration: TimeInterval = 0.3, delay: TimeInterval = 0.1, _ views: [UIView], action: @escaping (() -> Void) = {}) {
         UIView.animate(withDuration: duration, delay: delay, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.8, options: .curveLinear, animations: {
             views.forEach { (view) in
                 view.transform = .identity

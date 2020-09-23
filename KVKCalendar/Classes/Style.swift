@@ -69,6 +69,8 @@ public struct HeaderScrollStyle {
     public var colorWeekdayBackground: UIColor = .clear
     public var colorWeekendBackground: UIColor = .clear
     public var isHidden: Bool = false
+    public var dotCorners: UIRectCorner = .allCorners
+    public var dotCornersRadius: CGSize?
 }
 
 public struct TimelineStyle {
