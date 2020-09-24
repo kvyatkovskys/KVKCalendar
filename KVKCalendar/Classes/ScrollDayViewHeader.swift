@@ -25,7 +25,7 @@ final class ScrollDayHeaderView: UIView {
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.textAlignment = .center
+        label.textAlignment = style.headerScroll.titleDateAligment
         label.textColor = style.headerScroll.colorTitleDate
         return label
     }()
@@ -46,22 +46,14 @@ final class ScrollDayHeaderView: UIView {
         self.calendar = style.calendar
         super.init(frame: frame)
         
-        var newFrame = frame
-        newFrame.origin.x = 0
-        collectionView = createCollectionView(frame: newFrame, isScrollEnabled: style.headerScroll.isScrollEnabled)
-        
         if !style.headerScroll.isHiddenTitleDate {
-            collectionView.frame.size.height = frame.height - style.headerScroll.heightTitleDate
-            titleLabel.frame = frame
-            titleLabel.frame.origin.x = 0
-            titleLabel.frame.size.width -= frame.origin.x
-            titleLabel.frame.origin.y = collectionView.frame.size.height
-            titleLabel.frame.size.height -= (titleLabel.frame.origin.y + 5)
+            titleLabel.frame = CGRect(x: 10, y: 5, width: frame.width - 20, height: style.headerScroll.heightTitleDate - 5)
             
             setDateToTitle(date)
             addSubview(titleLabel)
         }
         
+        collectionView = createCollectionView(frame: frame, isScrollEnabled: style.headerScroll.isScrollEnabled)
         addSubview(collectionView)
     }
     
@@ -120,7 +112,15 @@ final class ScrollDayHeaderView: UIView {
     }
     
     private func createCollectionView(frame: CGRect, isScrollEnabled: Bool) -> UICollectionView {
-        let collection = UICollectionView(frame: frame, collectionViewLayout: layout)
+        let offsetX = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
+        
+        var newFrame = CGRect(x: offsetX, y: frame.origin.y, width: frame.width - offsetX, height: frame.height)
+        if !style.headerScroll.isHiddenTitleDate {
+            newFrame.origin.y = titleLabel.frame.height + 5
+            newFrame.size.height = frame.height - newFrame.origin.y
+        }
+        
+        let collection = UICollectionView(frame: newFrame, collectionViewLayout: layout)
         collection.isPagingEnabled = true
         collection.showsHorizontalScrollIndicator = false
         collection.backgroundColor = .clear
@@ -161,14 +161,10 @@ final class ScrollDayHeaderView: UIView {
 extension ScrollDayHeaderView: CalendarSettingProtocol {
     func reloadFrame(_ frame: CGRect) {
         self.frame.size.width = frame.width - self.frame.origin.x
-        titleLabel.frame.size.width = self.frame.width
+        titleLabel.frame = CGRect(x: 10, y: 5, width: self.frame.width - 20, height: titleLabel.frame.height)
         
         collectionView.removeFromSuperview()
         let newView = createCollectionView(frame: self.frame, isScrollEnabled: style.headerScroll.isScrollEnabled)
-        newView.frame.origin.x = 0
-        if !style.headerScroll.isHiddenTitleDate {
-            newView.frame.size.height = self.frame.height - style.headerScroll.heightTitleDate
-        }
         addSubview(newView)
         
         guard let scrollDate = getScrollDate(date),

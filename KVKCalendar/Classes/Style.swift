@@ -71,6 +71,7 @@ public struct HeaderScrollStyle {
     public var isHidden: Bool = false
     public var dotCorners: UIRectCorner = .allCorners
     public var dotCornersRadius: CGSize?
+    public var titleDateAligment: NSTextAlignment = .left
 }
 
 public struct TimelineStyle {
@@ -133,7 +134,7 @@ public struct MonthStyle {
     
     public lazy var formatter: DateFormatter = format
     public var heightHeaderWeek: CGFloat = 50
-    public var heightTitleDate: CGFloat = 30
+    public var heightTitleDate: CGFloat = 25
     public var isHiddenTitleDate: Bool = false
     public var colorDate: UIColor = .black
     public var colorNameDay: UIColor = .black
@@ -153,7 +154,7 @@ public struct MonthStyle {
     public var fontEventBullet: UIFont = .boldSystemFont(ofSize: 18)
     public var isHiddenSeporator: Bool = false
     public var isHiddenSeporatorOnEmptyDate: Bool = false
-    public var widthSeporator: CGFloat = 0.7
+    public var widthSeporator: CGFloat = 0.5
     public var colorSeporator: UIColor = gainsboro.withAlphaComponent(0.9)
     public var colorBackgroundWeekendDate: UIColor = gainsboro.withAlphaComponent(0.4)
     public var colorBackgroundDate: UIColor = .white
@@ -165,6 +166,9 @@ public struct MonthStyle {
     public var eventCorners: UIRectCorner = .allCorners
     public var eventCornersRadius: CGSize = CGSize(width: 5, height: 5)
     public var isHiddenDotInTitle: Bool = false
+    public var weekDayAligment: NSTextAlignment = .right
+    public var titleDateAligment: NSTextAlignment = .left
+    public var fontTitleDate: UIFont = .boldSystemFont(ofSize: 20)
 }
 
 public struct YearStyle {
@@ -197,7 +201,7 @@ public struct YearStyle {
     public var fontTitleHeader: UIFont = .boldSystemFont(ofSize: 20)
     public var colorTitleHeader: UIColor = .black
     public var heightTitleHeader: CGFloat = 50
-    public var aligmentTitleHeader: NSTextAlignment = .center
+    public var aligmentTitleHeader: NSTextAlignment = .left
     public var fontDayTitlePad: UIFont = .systemFont(ofSize: 15)
     public var fontDayTitlePhone: UIFont = .systemFont(ofSize: 11)
     public var fontDayTitle: UIFont {
@@ -213,6 +217,8 @@ public struct YearStyle {
     public var isAnimateSelection: Bool = true
     public var isPagingEnabled: Bool = true
     public var isAutoSelectDateScrolling: Bool = true
+    public var weekDayAligment: NSTextAlignment = .center
+    public var titleDateAligment: NSTextAlignment = .left
 }
 
 public struct AllDayStyle {
@@ -274,7 +280,6 @@ extension Style {
             newStyle.week.colorBackgroundCurrentDate = .systemRed
             newStyle.week.colorSelectDate = .white
             newStyle.week.colorWeekendDate = .systemGray2
-            newStyle.week.colorWeekendBackground = UIColor.useForStyle(dark: .systemGray6, white: newStyle.week.colorWeekendBackground)
             
             // month
             newStyle.month.colorDate = UIColor.useForStyle(dark: .systemGray, white: .black)

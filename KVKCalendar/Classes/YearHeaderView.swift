@@ -29,14 +29,13 @@ final class YearHeaderView: UIView {
             titleLabel.textColor = style.year.colorTitleHeader
             titleLabel.font = style.year.fontTitleHeader
             titleLabel.textAlignment = style.year.aligmentTitleHeader
-            
             backgroundColor = style.year.colorBackgroundHeader
         }
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        titleLabel.frame = frame
+        titleLabel.frame = CGRect(x: 10, y: 0, width: frame.width - 10, height: frame.height)
         addSubview(titleLabel)
     }
     

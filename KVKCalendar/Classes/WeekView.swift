@@ -22,8 +22,7 @@ final class WeekView: UIView {
         } else {
             heightView = style.headerScroll.heightHeaderWeek + style.headerScroll.heightTitleDate
         }
-        let offsetX = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
-        let view = ScrollDayHeaderView(frame: CGRect(x: offsetX, y: 0, width: frame.width - offsetX, height: heightView),
+        let view = ScrollDayHeaderView(frame: CGRect(x: 0, y: 0, width: frame.width, height: heightView),
                                        days: data.days,
                                        date: data.date,
                                        type: .week,

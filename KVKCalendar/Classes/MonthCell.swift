@@ -17,7 +17,6 @@ protocol MonthCellDelegate: class {
 
 final class MonthCell: UICollectionViewCell {
     private let titlesCount = 3
-    
     private let countInCell: CGFloat = 4
     private let offset: CGFloat = 3
     
