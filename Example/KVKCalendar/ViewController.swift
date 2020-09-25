@@ -31,6 +31,7 @@ final class ViewController: UIViewController {
             style.timeline.currentLineHourWidth = 45
             style.timeline.offsetTimeX = 2
             style.timeline.offsetLineLeft = 2
+            style.headerScroll.titleDateAligment = .center
         } else {
             style.timeline.widthEventViewer = 500
         }
