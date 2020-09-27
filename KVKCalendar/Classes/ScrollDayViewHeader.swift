@@ -103,7 +103,7 @@ final class ScrollDayHeaderView: UIView {
     func selectDate(offset: Int) {
         guard let nextDate = calendar.date(byAdding: .day, value: offset, to: date) else { return }
         
-        if !style.headerScroll.isHiddenTitleDate {
+        if !style.headerScroll.isHiddenTitleDate && style.headerScroll.isAnimateTitleDate {
             let value: CGFloat
             if offset < 0 {
                 value = -40

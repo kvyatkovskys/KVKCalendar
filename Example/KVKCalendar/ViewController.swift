@@ -32,6 +32,7 @@ final class ViewController: UIViewController {
             style.timeline.offsetTimeX = 2
             style.timeline.offsetLineLeft = 2
             style.headerScroll.titleDateAligment = .center
+            style.headerScroll.isAnimateTitleDate = true
         } else {
             style.timeline.widthEventViewer = 500
         }
