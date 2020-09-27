@@ -72,6 +72,7 @@ public struct HeaderScrollStyle {
     public var dotCorners: UIRectCorner = .allCorners
     public var dotCornersRadius: CGSize?
     public var titleDateAligment: NSTextAlignment = .left
+    public var isAnimateTitleDate: Bool = false
 }
 
 public struct TimelineStyle {
