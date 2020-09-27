@@ -107,6 +107,8 @@ extension ViewController: CalendarDelegate {
     func didAddNewEvent(_ event: Event, _ date: Date?) {}
     // get current displaying events
     func didDisplayEvents(_ events: [Event], dates: [Date?]) {}
+    // get next date when the calendar scrolls (works for month view)
+    func willSelectDate(_ date: Date, type: CalendarType) {}
 }
 ```
 
