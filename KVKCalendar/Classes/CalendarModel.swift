@@ -77,6 +77,7 @@ public struct EventColor {
 public struct Event {
     static let idForNewEvent = "-999"
     
+    /// unique identifier of Event
     public var ID: String
     public var text: String
     public var start: Date
@@ -98,7 +99,7 @@ public struct Event {
     public var eventData: Any?
     public var recurringType: RecurringType
     
-    public init(ID: String = "0", text: String = "", start: Date = Date(), end: Date = Date(), color: EventColor? = EventColor(UIColor.systemBlue), backgroundColor: UIColor = UIColor.systemBlue.withAlphaComponent(0.3), textColor: UIColor = .white, isAllDay: Bool = false, isContainsFile: Bool = false, textForMonth: String = "", eventData: Any? = nil, recurringType: RecurringType = .none) {
+    public init(ID: String, text: String = "", start: Date = Date(), end: Date = Date(), color: EventColor? = EventColor(UIColor.systemBlue), backgroundColor: UIColor = UIColor.systemBlue.withAlphaComponent(0.3), textColor: UIColor = .white, isAllDay: Bool = false, isContainsFile: Bool = false, textForMonth: String = "", eventData: Any? = nil, recurringType: RecurringType = .none) {
         self.ID = ID
         self.text = text
         self.start = start
@@ -235,10 +236,7 @@ protocol CalendarPrivateDelegate: class {
     func getEventViewerFrame(_ frame: CGRect)
     func didChangeCalendarEvent(_ event: Event, start: Date?, end: Date?)
     func didAddCalendarEvent(_ event: Event, _ date: Date?)
-}
-
-extension CalendarPrivateDelegate {
-    func getEventViewerFrame(_ frame: CGRect) {}
+    func deselectCalendarEvent(_ event: Event)
 }
 
 // MARK: - Data source protocol
@@ -272,7 +270,7 @@ extension DisplayDataSource {
 
 // MARK: - Delegate protocol
 
-public protocol CalendarDelegate: AnyObject {
+public protocol CalendarDelegate: class {
     func didSelectDate(_ date: Date?, type: CalendarType, frame: CGRect?)
     func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?)
     func didSelectMore(_ date: Date, frame: CGRect?)
@@ -281,6 +279,7 @@ public protocol CalendarDelegate: AnyObject {
     func didAddNewEvent(_ event: Event, _ date: Date?)
     func didDisplayEvents(_ events: [Event], dates: [Date?])
     func willSelectDate(_ date: Date, type: CalendarType)
+    func deselectEvent(_ event: Event, animated: Bool)
 }
 
 public extension CalendarDelegate {
@@ -293,6 +292,7 @@ public extension CalendarDelegate {
     func didAddNewEvent(_ event: Event, _ date: Date?) {}
     func didDisplayEvents(_ events: [Event], dates: [Date?]) {}
     func willSelectDate(_ date: Date, type: CalendarType) {}
+    func deselectEvent(_ event: Event, animated: Bool) {}
 }
 
 // MARK: - Date style protocol
