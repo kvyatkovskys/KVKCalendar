@@ -14,6 +14,7 @@ open class EventViewGeneral: UIView {
     public var event: Event
     public var color: UIColor
     public var style: Style
+    public var isSelected: Bool = false
     
     public init(style: Style, event: Event, frame: CGRect) {
         self.style = style
@@ -24,9 +25,10 @@ open class EventViewGeneral: UIView {
     }
     
     required public init?(coder: NSCoder) {
-        self.event = Event()
+        let event = Event(ID: "0")
+        self.event = event
         self.style = Style()
-        self.color = Event().backgroundColor
+        self.color = event.backgroundColor
         super.init(coder: coder)
     }
     
@@ -34,6 +36,7 @@ open class EventViewGeneral: UIView {
         setRoundCorners(style.timeline.eventCorners, radius: style.timeline.eventCornersRadius)
         backgroundColor = event.backgroundColor
         tag = event.hash
+        
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapOnEvent))
         addGestureRecognizer(tap)
         
@@ -96,6 +99,7 @@ protocol EventDelegate: class {
     func didEndMovingEvent(_ event: Event, gesture: UILongPressGestureRecognizer)
     func didChangeMovingEvent(_ event: Event, gesture: UILongPressGestureRecognizer)
     func didSelectEvent(_ event: Event, gesture: UITapGestureRecognizer)
+    func deselectEvent(_ event: Event)
 }
 
 protocol EventDataSource: class {

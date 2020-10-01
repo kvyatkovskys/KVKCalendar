@@ -34,7 +34,7 @@ final class ViewController: UIViewController {
             style.headerScroll.titleDateAligment = .center
             style.headerScroll.isAnimateTitleDate = true
         } else {
-            style.timeline.widthEventViewer = 500
+            style.timeline.widthEventViewer = 350
         }
         style.timeline.startFromFirstEvent = false
         style.followInSystemTheme = true
@@ -44,6 +44,9 @@ final class ViewController: UIViewController {
         style.startWeekDay = .sunday
         style.timeSystem = TimeHourSystem.currentSystemOnDevice ?? .twelve
         style.event.isEnableMoveEvent = true
+        if #available(iOS 13.0, *) {
+            style.event.iconFile = UIImage(systemName: "paperclip")
+        }
         return style
     }()
     
@@ -191,6 +194,10 @@ extension ViewController: CalendarDataSource {
         
         return CustomViewEvent(style: style, event: event, frame: frame)
     }
+    
+    func deselectEvent(_ event: Event, animated: Bool) {
+        print(event, animated)
+    }
 }
 
 extension ViewController {
@@ -207,8 +214,7 @@ extension ViewController {
             let startTime = self.timeFormatter(date: startDate)
             let endTime = self.timeFormatter(date: endDate)
             
-            var event = Event()
-            event.ID = item.id
+            var event = Event(ID: item.id)
             event.start = startDate
             event.end = endDate
             event.color = EventColor(item.color)

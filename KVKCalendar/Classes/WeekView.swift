@@ -36,13 +36,16 @@ final class WeekView: UIView {
         return view
     }()
     
-    private lazy var timelineView: TimelineView = {
+    lazy var timelineView: TimelineView = {
         var timelineFrame = frame
         timelineFrame.origin.y = scrollHeaderDay.frame.height
         timelineFrame.size.height -= scrollHeaderDay.frame.height
         let view = TimelineView(type: .week, timeHourSystem: data.timeSystem, style: style, frame: timelineFrame)
         view.delegate = self
         view.dataSource = self
+        view.deselectEvent = { [weak self] (event) in
+            self?.delegate?.deselectCalendarEvent(event)
+        }
         return view
     }()
     

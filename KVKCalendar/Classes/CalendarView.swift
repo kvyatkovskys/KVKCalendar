@@ -128,6 +128,17 @@ public final class CalendarView: UIView {
             yearView.setDate(date)
         }
     }
+    
+    public func deselectEvent(_ event: Event, animated: Bool) {
+        switch type {
+        case .day:
+            dayView.timelineView.deselectEvent(event, animated: animated)
+        case .week:
+            weekView.timelineView.deselectEvent(event, animated: animated)
+        default:
+            break
+        }
+    }
 }
 
 extension CalendarView: DisplayDataSource {
@@ -154,6 +165,10 @@ extension CalendarView: CalendarPrivateDelegate {
     
     func didSelectCalendarDate(_ date: Date?, type: CalendarType, frame: CGRect?) {
         delegate?.didSelectDate(date, type: type, frame: frame)
+    }
+    
+    func deselectCalendarEvent(_ event: Event) {
+        delegate?.deselectEvent(event, animated: true)
     }
     
     func didSelectCalendarEvent(_ event: Event, frame: CGRect?) {

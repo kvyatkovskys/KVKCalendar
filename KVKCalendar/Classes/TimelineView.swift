@@ -11,6 +11,9 @@ final class TimelineView: UIView, EventDateProtocol {
     
     weak var delegate: TimelineDelegate?
     weak var dataSource: DisplayDataSource?
+    
+    var deselectEvent: ((Event) -> Void)?
+    
     var style: Style
     var eventPreview: UIView?
     var firstAutoScrollIsCompleted = false
@@ -27,7 +30,8 @@ final class TimelineView: UIView, EventDateProtocol {
     private(set) var hours: [String]
     private let timeHourSystem: TimeHourSystem
     private var timer: Timer?
-    private var dates = [Date?]()
+    private(set) var events = [Event]()
+    private(set) var dates = [Date?]()
     private(set) var selectedDate: Date?
     private(set) var type: CalendarType
     
@@ -82,6 +86,9 @@ final class TimelineView: UIView, EventDateProtocol {
         let longTap = UILongPressGestureRecognizer(target: self, action: #selector(addNewEvent))
         longTap.minimumPressDuration = style.timeline.minimumPressDuration
         addGestureRecognizer(longTap)
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(forceDeselectEvent))
+        addGestureRecognizer(tap)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -239,6 +246,7 @@ final class TimelineView: UIView, EventDateProtocol {
     func create(dates: [Date?], events: [Event], selectedDate: Date?) {
         delegate?.didDisplayEvents(events, dates: dates)
         self.dates = dates
+        self.events = events
         self.selectedDate = selectedDate
         
         if style.allDay.isPinned {

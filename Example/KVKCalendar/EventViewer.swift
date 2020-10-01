@@ -18,6 +18,16 @@ final class EventViewer: UIView {
         return label
     }()
     
+    private let lineView: UIView = {
+        let view = UIView()
+        if #available(iOS 13.0, *) {
+            view.backgroundColor = .systemGray3
+        } else {
+            view.backgroundColor = .lightGray
+        }
+        return view
+    }()
+    
     var text: String? {
         didSet {
             textLabel.text = text
@@ -32,6 +42,7 @@ final class EventViewer: UIView {
             backgroundColor = .white
         }
         addSubview(textLabel)
+        addSubview(lineView)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -40,5 +51,6 @@ final class EventViewer: UIView {
     
     func reloadFrame(frame: CGRect) {
         textLabel.frame = frame
+        lineView.frame = CGRect(origin: .zero, size: CGSize(width: 1, height: frame.height))
     }
 }
