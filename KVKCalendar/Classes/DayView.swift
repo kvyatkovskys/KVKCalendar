@@ -64,7 +64,11 @@ final class DayView: UIView {
             heightView = style.headerScroll.heightHeaderWeek + style.headerScroll.heightTitleDate
         }
         let view = UIView(frame: CGRect(x: 0, y: 0, width: frame.width, height: heightView))
-        view.backgroundColor = style.headerScroll.colorBackground
+        if let blur = style.headerScroll.backgroundBlurStyle {
+            view.setBlur(style: blur)
+        } else {
+            view.backgroundColor = style.headerScroll.colorBackground
+        }
         return view
     }()
     

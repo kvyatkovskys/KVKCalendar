@@ -27,6 +27,7 @@ final class ScrollDayHeaderView: UIView {
         let label = UILabel()
         label.textAlignment = style.headerScroll.titleDateAligment
         label.textColor = style.headerScroll.colorTitleDate
+        label.font = style.headerScroll.titleDateFont
         return label
     }()
         
