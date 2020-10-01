@@ -62,6 +62,14 @@ extension UIScreen {
 }
 
 extension UIView {
+    func setBlur(style: UIBlurEffect.Style) {
+        let blur = UIBlurEffect(style: style)
+        let blurView = UIVisualEffectView(effect: blur)
+        blurView.frame = bounds
+        blurView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        addSubview(blurView)
+    }
+    
     func setRoundCorners(_ corners: UIRectCorner = .allCorners, radius: CGSize) {
         let path = UIBezierPath(roundedRect: bounds, byRoundingCorners: corners, cornerRadii: radius)
         let mask = CAShapeLayer()

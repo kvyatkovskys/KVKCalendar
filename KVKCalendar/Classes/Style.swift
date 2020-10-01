@@ -47,11 +47,7 @@ public struct HeaderScrollStyle {
     public var titleDays: [String] = []
     public var heightHeaderWeek: CGFloat = 70
     public var heightTitleDate: CGFloat = 30
-    
-    @available(swift, deprecated: 0.3.6, obsoleted: 0.3.7, renamed: "colorBackground")
-    public var backgroundColor: UIColor = gainsboro.withAlphaComponent(0.4)
     public var colorBackground: UIColor = gainsboro.withAlphaComponent(0.4)
-    
     public var isHiddenTitleDate: Bool = false
     public var isHiddenCornerTitleDate: Bool = true
     public lazy var formatterTitle: DateFormatter = formatFull
@@ -72,7 +68,9 @@ public struct HeaderScrollStyle {
     public var dotCorners: UIRectCorner = .allCorners
     public var dotCornersRadius: CGSize?
     public var titleDateAligment: NSTextAlignment = .left
+    public var titleDateFont: UIFont = .boldSystemFont(ofSize: 20)
     public var isAnimateTitleDate: Bool = false
+    var backgroundBlurStyle: UIBlurEffect.Style? = nil
 }
 
 public struct TimelineStyle {
@@ -150,7 +148,7 @@ public struct MonthStyle {
     public var colorMoreTitle: UIColor = .gray
     public var colorEventTitle: UIColor = .black
     public var weekFont: UIFont = .boldSystemFont(ofSize: 14)
-    public var fontEventTitle: UIFont = .systemFont(ofSize: 15)
+    public var fontEventTitle: UIFont = .systemFont(ofSize: 14)
     public var fontEventTime: UIFont = .systemFont(ofSize: 10)
     public var fontEventBullet: UIFont = .boldSystemFont(ofSize: 18)
     public var isHiddenSeporator: Bool = false
