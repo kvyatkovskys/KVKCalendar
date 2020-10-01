@@ -22,8 +22,8 @@ final class EventView: EventViewGeneral {
     
     private lazy var iconFileImageView: UIImageView = {
         let image = UIImageView(frame: CGRect(x: 0, y: 2, width: 10, height: 10))
-        image.image = style.timeline.iconFile?.withRenderingMode(.alwaysTemplate)
-        image.tintColor = style.timeline.colorIconFile
+        image.image = style.event.iconFile?.withRenderingMode(.alwaysTemplate)
+        image.tintColor = style.event.colorIconFile
         return image
     }()
     
@@ -44,12 +44,41 @@ final class EventView: EventViewGeneral {
         textFrame.size.width = textFrame.width - pointX
         textView.frame = textFrame
         textView.font = style.timeline.eventFont
-        textView.textColor = event.textColor
         textView.text = event.text
+        
+        if isSelected {
+            backgroundColor = color
+            textView.textColor = UIColor.white
+        } else {
+            textView.textColor = event.textColor
+        }
         
         if textView.frame.width > 20 {
             addSubview(textView)
         }
+    }
+    
+    override func tapOnEvent(gesture: UITapGestureRecognizer) {
+        guard !isSelected else {
+            delegate?.deselectEvent(event)
+            deselectEvent()
+            return
+        }
+        
+        delegate?.didSelectEvent(event, gesture: gesture)
+        selectEvent()
+    }
+    
+    func selectEvent() {
+        backgroundColor = color
+        isSelected = true
+        textView.textColor = UIColor.white
+    }
+    
+    func deselectEvent() {
+        backgroundColor = event.backgroundColor
+        isSelected = false
+        textView.textColor = event.textColor
     }
     
     required init?(coder aDecoder: NSCoder) {

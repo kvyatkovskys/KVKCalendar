@@ -14,6 +14,32 @@ extension TimelineView {
 }
 
 extension TimelineView {
+    @objc func forceDeselectEvent() {
+        guard let eventViewGeneral = scrollView.subviews.first(where: { ($0 as? EventViewGeneral)?.isSelected == true }) as? EventViewGeneral else { return }
+        
+        guard let eventView = eventViewGeneral as? EventView else {
+            deselectEvent?(eventViewGeneral.event)
+            return
+        }
+        
+        eventView.deselectEvent()
+    }
+    
+    func reloadData() {
+        create(dates: dates, events: events, selectedDate: selectedDate)
+    }
+    
+    func deselectEvent(_ event: Event, animated: Bool) {
+        guard let eventViewGeneral = scrollView.subviews.first(where: { ($0 as? EventViewGeneral)?.event.ID == event.ID }) as? EventViewGeneral else { return }
+        
+        guard let eventView = eventViewGeneral as? EventView else {
+            deselectEvent?(eventViewGeneral.event)
+            return
+        }
+        
+        eventView.deselectEvent()
+    }
+    
     func createAllDayEvents(events: [Event], date: Date?, width: CGFloat, originX: CGFloat) {
         guard !events.isEmpty else { return }
         let pointY = style.allDay.isPinned ? 0 : -style.allDay.height
@@ -227,7 +253,12 @@ extension TimelineView: EventDelegate {
         return eventPreviewSize.height * 0.7
     }
     
+    func deselectEvent(_ event: Event) {
+        deselectEvent?(event)
+    }
+    
     func didSelectEvent(_ event: Event, gesture: UITapGestureRecognizer) {
+        forceDeselectEvent()
         delegate?.didSelectEvent(event, frame: gesture.view?.frame)
     }
     

@@ -91,8 +91,12 @@ public struct TimelineStyle {
     public var timeFont: UIFont = .systemFont(ofSize: 12)
     public var scrollToCurrentHour: Bool = true
     public var widthEventViewer: CGFloat = 0
+    
+    @available(swift, deprecated: 0.3.7, obsoleted: 0.3.8, message: "")
     public var iconFile: UIImage? = nil
+    @available(swift, deprecated: 0.3.7, obsoleted: 0.3.8, message: "")
     public var colorIconFile: UIColor = .black
+    
     public var showCurrentLineHour: Bool = true
     public var currentLineHourFont: UIFont = .systemFont(ofSize: 12)
     public var currentLineHourColor: UIColor = .red
@@ -221,7 +225,7 @@ public struct YearStyle {
 }
 
 public struct AllDayStyle {
-    public var backgroundColor: UIColor = .gray
+    public var backgroundColor: UIColor = .lightGray
     public var titleText: String = "all-day"
     public var titleColor: UIColor = .black
     public var textColor: UIColor = .black
@@ -241,6 +245,9 @@ public struct EventStyle {
     public var minimumPressDuration: TimeInterval = 0.5
     public var alphaWhileMoving: CGFloat = 0.5
     public var textForNewEvent: String = "New Event"
+    public var iconFile: UIImage? = nil
+    public var colorIconFile: UIColor = .black
+    
     var isEnableContextMenu: Bool = false
 }
 
@@ -251,6 +258,9 @@ extension Style {
         var newStyle = self
         if #available(iOS 13.0, *) {
             let colorBackgroundWeekend = UIColor.useForStyle(dark: .systemGray6, white: gainsboro.withAlphaComponent(0.2))
+            
+            // event
+            newStyle.event.colorIconFile = UIColor.useForStyle(dark: .systemGray, white: newStyle.event.colorIconFile)
             
             // header
             newStyle.headerScroll.colorBackground = UIColor.useForStyle(dark: .black, white: newStyle.headerScroll.colorBackground)
@@ -267,7 +277,6 @@ extension Style {
             // timeline
             newStyle.timeline.backgroundColor = UIColor.useForStyle(dark: .black, white: newStyle.timeline.backgroundColor)
             newStyle.timeline.timeColor = UIColor.useForStyle(dark: .systemGray, white: newStyle.timeline.timeColor)
-            newStyle.timeline.colorIconFile = UIColor.useForStyle(dark: .systemGray, white: newStyle.timeline.colorIconFile)
             newStyle.timeline.currentLineHourColor = UIColor.useForStyle(dark: .systemRed, white: newStyle.timeline.currentLineHourColor)
             
             // week
@@ -307,7 +316,7 @@ extension Style {
             newStyle.year.colorDayTitle = UIColor.useForStyle(dark: .systemGray, white: .black)
             
             // all day
-            newStyle.allDay.backgroundColor = .systemGray
+            newStyle.allDay.backgroundColor = .systemGray3
             newStyle.allDay.titleColor = UIColor.useForStyle(dark: .white, white: .black)
             newStyle.allDay.textColor = UIColor.useForStyle(dark: .white, white: .black)
         }

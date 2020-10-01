@@ -35,7 +35,7 @@ final class DayView: UIView {
         return view
     }()
     
-    private lazy var timelineView: TimelineView = {
+    lazy var timelineView: TimelineView = {
         var timelineFrame = frame
         
         if !style.headerScroll.isHidden {
@@ -53,6 +53,9 @@ final class DayView: UIView {
         let view = TimelineView(type: .day, timeHourSystem: data.timeSystem, style: style, frame: timelineFrame)
         view.delegate = self
         view.dataSource = self
+        view.deselectEvent = { [weak self] (event) in
+            self?.delegate?.deselectCalendarEvent(event)
+        }
         return view
     }()
     
