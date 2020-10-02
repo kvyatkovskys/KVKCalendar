@@ -33,6 +33,7 @@ final class ViewController: UIViewController {
             style.timeline.offsetLineLeft = 2
             style.headerScroll.titleDateAligment = .center
             style.headerScroll.isAnimateTitleDate = true
+            style.event.isEnableVisualSelect = false
         } else {
             style.timeline.widthEventViewer = 350
             style.headerScroll.fontDate = .systemFont(ofSize: 17)
@@ -201,11 +202,11 @@ extension ViewController: CalendarDataSource {
         return CustomViewEvent(style: style, event: event, frame: frame)
     }
     
-    func configureScrollDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? {
+    func dequeueScrollDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? {
         guard date?.day == Date().day else { return nil }
         
-        return collectionView.dequeueCell(indexPath: indexPath) { (cell: ScrollHeaderDayCell) in
-            
+        return collectionView.dequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
+            cell.imageView.image = UIImage(named: "ic_stub")
         }
     }
 }

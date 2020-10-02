@@ -244,17 +244,19 @@ protocol CalendarPrivateDelegate: class {
 public protocol CalendarDataSource: class {
     func eventsForCalendar() -> [Event]
     
+    /// To change a style for month view use this method
     func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle?
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral?
     
-    func configureScrollDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell?
+    /// Use this method to add a custom cell for scrolling day header
+    func dequeueScrollDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell?
 }
 
 public extension CalendarDataSource {
     func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? { return nil }
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? { return nil }
     
-    func configureScrollDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? { return nil }
+    func dequeueScrollDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? { return nil }
 }
 
 // MARK: - Display data source
@@ -263,14 +265,14 @@ protocol DisplayDataSource: class {
     func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle?
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral?
     
-    func configureScrollDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell?
+    func dequeueScrollDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell?
     
     @available(iOS 13.0, *)
     func willDisplayContextMenu(_ event: Event, date: Date?) -> UIContextMenuConfiguration?
 }
 
 extension DisplayDataSource {
-    func configureScrollDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? { return nil }
+    func dequeueScrollDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? { return nil }
     
     func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? { return nil }
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? { return nil }
