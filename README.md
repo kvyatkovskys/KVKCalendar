@@ -131,7 +131,18 @@ func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventVi
 
 <img src="Screenshots/custom_event_view.png" width="300">
 
-Control a specific style for date.
+To use a custom cell for scroll day view, just subscribe on this optional method from `CalendarDataSourcse`.
+```swift
+func dequeueScrollDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? {    
+    return collectionView.dequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
+        configurate a cell
+    }
+}
+```
+
+<img src="Screenshots/custom_day_cell.png" width="300">
+
+Control a specific style for date (works only for month view).
 ```swift
 // optional function from CalendarDataSource
 func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? {

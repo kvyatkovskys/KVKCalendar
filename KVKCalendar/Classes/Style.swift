@@ -94,9 +94,9 @@ public struct TimelineStyle {
     public var scrollToCurrentHour: Bool = true
     public var widthEventViewer: CGFloat = 0
     
-    @available(swift, deprecated: 0.3.7, obsoleted: 0.3.8, message: "")
+    @available(swift, deprecated: 0.3.7, obsoleted: 0.3.8, message: "Moved to Event style struct")
     public var iconFile: UIImage? = nil
-    @available(swift, deprecated: 0.3.7, obsoleted: 0.3.8, message: "")
+    @available(swift, deprecated: 0.3.7, obsoleted: 0.3.8, message: "Moved to Event style struct")
     public var colorIconFile: UIColor = .black
     
     public var showCurrentLineHour: Bool = true
@@ -249,6 +249,7 @@ public struct EventStyle {
     public var textForNewEvent: String = "New Event"
     public var iconFile: UIImage? = nil
     public var colorIconFile: UIColor = .black
+    public var isEnableVisualSelect: Bool = true
     
     var isEnableContextMenu: Bool = false
 }
