@@ -1,17 +1,17 @@
-//
-//  ScrollHeaderDayCell.swift
-//  KVKCalendar
-//
-//  Created by Sergei Kviatkovskii on 02/01/2019.
-//
+////
+////  ScrollHeaderDayCell.swift
+////  KVKCalendar
+////
+////  Created by Sergei Kviatkovskii on 02/01/2019.
+////
 
 import UIKit
 
-final class ScrollHeaderDayCell: UICollectionViewCell {
+final public class ScrollHeaderDayCell: UICollectionViewCell {
     
-    private let heightDate: CGFloat = 35
-    private let heightTitle: CGFloat = 25
-    
+    private(set) var heightDate: CGFloat = 35
+    private(set) var heightTitle: CGFloat = 25
+
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
@@ -19,7 +19,7 @@ final class ScrollHeaderDayCell: UICollectionViewCell {
         label.textColor = headerStyle.colorNameDay
         return label
     }()
-    
+
     private lazy var dateLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
@@ -28,20 +28,20 @@ final class ScrollHeaderDayCell: UICollectionViewCell {
         label.clipsToBounds = true
         return label
     }()
-    
+
     var dotView: UIView = {
         let view = UIView()
         return view
     }()
-    
+
     private var headerStyle = HeaderScrollStyle()
-    
+
     var style = Style() {
         didSet {
             headerStyle = style.headerScroll
         }
     }
-    
+
     var item: DayStyle = DayStyle(.empty(), nil) {
         didSet {
             guard let tempDay = item.day.date?.day else {
@@ -49,7 +49,7 @@ final class ScrollHeaderDayCell: UICollectionViewCell {
                 dateLabel.text = nil
                 return
             }
-            
+
             if !headerStyle.titleDays.isEmpty, let title = headerStyle.titleDays[safe: item.day.type.shiftDay] {
                 titleLabel.text = title
             } else {
@@ -59,7 +59,7 @@ final class ScrollHeaderDayCell: UICollectionViewCell {
             populateCell(item)
         }
     }
-    
+
     var selectDate: Date = Date() {
         didSet {
             let nowDate = Date()
@@ -76,7 +76,7 @@ final class ScrollHeaderDayCell: UICollectionViewCell {
                 }
                 return
             }
-            
+
             // select date not in the current month
             guard item.day.date?.month == selectDate.month, item.day.date?.day == selectDate.day else {
                 populateCell(item)
@@ -86,16 +86,16 @@ final class ScrollHeaderDayCell: UICollectionViewCell {
             dotView.backgroundColor = item.style?.dotBackgroundColor ?? headerStyle.colorBackgroundSelectDate
         }
     }
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
+
         var titleFrame = frame
         titleFrame.origin.x = 0
         titleFrame.origin.y = 0
         titleFrame.size.height = titleFrame.height > heightTitle ? heightTitle : titleFrame.height / 2 - 10
         titleLabel.frame = titleFrame
-        
+
         var dateFrame = frame
         dateFrame.size.height = frame.height > heightDate ? heightDate : frame.height / 2
         dateFrame.size.width = heightDate
@@ -103,36 +103,38 @@ final class ScrollHeaderDayCell: UICollectionViewCell {
         dateFrame.origin.x = (frame.width / 2) - (dateFrame.width / 2)
         dotView.frame = dateFrame
         dateLabel.frame = CGRect(origin: .zero, size: dateFrame.size)
-        
+
         dotView.addSubview(dateLabel)
         addSubview(titleLabel)
         addSubview(dotView)
-        
+
         if let radius = headerStyle.dotCornersRadius {
             dotView.setRoundCorners(headerStyle.dotCorners, radius: radius)
         } else {
             let value = dotView.frame.width / 2
             dotView.setRoundCorners(headerStyle.dotCorners, radius: CGSize(width: value, height: value))
         }
+        
+        backgroundColor = .systemRed
     }
-    
+
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func populateCell(_ item: DayStyle) {
         guard item.day.type == .saturday || item.day.type == .sunday else {
             populateDay(date: item.day.date, colorText: item.style?.textColor ?? headerStyle.colorDate, style: item.style)
             titleLabel.textColor = headerStyle.colorDate
-            backgroundColor = item.style?.backgroundColor ?? headerStyle.colorWeekdayBackground
+            backgroundColor = .systemRed//item.style?.backgroundColor ?? headerStyle.colorWeekdayBackground
             return
         }
-        
+
         populateDay(date: item.day.date, colorText: item.style?.textColor ?? headerStyle.colorWeekendDate, style: item.style)
         titleLabel.textColor = headerStyle.colorWeekendDate
-        backgroundColor = item.style?.backgroundColor ?? headerStyle.colorWeekendBackground
+        backgroundColor = .systemRed//item.style?.backgroundColor ?? headerStyle.colorWeekendBackground
     }
-    
+
     private func populateDay(date: Date?, colorText: UIColor, style: DateStyle?) {
         let nowDate = Date()
         if date?.month == nowDate.month, date?.day == nowDate.day, date?.year == nowDate.year {

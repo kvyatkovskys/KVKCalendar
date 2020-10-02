@@ -35,6 +35,8 @@ final class ViewController: UIViewController {
             style.headerScroll.isAnimateTitleDate = true
         } else {
             style.timeline.widthEventViewer = 350
+            style.headerScroll.fontDate = .systemFont(ofSize: 17)
+            style.headerScroll.fontNameDay = .systemFont(ofSize: 17)
         }
         style.timeline.startFromFirstEvent = false
         style.followInSystemTheme = true
@@ -150,6 +152,10 @@ extension ViewController: CalendarDelegate {
         }
     }
     
+    func deselectEvent(_ event: Event, animated: Bool) {
+        print(event, animated)
+    }
+    
     func didSelectMore(_ date: Date, frame: CGRect?) {
         print(date)
     }
@@ -195,8 +201,12 @@ extension ViewController: CalendarDataSource {
         return CustomViewEvent(style: style, event: event, frame: frame)
     }
     
-    func deselectEvent(_ event: Event, animated: Bool) {
-        print(event, animated)
+    func configureScrollDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? {
+        guard date?.day == Date().day else { return nil }
+        
+        return collectionView.dequeueCell(indexPath: indexPath) { (cell: ScrollHeaderDayCell) in
+            
+        }
     }
 }
 
