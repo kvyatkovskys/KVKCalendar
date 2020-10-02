@@ -66,7 +66,10 @@ final class EventView: EventViewGeneral {
         }
         
         delegate?.didSelectEvent(event, gesture: gesture)
-        selectEvent()
+        
+        if style.event.isEnableVisualSelect {
+            selectEvent()
+        }
     }
     
     func selectEvent() {

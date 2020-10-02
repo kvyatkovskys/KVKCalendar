@@ -16,6 +16,7 @@
 		EB7697CCE6961FA0161D3D2B /* Pods_KVKCalendar_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDF73D449FF3DFB1BF1063AD /* Pods_KVKCalendar_Example.framework */; };
 		F91321AA21DE6CE60076B714 /* events.json in Resources */ = {isa = PBXBuildFile; fileRef = F91321A921DE6CE60076B714 /* events.json */; };
 		F91321AC21DF64DF0076B714 /* EventViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91321AB21DF64DF0076B714 /* EventViewer.swift */; };
+		F95EFF3A25277B4600EA6748 /* CustomDayCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F95EFF3925277B4600EA6748 /* CustomDayCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +50,7 @@
 		CDF73D449FF3DFB1BF1063AD /* Pods_KVKCalendar_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KVKCalendar_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F91321A921DE6CE60076B714 /* events.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = events.json; sourceTree = "<group>"; };
 		F91321AB21DF64DF0076B714 /* EventViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventViewer.swift; sourceTree = "<group>"; };
+		F95EFF3925277B4600EA6748 /* CustomDayCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDayCell.swift; sourceTree = "<group>"; };
 		F9FD62A624A8101300BDF807 /* KVKCalendar_Example.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KVKCalendar_Example.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -99,6 +101,7 @@
 			children = (
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
+				F95EFF3925277B4600EA6748 /* CustomDayCell.swift */,
 				F91321AB21DF64DF0076B714 /* EventViewer.swift */,
 				F91321A921DE6CE60076B714 /* events.json */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
@@ -356,6 +359,7 @@
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
 				F91321AC21DF64DF0076B714 /* EventViewer.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
+				F95EFF3A25277B4600EA6748 /* CustomDayCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

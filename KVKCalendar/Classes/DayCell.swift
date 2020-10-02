@@ -39,7 +39,7 @@ class DayCell: UICollectionViewCell {
             dateLabel.textColor = style.headerScroll.colorDate
         }
     }
-    
+        
     var day: Day = .empty() {
         didSet {
             guard let tempDay = day.date?.day else {
@@ -66,11 +66,13 @@ class DayCell: UICollectionViewCell {
                 if selectDate.day != nowDate.day, day.date?.day == nowDate.day, day.date?.year == nowDate.year {
                     dateLabel.textColor = style.headerScroll.colorBackgroundCurrentDate
                     dotView.backgroundColor = .clear
+                    isSelected = false
                 }
                 // mark the selected date, which is not the same as the current one
                 if day.date?.month == selectDate.month, day.date?.day == selectDate.day, selectDate.day != nowDate.day {
                     dateLabel.textColor = style.headerScroll.colorSelectDate
                     dotView.backgroundColor = style.headerScroll.colorBackgroundSelectDate
+                    isSelected = true
                 }
                 return
             }
@@ -82,6 +84,7 @@ class DayCell: UICollectionViewCell {
             }
             dateLabel.textColor = style.headerScroll.colorSelectDate
             dotView.backgroundColor = style.headerScroll.colorBackgroundSelectDate
+            isSelected = true
         }
     }
     
@@ -115,5 +118,6 @@ class DayCell: UICollectionViewCell {
             dateLabel.textColor = colorText
             dotView.backgroundColor = .clear
         }
+        isSelected = false
     }
 }

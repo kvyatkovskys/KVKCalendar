@@ -191,12 +191,12 @@ extension ScrollDayHeaderView: CalendarSettingProtocol {
             newFrame.origin.y = 0
             
             if !style.headerScroll.isHiddenTitleDate {
-                titleLabel.frame = CGRect(x: 10, y: self.frame.height - style.headerScroll.heightTitleDate - 5, width: self.frame.width - 20, height: style.headerScroll.heightTitleDate - 5)
+                titleLabel.frame = CGRect(x: 10, y: (self.frame.height - style.headerScroll.heightTitleDate) - 5, width: self.frame.width - 20, height: style.headerScroll.heightTitleDate - 5)
                 
                 setDateToTitle(date)
                 addSubview(titleLabel)
                 
-                newFrame.size.height = self.frame.height - titleLabel.frame.height
+                newFrame.size.height = (self.frame.height - titleLabel.frame.height) - titleLabel.frame.origin.x
             }
         default:
             if !style.headerScroll.isHiddenTitleDate {
@@ -245,18 +245,16 @@ extension ScrollDayHeaderView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let day = days[indexPath.row]
         
-        if let cell = dataSource?.configureScrollDayCell(date: day.date, type: type, collectionView: collectionView, indexPath: indexPath) {
+        if let cell = dataSource?.dequeueScrollDayCell(date: day.date, type: type, collectionView: collectionView, indexPath: indexPath) {
             return cell
         } else {
             switch UIDevice.current.userInterfaceIdiom {
             case .phone:
-                return UICollectionViewCell()
-    //            return collectionView.dequeueCell(indexPath: indexPath) { (cell: DayPhoneCell) in
-    //                collectionView.register(DayPhoneCell.self)
-    //                cell.style = style
-    //                cell.day = day
-    //                cell.selectDate = date
-    //            }
+                return collectionView.dequeueCell(indexPath: indexPath) { (cell: DayPhoneCell) in
+                    cell.phoneStyle = style
+                    cell.day = day
+                    cell.selectDate = date
+                }
             default:
                 return collectionView.dequeueCell(indexPath: indexPath) { (cell: DayPadCell) in
                     cell.padStyle = style

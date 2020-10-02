@@ -150,8 +150,8 @@ extension CalendarView: DisplayDataSource {
         return dataSource?.willDisplayDate(date, events: events)
     }
     
-    func configureScrollDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? {
-        return dataSource?.configureScrollDayCell(date: date, type: type, collectionView: collectionView, indexPath: indexPath)
+    func dequeueScrollDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? {
+        return dataSource?.dequeueScrollDayCell(date: date, type: type, collectionView: collectionView, indexPath: indexPath)
     }
     
     @available(iOS 13.0, *)
