@@ -243,13 +243,18 @@ protocol CalendarPrivateDelegate: class {
 
 public protocol CalendarDataSource: class {
     func eventsForCalendar() -> [Event]
+    
     func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle?
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral?
+    
+    func configureScrollDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell?
 }
 
 public extension CalendarDataSource {
     func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? { return nil }
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? { return nil }
+    
+    func configureScrollDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? { return nil }
 }
 
 // MARK: - Display data source
@@ -257,13 +262,19 @@ public extension CalendarDataSource {
 protocol DisplayDataSource: class {
     func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle?
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral?
+    
+    func configureScrollDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell?
+    
     @available(iOS 13.0, *)
     func willDisplayContextMenu(_ event: Event, date: Date?) -> UIContextMenuConfiguration?
 }
 
 extension DisplayDataSource {
+    func configureScrollDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? { return nil }
+    
     func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? { return nil }
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? { return nil }
+    
     @available(iOS 13.0, *)
     func willDisplayContextMenu(_ event: Event, date: Date?) -> UIContextMenuConfiguration? { return nil }
 }
@@ -311,8 +322,8 @@ public struct DateStyle {
 
 typealias DayStyle = (day: Day, style: DateStyle?)
 
-protocol DayStyleProtocol: class {
+protocol DayStyleProtocol: class {    
     associatedtype Model
-        
+    
     func styleForDay(_ day: Day) -> Model
 }

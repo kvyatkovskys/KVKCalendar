@@ -150,6 +150,10 @@ extension CalendarView: DisplayDataSource {
         return dataSource?.willDisplayDate(date, events: events)
     }
     
+    func configureScrollDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? {
+        return dataSource?.configureScrollDayCell(date: date, type: type, collectionView: collectionView, indexPath: indexPath)
+    }
+    
     @available(iOS 13.0, *)
     func willDisplayContextMenu(_ event: Event, date: Date?) -> UIContextMenuConfiguration? {
         return nil //dataSource?.willDisplayContextMenu(event, date: date)
