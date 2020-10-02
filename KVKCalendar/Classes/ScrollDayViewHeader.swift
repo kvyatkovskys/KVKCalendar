@@ -151,7 +151,6 @@ final class ScrollDayHeaderView: UIView {
         collection.delegate = self
         collection.dataSource = self
         collection.isScrollEnabled = isScrollEnabled
-        collection.register(ScrollHeaderDayCell.self)
         return collection
     }
     
@@ -203,7 +202,7 @@ extension ScrollDayHeaderView: CalendarSettingProtocol {
             if !style.headerScroll.isHiddenTitleDate {
                 titleLabel.frame = CGRect(x: 10, y: 5, width: self.frame.width - 20, height: titleLabel.frame.height)
                 newFrame.origin.y = titleLabel.frame.height + 5
-                newFrame.size.height = frame.height - newFrame.origin.y
+                newFrame.size.height = self.frame.height - newFrame.origin.y
             } else {
                 newFrame.origin.y = 0
             }
@@ -232,11 +231,6 @@ extension ScrollDayHeaderView: CalendarSettingProtocol {
     private func getScrollDate(_ date: Date) -> Date? {
         return style.startWeekDay == .sunday ? date.startSundayOfWeek : date.startMondayOfWeek
     }
-    
-    private func getMiddleIndexPath() -> IndexPath? {
-        let rect = CGRect(origin: collectionView.contentOffset, size: collectionView.bounds.size)
-        return collectionView.indexPathForItem(at: CGPoint(x: rect.midX, y: rect.midY))
-    }
 }
 
 extension ScrollDayHeaderView: UICollectionViewDataSource {
@@ -249,13 +243,28 @@ extension ScrollDayHeaderView: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ScrollHeaderDayCell.identifier,
-                                                      for: indexPath) as? ScrollHeaderDayCell ?? ScrollHeaderDayCell()
         let day = days[indexPath.row]
-        cell.style = style
-        cell.item = styleForDay(day)
-        cell.selectDate = date
-        return cell
+        
+        if let cell = dataSource?.configureScrollDayCell(date: day.date, type: type, collectionView: collectionView, indexPath: indexPath) {
+            return cell
+        } else {
+            switch UIDevice.current.userInterfaceIdiom {
+            case .phone:
+                return UICollectionViewCell()
+    //            return collectionView.dequeueCell(indexPath: indexPath) { (cell: DayPhoneCell) in
+    //                collectionView.register(DayPhoneCell.self)
+    //                cell.style = style
+    //                cell.day = day
+    //                cell.selectDate = date
+    //            }
+            default:
+                return collectionView.dequeueCell(indexPath: indexPath) { (cell: DayPadCell) in
+                    cell.padStyle = style
+                    cell.day = day
+                    cell.selectDate = date
+                }
+            }
+        }
     }
 }
 

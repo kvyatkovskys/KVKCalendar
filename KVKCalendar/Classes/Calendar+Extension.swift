@@ -31,12 +31,16 @@ extension Collection {
 }
 
 extension UICollectionView {
-    func register(_ cell: UICollectionViewCell.Type) {
-        register(cell, forCellWithReuseIdentifier: cell.identifier)
+    func reuseIndentifier<T>(for type: T.Type) -> String {
+        return String(describing: type)
+    }
+    
+    func register<T: UICollectionViewCell>(_ cell: T.Type) {
+        register(T.self, forCellWithReuseIdentifier: cell.identifier)
     }
 }
 
-extension UICollectionViewCell {
+public extension UICollectionViewCell {
     static var identifier: String {
         return String(describing: self)
     }
@@ -83,5 +87,23 @@ extension UIView {
             drawHierarchy(in: bounds, afterScreenUpdates: false)
         }
         return image
+    }
+}
+
+public extension UICollectionView {
+    func dequeueCell<T: UICollectionViewCell>(id: String = T.identifier,
+                                              indexPath: IndexPath,
+                                              configure: (T) -> Void) -> T {
+        register(T.self)
+        
+        let cell: T
+        if let dequeued = dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as? T {
+            cell = dequeued
+        } else {
+            cell = T(frame: .zero)
+        }
+        
+        configure(cell)
+        return cell
     }
 }
