@@ -245,7 +245,7 @@ extension ScrollDayHeaderView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let day = days[indexPath.row]
         
-        if let cell = dataSource?.dequeueScrollDayCell(date: day.date, type: type, collectionView: collectionView, indexPath: indexPath) {
+        if let cell = dataSource?.dequeueDayCell(date: day.date, type: type, collectionView: collectionView, indexPath: indexPath) {
             return cell
         } else {
             switch UIDevice.current.userInterfaceIdiom {
@@ -340,15 +340,5 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
         let widht = collectionView.frame.width / 7
         let height = collectionView.frame.height
         return CGSize(width: widht, height: height)
-    }
-}
-
-extension ScrollDayHeaderView: DayStyleProtocol {
-    typealias Model = DayStyle
-    
-    func styleForDay(_ day: Day) -> DayStyle {
-        guard let item = dataSource?.willDisplayDate(day.date, events: day.events) else { return DayStyle(day, nil) }
-        
-        return DayStyle(day, item)
     }
 }

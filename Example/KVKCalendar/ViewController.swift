@@ -34,6 +34,7 @@ final class ViewController: UIViewController {
             style.headerScroll.titleDateAligment = .center
             style.headerScroll.isAnimateTitleDate = true
             style.event.isEnableVisualSelect = false
+            style.month.isHiddenTitle = true
         } else {
             style.timeline.widthEventViewer = 350
             style.headerScroll.fontDate = .systemFont(ofSize: 17)
@@ -186,23 +187,13 @@ extension ViewController: CalendarDataSource {
         return events
     }
     
-    private var dates: [Date] {
-        return Array(0...10).compactMap({ Calendar.current.date(byAdding: .day, value: $0, to: Date()) })
-    }
-    
-    func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? {
-        guard dates.first(where: { $0.year == date?.year && $0.month == date?.month && $0.day == date?.day }) != nil else { return nil }
-        
-        return DateStyle(backgroundColor: .orange, textColor: .black, dotBackgroundColor: .red)
-    }
-    
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? {
         guard event.ID == "2" else { return nil }
         
         return CustomViewEvent(style: style, event: event, frame: frame)
     }
     
-    func dequeueScrollDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? {
+    func dequeueDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? {
         guard date?.day == Date().day else { return nil }
         
         return collectionView.dequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in

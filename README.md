@@ -131,9 +131,9 @@ func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventVi
 
 <img src="Screenshots/custom_event_view.png" width="300">
 
-To use a custom cell for scroll day view, just subscribe on this optional method from `CalendarDataSourcse`.
+To use a custom day cell, just subscribe on this optional method from `CalendarDataSourcse`.
 ```swift
-func dequeueScrollDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? {    
+func dequeueDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? {    
     return collectionView.dequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
         configurate a cell
     }
@@ -141,21 +141,6 @@ func dequeueScrollDayCell(date: Date?, type: CalendarType, collectionView: UICol
 ```
 
 <img src="Screenshots/custom_day_cell.png" width="300">
-
-Control a specific style for date (works only for month view).
-```swift
-// optional function from CalendarDataSource
-func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? {
-    // dates -> specific dates
-    guard dates.first(where: { $0.year == date?.year && $0.month == date?.month && $0.day == date?.day }) != nil else { return nil }
-        
-    // DateStyle
-    // - backgroundColor = cell background color
-    // - textColor = cell text color
-    // - dotBackgroundColor = selected date dot color
-    return DateStyle(backgroundColor: .orange, textColor: .black, dotBackgroundColor: .red)
-}
-```
 
 To add a new event, you need to subcribe on this method from `CalendarDelegate` and just press & hold on empty space in the calendar.
 

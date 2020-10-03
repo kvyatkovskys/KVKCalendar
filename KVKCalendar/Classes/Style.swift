@@ -171,6 +171,7 @@ public struct MonthStyle {
     public var eventCorners: UIRectCorner = .allCorners
     public var eventCornersRadius: CGSize = CGSize(width: 5, height: 5)
     public var isHiddenDotInTitle: Bool = false
+    public var isHiddenTitle: Bool = false
     public var weekDayAligment: NSTextAlignment = .right
     public var titleDateAligment: NSTextAlignment = .left
     public var fontTitleDate: UIFont = .boldSystemFont(ofSize: 20)

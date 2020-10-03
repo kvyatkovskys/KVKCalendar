@@ -137,11 +137,9 @@ final class MonthCell: UICollectionViewCell {
         }
     }
     
-    var item: DayStyle? = nil {
+    var day: Day = .empty() {
         didSet {
-            guard let value = item else { return }
-            
-            if let tempDay = value.day.date?.day {
+            if let tempDay = day.date?.day {
                 dateLabel.text = "\(tempDay)"
             } else {
                 dateLabel.text = nil
@@ -153,7 +151,7 @@ final class MonthCell: UICollectionViewCell {
                     topLineLayer.backgroundColor = monthStyle.colorSeporator.cgColor
                     layer.addSublayer(topLineLayer)
                 } else {
-                    if value.day.type != .empty {
+                    if day.type != .empty {
                         layer.borderWidth = monthStyle.isHiddenSeporatorOnEmptyDate ? 0 : monthStyle.widthSeporator
                         layer.borderColor = monthStyle.isHiddenSeporatorOnEmptyDate ? UIColor.clear.cgColor : monthStyle.colorSeporator.cgColor
                     } else {
@@ -162,7 +160,7 @@ final class MonthCell: UICollectionViewCell {
                     }
                 }
             }
-            populateCell(cellStyle: value, label: dateLabel, view: self)
+            populateCell(day: day, label: dateLabel, view: self)
         }
     }
     
@@ -245,25 +243,25 @@ final class MonthCell: UICollectionViewCell {
         }
     }
     
-    private func populateCell(cellStyle: DayStyle, label: UILabel, view: UIView) {
-        let date = cellStyle.day.date
-        let weekend = cellStyle.day.type == .saturday || cellStyle.day.type == .sunday
+    private func populateCell(day: Day, label: UILabel, view: UIView) {
+        let date = day.date
+        let weekend = day.type == .saturday || day.type == .sunday
         
         let nowDate = Date()
         label.backgroundColor = .clear
         
         if weekend {
-            label.textColor = cellStyle.style?.textColor ?? monthStyle.colorWeekendDate
-            view.backgroundColor = cellStyle.style?.backgroundColor ?? monthStyle.colorBackgroundWeekendDate
+            label.textColor = monthStyle.colorWeekendDate
+            view.backgroundColor = monthStyle.colorBackgroundWeekendDate
         } else {
-            view.backgroundColor = cellStyle.style?.backgroundColor ?? monthStyle.colorBackgroundDate
-            label.textColor = cellStyle.style?.textColor ?? monthStyle.colorDate
+            view.backgroundColor = monthStyle.colorBackgroundDate
+            label.textColor = monthStyle.colorDate
         }
         
         guard date?.year == nowDate.year else {
             if date?.year == selectDate.year && date?.month == selectDate.month && date?.day == selectDate.day {
-                label.textColor = cellStyle.style?.textColor ?? monthStyle.colorSelectDate
-                label.backgroundColor = cellStyle.style?.dotBackgroundColor ?? monthStyle.colorBackgroundSelectDate
+                label.textColor = monthStyle.colorSelectDate
+                label.backgroundColor = monthStyle.colorBackgroundSelectDate
                 label.layer.cornerRadius = label.frame.height / 2
                 label.clipsToBounds = true
             }
@@ -272,8 +270,8 @@ final class MonthCell: UICollectionViewCell {
         
         guard date?.month == nowDate.month else {
             if selectDate.day == date?.day && selectDate.month == date?.month {
-                label.textColor = cellStyle.style?.textColor ?? monthStyle.colorSelectDate
-                label.backgroundColor = cellStyle.style?.dotBackgroundColor ?? monthStyle.colorBackgroundSelectDate
+                label.textColor = monthStyle.colorSelectDate
+                label.backgroundColor = monthStyle.colorBackgroundSelectDate
                 label.layer.cornerRadius = label.frame.height / 2
                 label.clipsToBounds = true
             }
@@ -282,8 +280,8 @@ final class MonthCell: UICollectionViewCell {
         
         guard date?.day == nowDate.day else {
             if selectDate.day == date?.day && date?.month == selectDate.month {
-                label.textColor = cellStyle.style?.textColor ?? monthStyle.colorSelectDate
-                label.backgroundColor = cellStyle.style?.dotBackgroundColor ?? monthStyle.colorBackgroundSelectDate
+                label.textColor = monthStyle.colorSelectDate
+                label.backgroundColor = monthStyle.colorBackgroundSelectDate
                 label.layer.cornerRadius = label.frame.height / 2
                 label.clipsToBounds = true
             }
@@ -291,15 +289,15 @@ final class MonthCell: UICollectionViewCell {
         }
         
         guard selectDate.day == date?.day && selectDate.month == date?.month else {
-            if date?.day == nowDate.day, cellStyle.style == nil {
+            if date?.day == nowDate.day {
                 label.textColor = monthStyle.colorDate
                 label.backgroundColor = .clear
             }
             return
         }
         
-        label.textColor = cellStyle.style?.textColor ?? monthStyle.colorCurrentDate
-        label.backgroundColor = cellStyle.style?.dotBackgroundColor ?? monthStyle.colorBackgroundCurrentDate
+        label.textColor = monthStyle.colorCurrentDate
+        label.backgroundColor = monthStyle.colorBackgroundCurrentDate
         label.layer.cornerRadius = label.frame.height / 2
         label.clipsToBounds = true
     }
@@ -314,12 +312,19 @@ final class MonthCell: UICollectionViewCell {
         paragraphStyle.headIndent = indentation
         paragraphStyle.lineBreakMode = .byTruncatingMiddle
         
-        return eventList.reduce(NSMutableAttributedString()) { _, event -> NSMutableAttributedString in
+        return eventList.reduce(NSMutableAttributedString()) { (_, event) -> NSMutableAttributedString in
+            let text: String
+            if monthStyle.isHiddenTitle {
+                text = ""
+            } else {
+                text = event.textForMonth
+            }
+            
             let formattedString: String
             if !monthStyle.isHiddenDotInTitle {
-                formattedString = "\(bullet) \(event.textForMonth)\n"
+                formattedString = "\(bullet) \(text)\n"
             } else {
-                formattedString = "\(event.textForMonth)\n"
+                formattedString = "\(text)\n"
             }
             let attributedString = NSMutableAttributedString(string: formattedString)
             let string: NSString = NSString(string: formattedString)
