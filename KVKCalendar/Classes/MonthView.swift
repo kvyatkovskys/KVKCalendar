@@ -64,7 +64,6 @@ final class MonthView: UIView {
         collection.isPagingEnabled = style.isPagingEnabled
         collection.dataSource = self
         collection.delegate = self
-        collection.register(MonthCell.self)
         return collection
     }
     
@@ -99,11 +98,14 @@ final class MonthView: UIView {
     }
     
     private func getVisibaleDate() -> Date? {
-        let cells = collectionView.visibleCells as? [MonthCell] ?? [MonthCell()]
-        let cellDays = cells.filter({ $0.item?.day.type != .empty })
-        guard let newMoveDate = cellDays.filter({ $0.item?.day.date?.day == data.date.day }).first?.item?.day.date else {
-            let sorted = cellDays.sorted(by: { ($0.item?.day.date?.day ?? 0) < ($1.item?.day.date?.day ?? 0) })
-            if let lastDate = sorted.last?.item?.day.date, lastDate.day < data.date.day {
+        let cells = collectionView.indexPathsForVisibleItems
+        let days = cells.compactMap { (indexPath) -> Day in
+            let index = getIndexForDirection(style.month.scrollDirection, indexPath: indexPath)
+            return data.days[index.row]
+        }
+        guard let newMoveDate = days.filter({ $0.date?.day == data.date.day }).first?.date else {
+            let sorted = days.sorted(by: { ($0.date?.day ?? 0) < ($1.date?.day ?? 0) })
+            if let lastDate = sorted.last?.date, lastDate.day < data.date.day {
                 return lastDate
             }
             return nil
@@ -271,16 +273,20 @@ extension MonthView: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MonthCell.identifier,
-                                                      for: indexPath) as? MonthCell ?? MonthCell()
         let index = getIndexForDirection(style.month.scrollDirection, indexPath: indexPath)
         let day = data.days[index.row]
-        cell.selectDate = data.date
-        cell.style = style
-        cell.item = styleForDay(day)
-        cell.events = day.events
-        cell.delegate = self
-        return cell
+        
+        if let cell = dataSource?.dequeueDayCell(date: day.date, type: .month, collectionView: collectionView, indexPath: index) {
+            return cell
+        } else {
+            return collectionView.dequeueCell(indexPath: index) { (cell: MonthCell) in
+                cell.selectDate = data.date
+                cell.style = style
+                cell.day = day
+                cell.events = day.events
+                cell.delegate = self
+            }
+        }
     }
 }
 
@@ -363,15 +369,5 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         }
         
         return CGSize(width: widht, height: height)
-    }
-}
-
-extension MonthView: DayStyleProtocol {
-    typealias Model = DayStyle
-    
-    func styleForDay(_ day: Day) -> DayStyle {
-        guard let item = dataSource?.willDisplayDate(day.date, events: day.events) else { return DayStyle(day, nil) }
-        
-        return DayStyle(day, item)
     }
 }

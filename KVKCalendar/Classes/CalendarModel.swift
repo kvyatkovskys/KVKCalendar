@@ -244,37 +244,33 @@ protocol CalendarPrivateDelegate: class {
 public protocol CalendarDataSource: class {
     func eventsForCalendar() -> [Event]
     
-    /// To change a style for month view use this method
-    func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle?
+    /// deprecated method use func dequeueDayCell(:)
+    //func willDisplayDate(_ date: Date?, events: [Event])
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral?
     
-    /// Use this method to add a custom cell for scrolling day header
-    func dequeueScrollDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell?
+    /// Use this method to add a custom day cell
+    func dequeueDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell?
 }
 
 public extension CalendarDataSource {
-    func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? { return nil }
+    func willDisplayDate(_ date: Date?, events: [Event]) {}
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? { return nil }
     
-    func dequeueScrollDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? { return nil }
+    func dequeueDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? { return nil }
 }
 
 // MARK: - Display data source
 
 protocol DisplayDataSource: class {
-    func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle?
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral?
-    
-    func dequeueScrollDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell?
+    func dequeueDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell?
     
     @available(iOS 13.0, *)
     func willDisplayContextMenu(_ event: Event, date: Date?) -> UIContextMenuConfiguration?
 }
 
 extension DisplayDataSource {
-    func dequeueScrollDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? { return nil }
-    
-    func willDisplayDate(_ date: Date?, events: [Event]) -> DateStyle? { return nil }
+    func dequeueDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? { return nil }
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? { return nil }
     
     @available(iOS 13.0, *)
@@ -306,26 +302,4 @@ public extension CalendarDelegate {
     func didDisplayEvents(_ events: [Event], dates: [Date?]) {}
     func willSelectDate(_ date: Date, type: CalendarType) {}
     func deselectEvent(_ event: Event, animated: Bool) {}
-}
-
-// MARK: - Date style protocol
-
-public struct DateStyle {
-    public var backgroundColor: UIColor
-    public var textColor: UIColor?
-    public var dotBackgroundColor: UIColor?
-    
-    public init(backgroundColor: UIColor, textColor: UIColor? = nil, dotBackgroundColor: UIColor? = nil) {
-        self.backgroundColor = backgroundColor
-        self.textColor = textColor
-        self.dotBackgroundColor = dotBackgroundColor
-    }
-}
-
-typealias DayStyle = (day: Day, style: DateStyle?)
-
-protocol DayStyleProtocol: class {    
-    associatedtype Model
-    
-    func styleForDay(_ day: Day) -> Model
 }
