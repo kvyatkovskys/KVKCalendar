@@ -21,19 +21,28 @@ extension TimelineView: UIScrollViewDelegate {
             
             stack.top.subviews.filter({ ($0 as? StubEventView)?.valueHash == eventView.event.hash }).forEach({ $0.removeFromSuperview() })
             stack.bottom.subviews.filter({ ($0 as? StubEventView)?.valueHash == eventView.event.hash }).forEach({ $0.removeFromSuperview() })
+
+            guard !visibaleView(view) else { return }
             
-            if !visibaleView(view) {
-                let stubView = StubEventView(frame: CGRect(x: 0, y: 0, width: stack.top.frame.width, height: style.event.heightStubView))
-                stubView.backgroundColor = eventView.backgroundColor
-                stubView.valueHash = eventView.event.hash
-                stubView.setRoundCorners(style.event.eventCorners, radius: style.event.eventCornersRadius)
-                
-                if scrollView.contentOffset.y > eventView.frame.origin.y {
-                    stack.top.addArrangedSubview(stubView)
-                } else {
-                    stack.bottom.addArrangedSubview(stubView)
+            let stubView = StubEventView(frame: CGRect(x: 0, y: 0, width: stack.top.frame.width, height: style.event.heightStubView))
+            stubView.backgroundColor = style.event.colorStubView ?? eventView.backgroundColor
+            stubView.valueHash = eventView.event.hash
+            
+            if scrollView.contentOffset.y > eventView.frame.origin.y {
+                stack.top.addArrangedSubview(stubView)
+                if stack.top.subviews.count > 1 {
+                    let newWidth = stack.top.frame.width / CGFloat(stack.top.subviews.count) - 3
+                    stack.top.subviews.forEach({ $0.frame.size.width = newWidth })
+                }
+            } else {
+                stack.bottom.addArrangedSubview(stubView)
+                if stack.bottom.subviews.count > 1 {
+                    let newWidth = stack.bottom.frame.width / CGFloat(stack.bottom.subviews.count) - 3
+                    stack.bottom.subviews.forEach({ $0.frame.size.width = newWidth })
                 }
             }
+            
+            stubView.setRoundCorners(style.event.eventCorners, radius: style.event.eventCornersRadius)
         }
     }
     
