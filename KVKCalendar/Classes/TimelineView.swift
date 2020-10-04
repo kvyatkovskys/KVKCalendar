@@ -291,8 +291,8 @@ final class TimelineView: UIView, EventDateProtocol {
         times.forEach({ scrollView.addSubview($0) })
         lines.forEach({ scrollView.addSubview($0) })
 
-        let offset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
-        let widthPage = (frame.width - offset) / CGFloat(dates.count)
+        let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
+        let widthPage = (frame.width - leftOffset) / CGFloat(dates.count)
         let heightPage = (CGFloat(times.count) * (style.timeline.heightTime + style.timeline.offsetTimeY)) - 75
         let midnight = 24
         
@@ -300,11 +300,18 @@ final class TimelineView: UIView, EventDateProtocol {
         for (idx, date) in dates.enumerated() {
             let pointX: CGFloat
             if idx == 0 {
-                pointX = offset
+                pointX = leftOffset
             } else {
-                pointX = CGFloat(idx) * widthPage + offset
+                pointX = CGFloat(idx) * widthPage + leftOffset
             }
             scrollView.addSubview(createVerticalLine(pointX: pointX, date: date))
+            if !style.timeline.isHiddenStubEvent, let day = date?.day {
+                let topStackFrame = CGRect(x: pointX, y: 30, width: widthPage - style.timeline.offsetEvent, height: style.event.heightStubView)
+                let bottomStackFrame = CGRect(x: pointX, y: frame.height - 30, width: widthPage - style.timeline.offsetEvent, height: style.event.heightStubView)
+                
+                addSubview(createStackView(day: day, type: .top, frame: topStackFrame))
+                addSubview(createStackView(day: day, type: .bottom, frame: bottomStackFrame))
+            }
             
             let eventsByDate = filteredEvents.filter({ compareStartDate(date, with: $0) || compareEndDate(date, with: $0) || checkMultipleDate(date, with: $0) })
             let allDayEvents = filteredAllDayEvents.filter({ compareStartDate(date, with: $0) || compareEndDate(date, with: $0) })
