@@ -131,7 +131,7 @@ func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventVi
 
 <img src="Screenshots/custom_event_view.png" width="300">
 
-To use a custom day cell, just subscribe on this optional method from `CalendarDataSourcse`.
+To use a custom day cell, just subscribe on this optional method from `CalendarDataSourcse` (works for Day/Week/Month view).
 ```swift
 func dequeueDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? {    
     return collectionView.dequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in

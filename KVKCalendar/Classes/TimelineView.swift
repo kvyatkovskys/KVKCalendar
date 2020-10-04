@@ -62,6 +62,7 @@ final class TimelineView: UIView, EventDateProtocol {
     
     private(set) lazy var scrollView: UIScrollView = {
         let scroll = UIScrollView()
+        scroll.delegate = self
         scroll.backgroundColor = style.timeline.backgroundColor
         return scroll
     }()
@@ -168,6 +169,7 @@ final class TimelineView: UIView, EventDateProtocol {
             let formatter = DateFormatter()
             formatter.dateFormat = self.timeHourSystem.format
             self.currentLineView.time = formatter.string(from: nextDate)
+            self.currentLineView.date = nextDate
             
             if let timeNext = self.getTimelineLabel(hour: nextDate.hour + 1) {
                 timeNext.isHidden = self.currentLineView.frame.intersects(timeNext.frame)
