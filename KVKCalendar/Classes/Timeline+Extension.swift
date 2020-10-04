@@ -14,24 +14,25 @@ extension TimelineView: UIScrollViewDelegate {
     }
     
     func addStubUnvisibaleEvents() {
-        guard !style.timeline.isHiddenStubEvent else { return }
-        
-        let value: CGFloat = style.allDay.isPinned ? 30 : 5
         let events = scrollView.subviews.filter({ $0 is EventViewGeneral || $0 is AllDayEventView })
         
         events.forEach { (view) in
-            guard let eventView = view as? EventViewGeneral else { return }
+            guard let eventView = view as? EventViewGeneral, let stack = getStubStackView(day: eventView.event.start.day) else { return }
             
-            subviews.filter({ ($0 as? StubEventView)?.valueHash == eventView.event.hash }).forEach({ $0.removeFromSuperview() })
+            stack.top.subviews.filter({ ($0 as? StubEventView)?.valueHash == eventView.event.hash }).forEach({ $0.removeFromSuperview() })
+            stack.bottom.subviews.filter({ ($0 as? StubEventView)?.valueHash == eventView.event.hash }).forEach({ $0.removeFromSuperview() })
             
             if !visibaleView(view) {
-                let y = scrollView.contentOffset.y > eventView.frame.origin.y ? value : frame.height - 30
-                let stubView = StubEventView(frame: CGRect(x: eventView.frame.origin.x, y: y, width: eventView.frame.width, height: style.event.heightStubView))
+                let stubView = StubEventView(frame: CGRect(x: 0, y: 0, width: stack.top.frame.width, height: style.event.heightStubView))
                 stubView.backgroundColor = eventView.backgroundColor
                 stubView.valueHash = eventView.event.hash
-                stubView.tag = tagStubEvent
                 stubView.setRoundCorners(style.event.eventCorners, radius: style.event.eventCornersRadius)
-                addSubview(stubView)
+                
+                if scrollView.contentOffset.y > eventView.frame.origin.y {
+                    stack.top.addArrangedSubview(stubView)
+                } else {
+                    stack.bottom.addArrangedSubview(stubView)
+                }
             }
         }
     }
@@ -39,6 +40,23 @@ extension TimelineView: UIScrollViewDelegate {
     private func visibaleView(_ view: UIView) -> Bool {
         let container = CGRect(origin: scrollView.contentOffset, size: scrollView.frame.size)
         return view.frame.intersects(container)
+    }
+    
+    func getStubStackView(day: Int) -> (top: StubStackView, bottom: StubStackView)? {
+        let filtered = subviews.filter({ $0.tag == tagStubEvent }).compactMap({ $0 as? StubStackView })
+        guard let topStack = filtered.first(where: { $0.type == .top && $0.day == day }), let bottomStack = filtered.first(where: { $0.type == .bottom && $0.day == day }) else { return nil }
+        
+        return (topStack, bottomStack)
+    }
+    
+    func createStackView(day: Int, type: StubStackView.PositionType, frame: CGRect) -> StubStackView {
+        let view = StubStackView(type: type, frame: frame, day: day)
+        view.distribution = .fillEqually
+        view.axis = .horizontal
+        view.alignment = .fill
+        view.spacing = 5
+        view.tag = tagStubEvent
+        return view
     }
 }
 
