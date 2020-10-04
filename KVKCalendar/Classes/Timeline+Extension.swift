@@ -46,6 +46,23 @@ extension TimelineView: UIScrollViewDelegate {
         }
     }
     
+    private enum ScrollDirectionType: Int {
+        case up, down
+    }
+    
+    private func getDayEvent(_ event: Event, scrollDirection: ScrollDirectionType) -> Int {
+        if event.start.day == event.end.day {
+            return event.start.day
+        } else {
+            switch scrollDirection {
+            case .up:
+                return event.start.day
+            case .down:
+                return event.start.day
+            }
+        }
+    }
+    
     private func visibaleView(_ view: UIView) -> Bool {
         let container = CGRect(origin: scrollView.contentOffset, size: scrollView.frame.size)
         return view.frame.intersects(container)
