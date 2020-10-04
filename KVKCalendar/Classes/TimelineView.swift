@@ -305,13 +305,6 @@ final class TimelineView: UIView, EventDateProtocol {
                 pointX = CGFloat(idx) * widthPage + leftOffset
             }
             scrollView.addSubview(createVerticalLine(pointX: pointX, date: date))
-            if !style.timeline.isHiddenStubEvent, let day = date?.day {
-                let topStackFrame = CGRect(x: pointX, y: 30, width: widthPage - style.timeline.offsetEvent, height: style.event.heightStubView)
-                let bottomStackFrame = CGRect(x: pointX, y: frame.height - 30, width: widthPage - style.timeline.offsetEvent, height: style.event.heightStubView)
-                
-                addSubview(createStackView(day: day, type: .top, frame: topStackFrame))
-                addSubview(createStackView(day: day, type: .bottom, frame: bottomStackFrame))
-            }
             
             let eventsByDate = filteredEvents.filter({ compareStartDate(date, with: $0) || compareEndDate(date, with: $0) || checkMultipleDate(date, with: $0) })
             let allDayEvents = filteredAllDayEvents.filter({ compareStartDate(date, with: $0) || compareEndDate(date, with: $0) })
@@ -403,6 +396,14 @@ final class TimelineView: UIView, EventDateProtocol {
                     scrollView.addSubview(page)
                     pagesCached.append(page)
                 }
+            }
+            
+            if !style.timeline.isHiddenStubEvent, let day = date?.day {
+                let topStackFrame = CGRect(x: pointX, y: 30, width: widthPage - style.timeline.offsetEvent, height: style.event.heightStubView)
+                let bottomStackFrame = CGRect(x: pointX, y: frame.height - 30, width: widthPage - style.timeline.offsetEvent, height: style.event.heightStubView)
+                
+                addSubview(createStackView(day: day, type: .top, frame: topStackFrame))
+                addSubview(createStackView(day: day, type: .bottom, frame: bottomStackFrame))
             }
         }
         setOffsetScrollView()
