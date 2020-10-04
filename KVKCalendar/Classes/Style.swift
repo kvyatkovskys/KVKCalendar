@@ -110,9 +110,14 @@ public struct TimelineStyle {
     public var movingMinutesColor: UIColor = .systemBlue
     public var shadowColumnColor: UIColor = .systemTeal
     public var shadowColumnAlpha: CGFloat = 0.1
+    
+    @available(swift, deprecated: 0.3.7, obsoleted: 0.3.8, message: "Moved to Event style struct")
     public var eventCorners: UIRectCorner = .allCorners
+    @available(swift, deprecated: 0.3.7, obsoleted: 0.3.8, message: "Moved to Event style struct")
     public var eventCornersRadius: CGSize = CGSize(width: 5, height: 5)
+    
     public var minimumPressDuration: TimeInterval = 0.5
+    public var isHiddenStubEvent: Bool = false
 }
 
 public struct WeekStyle {
@@ -251,6 +256,10 @@ public struct EventStyle {
     public var iconFile: UIImage? = nil
     public var colorIconFile: UIColor = .black
     public var isEnableVisualSelect: Bool = true
+    public var colorStubView: UIColor? = nil
+    public var heightStubView: CGFloat = 5
+    public var eventCorners: UIRectCorner = .allCorners
+    public var eventCornersRadius: CGSize = CGSize(width: 2.5, height: 2.5)
     
     var isEnableContextMenu: Bool = false
 }

@@ -33,7 +33,7 @@ open class EventViewGeneral: UIView {
     }
     
     public func setup() {
-        setRoundCorners(style.timeline.eventCorners, radius: style.timeline.eventCornersRadius)
+        setRoundCorners(style.event.eventCorners, radius: style.event.eventCornersRadius)
         backgroundColor = event.backgroundColor
         tag = event.hash
         

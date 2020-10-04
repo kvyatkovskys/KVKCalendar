@@ -47,6 +47,7 @@
 		F91402AD2526252D005FDFCF /* DayPhoneCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91402AC2526252D005FDFCF /* DayPhoneCell.swift */; };
 		F91402B22526256A005FDFCF /* DayPadCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91402B12526256A005FDFCF /* DayPadCell.swift */; };
 		F91402B7252625A8005FDFCF /* DayCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91402B6252625A8005FDFCF /* DayCell.swift */; };
+		F95699A52529DC7E002D7B70 /* StubEventView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F95699A42529DC7E002D7B70 /* StubEventView.swift */; };
 		FC6B2B94CCFE03083E41328F0FCA1CE4 /* Timeline+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76F15A1FA526E8F890EC3BC7274AE55E /* Timeline+Extension.swift */; };
 /* End PBXBuildFile section */
 
@@ -131,6 +132,7 @@
 		F91402AC2526252D005FDFCF /* DayPhoneCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DayPhoneCell.swift; path = KVKCalendar/Classes/DayPhoneCell.swift; sourceTree = "<group>"; };
 		F91402B12526256A005FDFCF /* DayPadCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DayPadCell.swift; path = KVKCalendar/Classes/DayPadCell.swift; sourceTree = "<group>"; };
 		F91402B6252625A8005FDFCF /* DayCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DayCell.swift; path = KVKCalendar/Classes/DayCell.swift; sourceTree = "<group>"; };
+		F95699A42529DC7E002D7B70 /* StubEventView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StubEventView.swift; path = KVKCalendar/Classes/StubEventView.swift; sourceTree = "<group>"; };
 		F9A5FE2DD23FBAFCC63D57A554B1036E /* Pods-KVKCalendar_Example-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-KVKCalendar_Example-frameworks.sh"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -236,6 +238,7 @@
 				BAFA8101F400BC128BD0EFBC195C94F2 /* ShadowDayView.swift */,
 				7516A22AC009DCC5CDD20E099F83CC81 /* Style.swift */,
 				76F15A1FA526E8F890EC3BC7274AE55E /* Timeline+Extension.swift */,
+				F95699A42529DC7E002D7B70 /* StubEventView.swift */,
 				830155006284B976DE1402E5D1B877B6 /* TimelineLabel.swift */,
 				91A1F0E339A334B08260392B332831A3 /* TimelineModel.swift */,
 				51A66831DE281329D4D3B51B7ECB1B4A /* TimelineView.swift */,
@@ -481,6 +484,7 @@
 				8F79C620DC3FDE5570202F02C51CBE97 /* CalendarModel.swift in Sources */,
 				2EC70219542BFEC6F1ACF419180323F1 /* CalendarView.swift in Sources */,
 				418DF27EDEE11F772B93D2088A3C5E6C /* CurrentLineView.swift in Sources */,
+				F95699A52529DC7E002D7B70 /* StubEventView.swift in Sources */,
 				F91402AD2526252D005FDFCF /* DayPhoneCell.swift in Sources */,
 				773411EB8A3211D9BBDF33CAFDA8B68E /* Date+Extension.swift in Sources */,
 				740626B5E8E0F004E2718721B31E19A8 /* DayData.swift in Sources */,
