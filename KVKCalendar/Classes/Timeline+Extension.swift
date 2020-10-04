@@ -10,22 +10,35 @@ import Foundation
 extension TimelineView: UIScrollViewDelegate {
     // TO DO: in progress
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-//        let events = scrollView.subviews.filter({ $0 is EventViewGeneral })
-//        events.forEach { (view) in
-//            guard let eventView = view as? EventViewGeneral else { return }
-//
-//            let isVisibleView = true
-//            if !isVisibleView {
-//                let y = eventView.event.start.hour > (currentLineView.date?.hour ?? 0) ? frame.height - 50 : 30
-//                let tmpView = UIView(frame: CGRect(origin: CGPoint(x: eventView.frame.origin.x, y: y), size: CGSize(width: eventView.frame.width, height: 5)))
-//                tmpView.backgroundColor = eventView.color
-//                tmpView.tag = eventView.tag
-//                tmpView.setRoundCorners(radius: CGSize(width: 2.5, height: 2.5))
-//                addSubview(tmpView)
-//            } else {
-//                subviews.filter({ $0.tag == eventView.tag }).forEach({ $0.removeFromSuperview() })
-//            }
-//        }
+        addStubUnvisibaleEvents()
+    }
+    
+    func addStubUnvisibaleEvents() {
+        guard !style.timeline.isHiddenStubEvent else { return }
+        
+        let value: CGFloat = style.allDay.isPinned ? 30 : 5
+        let events = scrollView.subviews.filter({ $0 is EventViewGeneral || $0 is AllDayEventView })
+        
+        events.forEach { (view) in
+            guard let eventView = view as? EventViewGeneral else { return }
+            
+            subviews.filter({ ($0 as? StubEventView)?.valueHash == eventView.event.hash }).forEach({ $0.removeFromSuperview() })
+            
+            if !visibaleView(view) {
+                let y = scrollView.contentOffset.y > eventView.frame.origin.y ? value : frame.height - 30
+                let stubView = StubEventView(frame: CGRect(x: eventView.frame.origin.x, y: y, width: eventView.frame.width, height: style.event.heightStubView))
+                stubView.backgroundColor = eventView.backgroundColor
+                stubView.valueHash = eventView.event.hash
+                stubView.tag = tagStubEvent
+                stubView.setRoundCorners(style.event.eventCorners, radius: style.event.eventCornersRadius)
+                addSubview(stubView)
+            }
+        }
+    }
+    
+    private func visibaleView(_ view: UIView) -> Bool {
+        let container = CGRect(origin: scrollView.contentOffset, size: scrollView.frame.size)
+        return view.frame.intersects(container)
     }
 }
 

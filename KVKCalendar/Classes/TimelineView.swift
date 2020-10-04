@@ -26,6 +26,7 @@ final class TimelineView: UIView, EventDateProtocol {
     private let tagBackgroundView = -50
     private(set) var tagAllDayPlaceholder = -60
     private(set) var tagAllDayEvent = -70
+    private(set) var tagStubEvent = -80
     
     private(set) var hours: [String]
     private let timeHourSystem: TimeHourSystem
@@ -254,6 +255,7 @@ final class TimelineView: UIView, EventDateProtocol {
         if style.allDay.isPinned {
             subviews.filter({ $0.tag == tagAllDayEvent || $0.tag == tagAllDayPlaceholder }).forEach({ $0.removeFromSuperview() })
         }
+        subviews.filter({ $0.tag == tagStubEvent }).forEach({ $0.removeFromSuperview() })
         scrollView.subviews.filter({ $0.tag != tagCurrentHourLine }).forEach({ $0.removeFromSuperview() })
         
         // filter events
@@ -399,5 +401,6 @@ final class TimelineView: UIView, EventDateProtocol {
         setOffsetScrollView()
         scrollToCurrentTime(startHour)
         showCurrentLineHour()
+        addStubUnvisibaleEvents()
     }
 }
