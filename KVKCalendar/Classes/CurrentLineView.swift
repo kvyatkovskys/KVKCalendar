@@ -48,6 +48,8 @@ final class CurrentLineView: UIView {
         }
     }
     
+    var date: Date?
+    
     init(style: Style, frame: CGRect, timeHourSystem: TimeHourSystem) {
         self.style = style
         self.timeHourSystem = timeHourSystem

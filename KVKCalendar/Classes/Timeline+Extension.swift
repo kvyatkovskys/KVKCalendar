@@ -7,6 +7,28 @@
 
 import Foundation
 
+extension TimelineView: UIScrollViewDelegate {
+    // TO DO: in progress
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+//        let events = scrollView.subviews.filter({ $0 is EventViewGeneral })
+//        events.forEach { (view) in
+//            guard let eventView = view as? EventViewGeneral else { return }
+//
+//            let isVisibleView = true
+//            if !isVisibleView {
+//                let y = eventView.event.start.hour > (currentLineView.date?.hour ?? 0) ? frame.height - 50 : 30
+//                let tmpView = UIView(frame: CGRect(origin: CGPoint(x: eventView.frame.origin.x, y: y), size: CGSize(width: eventView.frame.width, height: 5)))
+//                tmpView.backgroundColor = eventView.color
+//                tmpView.tag = eventView.tag
+//                tmpView.setRoundCorners(radius: CGSize(width: 2.5, height: 2.5))
+//                addSubview(tmpView)
+//            } else {
+//                subviews.filter({ $0.tag == eventView.tag }).forEach({ $0.removeFromSuperview() })
+//            }
+//        }
+    }
+}
+
 extension TimelineView {
     var eventViews: [UIView] {
         return getAllDisplayableEvents()
