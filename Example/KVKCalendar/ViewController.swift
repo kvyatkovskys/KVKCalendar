@@ -44,7 +44,6 @@ final class ViewController: UIViewController {
         style.followInSystemTheme = true
         style.timeline.offsetTimeY = 80
         style.timeline.offsetEvent = 3
-        style.allDay.isPinned = true
         style.startWeekDay = .sunday
         style.timeSystem = TimeHourSystem.currentSystemOnDevice ?? .twelve
         style.event.isEnableMoveEvent = true

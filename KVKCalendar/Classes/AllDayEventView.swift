@@ -8,7 +8,7 @@
 import UIKit
 
 final class AllDayEventView: UIView {
-    private let events: [Event]
+    let events: [Event]
     weak var delegate: AllDayEventDelegate?
     
     init(events: [Event], frame: CGRect, style: AllDayStyle, date: Date?) {
@@ -40,6 +40,7 @@ final class AllDayEventView: UIView {
             label.backgroundColor = event.color.withAlphaComponent(0.8)
             label.tag = event.id.hashValue
             label.setRoundCorners(style.eventCorners, radius: style.eventCornersRadius)
+            
             let tap = UITapGestureRecognizer(target: self, action: #selector(tapOnEvent))
             label.addGestureRecognizer(tap)
             addSubview(label)

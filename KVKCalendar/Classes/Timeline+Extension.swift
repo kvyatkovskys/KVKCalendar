@@ -8,27 +8,40 @@
 import Foundation
 
 extension TimelineView: UIScrollViewDelegate {
-    // TO DO: in progress
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         addStubUnvisibaleEvents()
     }
     
     func addStubUnvisibaleEvents() {
-        let events = scrollView.subviews.filter({ $0 is EventViewGeneral || $0 is AllDayEventView })
+        let events = scrollView.subviews.compactMap { (view) -> StubEvent? in
+            guard let item = view as? EventViewGeneral else { return nil }
+            
+            return StubEvent(event: item.event, frame: item.frame)
+        }
         
-        events.forEach { (view) in
-            guard let eventView = view as? EventViewGeneral, let stack = getStubStackView(day: eventView.event.start.day) else { return }
+        var eventsAllDay: [StubEvent] = []
+        if !style.allDay.isPinned {
+            eventsAllDay = scrollView.subviews.compactMap { (view) -> [StubEvent]? in
+                guard let item = view as? AllDayEventView else { return nil }
+                
+                return item.events.compactMap({ StubEvent(event: $0, frame: item.frame) })
+            }.flatMap({ $0 })
+        }
+        
+        let stubEvents = events + eventsAllDay
+        stubEvents.forEach { (eventView) in
+            guard let stack = getStubStackView(day: eventView.event.start.day) else { return }
             
             stack.top.subviews.filter({ ($0 as? StubEventView)?.valueHash == eventView.event.hash }).forEach({ $0.removeFromSuperview() })
             stack.bottom.subviews.filter({ ($0 as? StubEventView)?.valueHash == eventView.event.hash }).forEach({ $0.removeFromSuperview() })
 
-            guard !visibaleView(view) else { return }
+            guard !visibaleView(eventView.frame) else { return }
             
             let stubView = StubEventView(event: eventView.event, frame: CGRect(x: 0, y: 0, width: stack.top.frame.width, height: style.event.heightStubView))
             stubView.valueHash = eventView.event.hash
             
             if scrollView.contentOffset.y > eventView.frame.origin.y {
-                stack.top.addArrangedSubview(stubView)
+                stack.top.insertArrangedSubview(stubView, at: 0)
                 
                 if stack.top.subviews.count >= 1 {
                     switch stack.top.axis {
@@ -42,7 +55,7 @@ extension TimelineView: UIScrollViewDelegate {
                     }
                 }
             } else {
-                stack.bottom.addArrangedSubview(stubView)
+                stack.bottom.insertArrangedSubview(stubView, at: 0)
                 
                 if stack.bottom.subviews.count >= 1 {
                     switch stack.bottom.axis {
@@ -61,10 +74,6 @@ extension TimelineView: UIScrollViewDelegate {
         }
     }
     
-    private enum ScrollDirectionType: Int {
-        case up, down
-    }
-    
     private func getDayEvent(_ event: Event, scrollDirection: ScrollDirectionType) -> Int {
         if event.start.day == event.end.day {
             return event.start.day
@@ -78,9 +87,9 @@ extension TimelineView: UIScrollViewDelegate {
         }
     }
     
-    private func visibaleView(_ view: UIView) -> Bool {
+    private func visibaleView(_ frame: CGRect) -> Bool {
         let container = CGRect(origin: scrollView.contentOffset, size: scrollView.frame.size)
-        return view.frame.intersects(container)
+        return frame.intersects(container)
     }
     
     func getStubStackView(day: Int) -> (top: StubStackView, bottom: StubStackView)? {
@@ -102,8 +111,8 @@ extension TimelineView: UIScrollViewDelegate {
 }
 
 extension TimelineView {
-    var eventViews: [UIView] {
-        return getAllDisplayableEvents()
+    var scrollableEventViews: [UIView] {
+        return getAllScrollableEvents()
     }
 }
 
@@ -250,26 +259,28 @@ extension TimelineView {
     
     func moveEvents(offset: CGFloat, stop: Bool = false) {
         guard !stop else {
-            identityViews(eventViews)
+            identityViews(scrollableEventViews)
             return
         }
         
-        eventViews.forEach { (view) in
+        scrollableEventViews.forEach { (view) in
             view.transform = CGAffineTransform(translationX: offset, y: 0)
         }
     }
     
-    private func getAllDisplayableEvents() -> [UIView] {
+    private func getAllScrollableEvents() -> [UIView] {
         let events = scrollView.subviews.filter({ $0 is EventViewGeneral })
-        let eventsAllDay: [UIView]
         
+        let eventsAllDay: [UIView]
         if style.allDay.isPinned {
             eventsAllDay = subviews.filter({ $0 is AllDayEventView || $0 is AllDayTitleView })
         } else {
             eventsAllDay = scrollView.subviews.filter({ $0 is AllDayEventView || $0 is AllDayTitleView })
         }
         
-        let eventViews = events + eventsAllDay
+        let stackViews = subviews.filter({ $0 is StubStackView })
+        
+        let eventViews = events + eventsAllDay + stackViews
         return eventViews
     }
     
@@ -284,7 +295,7 @@ extension TimelineView {
             guard endGesure else {
                 delegate?.swipeX(transform: CGAffineTransform(translationX: translation.x, y: 0), stop: false)
                 
-                eventViews.forEach { (view) in
+                scrollableEventViews.forEach { (view) in
                     view.transform = CGAffineTransform(translationX: translation.x, y: 0)
                 }
                 break
@@ -293,11 +304,11 @@ extension TimelineView {
             gesture.state = .ended
         case .failed:
             delegate?.swipeX(transform: .identity, stop: false)
-            identityViews(eventViews)
+            identityViews(scrollableEventViews)
         case .cancelled, .ended:
             guard endGesure else {
                 delegate?.swipeX(transform: .identity, stop: false)
-                identityViews(eventViews)
+                identityViews(scrollableEventViews)
                 break
             }
             
