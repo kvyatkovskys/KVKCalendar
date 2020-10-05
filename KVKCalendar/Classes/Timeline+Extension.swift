@@ -24,21 +24,36 @@ extension TimelineView: UIScrollViewDelegate {
 
             guard !visibaleView(view) else { return }
             
-            let stubView = StubEventView(frame: CGRect(x: 0, y: 0, width: stack.top.frame.width, height: style.event.heightStubView))
-            stubView.backgroundColor = style.event.colorStubView ?? eventView.backgroundColor
+            let stubView = StubEventView(event: eventView.event, frame: CGRect(x: 0, y: 0, width: stack.top.frame.width, height: style.event.heightStubView))
             stubView.valueHash = eventView.event.hash
             
             if scrollView.contentOffset.y > eventView.frame.origin.y {
                 stack.top.addArrangedSubview(stubView)
-                if stack.top.subviews.count > 1 {
-                    let newWidth = stack.top.frame.width / CGFloat(stack.top.subviews.count) - 3
-                    stack.top.subviews.forEach({ $0.frame.size.width = newWidth })
+                
+                if stack.top.subviews.count >= 1 {
+                    switch stack.top.axis {
+                    case .vertical:
+                        stack.top.frame.size.height = style.event.heightStubView * CGFloat(stack.top.subviews.count)
+                    case .horizontal:
+                        let newWidth = stack.top.frame.width / CGFloat(stack.top.subviews.count) - 3
+                        stack.top.subviews.forEach({ $0.frame.size.width = newWidth })
+                    @unknown default:
+                        fatalError()
+                    }
                 }
             } else {
                 stack.bottom.addArrangedSubview(stubView)
-                if stack.bottom.subviews.count > 1 {
-                    let newWidth = stack.bottom.frame.width / CGFloat(stack.bottom.subviews.count) - 3
-                    stack.bottom.subviews.forEach({ $0.frame.size.width = newWidth })
+                
+                if stack.bottom.subviews.count >= 1 {
+                    switch stack.bottom.axis {
+                    case .horizontal:
+                        let newWidth = stack.bottom.frame.width / CGFloat(stack.bottom.subviews.count) - 3
+                        stack.bottom.subviews.forEach({ $0.frame.size.width = newWidth })
+                    case .vertical:
+                        stack.bottom.frame.size.height = style.event.heightStubView * CGFloat(stack.bottom.subviews.count)
+                    @unknown default:
+                        fatalError()
+                    }
                 }
             }
             
@@ -78,9 +93,9 @@ extension TimelineView: UIScrollViewDelegate {
     func createStackView(day: Int, type: StubStackView.PositionType, frame: CGRect) -> StubStackView {
         let view = StubStackView(type: type, frame: frame, day: day)
         view.distribution = .fillEqually
-        view.axis = .horizontal
+        view.axis = style.event.aligmentStubView
         view.alignment = .fill
-        view.spacing = 5
+        view.spacing = style.event.spacingStubView
         view.tag = tagStubEvent
         return view
     }

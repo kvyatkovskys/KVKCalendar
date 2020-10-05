@@ -258,6 +258,8 @@ public struct EventStyle {
     public var isEnableVisualSelect: Bool = true
     public var colorStubView: UIColor? = nil
     public var heightStubView: CGFloat = 5
+    public var aligmentStubView: NSLayoutConstraint.Axis = .vertical
+    public var spacingStubView: CGFloat = 1
     public var eventCorners: UIRectCorner = .allCorners
     public var eventCornersRadius: CGSize = CGSize(width: 2.5, height: 2.5)
     
