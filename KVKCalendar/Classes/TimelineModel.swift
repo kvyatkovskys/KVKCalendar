@@ -60,3 +60,14 @@ extension EventDateProtocol {
         return event.start.day != event.end.day && event.start.day...event.end.day ~= day && event.start.year == date?.year && event.start.month == date?.month
     }
 }
+
+extension TimelineView {
+    struct StubEvent {
+        let event: Event
+        let frame: CGRect
+    }
+    
+    enum ScrollDirectionType: Int {
+        case up, down
+    }
+}
