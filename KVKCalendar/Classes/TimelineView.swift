@@ -234,13 +234,13 @@ final class TimelineView: UIView, EventDateProtocol {
         guard !firstAutoScrollIsCompleted else { return }
         
         var frame = scrollView.frame
-        frame.origin.y = time.frame.origin.y
+        frame.origin.y = time.frame.origin.y - 10
         scrollView.scrollRectToVisible(frame, animated: true)
         firstAutoScrollIsCompleted = true
     }
     
     private func fillBackgroundDayColor(_ color: UIColor, pointX: CGFloat, width: CGFloat) -> UIView {
-        let view = UIView(frame: CGRect(x: pointX, y: 0.0, width: width, height: (CGFloat(25) * (style.timeline.heightTime + style.timeline.offsetTimeY)) - 75))
+        let view = UIView(frame: CGRect(x: pointX, y: 0.0, width: width, height: scrollView.contentSize.height))
         view.backgroundColor = color
         view.tag = tagBackgroundView
         return view
@@ -285,15 +285,15 @@ final class TimelineView: UIView, EventDateProtocol {
         // add seporator line
         let lines = createLines(times: times)
         
-        // calculate all height by time label
-        let heightAllTimes = times.reduce(0, { $0 + ($1.frame.height + style.timeline.offsetTimeY) })
-        scrollView.contentSize = CGSize(width: frame.width, height: heightAllTimes + 20)
+        // calculate all height by time label minus the last offset
+        let heightAllTimes = times.reduce(0, { $0 + ($1.frame.height + style.timeline.offsetTimeY) }) - style.timeline.offsetTimeY
+        scrollView.contentSize = CGSize(width: frame.width, height: heightAllTimes)
         times.forEach({ scrollView.addSubview($0) })
         lines.forEach({ scrollView.addSubview($0) })
 
         let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
         let widthPage = (frame.width - leftOffset) / CGFloat(dates.count)
-        let heightPage = (CGFloat(times.count) * (style.timeline.heightTime + style.timeline.offsetTimeY)) - 75
+        let heightPage = scrollView.contentSize.height
         let midnight = 24
         
         // horror
