@@ -13,6 +13,8 @@ extension TimelineView: UIScrollViewDelegate {
     }
     
     func addStubUnvisibaleEvents() {
+        guard !style.timeline.isHiddenStubEvent else { return }
+        
         let events = scrollView.subviews.compactMap { (view) -> StubEvent? in
             guard let item = view as? EventViewGeneral else { return nil }
             
@@ -64,6 +66,7 @@ extension TimelineView: UIScrollViewDelegate {
                         stack.bottom.subviews.forEach({ $0.frame.size.width = newWidth })
                     case .vertical:
                         stack.bottom.frame.size.height = style.event.heightStubView * CGFloat(stack.bottom.subviews.count)
+                        stack.bottom.frame.origin.y = (frame.height - stack.bottom.frame.height) - 30
                     @unknown default:
                         fatalError()
                     }
@@ -495,7 +498,6 @@ extension TimelineView: CalendarSettingProtocol {
     func reloadFrame(_ frame: CGRect) {
         self.frame.size = frame.size
         scrollView.frame.size = frame.size
-        scrollView.contentSize.width = frame.width
         currentLineView.reloadFrame(frame)
     }
     
