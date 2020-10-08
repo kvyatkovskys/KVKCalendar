@@ -399,9 +399,9 @@ final class TimelineView: UIView, EventDateProtocol {
             }
             
             if !style.timeline.isHiddenStubEvent, let day = date?.day {
-                let y: CGFloat = style.allDay.isPinned ? 30 : 5
+                let y = topStabStackOffsetY(allDayEventsIsPinned: style.allDay.isPinned)
                 let topStackFrame = CGRect(x: pointX, y: y, width: widthPage - style.timeline.offsetEvent, height: style.event.heightStubView)
-                let bottomStackFrame = CGRect(x: pointX, y: frame.height - 30, width: widthPage - style.timeline.offsetEvent, height: style.event.heightStubView)
+                let bottomStackFrame = CGRect(x: pointX, y: frame.height - bottomStabStackOffsetY, width: widthPage - style.timeline.offsetEvent, height: style.event.heightStubView)
                 
                 addSubview(createStackView(day: day, type: .top, frame: topStackFrame))
                 addSubview(createStackView(day: day, type: .bottom, frame: bottomStackFrame))

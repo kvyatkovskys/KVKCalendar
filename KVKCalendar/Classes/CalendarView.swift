@@ -53,6 +53,7 @@ public final class CalendarView: UIView {
     private lazy var yearView: YearView = {
         let year = YearView(data: monthData.data, frame: frame, style: style)
         year.delegate = self
+        year.dataSource = self
         return year
     }()
     
@@ -146,8 +147,8 @@ extension CalendarView: DisplayDataSource {
         return dataSource?.willDisplayEventView(event, frame: frame, date: date)
     }
     
-    func dequeueDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? {
-        return dataSource?.dequeueDayCell(date: date, type: type, collectionView: collectionView, indexPath: indexPath)
+    func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? {
+        return dataSource?.dequeueDateCell(date: date, type: type, collectionView: collectionView, indexPath: indexPath)
     }
     
     @available(iOS 13.0, *)

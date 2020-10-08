@@ -276,7 +276,7 @@ extension MonthView: UICollectionViewDataSource {
         let index = getIndexForDirection(style.month.scrollDirection, indexPath: indexPath)
         let day = data.days[index.row]
         
-        if let cell = dataSource?.dequeueDayCell(date: day.date, type: .month, collectionView: collectionView, indexPath: index) {
+        if let cell = dataSource?.dequeueDateCell(date: day.date, type: .month, collectionView: collectionView, indexPath: index) {
             return cell
         } else {
             return collectionView.dequeueCell(indexPath: index) { (cell: MonthCell) in

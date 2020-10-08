@@ -66,7 +66,7 @@ extension TimelineView: UIScrollViewDelegate {
                         stack.bottom.subviews.forEach({ $0.frame.size.width = newWidth })
                     case .vertical:
                         stack.bottom.frame.size.height = style.event.heightStubView * CGFloat(stack.bottom.subviews.count)
-                        stack.bottom.frame.origin.y = (frame.height - stack.bottom.frame.height) - 30
+                        stack.bottom.frame.origin.y = (frame.height - stack.bottom.frame.height) - bottomStabStackOffsetY
                     @unknown default:
                         fatalError()
                     }
@@ -114,6 +114,14 @@ extension TimelineView: UIScrollViewDelegate {
 }
 
 extension TimelineView {
+    var bottomStabStackOffsetY: CGFloat {
+        return UIApplication.shared.isAvailableBotomHomeIndicator ? 30 : 5
+    }
+    
+    func topStabStackOffsetY(allDayEventsIsPinned: Bool) -> CGFloat {
+        return allDayEventsIsPinned ? 30 : 5
+    }
+    
     var scrollableEventViews: [UIView] {
         return getAllScrollableEvents()
     }
