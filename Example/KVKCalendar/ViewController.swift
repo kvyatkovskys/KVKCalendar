@@ -192,11 +192,17 @@ extension ViewController: CalendarDataSource {
         return CustomViewEvent(style: style, event: event, frame: frame)
     }
     
-    func dequeueDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? {
-        guard date?.day == Date().day else { return nil }
-        
-        return collectionView.dequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
+    func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? {
+        let cell = collectionView.dequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
             cell.imageView.image = UIImage(named: "ic_stub")
+        }
+        
+        if type == .year, date?.month == Date().month {
+            return cell
+        } else if date?.day == Date().day {
+            return cell
+        } else {
+            return nil
         }
     }
 }

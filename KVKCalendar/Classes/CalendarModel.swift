@@ -249,28 +249,28 @@ public protocol CalendarDataSource: class {
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral?
     
     /// Use this method to add a custom day cell
-    func dequeueDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell?
+    func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell?
 }
 
 public extension CalendarDataSource {
     func willDisplayDate(_ date: Date?, events: [Event]) {}
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? { return nil }
     
-    func dequeueDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? { return nil }
+    func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? { return nil }
 }
 
 // MARK: - Display data source
 
 protocol DisplayDataSource: class {
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral?
-    func dequeueDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell?
+    func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell?
     
     @available(iOS 13.0, *)
     func willDisplayContextMenu(_ event: Event, date: Date?) -> UIContextMenuConfiguration?
 }
 
 extension DisplayDataSource {
-    func dequeueDayCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? { return nil }
+    func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? { return nil }
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? { return nil }
     
     @available(iOS 13.0, *)

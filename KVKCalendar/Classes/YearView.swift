@@ -14,6 +14,7 @@ final class YearView: UIView {
     private var collectionView: UICollectionView!
     
     weak var delegate: CalendarPrivateDelegate?
+    weak var dataSource: DisplayDataSource?
     
     private let layout: UICollectionViewLayout = {
         let layout = UICollectionViewFlowLayout()
@@ -68,7 +69,6 @@ final class YearView: UIView {
         collection.isPagingEnabled = style.isPagingEnabled
         collection.dataSource = self
         collection.delegate = self
-        collection.register(YearPadCell.self)
         return collection
     }
     
@@ -141,13 +141,18 @@ extension YearView: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: YearPadCell.identifier, for: indexPath) as? YearPadCell ?? YearPadCell()
         let month = data.months[indexPath.row]
-        cell.style = style
-        cell.selectDate = data.date
-        cell.title = month.name
-        cell.days = month.days
-        return cell
+        
+        if let cell = dataSource?.dequeueDateCell(date: month.date, type: .year, collectionView: collectionView, indexPath: indexPath) {
+            return cell
+        } else {
+            return collectionView.dequeueCell(indexPath: indexPath) { (cell: YearPadCell) in
+                cell.style = style
+                cell.selectDate = data.date
+                cell.title = month.name
+                cell.days = month.days
+            }
+        }
     }
 }
 
