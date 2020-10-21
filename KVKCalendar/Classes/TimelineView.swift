@@ -256,7 +256,7 @@ final class TimelineView: UIView, EventDateProtocol {
             subviews.filter({ $0.tag == tagAllDayEvent || $0.tag == tagAllDayPlaceholder }).forEach({ $0.removeFromSuperview() })
         }
         subviews.filter({ $0.tag == tagStubEvent }).forEach({ $0.removeFromSuperview() })
-        scrollView.subviews.filter({ $0.tag != tagCurrentHourLine }).forEach({ $0.removeFromSuperview() })
+        scrollView.subviews.filter({ $0.tag != tagCurrentHourLine || $0.tag != tagEventPagePreview }).forEach({ $0.removeFromSuperview() })
         
         // filter events
         let recurringEvents = events.filter({ $0.recurringType != .none })

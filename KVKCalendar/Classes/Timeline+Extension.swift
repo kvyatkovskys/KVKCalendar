@@ -391,22 +391,19 @@ extension TimelineView: EventDelegate {
         eventPreview = nil
         
         if view is EventView {
-            eventPreviewSize = CGSize(width: 100, height: 100)
-            eventPreview = EventView(event: event,
-                                     style: style,
-                                     frame: CGRect(origin: CGPoint(x: point.x - eventPreviewXOffset, y: point.y - eventPreviewYOffset),
-                                                   size: eventPreviewSize))
+            let eventView = EventView(event: event,
+                                      style: style,
+                                      frame: view.frame)
+            eventView.selectEvent()
+            eventPreview = eventView
         } else {
             eventPreview = view.snapshotView(afterScreenUpdates: false)
-            if let size = eventPreview?.frame.size {
-                eventPreviewSize = size
-            }
-            eventPreview?.frame.origin = CGPoint(x: point.x - eventPreviewXOffset, y: point.y - eventPreviewYOffset)
+            eventPreview?.frame = view.frame
         }
         
         eventPreview?.alpha = 0.9
         eventPreview?.tag = tagEventPagePreview
-        eventPreview?.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+        eventPreview?.transform = CGAffineTransform(scaleX: 0.98, y: 0.98)
         if let eventTemp = eventPreview {
             scrollView.addSubview(eventTemp)
             showChangingMinutes(pointY: point.y)
@@ -418,8 +415,8 @@ extension TimelineView: EventDelegate {
     }
     
     func didEndMovingEvent(_ event: Event, gesture: UILongPressGestureRecognizer) {
-        eventPreview?.removeFromSuperview()
-        eventPreview = nil
+        //eventPreview?.removeFromSuperview()
+        //eventPreview = nil
         movingMinutesLabel.removeFromSuperview()
         
         var point = gesture.location(in: scrollView)
@@ -440,25 +437,25 @@ extension TimelineView: EventDelegate {
     }
     
     func didChangeMovingEvent(_ event: Event, gesture: UILongPressGestureRecognizer) {
-        let point = gesture.location(in: scrollView)
+        let location = gesture.location(in: scrollView)
         let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
-        guard scrollView.frame.width >= (point.x + 20), (point.x - 20) >= leftOffset else { return }
+        guard scrollView.frame.width >= (location.x + 20), (location.x - 20) >= leftOffset else { return }
         
         var offset = scrollView.contentOffset
-        if (point.y - 80) < scrollView.contentOffset.y, (point.y - eventPreviewSize.height) >= 0 {
+        if (location.y - 80) < scrollView.contentOffset.y, (location.y - eventPreviewSize.height) >= 0 {
             // scroll up
             offset.y -= 5
             scrollView.setContentOffset(offset, animated: false)
-        } else if (point.y + 80) > (scrollView.contentOffset.y + scrollView.bounds.height), point.y + eventPreviewSize.height <= scrollView.contentSize.height {
+        } else if (location.y + 80) > (scrollView.contentOffset.y + scrollView.bounds.height), location.y + eventPreviewSize.height <= scrollView.contentSize.height {
             // scroll down
             offset.y += 5
             scrollView.setContentOffset(offset, animated: false)
         }
         
-        eventPreview?.frame.origin = CGPoint(x: point.x - eventPreviewXOffset, y: point.y - eventPreviewYOffset)
-        showChangingMinutes(pointY: point.y)
+        eventPreview?.frame.origin = CGPoint(x: location.x - eventPreviewXOffset, y: location.y - eventPreviewYOffset)
+        showChangingMinutes(pointY: location.y)
         
-        if let value = moveShadowView(pointX: point.x) {
+        if let value = moveShadowView(pointX: location.x) {
             shadowView.frame = value.frame
             shadowView.date = value.date
         }

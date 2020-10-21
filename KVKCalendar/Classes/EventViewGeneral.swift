@@ -16,6 +16,12 @@ open class EventViewGeneral: UIView {
     public var style: Style
     public var isSelected: Bool = false
     
+    public lazy var longGesture: UILongPressGestureRecognizer = {
+        let gesture = UILongPressGestureRecognizer(target: self, action: #selector(activateMoveEvent))
+        gesture.minimumPressDuration = style.event.minimumPressDuration
+        return gesture
+    }()
+    
     public init(style: Style, event: Event, frame: CGRect) {
         self.style = style
         self.event = event
@@ -41,8 +47,6 @@ open class EventViewGeneral: UIView {
         addGestureRecognizer(tap)
         
         if style.event.isEnableMoveEvent {
-            let longGesture = UILongPressGestureRecognizer(target: self, action: #selector(activateMoveEvent))
-            longGesture.minimumPressDuration = style.event.minimumPressDuration
             addGestureRecognizer(longGesture)
         }
     }
