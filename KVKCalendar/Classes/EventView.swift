@@ -10,7 +10,7 @@ import UIKit
 final class EventView: EventViewGeneral {
     private let pointX: CGFloat = 5
         
-    private let textView: UITextView = {
+    private(set) var textView: UITextView = {
         let text = UITextView()
         text.backgroundColor = .clear
         text.isScrollEnabled = false

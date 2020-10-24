@@ -117,11 +117,11 @@ open class EventViewGeneral: UIView, CalendarTimer {
             switch mode {
             case .move:
                 alpha = 1.0
-                mode = .none
                 delegate?.didEndMovingEvent(event, gesture: gesture)
             default:
                 stopTimer()
             }
+            mode = .none
         default:
             break
         }
