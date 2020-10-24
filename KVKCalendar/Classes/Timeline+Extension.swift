@@ -129,6 +129,7 @@ extension TimelineView {
 
 extension TimelineView {
     @objc func forceDeselectEvent() {
+        scrollView.subviews.filter({ $0 is ResizeEventView }).forEach({ $0.removeFromSuperview() })
         guard let eventViewGeneral = scrollView.subviews.first(where: { ($0 as? EventViewGeneral)?.isSelected == true }) as? EventViewGeneral else { return }
         
         guard let eventView = eventViewGeneral as? EventView else {
@@ -240,6 +241,8 @@ extension TimelineView {
     }
     
     @objc func addNewEvent(gesture: UILongPressGestureRecognizer) {
+        guard !isResizeEnableMode else { return }
+        
         var point = gesture.location(in: scrollView)
         point.y = (point.y - eventPreviewYOffset) - style.timeline.offsetEvent - 6
         let time = calculateChangingTime(pointY: point.y)
@@ -296,6 +299,8 @@ extension TimelineView {
     }
     
     @objc func swipeEvent(gesture: UIPanGestureRecognizer) {
+        guard !isResizeEnableMode else { return }
+        
         let translation = gesture.translation(in: self)
         let velocity = gesture.velocity(in: self)
         let endGesure = abs(translation.x) > (frame.width / 3.5)
@@ -360,6 +365,17 @@ extension TimelineView: EventDataSource {
     }
 }
 
+extension TimelineView: ResizeEventViewDelegate {
+    func didStart(gesture: UIPanGestureRecognizer) {
+        let location = gesture.location(in: scrollView)
+        print(location.y)
+    }
+    
+    func didEnd(gesture: UIPanGestureRecognizer) {
+        
+    }
+}
+
 extension TimelineView: EventDelegate {
     var eventPreviewXOffset: CGFloat {
         return eventPreviewSize.width * 0.5
@@ -379,11 +395,25 @@ extension TimelineView: EventDelegate {
     }
     
     func didStartResizeEvent(_ event: Event, gesture: UILongPressGestureRecognizer, view: UIView) {
+        isResizeEnableMode = true
         print(event, "start resize")
+        let viewTmp: UIView
+        if view is EventView {
+            let eventView = EventView(event: event, style: style, frame: view.frame)
+            eventView.selectEvent()
+            eventView.isUserInteractionEnabled = false
+            viewTmp = eventView
+        } else {
+            viewTmp = view.snapshotView(afterScreenUpdates: false) ?? view
+        }
+        let resizeView = ResizeEventView(eventView: viewTmp, event: event, frame: viewTmp.frame)
+        resizeView.delegate = self
+        scrollView.addSubview(resizeView)
     }
     
     func didEndResizeEvent(_ event: Event, gesture: UILongPressGestureRecognizer) {
         print(event, "end resize")
+        isResizeEnableMode = false
     }
     
     func didStartMovingEvent(_ event: Event, gesture: UILongPressGestureRecognizer, view: UIView) {
@@ -406,6 +436,7 @@ extension TimelineView: EventDelegate {
                                      frame: CGRect(origin: CGPoint(x: point.x - eventPreviewXOffset, y: point.y - eventPreviewYOffset),
                                                    size: eventPreviewSize))
         } else {
+            eventPreview = view.snapshotView(afterScreenUpdates: false)
             if let size = eventPreview?.frame.size {
                 eventPreviewSize = size
             }

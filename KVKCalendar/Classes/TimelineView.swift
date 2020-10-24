@@ -18,6 +18,7 @@ final class TimelineView: UIView, EventDateProtocol {
     var eventPreview: UIView?
     var firstAutoScrollIsCompleted = false
     var eventPreviewSize = CGSize(width: 100, height: 100)
+    var isResizeEnableMode = false
     
     private(set) var tagCurrentHourLine = -10
     private(set) var tagEventPagePreview = -20
