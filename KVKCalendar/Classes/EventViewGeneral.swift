@@ -83,7 +83,6 @@ open class EventViewGeneral: UIView, CalendarTimer {
             switch mode {
             case .none:
                 mode = .resize
-                delegate?.didStartResizeEvent(event, gesture: gesture, view: self)
                 
                 startTimer(interval: 3) { [weak self] in
                     guard let self = self else { return }
@@ -93,6 +92,7 @@ open class EventViewGeneral: UIView, CalendarTimer {
                     self.alpha = self.style.event.alphaWhileMoving
                     self.delegate?.didStartMovingEvent(self.event, gesture: gesture, view: self)
                 }
+                delegate?.didStartResizeEvent(event, gesture: gesture, view: self)
             case .resize:
                 alpha = style.event.alphaWhileMoving
                 delegate?.didStartMovingEvent(event, gesture: gesture, view: self)
