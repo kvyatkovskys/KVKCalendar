@@ -128,8 +128,15 @@ extension TimelineView {
 }
 
 extension TimelineView {
+    private func removeEventResizeView() {
+        eventResizePreview?.frame = .zero
+        eventResizePreview?.removeFromSuperview()
+        eventResizePreview = nil
+    }
+    
     @objc func forceDeselectEvent() {
-        scrollView.subviews.filter({ $0 is ResizeEventView }).forEach({ $0.removeFromSuperview() })
+        removeEventResizeView()
+        
         guard let eventViewGeneral = scrollView.subviews.first(where: { ($0 as? EventViewGeneral)?.isSelected == true }) as? EventViewGeneral else { return }
         
         guard let eventView = eventViewGeneral as? EventView else {
@@ -366,12 +373,44 @@ extension TimelineView: EventDataSource {
 }
 
 extension TimelineView: ResizeEventViewDelegate {
-    func didStart(gesture: UIPanGestureRecognizer) {
+    func didStart(gesture: UIPanGestureRecognizer, type: ResizeEventView.ResizeEventViewType) {
         let location = gesture.location(in: scrollView)
-        print(location.y)
+        
+        print(location.y, eventResizePreview?.frame.origin.y, type, "start process resize")
+        showChangingMinutes(pointY: location.y)
+        
+        switch type {
+        case .top:
+            eventResizePreview?.frame.origin.y = location.y
+            
+//            if translation.y < 0 {
+//                eventResizePreview?.frame.size.height += location.y
+//            }
+        case .bottom:
+            guard (location.y - (eventResizePreview?.frame.origin.y ?? 0)) > 80 else { return }
+            
+            eventResizePreview?.frame.size.height = location.y - (eventResizePreview?.frame.origin.y ?? 0)
+            eventResizePreview?.bottomView.frame.origin.y = (eventResizePreview?.frame.size.height ?? 0) - 40
+            eventResizePreview?.eventView.frame.size.height = (eventResizePreview?.frame.size.height ?? 0) - 40
+            eventResizePreview?.eventView.subviews.forEach({ $0.frame.size.height = (eventResizePreview?.frame.size.height ?? 0) - 40 })
+        }
     }
     
-    func didEnd(gesture: UIPanGestureRecognizer) {
+    func didEnd(gesture: UIPanGestureRecognizer, type: ResizeEventView.ResizeEventViewType) {
+        let location = gesture.location(in: scrollView)
+        print(location.y, type, "end process resize")
+        movingMinutesLabel.removeFromSuperview()
+    }
+    
+    func didStartMoveResizeEvent(_ event: Event, gesture: UIPanGestureRecognizer, view: UIView) {
+        
+    }
+    
+    func didChangeMoveResizeEvent(_ event: Event, gesture: UIPanGestureRecognizer) {
+        
+    }
+    
+    func didEndMoveResizeEvent(_ event: Event, gesture: UIPanGestureRecognizer) {
         
     }
 }
@@ -395,6 +434,8 @@ extension TimelineView: EventDelegate {
     }
     
     func didStartResizeEvent(_ event: Event, gesture: UILongPressGestureRecognizer, view: UIView) {
+        removeEventResizeView()
+        
         isResizeEnableMode = true
         print(event, "start resize")
         let viewTmp: UIView
@@ -403,24 +444,31 @@ extension TimelineView: EventDelegate {
             eventView.selectEvent()
             eventView.isUserInteractionEnabled = false
             viewTmp = eventView
+            viewTmp.frame = view.frame
         } else {
             viewTmp = view.snapshotView(afterScreenUpdates: false) ?? view
+            viewTmp.frame = view.frame
         }
-        let resizeView = ResizeEventView(eventView: viewTmp, event: event, frame: viewTmp.frame)
-        resizeView.delegate = self
-        scrollView.addSubview(resizeView)
+        
+        eventResizePreview = ResizeEventView(view: viewTmp, event: event, frame: viewTmp.frame)
+        eventResizePreview?.delegate = self
+        if let resizeView = eventResizePreview {
+            scrollView.addSubview(resizeView)
+        }
     }
     
     func didEndResizeEvent(_ event: Event, gesture: UILongPressGestureRecognizer) {
         print(event, "end resize")
         isResizeEnableMode = false
+        removeEventResizeView()
     }
     
     func didStartMovingEvent(_ event: Event, gesture: UILongPressGestureRecognizer, view: UIView) {
-        let point = gesture.location(in: scrollView)
+        removeEventResizeView()
+        let location = gesture.location(in: scrollView)
         
         shadowView.removeFromSuperview()
-        if let value = moveShadowView(pointX: point.x) {
+        if let value = moveShadowView(pointX: location.x) {
             shadowView.frame = value.frame
             shadowView.date = value.date
             scrollView.addSubview(shadowView)
@@ -433,14 +481,14 @@ extension TimelineView: EventDelegate {
             eventPreviewSize = CGSize(width: 100, height: 100)
             eventPreview = EventView(event: event,
                                      style: style,
-                                     frame: CGRect(origin: CGPoint(x: point.x - eventPreviewXOffset, y: point.y - eventPreviewYOffset),
+                                     frame: CGRect(origin: CGPoint(x: location.x - eventPreviewXOffset, y: location.y - eventPreviewYOffset),
                                                    size: eventPreviewSize))
         } else {
             eventPreview = view.snapshotView(afterScreenUpdates: false)
             if let size = eventPreview?.frame.size {
                 eventPreviewSize = size
             }
-            eventPreview?.frame.origin = CGPoint(x: point.x - eventPreviewXOffset, y: point.y - eventPreviewYOffset)
+            eventPreview?.frame.origin = CGPoint(x: location.x - eventPreviewXOffset, y: location.y - eventPreviewYOffset)
         }
         
         eventPreview?.alpha = 0.9
@@ -448,7 +496,8 @@ extension TimelineView: EventDelegate {
         eventPreview?.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
         if let eventTemp = eventPreview {
             scrollView.addSubview(eventTemp)
-            showChangingMinutes(pointY: point.y)
+            let offset = eventPreviewYOffset - style.timeline.offsetEvent - 6
+            showChangingMinutes(pointY: location.y, offset: offset)
             UIView.animate(withDuration: 0.3) {
                 self.eventPreview?.transform = CGAffineTransform(scaleX: 1, y: 1)
             }
@@ -461,18 +510,18 @@ extension TimelineView: EventDelegate {
         eventPreview = nil
         movingMinutesLabel.removeFromSuperview()
         
-        var point = gesture.location(in: scrollView)
+        var location = gesture.location(in: scrollView)
         let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
-        guard scrollView.frame.width >= (point.x + 30), (point.x - 10) >= leftOffset else { return }
+        guard scrollView.frame.width >= (location.x + 30), (location.x - 10) >= leftOffset else { return }
         
-        point.y = (point.y - eventPreviewYOffset) - style.timeline.offsetEvent - 6
-        let time = calculateChangingTime(pointY: point.y)
+        location.y = (location.y - eventPreviewYOffset) - style.timeline.offsetEvent - 6
+        let time = calculateChangingTime(pointY: location.y)
         if let minute = time.minute, let hour = time.hour, !event.isNew {
             var newDayEvent: Int?
             if type == .week, let newDay = shadowView.date?.day {
                 newDayEvent = newDay
             }
-            delegate?.didChangeEvent(event, minute: minute, hour: hour, point: point, newDay: newDayEvent)
+            delegate?.didChangeEvent(event, minute: minute, hour: hour, point: location, newDay: newDayEvent)
         }
         
         shadowView.removeFromSuperview()
@@ -495,7 +544,8 @@ extension TimelineView: EventDelegate {
         }
         
         eventPreview?.frame.origin = CGPoint(x: location.x - eventPreviewXOffset, y: location.y - eventPreviewYOffset)
-        showChangingMinutes(pointY: location.y)
+        let offsetMinutes = eventPreviewYOffset - style.timeline.offsetEvent - 6
+        showChangingMinutes(pointY: location.y, offset: offsetMinutes)
         
         if let value = moveShadowView(pointX: location.x) {
             shadowView.frame = value.frame
@@ -503,13 +553,12 @@ extension TimelineView: EventDelegate {
         }
     }
     
-    private func showChangingMinutes(pointY: CGFloat) {
+    private func showChangingMinutes(pointY: CGFloat, offset: CGFloat = 0) {
         movingMinutesLabel.removeFromSuperview()
         
         let pointTempY = (pointY - eventPreviewYOffset) - style.timeline.offsetEvent - 6
         let time = calculateChangingTime(pointY: pointTempY)
         if style.timeline.offsetTimeY > 50, let minute = time.minute, 0...59 ~= minute {
-            let offset = eventPreviewYOffset - style.timeline.offsetEvent - 6
             movingMinutesLabel.frame =  CGRect(x: style.timeline.offsetTimeX, y: (pointY - offset) - style.timeline.heightTime,
                                                width: style.timeline.widthTime, height: style.timeline.heightTime)
             scrollView.addSubview(movingMinutesLabel)

@@ -16,6 +16,7 @@ final class TimelineView: UIView, EventDateProtocol {
     
     var style: Style
     var eventPreview: UIView?
+    var eventResizePreview: ResizeEventView?
     var firstAutoScrollIsCompleted = false
     var eventPreviewSize = CGSize(width: 100, height: 100)
     var isResizeEnableMode = false
