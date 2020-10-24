@@ -7,6 +7,34 @@
 
 import UIKit
 
+private enum AssociatedKeys {
+    static var timer: UInt8 = 0
+}
+
+/// Any object can start and stop delayed action for key
+protocol CalendarTimer: class {}
+
+extension CalendarTimer {
+    
+    private var timers: [String: Timer] {
+        get { return objc_getAssociatedObject(self, &AssociatedKeys.timer) as? [String: Timer] ?? [:] }
+        set { objc_setAssociatedObject(self, &AssociatedKeys.timer, newValue, .OBJC_ASSOCIATION_RETAIN) }
+    }
+    
+    func stopTimer(_ key: String = "Timer") {
+        timers[key]?.invalidate()
+        timers[key] = nil
+    }
+    
+    func startTimer(_ key: String = "Timer", interval: TimeInterval = 1, action: @escaping () -> Void) {
+        timers[key] = Timer.scheduledTimer(withTimeInterval: interval, repeats: false, block: { _ in
+            action()
+        })
+    }
+    
+}
+
+
 extension UIApplication {
     var isAvailableBotomHomeIndicator: Bool {
         if #available(iOS 13.0, *), let keyWindow = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) {
