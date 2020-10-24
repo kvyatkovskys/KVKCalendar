@@ -21,8 +21,6 @@ public struct Style {
     public var calendar = Calendar.current
     public var timezone = TimeZone.current
     public var defaultType: CalendarType?
-    @available(swift, deprecated: 0.3.6, obsoleted: 0.3.7, renamed: "timeSystem")
-    public var timeHourSystem: TimeHourSystem = .twentyFour
     public var timeSystem: TimeHourSystem = .twentyFour
     public var startWeekDay: StartDayType = .monday
     public var followInSystemTheme: Bool = false
@@ -93,12 +91,6 @@ public struct TimelineStyle {
     public var timeFont: UIFont = .systemFont(ofSize: 12)
     public var scrollToCurrentHour: Bool = true
     public var widthEventViewer: CGFloat = 0
-    
-    @available(swift, deprecated: 0.3.7, obsoleted: 0.3.8, message: "Moved to Event style struct")
-    public var iconFile: UIImage? = nil
-    @available(swift, deprecated: 0.3.7, obsoleted: 0.3.8, message: "Moved to Event style struct")
-    public var colorIconFile: UIColor = .black
-    
     public var showCurrentLineHour: Bool = true
     public var currentLineHourFont: UIFont = .systemFont(ofSize: 12)
     public var currentLineHourColor: UIColor = .red
@@ -110,12 +102,6 @@ public struct TimelineStyle {
     public var movingMinutesColor: UIColor = .systemBlue
     public var shadowColumnColor: UIColor = .systemTeal
     public var shadowColumnAlpha: CGFloat = 0.1
-    
-    @available(swift, deprecated: 0.3.7, obsoleted: 0.3.8, message: "Moved to Event style struct")
-    public var eventCorners: UIRectCorner = .allCorners
-    @available(swift, deprecated: 0.3.7, obsoleted: 0.3.8, message: "Moved to Event style struct")
-    public var eventCornersRadius: CGSize = CGSize(width: 5, height: 5)
-    
     public var minimumPressDuration: TimeInterval = 0.5
     public var isHiddenStubEvent: Bool = false
 }

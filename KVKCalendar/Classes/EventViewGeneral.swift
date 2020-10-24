@@ -7,7 +7,12 @@
 
 import UIKit
 
-open class EventViewGeneral: UIView {
+open class EventViewGeneral: UIView, CalendarTimer {
+    
+    public enum EventViewMode: Int {
+        case resize, move, none
+    }
+    
     weak var delegate: EventDelegate?
     weak var dataSource: EventDataSource?
     
@@ -15,9 +20,10 @@ open class EventViewGeneral: UIView {
     public var color: UIColor
     public var style: Style
     public var isSelected: Bool = false
+    public var mode: EventViewMode = .none
     
     public lazy var longGesture: UILongPressGestureRecognizer = {
-        let gesture = UILongPressGestureRecognizer(target: self, action: #selector(activateMoveEvent))
+        let gesture = UILongPressGestureRecognizer(target: self, action: #selector(editEvent))
         gesture.minimumPressDuration = style.event.minimumPressDuration
         return gesture
     }()
@@ -55,6 +61,7 @@ open class EventViewGeneral: UIView {
         delegate?.didSelectEvent(event, gesture: gesture)
     }
     
+    @available(swift, deprecated: 0.3.8, obsoleted: 0.3.9, renamed: "editEvent")
     @objc public func activateMoveEvent(gesture: UILongPressGestureRecognizer) {
         switch gesture.state {
         case .began:
@@ -65,6 +72,44 @@ open class EventViewGeneral: UIView {
         case .cancelled, .ended, .failed:
             alpha = 1.0
             delegate?.didEndMovingEvent(event, gesture: gesture)
+        default:
+            break
+        }
+    }
+    
+    @objc public func editEvent(gesture: UILongPressGestureRecognizer) {
+        switch gesture.state {
+        case .began:
+            mode = .resize
+            delegate?.didStartResizeEvent(event, gesture: gesture, view: self)
+            
+            startTimer(interval: 3) { [weak self] in
+                guard let self = self else { return }
+                
+                self.mode = .move
+                self.delegate?.didEndResizeEvent(self.event, gesture: gesture)
+                self.alpha = self.style.event.alphaWhileMoving
+                self.delegate?.didStartMovingEvent(self.event, gesture: gesture, view: self)
+            }
+        case .changed:
+            stopTimer()
+            
+            if mode == .resize {
+                mode = .move
+                delegate?.didEndResizeEvent(event, gesture: gesture)
+                alpha = style.event.alphaWhileMoving
+                delegate?.didStartMovingEvent(event, gesture: gesture, view: self)
+            }
+            
+            delegate?.didChangeMovingEvent(event, gesture: gesture)
+        case .cancelled, .ended, .failed:
+            if mode == .move {
+                alpha = 1.0
+                delegate?.didEndMovingEvent(event, gesture: gesture)
+            } else {
+                mode = .none
+                stopTimer()
+            }
         default:
             break
         }
@@ -99,6 +144,8 @@ extension EventViewGeneral: UIContextMenuInteractionDelegate {
 }
 
 protocol EventDelegate: class {
+    func didStartResizeEvent(_ event: Event, gesture: UILongPressGestureRecognizer, view: UIView)
+    func didEndResizeEvent(_ event: Event, gesture: UILongPressGestureRecognizer)
     func didStartMovingEvent(_ event: Event, gesture: UILongPressGestureRecognizer, view: UIView)
     func didEndMovingEvent(_ event: Event, gesture: UILongPressGestureRecognizer)
     func didChangeMovingEvent(_ event: Event, gesture: UILongPressGestureRecognizer)

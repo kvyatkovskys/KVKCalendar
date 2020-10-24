@@ -378,6 +378,14 @@ extension TimelineView: EventDelegate {
         delegate?.didSelectEvent(event, frame: gesture.view?.frame)
     }
     
+    func didStartResizeEvent(_ event: Event, gesture: UILongPressGestureRecognizer, view: UIView) {
+        print(event, "start resize")
+    }
+    
+    func didEndResizeEvent(_ event: Event, gesture: UILongPressGestureRecognizer) {
+        print(event, "end resize")
+    }
+    
     func didStartMovingEvent(_ event: Event, gesture: UILongPressGestureRecognizer, view: UIView) {
         let point = gesture.location(in: scrollView)
         
@@ -388,22 +396,25 @@ extension TimelineView: EventDelegate {
             scrollView.addSubview(shadowView)
         }
     
+        eventPreview?.removeFromSuperview()
         eventPreview = nil
         
         if view is EventView {
-            let eventView = EventView(event: event,
-                                      style: style,
-                                      frame: view.frame)
-            eventView.selectEvent()
-            eventPreview = eventView
+            eventPreviewSize = CGSize(width: 100, height: 100)
+            eventPreview = EventView(event: event,
+                                     style: style,
+                                     frame: CGRect(origin: CGPoint(x: point.x - eventPreviewXOffset, y: point.y - eventPreviewYOffset),
+                                                   size: eventPreviewSize))
         } else {
-            eventPreview = view.snapshotView(afterScreenUpdates: false)
-            eventPreview?.frame = view.frame
+            if let size = eventPreview?.frame.size {
+                eventPreviewSize = size
+            }
+            eventPreview?.frame.origin = CGPoint(x: point.x - eventPreviewXOffset, y: point.y - eventPreviewYOffset)
         }
         
         eventPreview?.alpha = 0.9
         eventPreview?.tag = tagEventPagePreview
-        eventPreview?.transform = CGAffineTransform(scaleX: 0.98, y: 0.98)
+        eventPreview?.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
         if let eventTemp = eventPreview {
             scrollView.addSubview(eventTemp)
             showChangingMinutes(pointY: point.y)
@@ -415,8 +426,8 @@ extension TimelineView: EventDelegate {
     }
     
     func didEndMovingEvent(_ event: Event, gesture: UILongPressGestureRecognizer) {
-        //eventPreview?.removeFromSuperview()
-        //eventPreview = nil
+        eventPreview?.removeFromSuperview()
+        eventPreview = nil
         movingMinutesLabel.removeFromSuperview()
         
         var point = gesture.location(in: scrollView)
