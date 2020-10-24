@@ -246,7 +246,7 @@ extension TimelineView {
         var newEvent = Event(ID: Event.idForNewEvent, text: style.event.textForNewEvent)
         let newEventPreview = getEventView(style: style, event: newEvent, frame: CGRect(origin: point, size: .zero))
         newEventPreview.delegate = self
-        newEventPreview.activateMoveEvent(gesture: gesture)
+        newEventPreview.editEvent(gesture: gesture)
         
         switch gesture.state {
         case .ended, .failed, .cancelled:

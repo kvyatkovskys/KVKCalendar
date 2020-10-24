@@ -80,34 +80,46 @@ open class EventViewGeneral: UIView, CalendarTimer {
     @objc public func editEvent(gesture: UILongPressGestureRecognizer) {
         switch gesture.state {
         case .began:
-            mode = .resize
-            delegate?.didStartResizeEvent(event, gesture: gesture, view: self)
-            
-            startTimer(interval: 3) { [weak self] in
-                guard let self = self else { return }
+            switch mode {
+            case .none:
+                mode = .resize
+                delegate?.didStartResizeEvent(event, gesture: gesture, view: self)
                 
-                self.mode = .move
-                self.delegate?.didEndResizeEvent(self.event, gesture: gesture)
-                self.alpha = self.style.event.alphaWhileMoving
-                self.delegate?.didStartMovingEvent(self.event, gesture: gesture, view: self)
+                startTimer(interval: 3) { [weak self] in
+                    guard let self = self else { return }
+                    
+                    self.mode = .move
+                    self.delegate?.didEndResizeEvent(self.event, gesture: gesture)
+                    self.alpha = self.style.event.alphaWhileMoving
+                    self.delegate?.didStartMovingEvent(self.event, gesture: gesture, view: self)
+                }
+            case .resize:
+                alpha = style.event.alphaWhileMoving
+                delegate?.didStartMovingEvent(event, gesture: gesture, view: self)
+            case .move:
+                break
             }
         case .changed:
             stopTimer()
             
-            if mode == .resize {
+            switch mode {
+            case .resize:
                 mode = .move
                 delegate?.didEndResizeEvent(event, gesture: gesture)
                 alpha = style.event.alphaWhileMoving
                 delegate?.didStartMovingEvent(event, gesture: gesture, view: self)
+            default:
+                break
             }
-            
+
             delegate?.didChangeMovingEvent(event, gesture: gesture)
         case .cancelled, .ended, .failed:
-            if mode == .move {
+            switch mode {
+            case .move:
                 alpha = 1.0
-                delegate?.didEndMovingEvent(event, gesture: gesture)
-            } else {
                 mode = .none
+                delegate?.didEndMovingEvent(event, gesture: gesture)
+            default:
                 stopTimer()
             }
         default:
