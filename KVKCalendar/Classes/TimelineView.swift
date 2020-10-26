@@ -18,7 +18,7 @@ final class TimelineView: UIView, EventDateProtocol {
     var eventPreview: UIView?
     var eventResizePreview: ResizeEventView?
     var firstAutoScrollIsCompleted = false
-    var eventPreviewSize = CGSize(width: 200, height: 200)
+    var eventPreviewSize = CGSize(width: 150, height: 150)
     var isResizeEnableMode = false
     
     private(set) var tagCurrentHourLine = -10
@@ -249,7 +249,9 @@ final class TimelineView: UIView, EventDateProtocol {
     }
     
     func create(dates: [Date?], events: [Event], selectedDate: Date?) {
+        isResizeEnableMode = false
         delegate?.didDisplayEvents(events, dates: dates)
+        
         self.dates = dates
         self.events = events
         self.selectedDate = selectedDate

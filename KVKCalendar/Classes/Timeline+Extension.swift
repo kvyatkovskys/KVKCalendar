@@ -132,6 +132,7 @@ extension TimelineView {
         eventResizePreview?.frame = .zero
         eventResizePreview?.removeFromSuperview()
         eventResizePreview = nil
+        isResizeEnableMode = false
     }
     
     @objc func forceDeselectEvent() {
@@ -255,6 +256,7 @@ extension TimelineView {
         let time = calculateChangingTime(pointY: point.y)
         var newEvent = Event(ID: Event.idForNewEvent, text: style.event.textForNewEvent)
         let newEventPreview = getEventView(style: style, event: newEvent, frame: CGRect(origin: point, size: .zero))
+        newEventPreview.mode = .move
         newEventPreview.delegate = self
         newEventPreview.editEvent(gesture: gesture)
         
@@ -380,9 +382,9 @@ extension TimelineView: ResizeEventViewDelegate {
         switch type {
         case .top:
             let offsetY = (eventResizePreview?.frame.origin.y ?? 0) - location.y
-            print((location.y + 80) - location.y)
-            //guard (location.y + 80) - location.y > 80 else { return }
-
+            let endY = (eventResizePreview?.originalFrameEventView.height ?? 0) + (eventResizePreview?.originalFrameEventView.origin.y ?? 0)
+            guard endY - location.y > 70 else { return }
+            
             eventResizePreview?.frame.origin.y = location.y
             eventResizePreview?.frame.size.height += offsetY
         case .bottom:

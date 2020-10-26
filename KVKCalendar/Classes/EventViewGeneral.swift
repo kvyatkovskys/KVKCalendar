@@ -93,15 +93,13 @@ open class EventViewGeneral: UIView, CalendarTimer {
                     self.delegate?.didStartMovingEvent(self.event, gesture: gesture, view: self)
                 }
                 delegate?.didStartResizeEvent(event, gesture: gesture, view: self)
-            case .resize:
+            case .resize, .move:
                 alpha = style.event.alphaWhileMoving
                 delegate?.didStartMovingEvent(event, gesture: gesture, view: self)
-            case .move:
-                break
             }
         case .changed:
             stopTimer()
-            
+
             switch mode {
             case .resize:
                 mode = .move
