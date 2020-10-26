@@ -84,7 +84,7 @@ open class EventViewGeneral: UIView, CalendarTimer {
             case .none:
                 mode = .resize
                 
-                startTimer(interval: 3) { [weak self] in
+                startTimer(interval: 2) { [weak self] in
                     guard let self = self else { return }
                     
                     self.mode = .move
