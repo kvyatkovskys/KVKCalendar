@@ -64,6 +64,12 @@ final class ResizeEventView: UIView {
         addSubview(bottomView)
     }
     
+    func updateHeight() {
+        bottomView.frame.origin.y = frame.height - 40
+        eventView.frame.size.height = frame.height - 40
+        eventView.subviews.forEach({ $0.frame.size.height = frame.height - 40 })
+    }
+    
     @objc private func trackGesture(gesture: UIPanGestureRecognizer) {
         guard let tag = gesture.view?.tag, let type = ResizeEventViewType(rawValue: tag) else { return }
         

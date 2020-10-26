@@ -375,30 +375,26 @@ extension TimelineView: EventDataSource {
 extension TimelineView: ResizeEventViewDelegate {
     func didStart(gesture: UIPanGestureRecognizer, type: ResizeEventView.ResizeEventViewType) {
         let location = gesture.location(in: scrollView)
-        
-        print(location.y, eventResizePreview?.frame.origin.y, type, "start process resize")
         showChangingMinutes(pointY: location.y)
-        
+
         switch type {
         case .top:
+            let offsetY = (eventResizePreview?.frame.origin.y ?? 0) - location.y
+            print((location.y + 80) - location.y)
+            //guard (location.y + 80) - location.y > 80 else { return }
+
             eventResizePreview?.frame.origin.y = location.y
-            
-//            if translation.y < 0 {
-//                eventResizePreview?.frame.size.height += location.y
-//            }
+            eventResizePreview?.frame.size.height += offsetY
         case .bottom:
             guard (location.y - (eventResizePreview?.frame.origin.y ?? 0)) > 80 else { return }
             
             eventResizePreview?.frame.size.height = location.y - (eventResizePreview?.frame.origin.y ?? 0)
-            eventResizePreview?.bottomView.frame.origin.y = (eventResizePreview?.frame.size.height ?? 0) - 40
-            eventResizePreview?.eventView.frame.size.height = (eventResizePreview?.frame.size.height ?? 0) - 40
-            eventResizePreview?.eventView.subviews.forEach({ $0.frame.size.height = (eventResizePreview?.frame.size.height ?? 0) - 40 })
         }
+        
+        eventResizePreview?.updateHeight()
     }
     
     func didEnd(gesture: UIPanGestureRecognizer, type: ResizeEventView.ResizeEventViewType) {
-        let location = gesture.location(in: scrollView)
-        print(location.y, type, "end process resize")
         movingMinutesLabel.removeFromSuperview()
     }
     
@@ -478,7 +474,7 @@ extension TimelineView: EventDelegate {
         eventPreview = nil
         
         if view is EventView {
-            eventPreviewSize = CGSize(width: 100, height: 100)
+            eventPreviewSize = CGSize(width: 200, height: 200)
             eventPreview = EventView(event: event,
                                      style: style,
                                      frame: CGRect(origin: CGPoint(x: location.x - eventPreviewXOffset, y: location.y - eventPreviewYOffset),
