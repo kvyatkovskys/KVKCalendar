@@ -255,7 +255,7 @@ extension TimelineView {
         point.y = (point.y - eventPreviewYOffset) - style.timeline.offsetEvent - 6
         let time = calculateChangingTime(pointY: point.y)
         var newEvent = Event(ID: Event.idForNewEvent, text: style.event.textForNewEvent)
-        let newEventPreview = getEventView(style: style, event: newEvent, frame: CGRect(origin: point, size: .zero))
+        let newEventPreview = getEventView(style: style, event: newEvent, frame: CGRect(origin: point, size: eventPreviewSize))
         newEventPreview.mode = .move
         newEventPreview.delegate = self
         newEventPreview.editEvent(gesture: gesture)
@@ -476,13 +476,13 @@ extension TimelineView: EventDelegate {
         eventPreview = nil
         
         if view is EventView {
-            eventPreviewSize = CGSize(width: 200, height: 200)
+            eventPreviewSize = CGSize(width: 150, height: 150)
             eventPreview = EventView(event: event,
                                      style: style,
                                      frame: CGRect(origin: CGPoint(x: location.x - eventPreviewXOffset, y: location.y - eventPreviewYOffset),
                                                    size: eventPreviewSize))
         } else {
-            eventPreview = view.snapshotView(afterScreenUpdates: false)
+            eventPreview = event.isNew ? view : view.snapshotView(afterScreenUpdates: false)
             if let size = eventPreview?.frame.size {
                 eventPreviewSize = size
             }

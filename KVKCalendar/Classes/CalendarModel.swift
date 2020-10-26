@@ -136,7 +136,9 @@ extension Event {
     var hash: Int {
         return ID.hashValue
     }
-    
+}
+
+public extension Event {
     var isNew: Bool {
         return ID == Event.idForNewEvent
     }
