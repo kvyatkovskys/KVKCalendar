@@ -129,10 +129,29 @@ extension TimelineView {
 
 extension TimelineView {
     private func removeEventResizeView() {
+        if let value = eventResizePreview?.haveNewSize, value.needSave, let event = eventResizePreview?.event {
+            let startTime = calculateChangingTime(pointY: value.frame.origin.y)
+            let endTime = calculateChangingTime(pointY: value.frame.origin.y + value.frame.height)
+            if let startHour = startTime.hour, let startMinutes = startTime.minute, let endHour = endTime.hour, let endMinutes = endTime.minute {
+                delegate?.didResizeEvent(event, startTime: ResizeTime(startHour, startMinutes), endTime: ResizeTime(endHour, endMinutes))
+            }
+        }
+        
         eventResizePreview?.frame = .zero
         eventResizePreview?.removeFromSuperview()
         eventResizePreview = nil
         isResizeEnableMode = false
+        enableAllEvents(enable: true)
+    }
+    
+    private func enableAllEvents(enable: Bool) {
+        if style.allDay.isPinned {
+            subviews.filter({ $0 is AllDayEventView || $0 is AllDayTitleView }).forEach({ $0.isUserInteractionEnabled = enable })
+        } else {
+            scrollView.subviews.filter({ $0 is AllDayEventView || $0 is AllDayTitleView }).forEach({ $0.isUserInteractionEnabled = enable })
+        }
+        
+        scrollView.subviews.filter({ $0 is EventViewGeneral }).forEach({ $0.isUserInteractionEnabled = enable })
     }
     
     @objc func forceDeselectEvent() {
@@ -374,13 +393,15 @@ extension TimelineView: EventDataSource {
     }
 }
 
+// MARK: ResizeEventViewDelegate
 extension TimelineView: ResizeEventViewDelegate {
     func didStart(gesture: UIPanGestureRecognizer, type: ResizeEventView.ResizeEventViewType) {
         let location = gesture.location(in: scrollView)
-        showChangingMinutes(pointY: location.y)
-
         switch type {
         case .top:
+            let offsetMinutes = location.y + (eventResizePreview?.mainYOffset ?? 0) + style.timeline.offsetEvent
+            showChangingMinutes(pointY: offsetMinutes)
+            
             let offsetY = (eventResizePreview?.frame.origin.y ?? 0) - location.y
             let endY = (eventResizePreview?.originalFrameEventView.height ?? 0) + (eventResizePreview?.originalFrameEventView.origin.y ?? 0)
             guard endY - location.y > 70 else { return }
@@ -388,6 +409,9 @@ extension TimelineView: ResizeEventViewDelegate {
             eventResizePreview?.frame.origin.y = location.y
             eventResizePreview?.frame.size.height += offsetY
         case .bottom:
+            let offset = location.y - (eventResizePreview?.mainYOffset ?? 0) + style.timeline.offsetEvent
+            showChangingMinutes(pointY: offset)
+            
             guard (location.y - (eventResizePreview?.frame.origin.y ?? 0)) > 80 else { return }
             
             eventResizePreview?.frame.size.height = location.y - (eventResizePreview?.frame.origin.y ?? 0)
@@ -413,6 +437,7 @@ extension TimelineView: ResizeEventViewDelegate {
     }
 }
 
+// MARK: EventDelegate
 extension TimelineView: EventDelegate {
     var eventPreviewXOffset: CGFloat {
         return eventPreviewSize.width * 0.5
@@ -453,11 +478,11 @@ extension TimelineView: EventDelegate {
         if let resizeView = eventResizePreview {
             scrollView.addSubview(resizeView)
         }
+        enableAllEvents(enable: false)
     }
     
     func didEndResizeEvent(_ event: Event, gesture: UILongPressGestureRecognizer) {
         print(event, "end resize")
-        isResizeEnableMode = false
         removeEventResizeView()
     }
     

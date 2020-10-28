@@ -151,8 +151,24 @@ extension DayView: TimelineDelegate {
         scrollHeaderDay.selectDate(offset: -1)
     }
     
-    func swipeX(transform: CGAffineTransform, stop: Bool) {
+    func didResizeEvent(_ event: Event, startTime: ResizeTime, endTime: ResizeTime) {
+        var startComponents = DateComponents()
+        startComponents.year = event.start.year
+        startComponents.month = event.start.month
+        startComponents.day = event.start.day
+        startComponents.hour = startTime.hour
+        startComponents.minute = startTime.minutes
+        let startDate = style.calendar.date(from: startComponents)
         
+        var endComponents = DateComponents()
+        endComponents.year = event.end.year
+        endComponents.month = event.end.month
+        endComponents.day = event.end.day
+        endComponents.hour = endTime.hour
+        endComponents.minute = endTime.minutes
+        let endDate = style.calendar.date(from: endComponents)
+                
+        delegate?.didChangeCalendarEvent(event, start: startDate, end: endDate)
     }
     
     func didAddNewEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint) {
