@@ -33,6 +33,8 @@ struct EventTime: Equatable, Hashable {
     let end: TimeInterval
 }
 
+typealias ResizeTime = (hour: Int, minutes: Int)
+
 protocol TimelineDelegate: AnyObject {
     func didDisplayEvents(_ events: [Event], dates: [Date?])
     func didSelectEvent(_ event: Event, frame: CGRect?)
@@ -41,6 +43,11 @@ protocol TimelineDelegate: AnyObject {
     func swipeX(transform: CGAffineTransform, stop: Bool)
     func didChangeEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint, newDay: Int?)
     func didAddNewEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint)
+    func didResizeEvent(_ event: Event, startTime: ResizeTime, endTime: ResizeTime)
+}
+
+extension TimelineDelegate {
+    func swipeX(transform: CGAffineTransform, stop: Bool) {}
 }
 
 protocol EventDateProtocol {}

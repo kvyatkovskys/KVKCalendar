@@ -19,10 +19,10 @@ final class ResizeEventView: UIView {
     
     weak var delegate: ResizeEventViewDelegate?
     
-    private let event: Event
+    let event: Event
     private let mainHeightOffset: CGFloat = 30
-    private let mainYOffset: CGFloat = 15
     
+    let mainYOffset: CGFloat = 15
     private lazy var eventView: UIView = {
         let view = UIView()
         view.backgroundColor = event.color?.value ?? event.backgroundColor
@@ -33,6 +33,18 @@ final class ResizeEventView: UIView {
     private lazy var bottomView = createPanView(type: .bottom)
     
     let originalFrameEventView: CGRect
+    
+    var haveNewSize: (needSave: Bool, frame: CGRect) {
+        guard originalFrameEventView.height != eventView.frame.height else {
+            return (false, .zero)
+        }
+        
+        let newFrame = CGRect(x: originalFrameEventView.origin.x,
+                              y: frame.origin.y,
+                              width: originalFrameEventView.width,
+                              height: eventView.frame.height)
+        return (true, newFrame)
+    }
     
     private func createPanView(type: ResizeEventViewType) -> UIView {
         let view = UIView(frame: CGRect(origin: .zero, size: CGSize(width: 30, height: mainYOffset)))
