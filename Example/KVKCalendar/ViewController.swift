@@ -24,6 +24,13 @@ final class ViewController: UIViewController {
         return button
     }()
     
+    @available(iOS 13.0.0, *)
+    private lazy var swiftUI: UIBarButtonItem = {
+        let button = UIBarButtonItem(title: "Swift UI test", style: .done, target: self, action: #selector(openSwiftUITest))
+        button.tintColor = .systemRed
+        return button
+    }()
+    
     private lazy var style: Style = {
         var style = Style()
         if UIDevice.current.userInterfaceIdiom == .phone {
@@ -85,6 +92,9 @@ final class ViewController: UIViewController {
         view.addSubview(calendarView)
         navigationItem.titleView = segmentedControl
         navigationItem.rightBarButtonItem = todayButton
+        if #available(iOS 13.0.0, *) {
+            navigationItem.leftBarButtonItem = swiftUI
+        }
         
         calendarView.addEventViewToDay(view: eventViewer)
         
@@ -105,6 +115,12 @@ final class ViewController: UIViewController {
     
     @objc func today(sender: UIBarButtonItem) {
         calendarView.scrollTo(Date())
+    }
+    
+    @available(iOS 13.0.0, *)
+    @objc func openSwiftUITest() {
+        let vc = CalendarContentVC()
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func switchCalendar(sender: UISegmentedControl) {
