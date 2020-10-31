@@ -62,9 +62,9 @@ extension EventDateProtocol {
     }
     
     func checkMultipleDate(_ date: Date?, with event: Event) -> Bool {
-        guard let day = date?.day else { return false }
+        guard let timeInterval = date?.timeIntervalSince1970 else { return false }
         
-        return event.start.day != event.end.day && event.start.day...event.end.day ~= day && event.start.year == date?.year && event.start.month == date?.month
+        return event.start.day != event.end.day && event.start.timeIntervalSince1970...event.end.timeIntervalSince1970 ~= timeInterval && event.start.year == date?.year && event.start.month == date?.month
     }
 }
 

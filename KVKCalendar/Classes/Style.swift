@@ -166,6 +166,7 @@ public struct MonthStyle {
     public var weekDayAligment: NSTextAlignment = .right
     public var titleDateAligment: NSTextAlignment = .left
     public var fontTitleDate: UIFont = .boldSystemFont(ofSize: 20)
+    public var colorTitleDate: UIColor = .black
 }
 
 public struct YearStyle {
@@ -303,6 +304,7 @@ extension Style {
             newStyle.month.colorSeporator = UIColor.useForStyle(dark: .systemGray, white: newStyle.month.colorSeporator)
             newStyle.month.colorBackgroundWeekendDate = UIColor.useForStyle(dark: .systemGray6, white: newStyle.month.colorBackgroundWeekendDate)
             newStyle.month.colorBackgroundDate = UIColor.useForStyle(dark: .black, white: newStyle.month.colorBackgroundDate)
+            newStyle.month.colorTitleDate = UIColor.useForStyle(dark: .systemGray6, white: newStyle.month.colorTitleDate)
             
             // year
             newStyle.year.colorCurrentDate = UIColor.useForStyle(dark: .white, white: newStyle.year.colorCurrentDate)
