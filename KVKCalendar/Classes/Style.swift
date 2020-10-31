@@ -172,7 +172,7 @@ public struct MonthStyle {
 public struct YearStyle {
     private let format: DateFormatter = {
         let format = DateFormatter()
-        format.dateStyle = .full
+        format.dateFormat = "yyyy"
         return format
     }()
     
@@ -182,7 +182,7 @@ public struct YearStyle {
     public var colorBackgroundSelectDate: UIColor = .black
     public var colorSelectDate: UIColor = .white
     public var colorWeekendDate: UIColor = .gray
-    public var colorBackgroundWeekendDate: UIColor = gainsboro.withAlphaComponent(0.2)
+    public var colorBackgroundWeekendDate: UIColor = .clear
     public var weekFontPad: UIFont = .boldSystemFont(ofSize: 14)
     public var weekFontPhone: UIFont = .boldSystemFont(ofSize: 8)
     public var weekFont: UIFont {
@@ -196,7 +196,7 @@ public struct YearStyle {
     public var fontTitle: UIFont = .systemFont(ofSize: 19)
     public var colorTitle: UIColor = .black
     public var colorBackgroundHeader: UIColor = gainsboro.withAlphaComponent(0.4)
-    public var fontTitleHeader: UIFont = .boldSystemFont(ofSize: 20)
+    public var fontTitleHeader: UIFont = .boldSystemFont(ofSize: 40)
     public var colorTitleHeader: UIColor = .black
     public var heightTitleHeader: CGFloat = 50
     public var aligmentTitleHeader: NSTextAlignment = .left
