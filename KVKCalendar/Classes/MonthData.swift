@@ -51,13 +51,14 @@ final class MonthData: EventDateProtocol {
         return day.date?.year == date?.year && day.date?.month == date?.month
     }
     
-    func reloadEventsInDays(events: [Event]) {
+    func reloadEventsInDays(events: [Event]) -> (events: [Event], dates: [Date?]) {
         let recurringEvents = events.filter({ $0.recurringType != .none })
         let startDate = date.startOfMonth
         let endDate = date.endOfMonth?.startOfDay
         let startIdx = cachedDays.firstIndex(where: { $0.date?.day == startDate?.day && compareDate(day: $0, date: startDate) }) ?? 0
         let endIdx = cachedDays.firstIndex(where: { $0.date?.day == endDate?.day && compareDate(day: $0, date: endDate) }) ?? 0
         
+        var displayableEvents = [Event]()
         let newDays = cachedDays[startIdx...endIdx].reduce([], { (acc, day) -> [Day] in
             var newDay = day
             guard newDay.events.isEmpty else { return acc + [day] }
@@ -83,8 +84,12 @@ final class MonthData: EventDateProtocol {
             }
             let sortedEvents = (otherEvents + recurringEventByDate).sorted(by: { $0.start.hour < $1.start.hour })
             newDay.events = allDayEvents + sortedEvents.sorted(by: { $0.isAllDay && !$1.isAllDay })
+            displayableEvents += newDay.events
             return acc + [newDay]
         })
+        
         days[startIdx...endIdx] = ArraySlice(newDays)
+        
+        return (displayableEvents, newDays.map({ $0.date }))
     }
 }

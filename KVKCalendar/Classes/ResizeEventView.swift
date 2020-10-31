@@ -60,7 +60,7 @@ final class ResizeEventView: UIView {
     private func createCircleView() -> UIView {
         let view = UIView(frame: CGRect(origin: .zero, size: CGSize(width: 8, height: 8)))
         view.backgroundColor = .white
-        view.layer.borderWidth = 2
+        view.layer.borderWidth = 1.5
         view.layer.borderColor = event.color?.value.cgColor ?? event.backgroundColor.cgColor
         view.setRoundCorners(radius: CGSize(width: 4, height: 4))
         return view
@@ -77,6 +77,7 @@ final class ResizeEventView: UIView {
         
         eventView.frame = CGRect(origin: CGPoint(x: 0, y: mainYOffset), size: CGSize(width: frame.width, height: frame.height))
         addSubview(eventView)
+        eventView.layer.cornerRadius = 5
         
         view.frame = CGRect(origin: .zero, size: eventView.frame.size)
         eventView.addSubview(view)

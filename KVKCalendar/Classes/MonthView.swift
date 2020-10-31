@@ -54,7 +54,8 @@ final class MonthView: UIView {
     }
     
     func reloadData(events: [Event]) {
-        data.reloadEventsInDays(events: events)
+        let displayableValues = data.reloadEventsInDays(events: events)
+        delegate?.didDisplayCalendarEvents(displayableValues.events, dates: displayableValues.dates, type: .month)
         collectionView.reloadData()
     }
     

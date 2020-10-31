@@ -15,6 +15,7 @@ final class WeekHeaderView: UIView {
         let label = UILabel()
         label.textAlignment = style.month.titleDateAligment
         label.font = style.month.fontTitleDate
+        label.textColor = style.month.colorTitleDate
         label.tag = -999
         return label
     }()
