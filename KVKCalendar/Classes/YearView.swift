@@ -160,21 +160,11 @@ extension YearView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         guard style.year.isAutoSelectDateScrolling else { return }
         
-        let cells = collectionView.visibleCells as? [YearPadCell] ?? [YearPadCell()]
-        let newMoveDate = cells.reduce([]) { (acc, month) -> [Date?] in
-            var resultDate = acc
-            if let day = month.days.filter({ $0.date?.month == data.date.month && $0.date?.day == data.date.day }).first {
-                resultDate = [day.date]
-            }
-            return resultDate
-        }
-        .compactMap({ $0 })
-        .first
-        
-        data.date = newMoveDate ?? Date()
+        let cells = collectionView.indexPathsForVisibleItems
+        let dates = cells.compactMap { data.months[$0.row].date }
+        delegate?.didDisplayCalendarEvents([], dates: dates, type: .year)
+        let newMoveDate = dates.first(where: { $0.month == data.date.month })
         headerView.date = newMoveDate
-        delegate?.didSelectCalendarDate(newMoveDate, type: .year, frame: nil)
-        collectionView.reloadData()
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
