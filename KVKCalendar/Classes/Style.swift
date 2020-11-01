@@ -23,7 +23,7 @@ public struct Style {
     public var defaultType: CalendarType?
     public var timeSystem: TimeHourSystem = .twentyFour
     public var startWeekDay: StartDayType = .monday
-    public var followInSystemTheme: Bool = false
+    public var followInSystemTheme: Bool = true
     
     public init() {}
 }
@@ -75,9 +75,9 @@ public struct HeaderScrollStyle {
 }
 
 public struct TimelineStyle {
-    public var startFromFirstEvent: Bool = true
+    public var startFromFirstEvent: Bool = false
     public var eventFont: UIFont = .boldSystemFont(ofSize: 12)
-    public var offsetEvent: CGFloat = 1
+    public var offsetEvent: CGFloat = 3
     public var startHour: Int = 0
     public var heightLine: CGFloat = 0.5
     public var widthLine: CGFloat = 0.5
@@ -87,7 +87,7 @@ public struct TimelineStyle {
     public var widthTime: CGFloat = 40
     public var heightTime: CGFloat = 20
     public var offsetTimeX: CGFloat = 10
-    public var offsetTimeY: CGFloat = 50
+    public var offsetTimeY: CGFloat = 80
     public var timeColor: UIColor = .systemGray
     public var timeFont: UIFont = .systemFont(ofSize: 12)
     public var scrollToCurrentHour: Bool = true
@@ -237,7 +237,7 @@ public struct AllDayStyle {
 }
 
 public struct EventStyle {
-    public var isEnableMoveEvent: Bool = false
+    public var isEnableMoveEvent: Bool = true
     public var minimumPressDuration: TimeInterval = 0.5
     public var alphaWhileMoving: CGFloat = 0.5
     public var textForNewEvent: String = "New Event"
