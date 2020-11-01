@@ -27,7 +27,6 @@ final class ResizeEventView: UIView {
     private lazy var eventView: UIView = {
         let view = UIView()
         view.backgroundColor = event.color?.value ?? event.backgroundColor
-        view.addGestureRecognizer(panGesture)
         return view
     }()
     
@@ -67,11 +66,6 @@ final class ResizeEventView: UIView {
         view.layer.cornerRadius = 4
         return view
     }
-    
-    private lazy var panGesture: UIPanGestureRecognizer = {
-        let gesture = UIPanGestureRecognizer(target: self, action: #selector(panResizeView))
-        return gesture
-    }()
     
     init(view: UIView, event: Event, frame: CGRect, style: Style) {
         self.event = event
@@ -121,26 +115,6 @@ final class ResizeEventView: UIView {
             delegate?.didStart(gesture: gesture, type: type)
         case .cancelled, .failed, .ended:
             delegate?.didEnd(gesture: gesture, type: type)
-        default:
-            break
-        }
-    }
-    
-    @objc private func panResizeView(gesture: UIPanGestureRecognizer) {
-        switch gesture.state {
-        case .began:
-            UINotificationFeedbackGenerator().notificationOccurred(.success)
-            alpha = style.event.alphaWhileMoving
-            delegate?.didStartMoveResizeEvent(event, gesture: gesture, view: self)
-        case .changed:
-            delegate?.didChangeMoveResizeEvent(event, gesture: gesture)
-        case .cancelled, .ended, .failed:
-            if gesture.state == .failed {
-                UINotificationFeedbackGenerator().notificationOccurred(.warning)
-            }
-            
-            alpha = 1.0
-            delegate?.didEndMoveResizeEvent(event, gesture: gesture)
         default:
             break
         }

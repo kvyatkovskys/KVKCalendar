@@ -90,12 +90,12 @@ open class EventViewGeneral: UIView, CalendarTimer {
                     self.mode = .move
                     self.delegate?.didEndResizeEvent(self.event, gesture: gesture)
                     
-                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                    UIImpactFeedbackGenerator().impactOccurred()
                     self.alpha = self.style.event.alphaWhileMoving
                     self.delegate?.didStartMovingEvent(self.event, gesture: gesture, view: self)
                 }
                 
-                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                UIImpactFeedbackGenerator().impactOccurred()
                 delegate?.didStartResizeEvent(event, gesture: gesture, view: self)
             case .resize, .move:
                 alpha = style.event.alphaWhileMoving
@@ -109,7 +109,7 @@ open class EventViewGeneral: UIView, CalendarTimer {
                 mode = .move
                 delegate?.didEndResizeEvent(event, gesture: gesture)
                 
-                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                UIImpactFeedbackGenerator().impactOccurred()
                 alpha = style.event.alphaWhileMoving
                 delegate?.didStartMovingEvent(event, gesture: gesture, view: self)
             default:
