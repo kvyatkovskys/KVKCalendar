@@ -23,7 +23,7 @@ final class MonthView: UIView {
         if style.month.isHiddenTitleDate {
             height = style.month.heightHeaderWeek
         } else {
-            height = style.month.heightHeaderWeek + style.month.heightTitleDate
+            height = style.month.heightHeaderWeek + style.month.heightTitleDate + 5
         }
         let view = WeekHeaderView(frame: CGRect(x: 0, y: 0, width: frame.width, height: height), style: style)
         view.backgroundColor = style.week.colorBackground
@@ -298,7 +298,7 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
             return
         }
         
-        guard let newMoveDate = getVisibaleDate(), data.willSelectDate?.month != newMoveDate.month, data.date != newMoveDate else {
+        guard let newMoveDate = getVisibaleDate(), data.willSelectDate.month != newMoveDate.month, data.date != newMoveDate else {
             return
         }
         
@@ -307,10 +307,12 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
     }
         
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        guard style.month.isAutoSelectDateScrolling, let newMoveDate = getVisibaleDate() else { return }
+        guard let newMoveDate = getVisibaleDate() else { return }
+        
+        headerView.date = newMoveDate
+        guard style.month.isAutoSelectDateScrolling else { return }
         
         data.date = newMoveDate
-        headerView.date = newMoveDate
         delegate?.didSelectCalendarDate(newMoveDate, type: .month, frame: nil)
         collectionView.reloadData()
     }

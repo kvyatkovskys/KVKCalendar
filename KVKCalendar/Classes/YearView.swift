@@ -150,6 +150,7 @@ extension YearView: UICollectionViewDataSource {
                 cell.style = style
                 cell.selectDate = data.date
                 cell.title = month.name
+                cell.date = month.date
                 cell.days = month.days
             }
         }

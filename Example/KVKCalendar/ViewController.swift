@@ -12,7 +12,7 @@ import KVKCalendar
 final class ViewController: UIViewController {
     private var events = [Event]()
     
-    private var selectDate: Date = {
+    static var selectDate: Date = {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd.MM.yyyy"
         return formatter.date(from: "14.12.2018") ?? Date()
@@ -31,7 +31,7 @@ final class ViewController: UIViewController {
         return button
     }()
     
-    private lazy var style: Style = {
+    static var style: Style = {
         var style = Style()
         if UIDevice.current.userInterfaceIdiom == .phone {
             style.timeline.widthTime = 40
@@ -61,7 +61,7 @@ final class ViewController: UIViewController {
     }()
     
     private lazy var calendarView: CalendarView = {
-        let calendar = CalendarView(frame: view.frame, date: selectDate, style: style)
+        let calendar = CalendarView(frame: view.frame, date: ViewController.selectDate, style: ViewController.style)
         calendar.delegate = self
         calendar.dataSource = self
         return calendar
@@ -125,7 +125,7 @@ final class ViewController: UIViewController {
     
     @objc func switchCalendar(sender: UISegmentedControl) {
         let type = CalendarType.allCases[sender.selectedSegmentIndex]
-        calendarView.set(type: type, date: selectDate)
+        calendarView.set(type: type, date: ViewController.selectDate)
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -155,7 +155,7 @@ extension ViewController: CalendarDelegate {
     }
     
     func didSelectDate(_ date: Date?, type: CalendarType, frame: CGRect?) {
-        selectDate = date ?? Date()
+        ViewController.selectDate = date ?? Date()
         calendarView.reloadData()
     }
     
@@ -205,7 +205,7 @@ extension ViewController: CalendarDataSource {
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? {
         guard event.ID == "2" else { return nil }
         
-        return CustomViewEvent(style: style, event: event, frame: frame)
+        return CustomViewEvent(style: ViewController.style, event: event, frame: frame)
     }
     
     func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? {
@@ -264,7 +264,7 @@ extension ViewController {
     
     func timeFormatter(date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = style.timeSystem.format
+        formatter.dateFormat = ViewController.style.timeSystem.format
         return formatter.string(from: date)
     }
     

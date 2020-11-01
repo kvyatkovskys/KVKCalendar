@@ -15,7 +15,7 @@ final class MonthData: EventDateProtocol {
     let tagEventPagePreview = -20
     let eventPreviewYOffset: CGFloat = 30
     var eventPreviewXOffset: CGFloat = 60
-    var willSelectDate: Date?
+    var willSelectDate: Date
     let rows = 6
     let columns = 7
     var isFirstLoad = true
@@ -43,6 +43,7 @@ final class MonthData: EventDateProtocol {
         })
         data.months = months
         self.date = yearData.date
+        self.willSelectDate = yearData.date
         self.days = months.flatMap({ $0.days })
         self.cachedDays = days
     }

@@ -15,7 +15,7 @@ class CalendarContentVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let childView = UIHostingController(rootView: CalendarViewSwiftUI())
+        let childView = UIHostingController(rootView: CalendarViewContent())
         addChild(childView)
         childView.view.frame = view.bounds
         addConstrained(subview: childView.view)

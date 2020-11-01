@@ -43,6 +43,17 @@ final class YearPadCell: UICollectionViewCell {
         }
     }
     
+    var date: Date? {
+        didSet {
+            guard Date().month == date?.month && Date().year == date?.year else {
+                titleLabel.textColor = style.year.colorTitle
+                return
+            }
+            
+            titleLabel.textColor = .systemRed
+        }
+    }
+    
     var days: [Day] = [] {
         didSet {
             subviews.filter({ $0.tag == 1 }).forEach({ $0.removeFromSuperview() })

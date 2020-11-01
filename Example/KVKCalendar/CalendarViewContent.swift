@@ -1,5 +1,5 @@
 //
-//  CalendarViewSwiftUI.swift
+//  CalendarViewContent.swift
 //  KVKCalendar_Example
 //
 //  Created by Sergei Kviatkovskii on 31.10.2020.
@@ -9,9 +9,10 @@
 import SwiftUI
 
 @available(iOS 13.0.0, *)
-struct CalendarViewSwiftUI: View {
+struct CalendarViewContent: View {
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        CalendarDisplayView().edgesIgnoringSafeArea(.bottom)
+            .navigationBarTitle("", displayMode: .inline)
     }
 }
 
@@ -19,7 +20,7 @@ struct CalendarViewSwiftUI: View {
 struct CalendarViewSwiftUI_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            CalendarViewSwiftUI()
+            CalendarViewContent()
         }
     }
 }

@@ -40,7 +40,7 @@ final class YearHeaderView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        titleLabel.frame = CGRect(x: 10, y: 0, width: frame.width - 10, height: frame.height)
+        titleLabel.frame = CGRect(x: 20, y: 0, width: frame.width - 10, height: frame.height)
         addSubview(titleLabel)
     }
     
