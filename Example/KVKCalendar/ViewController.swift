@@ -12,7 +12,7 @@ import KVKCalendar
 final class ViewController: UIViewController {
     private var events = [Event]()
     
-    static var selectDate: Date = {
+    private var selectDate: Date = {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd.MM.yyyy"
         return formatter.date(from: "14.12.2018") ?? Date()
@@ -24,14 +24,7 @@ final class ViewController: UIViewController {
         return button
     }()
     
-    @available(iOS 13.0.0, *)
-    private lazy var swiftUI: UIBarButtonItem = {
-        let button = UIBarButtonItem(title: "Swift UI test", style: .done, target: self, action: #selector(openSwiftUITest))
-        button.tintColor = .systemRed
-        return button
-    }()
-    
-    static var style: Style = {
+    private var style: Style = {
         var style = Style()
         if UIDevice.current.userInterfaceIdiom == .phone {
             style.timeline.widthTime = 40
@@ -61,7 +54,7 @@ final class ViewController: UIViewController {
     }()
     
     private lazy var calendarView: CalendarView = {
-        let calendar = CalendarView(frame: view.frame, date: ViewController.selectDate, style: ViewController.style)
+        let calendar = CalendarView(frame: view.frame, date: selectDate, style: style)
         calendar.delegate = self
         calendar.dataSource = self
         return calendar
@@ -92,9 +85,6 @@ final class ViewController: UIViewController {
         view.addSubview(calendarView)
         navigationItem.titleView = segmentedControl
         navigationItem.rightBarButtonItem = todayButton
-        if #available(iOS 13.0.0, *) {
-            navigationItem.leftBarButtonItem = swiftUI
-        }
         
         calendarView.addEventViewToDay(view: eventViewer)
         
@@ -117,15 +107,9 @@ final class ViewController: UIViewController {
         calendarView.scrollTo(Date())
     }
     
-    @available(iOS 13.0.0, *)
-    @objc func openSwiftUITest() {
-        let vc = CalendarContentVC()
-        navigationController?.pushViewController(vc, animated: true)
-    }
-    
     @objc func switchCalendar(sender: UISegmentedControl) {
         let type = CalendarType.allCases[sender.selectedSegmentIndex]
-        calendarView.set(type: type, date: ViewController.selectDate)
+        calendarView.set(type: type, date: selectDate)
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -155,7 +139,7 @@ extension ViewController: CalendarDelegate {
     }
     
     func didSelectDate(_ date: Date?, type: CalendarType, frame: CGRect?) {
-        ViewController.selectDate = date ?? Date()
+        selectDate = date ?? Date()
         calendarView.reloadData()
     }
     
@@ -205,7 +189,7 @@ extension ViewController: CalendarDataSource {
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? {
         guard event.ID == "2" else { return nil }
         
-        return CustomViewEvent(style: ViewController.style, event: event, frame: frame)
+        return CustomViewEvent(style: style, event: event, frame: frame)
     }
     
     func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? {
@@ -264,7 +248,7 @@ extension ViewController {
     
     func timeFormatter(date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = ViewController.style.timeSystem.format
+        formatter.dateFormat = style.timeSystem.format
         return formatter.string(from: date)
     }
     
