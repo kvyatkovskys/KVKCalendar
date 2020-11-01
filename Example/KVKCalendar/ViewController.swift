@@ -33,6 +33,7 @@ final class ViewController: UIViewController {
             style.timeline.offsetLineLeft = 2
             style.headerScroll.titleDateAligment = .center
             style.headerScroll.isAnimateTitleDate = true
+            style.headerScroll.heightHeaderWeek = 70
             style.event.isEnableVisualSelect = false
             style.month.isHiddenTitle = true
         } else {
@@ -40,13 +41,8 @@ final class ViewController: UIViewController {
             style.headerScroll.fontDate = .systemFont(ofSize: 17)
             style.headerScroll.fontNameDay = .systemFont(ofSize: 17)
         }
-        style.timeline.startFromFirstEvent = false
-        style.followInSystemTheme = true
-        style.timeline.offsetTimeY = 80
-        style.timeline.offsetEvent = 3
         style.startWeekDay = .sunday
         style.timeSystem = TimeHourSystem.currentSystemOnDevice ?? .twelve
-        style.event.isEnableMoveEvent = true
         if #available(iOS 13.0, *) {
             style.event.iconFile = UIImage(systemName: "paperclip")
         }
