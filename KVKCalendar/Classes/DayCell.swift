@@ -77,7 +77,6 @@ class DayCell: UICollectionViewCell {
                 return
             }
             
-            // select date not in the current month
             guard day.date?.month == selectDate.month, day.date?.day == selectDate.day else {
                 populateCell(day)
                 return
@@ -112,7 +111,7 @@ class DayCell: UICollectionViewCell {
     private func populateDay(date: Date?, colorText: UIColor) {
         let nowDate = Date()
         if date?.month == nowDate.month, date?.day == nowDate.day, date?.year == nowDate.year {
-            dateLabel.textColor = style.headerScroll.colorCurrentDate
+            dateLabel.textColor = UIScreen.isDarkMode ? style.headerScroll.colorCurrentSelectDateForDarkStyle : style.headerScroll.colorCurrentDate
             dotView.backgroundColor = style.headerScroll.colorBackgroundCurrentDate
         } else {
             dateLabel.textColor = colorText

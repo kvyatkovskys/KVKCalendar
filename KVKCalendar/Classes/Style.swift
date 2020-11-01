@@ -43,7 +43,7 @@ public struct HeaderScrollStyle {
     }()
     
     public var titleDays: [String] = []
-    public var heightHeaderWeek: CGFloat = 70
+    public var heightHeaderWeek: CGFloat = 50
     public var heightTitleDate: CGFloat = 30
     public var colorBackground: UIColor = gainsboro.withAlphaComponent(0.4)
     public var isHiddenTitleDate: Bool = false
@@ -60,6 +60,7 @@ public struct HeaderScrollStyle {
     public var colorBackgroundCurrentDate: UIColor = .red
     public var colorBackgroundSelectDate: UIColor = .black
     public var colorSelectDate: UIColor = .white
+    public var colorCurrentSelectDateForDarkStyle: UIColor = .white
     public var colorWeekendDate: UIColor = .gray
     public var isScrollEnabled: Bool = true
     public var colorWeekdayBackground: UIColor = .clear
@@ -107,7 +108,7 @@ public struct TimelineStyle {
 }
 
 public struct WeekStyle {
-    public var colorBackground: UIColor = gainsboro.withAlphaComponent(0.4)
+    public var colorBackground: UIColor = gainsboro.withAlphaComponent(0.2)
     public var colorDate: UIColor = .black
     public var colorNameDay: UIColor = .black
     public var colorCurrentDate: UIColor = .white
@@ -124,13 +125,13 @@ public struct WeekStyle {
 public struct MonthStyle {
     private let format: DateFormatter = {
         let format = DateFormatter()
-        format.dateStyle = .full
+        format.dateFormat = "MMMM yyyy"
         return format
     }()
     
     public lazy var formatter: DateFormatter = format
-    public var heightHeaderWeek: CGFloat = 50
-    public var heightTitleDate: CGFloat = 25
+    public var heightHeaderWeek: CGFloat = 25
+    public var heightTitleDate: CGFloat = 40
     public var isHiddenTitleDate: Bool = false
     public var colorDate: UIColor = .black
     public var colorNameDay: UIColor = .black
@@ -165,7 +166,7 @@ public struct MonthStyle {
     public var isHiddenTitle: Bool = false
     public var weekDayAligment: NSTextAlignment = .right
     public var titleDateAligment: NSTextAlignment = .left
-    public var fontTitleDate: UIFont = .boldSystemFont(ofSize: 20)
+    public var fontTitleDate: UIFont = .boldSystemFont(ofSize: 30)
     public var colorTitleDate: UIColor = .black
 }
 
@@ -195,7 +196,7 @@ public struct YearStyle {
     }
     public var fontTitle: UIFont = .systemFont(ofSize: 19)
     public var colorTitle: UIColor = .black
-    public var colorBackgroundHeader: UIColor = gainsboro.withAlphaComponent(0.4)
+    public var colorBackgroundHeader: UIColor = gainsboro.withAlphaComponent(0.2)
     public var fontTitleHeader: UIFont = .boldSystemFont(ofSize: 40)
     public var colorTitleHeader: UIColor = .black
     public var heightTitleHeader: CGFloat = 50
@@ -220,7 +221,7 @@ public struct YearStyle {
 }
 
 public struct AllDayStyle {
-    public var backgroundColor: UIColor = .lightGray
+    public var backgroundColor: UIColor = gainsboro
     public var titleText: String = "all-day"
     public var titleColor: UIColor = .black
     public var textColor: UIColor = .black
@@ -266,12 +267,13 @@ extension Style {
             newStyle.headerScroll.colorBackground = UIColor.useForStyle(dark: .black, white: newStyle.headerScroll.colorBackground)
             newStyle.headerScroll.colorTitleDate = UIColor.useForStyle(dark: .white, white: newStyle.headerScroll.colorTitleDate)
             newStyle.headerScroll.colorTitleCornerDate = UIColor.useForStyle(dark: .systemRed, white: newStyle.headerScroll.colorTitleCornerDate)
-            newStyle.headerScroll.colorDate = UIColor.useForStyle(dark: .systemGray, white: newStyle.headerScroll.colorDate)
-            newStyle.headerScroll.colorNameDay = UIColor.useForStyle(dark: .systemGray, white: newStyle.headerScroll.colorNameDay)
+            newStyle.headerScroll.colorDate = UIColor.useForStyle(dark: .white, white: newStyle.headerScroll.colorDate)
+            newStyle.headerScroll.colorNameDay = UIColor.useForStyle(dark: .white, white: newStyle.headerScroll.colorNameDay)
             newStyle.headerScroll.colorCurrentDate = UIColor.useForStyle(dark: .systemGray6, white: newStyle.headerScroll.colorCurrentDate)
             newStyle.headerScroll.colorBackgroundCurrentDate = UIColor.useForStyle(dark: .systemRed, white: newStyle.headerScroll.colorBackgroundCurrentDate)
-            newStyle.headerScroll.colorBackgroundSelectDate = UIColor.useForStyle(dark: .systemGray, white: newStyle.headerScroll.colorBackgroundSelectDate)
-            newStyle.headerScroll.colorSelectDate = UIColor.useForStyle(dark: .systemGray6, white: newStyle.headerScroll.colorSelectDate)
+            newStyle.headerScroll.colorBackgroundSelectDate = UIColor.useForStyle(dark: .white, white: newStyle.headerScroll.colorBackgroundSelectDate)
+            newStyle.headerScroll.colorSelectDate = UIColor.useForStyle(dark: .black, white: newStyle.headerScroll.colorSelectDate)
+            newStyle.headerScroll.colorCurrentSelectDateForDarkStyle = UIColor.useForStyle(dark: .white, white: newStyle.headerScroll.colorCurrentSelectDateForDarkStyle)
             newStyle.headerScroll.colorWeekendDate = UIColor.useForStyle(dark: .systemGray2, white: newStyle.headerScroll.colorWeekendDate)
             
             // timeline
@@ -281,7 +283,7 @@ extension Style {
             
             // week
             newStyle.week.colorBackground = UIColor.useForStyle(dark: .black, white: newStyle.week.colorBackground)
-            newStyle.week.colorDate = UIColor.useForStyle(dark: .systemGray, white: newStyle.week.colorDate)
+            newStyle.week.colorDate = UIColor.useForStyle(dark: .white, white: newStyle.week.colorDate)
             newStyle.week.colorNameDay = UIColor.useForStyle(dark: .systemGray, white: newStyle.week.colorNameDay)
             newStyle.week.colorCurrentDate = UIColor.useForStyle(dark: .systemGray, white: newStyle.week.colorCurrentDate)
             newStyle.week.colorBackgroundSelectDate = UIColor.useForStyle(dark: .systemGray, white: newStyle.week.colorBackgroundSelectDate)
@@ -293,10 +295,10 @@ extension Style {
             
             // month
             newStyle.month.colorDate = UIColor.useForStyle(dark: .systemGray, white: newStyle.month.colorDate)
-            newStyle.month.colorNameDay = UIColor.useForStyle(dark: .systemGray, white: newStyle.month.colorNameDay)
+            newStyle.month.colorNameDay = UIColor.useForStyle(dark: .white, white: newStyle.month.colorNameDay)
             newStyle.month.colorCurrentDate = UIColor.useForStyle(dark: .white, white: newStyle.month.colorCurrentDate)
             newStyle.month.colorBackgroundCurrentDate = UIColor.useForStyle(dark: .systemRed, white: newStyle.month.colorBackgroundCurrentDate)
-            newStyle.month.colorBackgroundSelectDate = UIColor.useForStyle(dark: .systemGray, white: newStyle.month.colorBackgroundSelectDate)
+            newStyle.month.colorBackgroundSelectDate = UIColor.useForStyle(dark: .white, white: newStyle.month.colorBackgroundSelectDate)
             newStyle.month.colorSelectDate = UIColor.useForStyle(dark: .black, white: newStyle.month.colorSelectDate)
             newStyle.month.colorWeekendDate = UIColor.useForStyle(dark: .systemGray2, white: newStyle.month.colorWeekendDate)
             newStyle.month.colorMoreTitle = UIColor.useForStyle(dark: .systemGray3, white: newStyle.month.colorMoreTitle)
@@ -304,7 +306,7 @@ extension Style {
             newStyle.month.colorSeporator = UIColor.useForStyle(dark: .systemGray, white: newStyle.month.colorSeporator)
             newStyle.month.colorBackgroundWeekendDate = UIColor.useForStyle(dark: .systemGray6, white: newStyle.month.colorBackgroundWeekendDate)
             newStyle.month.colorBackgroundDate = UIColor.useForStyle(dark: .black, white: newStyle.month.colorBackgroundDate)
-            newStyle.month.colorTitleDate = UIColor.useForStyle(dark: .systemGray6, white: newStyle.month.colorTitleDate)
+            newStyle.month.colorTitleDate = UIColor.useForStyle(dark: .white, white: newStyle.month.colorTitleDate)
             
             // year
             newStyle.year.colorCurrentDate = UIColor.useForStyle(dark: .white, white: newStyle.year.colorCurrentDate)
@@ -312,14 +314,14 @@ extension Style {
             newStyle.year.colorBackgroundSelectDate = UIColor.useForStyle(dark: .systemGray, white: newStyle.year.colorBackgroundSelectDate)
             newStyle.year.colorSelectDate = UIColor.useForStyle(dark: .white, white: newStyle.year.colorSelectDate)
             newStyle.year.colorWeekendDate = UIColor.useForStyle(dark: .systemGray2, white: newStyle.year.colorWeekendDate)
-            newStyle.year.colorBackgroundWeekendDate = UIColor.useForStyle(dark: .systemGray6, white: newStyle.year.colorBackgroundWeekendDate)
-            newStyle.year.colorTitle = UIColor.useForStyle(dark: .systemGray, white: newStyle.year.colorTitle)
+            newStyle.year.colorBackgroundWeekendDate = UIColor.useForStyle(dark: .clear, white: newStyle.year.colorBackgroundWeekendDate)
+            newStyle.year.colorTitle = UIColor.useForStyle(dark: .white, white: newStyle.year.colorTitle)
             newStyle.year.colorBackgroundHeader = UIColor.useForStyle(dark: .black, white: newStyle.year.colorBackgroundHeader)
             newStyle.year.colorTitleHeader = UIColor.useForStyle(dark: .white, white: newStyle.year.colorTitleHeader)
             newStyle.year.colorDayTitle = UIColor.useForStyle(dark: .systemGray, white: newStyle.year.colorDayTitle)
             
             // all day
-            newStyle.allDay.backgroundColor = UIColor.useForStyle(dark: .systemGray3, white: newStyle.allDay.backgroundColor)
+            newStyle.allDay.backgroundColor = UIColor.useForStyle(dark: .systemGray6, white: newStyle.allDay.backgroundColor)
             newStyle.allDay.titleColor = UIColor.useForStyle(dark: .white, white: newStyle.allDay.titleColor)
             newStyle.allDay.textColor = UIColor.useForStyle(dark: .white, white: newStyle.allDay.textColor)
         }
