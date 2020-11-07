@@ -20,9 +20,10 @@ final class ResizeEventView: UIView {
     weak var delegate: ResizeEventViewDelegate?
     
     let event: Event
-    
     let mainYOffset: CGFloat = 15
     let originalFrameEventView: CGRect
+    var startMinute: Int?
+    var endMinute: Int?
     
     private lazy var eventView: UIView = {
         let view = UIView()

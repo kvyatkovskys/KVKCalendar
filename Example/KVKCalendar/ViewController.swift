@@ -15,7 +15,7 @@ final class ViewController: UIViewController {
     private var selectDate: Date = {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd.MM.yyyy"
-        return formatter.date(from: "14.12.2018") ?? Date()
+        return formatter.date(from: "14.12.2020") ?? Date()
     }()
     
     private lazy var todayButton: UIBarButtonItem = {

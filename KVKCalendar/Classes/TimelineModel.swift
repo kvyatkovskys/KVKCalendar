@@ -33,7 +33,7 @@ struct EventTime: Equatable, Hashable {
     let end: TimeInterval
 }
 
-typealias ResizeTime = (hour: Int, minutes: Int)
+typealias ResizeTime = (hour: Int, minute: Int)
 
 protocol TimelineDelegate: AnyObject {
     func didDisplayEvents(_ events: [Event], dates: [Date?])

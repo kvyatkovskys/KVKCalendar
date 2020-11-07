@@ -25,13 +25,18 @@ struct YearData {
         var yearsCount = [Int]()
         
         // last years
-        for lastIdx in lastYear.indices.reversed() {
+        for lastIdx in lastYear.indices.reversed() where years > 1 {
             yearsCount.append(-lastIdx)
         }
         
         // next years
-        for nextIdx in nextYear.indices {
+        for nextIdx in nextYear.indices where years > 1 {
             yearsCount.append(nextIdx + 1)
+        }
+        
+        // select current year
+        if 0...1 ~= years {
+            yearsCount = [0]
         }
         
         let formatter = DateFormatter()
