@@ -211,7 +211,7 @@ extension WeekView: TimelineDelegate {
         startComponents.month = event.start.month
         startComponents.day = event.start.day
         startComponents.hour = startTime.hour
-        startComponents.minute = startTime.minutes
+        startComponents.minute = startTime.minute
         let startDate = style.calendar.date(from: startComponents)
         
         var endComponents = DateComponents()
@@ -219,7 +219,7 @@ extension WeekView: TimelineDelegate {
         endComponents.month = event.end.month
         endComponents.day = event.end.day
         endComponents.hour = endTime.hour
-        endComponents.minute = endTime.minutes
+        endComponents.minute = endTime.minute
         let endDate = style.calendar.date(from: endComponents)
                 
         delegate?.didChangeCalendarEvent(event, start: startDate, end: endDate)

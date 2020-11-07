@@ -46,7 +46,7 @@ final class TimelineView: UIView, EventDateProtocol {
         return view
     }()
     
-    private(set) lazy var movingMinutesLabel: TimelineLabel = {
+    private(set) lazy var movingMinuteLabel: TimelineLabel = {
         let label = TimelineLabel()
         label.adjustsFontSizeToFitWidth = true
         label.textColor = style.timeline.movingMinutesColor
