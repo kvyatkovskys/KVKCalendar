@@ -126,24 +126,22 @@ open class EventViewGeneral: UIView, CalendarTimer {
         case .changed:
             guard isAvailableMove else { return }
             
-            if isAvailableResize {
-                // set delay before start moving event
-                let distance = hypotf(Float((originalLocation.x - location.x)), Float((originalLocation.y - location.y)))
-                switch stateEvent {
-                case .resize where distance > 15:
-                    stopTimer()
-                    stateEvent = .move
-                    delegate?.didEndResizeEvent(event, gesture: gesture)
-                    
-                    UIImpactFeedbackGenerator().impactOccurred()
-                    alpha = style.event.alphaWhileMoving
-                    delegate?.didStartMovingEvent(event, gesture: gesture, view: self)
-                default:
-                    break
-                }
+            // set delay before start moving event
+            let distance = hypotf(Float((originalLocation.x - location.x)), Float((originalLocation.y - location.y)))
+            switch stateEvent {
+            case .resize where distance > 15 && isAvailableResize:
+                stopTimer()
+                stateEvent = .move
+                delegate?.didEndResizeEvent(event, gesture: gesture)
+                
+                UIImpactFeedbackGenerator().impactOccurred()
+                alpha = style.event.alphaWhileMoving
+                delegate?.didStartMovingEvent(event, gesture: gesture, view: self)
+            case .move:
+                delegate?.didChangeMovingEvent(event, gesture: gesture)
+            default:
+                break
             }
-            
-            delegate?.didChangeMovingEvent(event, gesture: gesture)
         case .cancelled, .ended, .failed:
             if gesture.state == .failed {
                 UINotificationFeedbackGenerator().notificationOccurred(.warning)
