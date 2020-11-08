@@ -9,18 +9,21 @@ import UIKit
 
 open class EventViewGeneral: UIView, CalendarTimer {
     
-    public enum EventViewMode: Int {
+    public enum EventViewState: Int {
         case resize, move, none
     }
     
     weak var delegate: EventDelegate?
     weak var dataSource: EventDataSource?
     
+    private var originalLocation: CGPoint = .zero
+    private let states: Set<EventViewState>
+    
     public var event: Event
     public var color: UIColor
     public var style: Style
     public var isSelected: Bool = false
-    public var mode: EventViewMode = .none
+    public var stateEvent: EventViewState = .none
     
     public lazy var longGesture: UILongPressGestureRecognizer = {
         let gesture = UILongPressGestureRecognizer(target: self, action: #selector(editEvent))
@@ -32,7 +35,10 @@ open class EventViewGeneral: UIView, CalendarTimer {
         self.style = style
         self.event = event
         self.color = EventColor(event.color?.value ?? event.backgroundColor).value
+        self.states = style.event.states
         super.init(frame: frame)
+        
+        stateEvent = isAvailableOnlyMove ? .move : .none
         setup()
     }
     
@@ -41,7 +47,11 @@ open class EventViewGeneral: UIView, CalendarTimer {
         self.event = event
         self.style = Style()
         self.color = event.backgroundColor
+        self.states = style.event.states
         super.init(coder: coder)
+        
+        stateEvent = isAvailableOnlyMove ? .move : .none
+        setup()
     }
     
     public func setup() {
@@ -52,7 +62,7 @@ open class EventViewGeneral: UIView, CalendarTimer {
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapOnEvent))
         addGestureRecognizer(tap)
         
-        if style.event.isEnableMoveEvent {
+        if isAvailableResize || isAvailableMove {
             addGestureRecognizer(longGesture)
         }
     }
@@ -78,58 +88,75 @@ open class EventViewGeneral: UIView, CalendarTimer {
     }
     
     @objc public func editEvent(gesture: UILongPressGestureRecognizer) {
+        let location = gesture.location(in: self)
+        
         switch gesture.state {
         case .began:
-            switch mode {
+            switch stateEvent {
             case .none:
-                mode = .resize
+                guard isAvailableResize else { return }
                 
-                startTimer(interval: 1.5) { [weak self] in
-                    guard let self = self else { return }
-                    
-                    self.mode = .move
-                    self.delegate?.didEndResizeEvent(self.event, gesture: gesture)
-                    
-                    UIImpactFeedbackGenerator().impactOccurred()
-                    self.alpha = self.style.event.alphaWhileMoving
-                    self.delegate?.didStartMovingEvent(self.event, gesture: gesture, view: self)
+                originalLocation = location
+                stateEvent = .resize
+                
+                if isAvailableMove {
+                    startTimer(interval: 1.5) { [weak self] in
+                        guard let self = self else { return }
+                        
+                        self.stateEvent = .move
+                        self.delegate?.didEndResizeEvent(self.event, gesture: gesture)
+                        
+                        UIImpactFeedbackGenerator().impactOccurred()
+                        self.alpha = self.style.event.alphaWhileMoving
+                        self.delegate?.didStartMovingEvent(self.event, gesture: gesture, view: self)
+                    }
                 }
                 
                 UIImpactFeedbackGenerator().impactOccurred()
                 delegate?.didStartResizeEvent(event, gesture: gesture, view: self)
-            case .resize, .move:
-                alpha = style.event.alphaWhileMoving
-                delegate?.didStartMovingEvent(event, gesture: gesture, view: self)
-            }
-        case .changed:
-            stopTimer()
-
-            switch mode {
-            case .resize:
-                mode = .move
-                delegate?.didEndResizeEvent(event, gesture: gesture)
+            case .move:
+                guard isAvailableMove else { return }
                 
-                UIImpactFeedbackGenerator().impactOccurred()
+                stateEvent = .move
                 alpha = style.event.alphaWhileMoving
                 delegate?.didStartMovingEvent(event, gesture: gesture, view: self)
-            default:
+            case .resize:
                 break
             }
-
+        case .changed:
+            guard isAvailableMove else { return }
+            
+            if isAvailableResize {
+                // set delay before start moving event
+                let distance = hypotf(Float((originalLocation.x - location.x)), Float((originalLocation.y - location.y)))
+                switch stateEvent {
+                case .resize where distance > 15:
+                    stopTimer()
+                    stateEvent = .move
+                    delegate?.didEndResizeEvent(event, gesture: gesture)
+                    
+                    UIImpactFeedbackGenerator().impactOccurred()
+                    alpha = style.event.alphaWhileMoving
+                    delegate?.didStartMovingEvent(event, gesture: gesture, view: self)
+                default:
+                    break
+                }
+            }
+            
             delegate?.didChangeMovingEvent(event, gesture: gesture)
         case .cancelled, .ended, .failed:
             if gesture.state == .failed {
                 UINotificationFeedbackGenerator().notificationOccurred(.warning)
             }
             
-            switch mode {
+            switch stateEvent {
             case .move:
                 alpha = 1.0
                 delegate?.didEndMovingEvent(event, gesture: gesture)
             default:
                 stopTimer()
             }
-            mode = .none
+            stateEvent = .none
         default:
             break
         }
@@ -149,6 +176,20 @@ open class EventViewGeneral: UIView, CalendarTimer {
         context.addLine(to: CGPoint(x: x, y: bounds.height))
         context.strokePath()
         context.restoreGState()
+    }
+}
+
+extension EventViewGeneral {
+    var isAvailableResize: Bool {
+        return states.contains(.resize)
+    }
+    
+    var isAvailableMove: Bool {
+        return states.contains(.move)
+    }
+    
+    var isAvailableOnlyMove: Bool {
+        return states.contains(.move) && states.count == 1
     }
 }
 

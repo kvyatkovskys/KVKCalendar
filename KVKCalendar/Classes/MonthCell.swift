@@ -127,7 +127,7 @@ final class MonthCell: UICollectionViewCell {
                     let tap = UITapGestureRecognizer(target: self, action: #selector(tapOneEvent))
                     label.addGestureRecognizer(tap)
                     label.tag = event.hash
-                    if style.event.isEnableMoveEvent, UIDevice.current.userInterfaceIdiom != .phone, !event.isAllDay {
+                    if style.event.states.contains(.move), UIDevice.current.userInterfaceIdiom != .phone, !event.isAllDay {
                         label.addGestureRecognizer(longGesture)
                         label.addGestureRecognizer(panGesture)
                     }

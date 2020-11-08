@@ -290,7 +290,7 @@ extension TimelineView {
         let time = calculateChangingTime(pointY: point.y)
         var newEvent = Event(ID: Event.idForNewEvent, text: style.event.textForNewEvent)
         let newEventPreview = getEventView(style: style, event: newEvent, frame: CGRect(origin: point, size: eventPreviewSize))
-        newEventPreview.mode = .move
+        newEventPreview.stateEvent = .move
         newEventPreview.delegate = self
         newEventPreview.editEvent(gesture: gesture)
         
