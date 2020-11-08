@@ -88,9 +88,15 @@ final class ResizeEventView: UIView {
         eventView.addSubview(view)
         
         topView.frame.origin = CGPoint(x: frame.width * 0.8, y: mainYOffset * 0.5)
+        if (topView.frame.origin.x + topView.frame.width) > frame.width {
+            topView.frame.origin.x = frame.width - topView.frame.width
+        }
         addSubview(topView)
         
         bottomView.frame.origin = CGPoint(x: (frame.width * 0.2) - bottomView.frame.width, y: frame.height + (mainYOffset * 0.5))
+        if bottomView.frame.origin.x < 0 {
+            bottomView.frame.origin.x = 0
+        }
         addSubview(bottomView)
         
         let topCircleView = createCircleView()

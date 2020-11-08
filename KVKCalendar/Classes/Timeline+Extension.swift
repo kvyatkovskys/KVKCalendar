@@ -480,18 +480,24 @@ extension TimelineView: EventDelegate {
     
     func didStartResizeEvent(_ event: Event, gesture: UILongPressGestureRecognizer, view: UIView) {
         forceDeselectEvent()
-        
         isResizeEnableMode = true
+        
+        var viewFrame = view.frame
+        if viewFrame.width < 50 {
+            viewFrame.size.width = 50
+        }
+        
         let viewTmp: UIView
         if view is EventView {
-            let eventView = EventView(event: event, style: style, frame: view.frame)
+            let eventView = EventView(event: event, style: style, frame: viewFrame)
+            eventView.textView.isHidden = false
             eventView.selectEvent()
             eventView.isUserInteractionEnabled = false
             viewTmp = eventView
-            viewTmp.frame = view.frame
+            viewTmp.frame = viewFrame
         } else {
             viewTmp = view.snapshotView(afterScreenUpdates: false) ?? view
-            viewTmp.frame = view.frame
+            viewTmp.frame = viewFrame
         }
         
         eventResizePreview = ResizeEventView(view: viewTmp, event: event, frame: viewTmp.frame, style: style)
