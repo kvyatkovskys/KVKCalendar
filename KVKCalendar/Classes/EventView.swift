@@ -34,7 +34,7 @@ final class EventView: EventViewGeneral {
         textFrame.origin.x = pointX
         textFrame.origin.y = 0
         
-        if event.isContainsFile {
+        if event.isContainsFile && textFrame.width > 20 {
             textFrame.size.width = frame.width - iconFileImageView.frame.width - pointX
             iconFileImageView.frame.origin.x = frame.width - iconFileImageView.frame.width - 2
             addSubview(iconFileImageView)
@@ -53,9 +53,8 @@ final class EventView: EventViewGeneral {
             textView.textColor = event.textColor
         }
         
-        if textView.frame.width > 20 {
-            addSubview(textView)
-        }
+        textView.isHidden = textView.frame.width < 20
+        addSubview(textView)
     }
     
     override func tapOnEvent(gesture: UITapGestureRecognizer) {
@@ -76,12 +75,14 @@ final class EventView: EventViewGeneral {
         backgroundColor = color
         isSelected = true
         textView.textColor = UIColor.white
+        iconFileImageView.tintColor = UIColor.white
     }
     
     func deselectEvent() {
         backgroundColor = event.backgroundColor
         isSelected = false
         textView.textColor = event.textColor
+        iconFileImageView.tintColor = style.event.colorIconFile
     }
     
     required init?(coder aDecoder: NSCoder) {
