@@ -237,7 +237,9 @@ public struct AllDayStyle {
 }
 
 public struct EventStyle {
+    @available(swift, deprecated: 0.3.8, obsoleted: 0.3.9, renamed: "states")
     public var isEnableMoveEvent: Bool = true
+    
     public var minimumPressDuration: TimeInterval = 0.5
     public var alphaWhileMoving: CGFloat = 0.5
     public var textForNewEvent: String = "New Event"
@@ -250,6 +252,8 @@ public struct EventStyle {
     public var spacingStubView: CGFloat = 1
     public var eventCorners: UIRectCorner = .allCorners
     public var eventCornersRadius: CGSize = CGSize(width: 2.5, height: 2.5)
+    public var delayForStartMove: TimeInterval = 1.5
+    public var states: Set<EventViewGeneral.EventViewState> = [.move, .resize]
     
     var isEnableContextMenu: Bool = false
 }
