@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import EventKit
 
 public final class CalendarView: UIView {
     public weak var delegate: CalendarDelegate?
@@ -14,6 +15,13 @@ public final class CalendarView: UIView {
         return type
     }
     
+    private let eventStore = EKEventStore()
+    private var systemEvents: [Event] {
+        let systemCalendars = eventStore.calendars(for: .event).filter({ style.systemCalendars.contains($0.title) })
+        guard !systemCalendars.isEmpty else { return [] }
+        
+        return getSystemEvents(eventStore: eventStore, calendars: systemCalendars).compactMap({ $0.transform })
+    }
     private var style: Style
     private var type = CalendarType.day
     private var yearData: YearData
@@ -68,11 +76,52 @@ public final class CalendarView: UIView {
         if let defaultType = style.defaultType {
             type = defaultType
         }
+        
         set(type: type, date: date)
+        authForSystemCalendar()
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func getSystemEvents(eventStore: EKEventStore, calendars: [EKCalendar]) -> [EKEvent] {
+        var startOffset = 0
+        if yearData.yearsCount.count > 1 {
+            startOffset = yearData.yearsCount.first ?? 0
+        }
+        var endOffset = 1
+        if yearData.yearsCount.count > 1 {
+            endOffset = yearData.yearsCount.last ?? 1
+        }
+        
+        guard let startDate = style.calendar.date(byAdding: .year, value: startOffset, to: yearData.date),
+              let endDate = style.calendar.date(byAdding: .year, value: endOffset, to: yearData.date) else {
+            return []
+        }
+        
+        let predicate = eventStore.predicateForEvents(withStart: startDate, end: endDate, calendars: calendars)
+        return eventStore.events(matching: predicate)
+    }
+    
+    private func authForSystemCalendar() {
+        let status = EKEventStore.authorizationStatus(for: .event)
+        
+        switch (status) {
+        case .notDetermined:
+            requestAccessToSystemCalendar { [weak self] (_) in
+                self?.reloadData()
+            }
+        default:
+            break
+        }
+    }
+    
+    private func requestAccessToSystemCalendar(completion: @escaping (Bool) -> Void) {
+        eventStore.requestAccess(to: .event) { (access, error) in
+            print(access, error ?? "")
+            completion(access)
+        }
     }
     
     private func switchTypeCalendar(type: CalendarType) {
@@ -105,15 +154,23 @@ public final class CalendarView: UIView {
     }
     
     public func reloadData() {
-        switch type {
-        case .day:
-            dayView.reloadData(events: events)
-        case .week:
-            weekView.reloadData(events: events)
-        case .month:
-            monthView.reloadData(events: events)
-        case .year:
-            break
+        var values = events
+        
+        DispatchQueue.main.async { [weak self] in
+            if self?.systemEvents.isEmpty == false {
+                values += self?.systemEvents ?? []
+            }
+            
+            switch self?.type {
+            case .day:
+                self?.dayView.reloadData(events: values)
+            case .week:
+                self?.weekView.reloadData(events: values)
+            case .month:
+                self?.monthView.reloadData(events: values)
+            default:
+                break
+            }
         }
     }
 
