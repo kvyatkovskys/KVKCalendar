@@ -13,17 +13,17 @@ struct YearData {
     let boxCount = 42
     var months = [Month]()
     var date: Date
+    var yearsCount = [Int]()
     
     init(date: Date, years: Int, style: Style) {
         self.style = style
         self.date = date
+        
         // count years for calendar
         let indexsYear = [Int](repeating: 0, count: years).split(half: years / 2)
         let lastYear = indexsYear.left
         let nextYear = indexsYear.right
-        
-        var yearsCount = [Int]()
-        
+                
         // last years
         for lastIdx in lastYear.indices.reversed() where years > 1 {
             yearsCount.append(-lastIdx)

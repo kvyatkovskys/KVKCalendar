@@ -24,6 +24,7 @@ public struct Style {
     public var timeSystem: TimeHourSystem = .twentyFour
     public var startWeekDay: StartDayType = .monday
     public var followInSystemTheme: Bool = true
+    public var systemCalendars: Set<String> = []
     
     public init() {}
 }

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import EventKit
 
 public enum TimeHourSystem: Int {
     @available(swift, deprecated: 0.3.6, obsoleted: 0.3.7, renamed: "twelve")
@@ -304,4 +305,17 @@ public extension CalendarDelegate {
     func didDisplayEvents(_ events: [Event], dates: [Date?]) {}
     func willSelectDate(_ date: Date, type: CalendarType) {}
     func deselectEvent(_ event: Event, animated: Bool) {}
+}
+
+// MARK: EKEvent
+
+extension EKEvent {
+    var transform: Event {
+        let event = Event(ID: eventIdentifier,
+                          text: title,
+                          start: startDate,
+                          end: endDate,
+                          isAllDay: isAllDay)
+        return event
+    }
 }
