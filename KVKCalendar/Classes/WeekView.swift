@@ -12,7 +12,7 @@ final class WeekView: UIView {
     private var data: WeekData
     private var style: Style
     
-    weak var delegate: CalendarPrivateDelegate?
+    weak var delegate: CalendarDataProtocol?
     weak var dataSource: DisplayDataSource?
     
     lazy var scrollHeaderDay: ScrollDayHeaderView = {
