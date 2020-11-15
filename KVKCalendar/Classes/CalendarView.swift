@@ -85,6 +85,8 @@ public final class CalendarView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: private funcs
+    
     private func getSystemEvents(eventStore: EKEventStore, calendars: [EKCalendar]) -> [EKEvent] {
         var startOffset = 0
         if yearData.yearsCount.count > 1 {
@@ -143,6 +145,8 @@ public final class CalendarView: UIView {
         }
     }
     
+    // MARK: public funcs
+    
     public func addEventViewToDay(view: UIView) {
         dayView.addEventView(view: view)
     }
@@ -155,12 +159,14 @@ public final class CalendarView: UIView {
     
     public func reloadData() {
         var values = events
+        if !style.systemCalendars.isEmpty {
+            authForSystemCalendar()
+        }
+        if systemEvents.isEmpty == false {
+            values += systemEvents
+        }
         
         DispatchQueue.main.async { [weak self] in
-            if self?.systemEvents.isEmpty == false {
-                values += self?.systemEvents ?? []
-            }
-            
             switch self?.type {
             case .day:
                 self?.dayView.reloadData(events: values)
@@ -197,6 +203,14 @@ public final class CalendarView: UIView {
             break
         }
     }
+    
+    public func addEventsToSystemCalendars(events: [Event], calendars: [String], span: EKSpan = .thisEvent) throws {
+        try eventStore.save(EKEvent(), span: span)
+    }
+    
+    public func removeEventsFromSystemCalendar(events: [Event], calendars: [String], span: EKSpan = .thisEvent) throws {
+        try eventStore.remove(EKEvent(), span: span)
+    }
 }
 
 extension CalendarView: DisplayDataSource {
@@ -214,7 +228,7 @@ extension CalendarView: DisplayDataSource {
     }
 }
 
-extension CalendarView: CalendarPrivateDelegate {
+extension CalendarView: CalendarDataProtocol {
     func didDisplayCalendarEvents(_ events: [Event], dates: [Date?], type: CalendarType) {
         guard self.type == type else { return }
         

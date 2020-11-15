@@ -141,7 +141,7 @@ extension TimelineView {
             }
             
             if let endMinute = eventResizePreview?.endMinute {
-                endTime = calculateChangingTime(pointY: value.frame.origin.y + value.frame.height)
+                endTime = calculateChangingTime(pointY: value.frame.origin.y + value.frame.height, isForEndEvent: true)
                 endTime.minute = endMinute
             } else {
                 endTime = (eventResizePreview?.event.end.hour, eventResizePreview?.event.end.minute)
@@ -607,26 +607,31 @@ extension TimelineView: EventDelegate {
         let pointTempY = (pointY - eventPreviewYOffset) - style.timeline.offsetEvent - 6
         let time = calculateChangingTime(pointY: pointTempY)
         if style.timeline.offsetTimeY > 50, let minute = time.minute, 0...59 ~= minute {
-            movingMinuteLabel.isHidden = false
-            movingMinuteLabel.frame =  CGRect(x: style.timeline.offsetTimeX, y: (pointY - offset) - style.timeline.heightTime,
-                                               width: style.timeline.widthTime, height: style.timeline.heightTime)
+            movingMinuteLabel.frame = CGRect(x: style.timeline.offsetTimeX, y: (pointY - offset) - style.timeline.heightTime,
+                                             width: style.timeline.widthTime, height: style.timeline.heightTime)
             scrollView.addSubview(movingMinuteLabel)
             movingMinuteLabel.text = ":\(minute)"
             movingMinuteLabel.minute = minute
         } else {
-            movingMinuteLabel.isHidden = true
+            movingMinuteLabel.text = ":0"
             movingMinuteLabel.minute = 0
         }
     }
     
-    func calculateChangingTime(pointY: CGFloat) -> (hour: Int?, minute: Int?) {
+    func calculateChangingTime(pointY: CGFloat, isForEndEvent: Bool = false) -> (hour: Int?, minute: Int?) {
         let times = scrollView.subviews.filter({ ($0 is TimelineLabel) }).compactMap({ $0 as? TimelineLabel })
         guard let time = times.first( where: { $0.frame.origin.y >= pointY }) else { return (nil, nil) }
 
         let firstY = time.frame.origin.y - (style.timeline.offsetTimeY + style.timeline.heightTime)
         let percent = (pointY - firstY) / (style.timeline.offsetTimeY + style.timeline.heightTime)
         let newMinute = Int(60.0 * percent)
-        return (time.tag - 1, newMinute)
+        let newHour: Int
+        if isForEndEvent && movingMinuteLabel.minute == 0 {
+            newHour = time.tag
+        } else {
+            newHour = time.tag - 1
+        }
+        return (newHour, newMinute)
     }
     
     private func moveShadowView(pointX: CGFloat) -> (frame: CGRect, date: Date?)? {

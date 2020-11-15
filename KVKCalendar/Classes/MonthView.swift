@@ -13,7 +13,7 @@ final class MonthView: UIView {
     private var collectionView: UICollectionView!
     private var eventPreview: UIView?
     
-    weak var delegate: CalendarPrivateDelegate?
+    weak var delegate: CalendarDataProtocol?
     weak var dataSource: DisplayDataSource?
     
     var willSelectDate: ((Date) -> Void)?
