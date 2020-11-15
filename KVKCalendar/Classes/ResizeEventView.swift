@@ -118,6 +118,8 @@ final class ResizeEventView: UIView {
         guard let tag = gesture.view?.tag, let type = ResizeEventViewType(rawValue: tag) else { return }
         
         switch gesture.state {
+        case .began:
+            UIImpactFeedbackGenerator().impactOccurred()
         case .changed:
             delegate?.didStart(gesture: gesture, type: type)
         case .cancelled, .failed, .ended:

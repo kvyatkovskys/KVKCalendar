@@ -11,7 +11,7 @@ final class DayView: UIView {
     private var style: Style
     private var data: DayData
 
-    weak var delegate: CalendarPrivateDelegate?
+    weak var delegate: CalendarDataProtocol?
     weak var dataSource: DisplayDataSource?
     
     lazy var scrollHeaderDay: ScrollDayHeaderView = {

@@ -71,7 +71,7 @@ final class ViewController: UIViewController {
         let view = EventViewer(frame: CGRect(x: 0, y: 0, width: 500, height: calendarView.frame.height))
         return view
     }()
-    
+        
     override func viewDidLoad() {
         super.viewDidLoad()
         

@@ -219,7 +219,7 @@ public protocol EventProtocol {
 
 // MARK: - Settings protocol
 
-protocol CalendarSettingProtocol {
+protocol CalendarSettingProtocol: class {
     func reloadFrame(_ frame: CGRect)
     func updateStyle(_ style: Style)
     func setUI()
@@ -227,19 +227,6 @@ protocol CalendarSettingProtocol {
 
 extension CalendarSettingProtocol {
     func setUI() {}
-}
-
-// MARK: - Calendar private protocol
-
-protocol CalendarPrivateDelegate: class {
-    func didDisplayCalendarEvents(_ events: [Event], dates: [Date?], type: CalendarType)
-    func didSelectCalendarDate(_ date: Date?, type: CalendarType, frame: CGRect?)
-    func didSelectCalendarEvent(_ event: Event, frame: CGRect?)
-    func didSelectCalendarMore(_ date: Date, frame: CGRect?)
-    func getEventViewerFrame(_ frame: CGRect)
-    func didChangeCalendarEvent(_ event: Event, start: Date?, end: Date?)
-    func didAddCalendarEvent(_ event: Event, _ date: Date?)
-    func deselectCalendarEvent(_ event: Event)
 }
 
 // MARK: - Data source protocol
@@ -262,7 +249,7 @@ public extension CalendarDataSource {
     func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? { return nil }
 }
 
-// MARK: - Display data source
+// MARK: - Private Display data source
 
 protocol DisplayDataSource: class {
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral?
@@ -305,6 +292,19 @@ public extension CalendarDelegate {
     func didDisplayEvents(_ events: [Event], dates: [Date?]) {}
     func willSelectDate(_ date: Date, type: CalendarType) {}
     func deselectEvent(_ event: Event, animated: Bool) {}
+}
+
+// MARK: - Private Data protocol
+
+protocol CalendarDataProtocol: class {
+    func didDisplayCalendarEvents(_ events: [Event], dates: [Date?], type: CalendarType)
+    func didSelectCalendarDate(_ date: Date?, type: CalendarType, frame: CGRect?)
+    func didSelectCalendarEvent(_ event: Event, frame: CGRect?)
+    func didSelectCalendarMore(_ date: Date, frame: CGRect?)
+    func getEventViewerFrame(_ frame: CGRect)
+    func didChangeCalendarEvent(_ event: Event, start: Date?, end: Date?)
+    func didAddCalendarEvent(_ event: Event, _ date: Date?)
+    func deselectCalendarEvent(_ event: Event)
 }
 
 // MARK: EKEvent
