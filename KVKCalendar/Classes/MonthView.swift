@@ -81,8 +81,10 @@ final class MonthView: UIView {
     
     private func scrollToIndex(_ idx: Int, animated: Bool) {
         let index = getIndexForDirection(style.month.scrollDirection, indexPath: IndexPath(row: idx, section: 0))
+        let scrollType: UICollectionView.ScrollPosition = style.month.scrollDirection == .horizontal ? .right : .top
+        
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
-            self?.collectionView.scrollToItem(at: index, at: .top, animated: animated)
+            self?.collectionView.scrollToItem(at: index, at: scrollType, animated: animated)
         }
     }
     
@@ -116,89 +118,6 @@ final class MonthView: UIView {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-}
-
-extension MonthView: MonthCellDelegate {
-    func didSelectEvent(_ event: Event, frame: CGRect?) {
-        delegate?.didSelectCalendarEvent(event, frame: frame)
-    }
-    
-    func didSelectMore(_ date: Date, frame: CGRect?) {
-        delegate?.didSelectCalendarMore(date, frame: frame)
-    }
-    
-    func didStartMoveEvent(_ event: EventViewGeneral, snapshot: UIView?, gesture: UILongPressGestureRecognizer) {
-        let point = gesture.location(in: collectionView)
-        
-        data.movingEvent = event
-        eventPreview = nil
-        eventPreview = snapshot
-        data.eventPreviewXOffset = (snapshot?.bounds.width ?? data.eventPreviewXOffset) / 2
-        eventPreview?.frame.origin = CGPoint(x: point.x - data.eventPreviewXOffset, y: point.y - data.eventPreviewYOffset)
-        eventPreview?.alpha = 0.9
-        eventPreview?.tag = data.tagEventPagePreview
-        eventPreview?.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-        guard let eventTemp = eventPreview else { return }
-        
-        collectionView.addSubview(eventTemp)
-        UIView.animate(withDuration: 0.3) {
-            self.eventPreview?.transform = CGAffineTransform(scaleX: 1, y: 1)
-        }
-        UIImpactFeedbackGenerator().impactOccurred()
-        collectionView.isScrollEnabled = false
-    }
-    
-    func didEndMoveEvent(gesture: UILongPressGestureRecognizer) {
-        eventPreview?.removeFromSuperview()
-        eventPreview = nil
-        
-        let point = gesture.location(in: collectionView)
-        guard let indexPath = collectionView.indexPathForItem(at: point), let event = data.movingEvent?.event else { return }
-        
-        data.movingEvent = nil
-        let index = getIndexForDirection(style.month.scrollDirection, indexPath: indexPath)
-        let day = data.days[index.row]
-        let newDate = day.date ?? event.start
-
-        var startComponents = DateComponents()
-        startComponents.year = newDate.year
-        startComponents.month = newDate.month
-        startComponents.day = newDate.day
-        startComponents.hour = event.start.hour
-        startComponents.minute = event.start.minute
-        let startDate = style.calendar.date(from: startComponents)
-
-        var endComponents = DateComponents()
-        endComponents.year = newDate.year
-        endComponents.month = newDate.month
-        endComponents.day = newDate.day
-        endComponents.hour = event.end.hour
-        endComponents.minute = event.end.minute
-        let endDate = style.calendar.date(from: endComponents)
-
-        delegate?.didChangeCalendarEvent(event, start: startDate, end: endDate)
-        scrollToDate(newDate, animated: true)
-        didSelectDate(newDate, indexPath: index)
-        collectionView.isScrollEnabled = true
-    }
-    
-    func didChangeMoveEvent(gesture: UIPanGestureRecognizer) {
-        let point = gesture.location(in: collectionView)
-        guard collectionView.frame.width >= (point.x + 20), (point.x - 20) >= 0 else { return }
-        
-        var offset = collectionView.contentOffset
-        if (point.y - 80) < collectionView.contentOffset.y, (point.y - (eventPreview?.bounds.height ?? 50)) >= 0 {
-            // scroll up
-            offset.y -= 5
-            collectionView.setContentOffset(offset, animated: false)
-        } else if (point.y + 80) > (collectionView.contentOffset.y + collectionView.bounds.height), point.y + (eventPreview?.bounds.height ?? 50) <= collectionView.contentSize.height {
-            // scroll down
-            offset.y += 5
-            collectionView.setContentOffset(offset, animated: false)
-        }
-        
-        eventPreview?.frame.origin = CGPoint(x: point.x - data.eventPreviewXOffset, y: point.y - data.eventPreviewYOffset)
     }
 }
 
@@ -244,10 +163,10 @@ extension MonthView: CalendarSettingProtocol {
     private func getIndexForDirection(_ direction: UICollectionView.ScrollDirection, indexPath: IndexPath) -> IndexPath {
         switch direction {
         case .horizontal:
-            let row = indexPath.row % data.rows
-            let column = floor(Double(indexPath.row / data.rows))
-            let newIndex = (indexPath.section * data.rows * data.columns) + Int(column) + row * data.columns
-            return IndexPath(row: newIndex, section: indexPath.section)
+            let i = indexPath.row / data.rows
+            let j = indexPath.row % data.rows
+            let newIdx = j * data.columns + i
+            return IndexPath(row: newIdx, section: indexPath.section)
         default:
             return indexPath
         }
@@ -258,7 +177,7 @@ extension MonthView: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         switch style.month.scrollDirection {
         case .horizontal:
-            return Int(ceil(Float(data.days.count) / Float(data.rows * data.columns)))
+            return data.columns
         default:
             return 1
         }
@@ -286,6 +205,7 @@ extension MonthView: UICollectionViewDataSource {
                 cell.day = day
                 cell.events = day.events
                 cell.delegate = self
+                cell.isHidden = index.row > data.days.count
             }
         }
     }
@@ -372,5 +292,88 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         }
         
         return CGSize(width: widht, height: height)
+    }
+}
+
+extension MonthView: MonthCellDelegate {
+    func didSelectEvent(_ event: Event, frame: CGRect?) {
+        delegate?.didSelectCalendarEvent(event, frame: frame)
+    }
+    
+    func didSelectMore(_ date: Date, frame: CGRect?) {
+        delegate?.didSelectCalendarMore(date, frame: frame)
+    }
+    
+    func didStartMoveEvent(_ event: EventViewGeneral, snapshot: UIView?, gesture: UILongPressGestureRecognizer) {
+        let point = gesture.location(in: collectionView)
+        
+        data.movingEvent = event
+        eventPreview = nil
+        eventPreview = snapshot
+        data.eventPreviewXOffset = (snapshot?.bounds.width ?? data.eventPreviewXOffset) / 2
+        eventPreview?.frame.origin = CGPoint(x: point.x - data.eventPreviewXOffset, y: point.y - data.eventPreviewYOffset)
+        eventPreview?.alpha = 0.9
+        eventPreview?.tag = data.tagEventPagePreview
+        eventPreview?.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+        guard let eventTemp = eventPreview else { return }
+        
+        collectionView.addSubview(eventTemp)
+        UIView.animate(withDuration: 0.3) {
+            self.eventPreview?.transform = CGAffineTransform(scaleX: 1, y: 1)
+        }
+        UIImpactFeedbackGenerator().impactOccurred()
+        collectionView.isScrollEnabled = false
+    }
+    
+    func didEndMoveEvent(gesture: UILongPressGestureRecognizer) {
+        eventPreview?.removeFromSuperview()
+        eventPreview = nil
+        
+        let point = gesture.location(in: collectionView)
+        guard let indexPath = collectionView.indexPathForItem(at: point), let event = data.movingEvent?.event else { return }
+        
+        data.movingEvent = nil
+        let index = getIndexForDirection(style.month.scrollDirection, indexPath: indexPath)
+        let day = data.days[index.row]
+        let newDate = day.date ?? event.start
+
+        var startComponents = DateComponents()
+        startComponents.year = newDate.year
+        startComponents.month = newDate.month
+        startComponents.day = newDate.day
+        startComponents.hour = event.start.hour
+        startComponents.minute = event.start.minute
+        let startDate = style.calendar.date(from: startComponents)
+
+        var endComponents = DateComponents()
+        endComponents.year = newDate.year
+        endComponents.month = newDate.month
+        endComponents.day = newDate.day
+        endComponents.hour = event.end.hour
+        endComponents.minute = event.end.minute
+        let endDate = style.calendar.date(from: endComponents)
+
+        delegate?.didChangeCalendarEvent(event, start: startDate, end: endDate)
+        scrollToDate(newDate, animated: true)
+        didSelectDate(newDate, indexPath: index)
+        collectionView.isScrollEnabled = true
+    }
+    
+    func didChangeMoveEvent(gesture: UIPanGestureRecognizer) {
+        let point = gesture.location(in: collectionView)
+        guard collectionView.frame.width >= (point.x + 20), (point.x - 20) >= 0 else { return }
+        
+        var offset = collectionView.contentOffset
+        if (point.y - 80) < collectionView.contentOffset.y, (point.y - (eventPreview?.bounds.height ?? 50)) >= 0 {
+            // scroll up
+            offset.y -= 5
+            collectionView.setContentOffset(offset, animated: false)
+        } else if (point.y + 80) > (collectionView.contentOffset.y + collectionView.bounds.height), point.y + (eventPreview?.bounds.height ?? 50) <= collectionView.contentSize.height {
+            // scroll down
+            offset.y += 5
+            collectionView.setContentOffset(offset, animated: false)
+        }
+        
+        eventPreview?.frame.origin = CGPoint(x: point.x - data.eventPreviewXOffset, y: point.y - data.eventPreviewYOffset)
     }
 }

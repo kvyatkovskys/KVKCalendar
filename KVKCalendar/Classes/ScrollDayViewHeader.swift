@@ -116,7 +116,9 @@ final class ScrollDayHeaderView: UIView {
                 self.titleLabel.transform = CGAffineTransform.identity
             })
         }
-        setDate(nextDate)
+        
+        date = nextDate
+        collectionView.reloadData()
     }
     
     func getDateByPointX(_ pointX: CGFloat) -> Date? {
@@ -269,21 +271,9 @@ extension ScrollDayHeaderView: UICollectionViewDataSource {
 extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let translation = scrollView.panGestureRecognizer.translation(in: collectionView)
-        let velocity = scrollView.panGestureRecognizer.velocity(in: collectionView)
-        
         if trackingTranslation != translation.x {
             trackingTranslation = translation.x
-            
             didTrackScrollOffset?(translation.x, false)
-            
-            let translationLimit: CGFloat = UIDevice.current.userInterfaceIdiom == .phone ? 160 : 300
-            let velocityLimit: CGFloat = 1000
-            
-            if translation.x > translationLimit || velocity.x > velocityLimit {
-                scrollView.panGestureRecognizer.state = .cancelled
-            } else if translation.x < -translationLimit || velocity.x < -velocityLimit {
-                scrollView.panGestureRecognizer.state = .cancelled
-            }
         }
         
         guard lastContentOffset == 0 else { return }
@@ -303,9 +293,15 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
         guard let value = trackingTranslation else { return }
         
         if value > translationLimit || velocity.x > velocityLimit  {
+            if let idx = days.firstIndex(where: { $0.date?.year == date.year && $0.date?.month == date.month && $0.date?.day == date.day }) {
+                collectionView.selectItem(at: IndexPath(row: (idx + 1) - date.weekday, section: 0), animated: true, scrollPosition: .left)
+            } else {
+                
+            }
             selectDate(offset: -7)
         } else if value < -translationLimit || velocity.x < -velocityLimit {
             selectDate(offset: 7)
+            scrollView.setContentOffset(CGPoint(x: lastContentOffset + 800, y: 0), animated: true)
         }
         
         trackingTranslation = translation.x

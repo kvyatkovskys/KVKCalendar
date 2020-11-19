@@ -42,7 +42,6 @@ final class ViewController: UIViewController {
             style.headerScroll.fontDate = .systemFont(ofSize: 17)
             style.headerScroll.fontNameDay = .systemFont(ofSize: 17)
         }
-        style.systemCalendars = ["Test"]
         style.startWeekDay = .sunday
         style.timeSystem = TimeHourSystem.currentSystemOnDevice ?? .twelve
         if #available(iOS 13.0, *) {

@@ -78,6 +78,10 @@ final class YearPadCell: UICollectionViewCell {
         super.init(frame: frame)
         titleLabel.frame = CGRect(x: 3, y: 3, width: frame.width - 6, height: topHeight)
         addSubview(titleLabel)
+        
+        if #available(iOS 13.4, *) {
+            addPointInteraction(on: self, delegate: self)
+        }
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -183,5 +187,18 @@ final class YearPadCell: UICollectionViewCell {
         label.backgroundColor = style.year.colorBackgroundCurrentDate
         label.layer.cornerRadius = label.frame.height / 2
         label.clipsToBounds = true
+    }
+}
+
+@available(iOS 13.4, *)
+extension YearPadCell: PointerInteractionProtocol {
+    func pointerInteraction(_ interaction: UIPointerInteraction, styleFor region: UIPointerRegion) -> UIPointerStyle? {
+        var pointerStyle: UIPointerStyle?
+        
+        if let interactionView = interaction.view {
+            let targetedPreview = UITargetedPreview(view: interactionView)
+            pointerStyle = UIPointerStyle(effect: .hover(targetedPreview))
+        }
+        return pointerStyle
     }
 }
