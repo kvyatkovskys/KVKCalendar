@@ -24,7 +24,6 @@ public struct Style {
     public var timeSystem: TimeHourSystem = .twentyFour
     public var startWeekDay: StartDayType = .monday
     public var followInSystemTheme: Bool = true
-    public var systemCalendars: Set<String> = []
     
     public init() {}
 }
@@ -160,7 +159,7 @@ public struct MonthStyle {
     public var selectCalendarType: CalendarType = .week
     public var isAnimateSelection: Bool = false
     public var isPagingEnabled: Bool = true
-    public var isAutoSelectDateScrolling: Bool = true
+    public var isAutoSelectDateScrolling: Bool = false
     public var eventCorners: UIRectCorner = .allCorners
     public var eventCornersRadius: CGSize = CGSize(width: 5, height: 5)
     public var isHiddenDotInTitle: Bool = false

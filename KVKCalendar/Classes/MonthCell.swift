@@ -7,14 +7,6 @@
 
 import UIKit
 
-protocol MonthCellDelegate: class {
-    func didSelectEvent(_ event: Event, frame: CGRect?)
-    func didSelectMore(_ date: Date, frame: CGRect?)
-    func didStartMoveEvent(_ event: EventViewGeneral, snapshot: UIView?, gesture: UILongPressGestureRecognizer)
-    func didEndMoveEvent(gesture: UILongPressGestureRecognizer)
-    func didChangeMoveEvent(gesture: UIPanGestureRecognizer)
-}
-
 final class MonthCell: UICollectionViewCell {
     private let titlesCount = 3
     private let countInCell: CGFloat = 4
@@ -197,6 +189,10 @@ final class MonthCell: UICollectionViewCell {
         dateFrame.origin.y = offset
         dateLabel.frame = dateFrame
         addSubview(dateLabel)
+        
+        if #available(iOS 13.4, *) {
+            addPointInteraction(on: self, delegate: self)
+        }
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -347,4 +343,25 @@ extension MonthCell: UIGestureRecognizerDelegate {
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
     }
+}
+
+@available(iOS 13.4, *)
+extension MonthCell: PointerInteractionProtocol {
+    func pointerInteraction(_ interaction: UIPointerInteraction, styleFor region: UIPointerRegion) -> UIPointerStyle? {
+        var pointerStyle: UIPointerStyle?
+        
+        if let interactionView = interaction.view {
+            let targetedPreview = UITargetedPreview(view: interactionView)
+            pointerStyle = UIPointerStyle(effect: .hover(targetedPreview))
+        }
+        return pointerStyle
+    }
+}
+
+protocol MonthCellDelegate: class {
+    func didSelectEvent(_ event: Event, frame: CGRect?)
+    func didSelectMore(_ date: Date, frame: CGRect?)
+    func didStartMoveEvent(_ event: EventViewGeneral, snapshot: UIView?, gesture: UILongPressGestureRecognizer)
+    func didEndMoveEvent(gesture: UILongPressGestureRecognizer)
+    func didChangeMoveEvent(gesture: UIPanGestureRecognizer)
 }
