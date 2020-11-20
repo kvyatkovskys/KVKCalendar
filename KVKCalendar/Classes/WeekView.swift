@@ -192,11 +192,11 @@ extension WeekView: TimelineDelegate {
     }
     
     func nextDate() {
-        scrollHeaderDay.selectDate(offset: 7)
+        scrollHeaderDay.selectDate(offset: 7, needScrollToDate: true)
     }
     
     func previousDate() {
-        scrollHeaderDay.selectDate(offset: -7)
+        scrollHeaderDay.selectDate(offset: -7, needScrollToDate: true)
     }
     
     func swipeX(transform: CGAffineTransform, stop: Bool) {

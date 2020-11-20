@@ -25,6 +25,15 @@ public final class CalendarView: UIView {
         return dataSource?.eventsForCalendar() ?? []
     }
     
+    private let eventStore = EKEventStore()
+    
+    private var systemEvents: [Event] {
+        let systemCalendars = eventStore.calendars(for: .event).filter({ style.systemCalendars.contains($0.title) })
+        guard !systemCalendars.isEmpty else { return [] }
+        
+        return getSystemEvents(eventStore: eventStore, calendars: systemCalendars).compactMap({ $0.transform })
+    }
+    
     private lazy var dayView: DayView = {
         let day = DayView(data: dayData, frame: frame, style: style)
         day.delegate = self
@@ -77,6 +86,47 @@ public final class CalendarView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: Private methods
+    
+    private func getSystemEvents(eventStore: EKEventStore, calendars: [EKCalendar]) -> [EKEvent] {
+            var startOffset = 0
+            if yearData.yearsCount.count > 1 {
+                startOffset = yearData.yearsCount.first ?? 0
+            }
+            var endOffset = 1
+            if yearData.yearsCount.count > 1 {
+                endOffset = yearData.yearsCount.last ?? 1
+            }
+            
+            guard let startDate = style.calendar.date(byAdding: .year, value: startOffset, to: yearData.date),
+                  let endDate = style.calendar.date(byAdding: .year, value: endOffset, to: yearData.date) else {
+                return []
+            }
+            
+            let predicate = eventStore.predicateForEvents(withStart: startDate, end: endDate, calendars: calendars)
+            return eventStore.events(matching: predicate)
+        }
+        
+        private func authForSystemCalendar() {
+            let status = EKEventStore.authorizationStatus(for: .event)
+            
+            switch (status) {
+            case .notDetermined:
+                requestAccessToSystemCalendar { [weak self] (_) in
+                    self?.reloadData()
+                }
+            default:
+                break
+            }
+        }
+        
+        private func requestAccessToSystemCalendar(completion: @escaping (Bool) -> Void) {
+            eventStore.requestAccess(to: .event) { (access, error) in
+                print(access, error ?? "")
+                completion(access)
+            }
+        }
+    
     private func switchTypeCalendar(type: CalendarType) {
         self.type = type
         subviews.filter({ $0 is DayView
@@ -96,7 +146,7 @@ public final class CalendarView: UIView {
         }
     }
     
-    // MARK: public funcs
+    // MARK: Public methods
     
     public func addEventViewToDay(view: UIView) {
         dayView.addEventView(view: view)
@@ -109,15 +159,25 @@ public final class CalendarView: UIView {
     }
     
     public func reloadData() {
-        switch type {
-        case .day:
-            dayView.reloadData(events: events)
-        case .week:
-            weekView.reloadData(events: events)
-        case .month:
-            monthView.reloadData(events: events)
-        default:
-            break
+        var values = events
+        if !style.systemCalendars.isEmpty {
+            authForSystemCalendar()
+        }
+        if systemEvents.isEmpty == false {
+            values += systemEvents
+        }
+        
+        DispatchQueue.main.async { [weak self] in
+            switch self?.type {
+            case .day:
+                self?.dayView.reloadData(events: values)
+            case .week:
+                self?.weekView.reloadData(events: values)
+            case .month:
+                self?.monthView.reloadData(events: values)
+            default:
+                break
+            }
         }
     }
     
@@ -143,6 +203,14 @@ public final class CalendarView: UIView {
         default:
             break
         }
+    }
+    
+    public func addEventsToSystemCalendars(events: [Event], calendars: [String], span: EKSpan = .thisEvent) throws {
+        try eventStore.save(EKEvent(), span: span)
+    }
+    
+    public func removeEventsFromSystemCalendar(events: [Event], calendars: [String], span: EKSpan = .thisEvent) throws {
+        try eventStore.remove(EKEvent(), span: span)
     }
 }
 

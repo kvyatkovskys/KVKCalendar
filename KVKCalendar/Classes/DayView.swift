@@ -144,11 +144,11 @@ extension DayView: TimelineDelegate {
     }
     
     func nextDate() {
-        scrollHeaderDay.selectDate(offset: 1)
+        scrollHeaderDay.selectDate(offset: 1, needScrollToDate: true)
     }
     
     func previousDate() {
-        scrollHeaderDay.selectDate(offset: -1)
+        scrollHeaderDay.selectDate(offset: -1, needScrollToDate: true)
     }
     
     func didResizeEvent(_ event: Event, startTime: ResizeTime, endTime: ResizeTime) {

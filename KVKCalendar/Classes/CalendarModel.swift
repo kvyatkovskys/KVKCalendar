@@ -306,3 +306,16 @@ protocol CalendarDataProtocol: class {
     func didAddCalendarEvent(_ event: Event, _ date: Date?)
     func deselectCalendarEvent(_ event: Event)
 }
+
+// MARK: EKEvent
+
+extension EKEvent {
+    var transform: Event {
+        let event = Event(ID: eventIdentifier,
+                          text: title,
+                          start: startDate,
+                          end: endDate,
+                          isAllDay: isAllDay)
+        return event
+    }
+}
