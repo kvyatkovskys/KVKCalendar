@@ -8,7 +8,6 @@
 
 import UIKit
 import KVKCalendar
-import EventKit
 
 final class ViewController: UIViewController {
     private var events = [Event]()
@@ -44,6 +43,7 @@ final class ViewController: UIViewController {
         }
         style.startWeekDay = .sunday
         style.timeSystem = TimeHourSystem.currentSystemOnDevice ?? .twelve
+        style.systemCalendars = ["Test"]
         if #available(iOS 13.0, *) {
             style.event.iconFile = UIImage(systemName: "paperclip")
         }

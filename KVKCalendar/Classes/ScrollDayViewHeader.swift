@@ -20,6 +20,7 @@ final class ScrollDayHeaderView: UIView {
     private let calendar: Calendar
     private var lastContentOffset: CGFloat = 0
     private var trackingTranslation: CGFloat?
+    private var currentPage: Int = 0
     
     weak var dataSource: DisplayDataSource?
     
@@ -101,7 +102,7 @@ final class ScrollDayHeaderView: UIView {
         collectionView.reloadData()
     }
     
-    func selectDate(offset: Int) {
+    func selectDate(offset: Int, needScrollToDate: Bool) {
         guard let nextDate = calendar.date(byAdding: .day, value: offset, to: date) else { return }
         
         if !style.headerScroll.isHiddenTitleDate && style.headerScroll.isAnimateTitleDate {
@@ -118,6 +119,11 @@ final class ScrollDayHeaderView: UIView {
         }
         
         date = nextDate
+        if needScrollToDate {
+            scrollToDate(date, isAnimate: true, isDelay: false)
+        } else {
+            selectDate(date, type: type)
+        }
         collectionView.reloadData()
     }
     
@@ -157,8 +163,7 @@ final class ScrollDayHeaderView: UIView {
     }
     
     private func scrollToDate(_ date: Date, isAnimate: Bool, isDelay: Bool = true) {
-        didSelectDate?(date, type)
-        setDateToTitle(date)
+        selectDate(date, type: type)
         
         guard let scrollDate = getScrollDate(date),
               let idx = days.firstIndex(where: { $0.date?.year == scrollDate.year
@@ -176,6 +181,11 @@ final class ScrollDayHeaderView: UIView {
         if !self.isAnimate {
             self.isAnimate = true
         }
+    }
+    
+    private func selectDate(_ date: Date, type: CalendarType) {
+        didSelectDate?(date, type)
+        setDateToTitle(date)
     }
         
     required init?(coder aDecoder: NSCoder) {
@@ -271,6 +281,7 @@ extension ScrollDayHeaderView: UICollectionViewDataSource {
 extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let translation = scrollView.panGestureRecognizer.translation(in: collectionView)
+        
         if trackingTranslation != translation.x {
             trackingTranslation = translation.x
             didTrackScrollOffset?(translation.x, false)
@@ -280,35 +291,29 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
         lastContentOffset = scrollView.contentOffset.x
     }
     
+
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        if currentPage != scrollView.currentPage {
+            if (trackingTranslation ?? 0) > 0 {
+                selectDate(offset: -7, needScrollToDate: false)
+            } else if (trackingTranslation ?? 0) < 0 {
+                selectDate(offset: 7, needScrollToDate: false)
+            }
+            currentPage = scrollView.currentPage
+        }
+    }
+    
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         let translation = scrollView.panGestureRecognizer.translation(in: collectionView)
-        let velocity = scrollView.panGestureRecognizer.velocity(in: collectionView)
         
         didTrackScrollOffset?(0, true)
         lastContentOffset = scrollView.contentOffset.x
-        
-        let translationLimit: CGFloat = UIDevice.current.userInterfaceIdiom == .phone ? 160 : 300
-        let velocityLimit: CGFloat = 300
-        
-        guard let value = trackingTranslation else { return }
-        
-        if value > translationLimit || velocity.x > velocityLimit  {
-            if let idx = days.firstIndex(where: { $0.date?.year == date.year && $0.date?.month == date.month && $0.date?.day == date.day }) {
-                collectionView.selectItem(at: IndexPath(row: (idx + 1) - date.weekday, section: 0), animated: true, scrollPosition: .left)
-            } else {
-                
-            }
-            selectDate(offset: -7)
-        } else if value < -translationLimit || velocity.x < -velocityLimit {
-            selectDate(offset: 7)
-            scrollView.setContentOffset(CGPoint(x: lastContentOffset + 800, y: 0), animated: true)
-        }
-        
         trackingTranslation = translation.x
     }
     
     func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
         lastContentOffset = scrollView.contentOffset.x
+        currentPage = scrollView.currentPage
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -317,19 +322,17 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
             guard date != days[indexPath.row].date, let dateNew = days[indexPath.row].date else { return }
             
             date = dateNew
-            didSelectDate?(date, .day)
-            setDateToTitle(date)
-            collectionView.reloadData()
+            selectDate(date, type: .day)
         case .week:
-            guard let dateTemp = days[indexPath.row].date else { return }
+            guard let dateNew = days[indexPath.row].date else { return }
             
-            date = dateTemp
-            didSelectDate?(date, style.week.selectCalendarType)
-            setDateToTitle(date)
-            collectionView.reloadData()
+            date = dateNew
+            selectDate(date, type: style.week.selectCalendarType)
         default:
             break
         }
+        
+        collectionView.reloadData()
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {

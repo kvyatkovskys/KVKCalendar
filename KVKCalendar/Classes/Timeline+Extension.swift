@@ -134,14 +134,14 @@ extension TimelineView {
             var endTime: (hour: Int?, minute: Int?)
             
             if let startMinute = eventResizePreview?.startMinute {
-                startTime = calculateChangingTime(pointY: value.frame.origin.y)
+                startTime = calculateChangingTime(pointY: value.frame.origin.y, isForResizeEvent: true)
                 startTime.minute = startMinute
             } else {
                 startTime = (eventResizePreview?.event.start.hour, eventResizePreview?.event.start.minute)
             }
             
             if let endMinute = eventResizePreview?.endMinute {
-                endTime = calculateChangingTime(pointY: value.frame.origin.y + value.frame.height, isForEndEvent: true)
+                endTime = calculateChangingTime(pointY: value.frame.origin.y + value.frame.height, isForResizeEvent: true)
                 endTime.minute = endMinute
             } else {
                 endTime = (eventResizePreview?.event.end.hour, eventResizePreview?.event.end.minute)
@@ -618,7 +618,7 @@ extension TimelineView: EventDelegate {
         }
     }
     
-    func calculateChangingTime(pointY: CGFloat, isForEndEvent: Bool = false) -> (hour: Int?, minute: Int?) {
+    func calculateChangingTime(pointY: CGFloat, isForResizeEvent: Bool = false) -> (hour: Int?, minute: Int?) {
         let times = scrollView.subviews.filter({ ($0 is TimelineLabel) }).compactMap({ $0 as? TimelineLabel })
         guard let time = times.first( where: { $0.frame.origin.y >= pointY }) else { return (nil, nil) }
 
@@ -626,7 +626,7 @@ extension TimelineView: EventDelegate {
         let percent = (pointY - firstY) / (style.timeline.offsetTimeY + style.timeline.heightTime)
         let newMinute = Int(60.0 * percent)
         let newHour: Int
-        if isForEndEvent && movingMinuteLabel.minute == 0 {
+        if isForResizeEvent && (eventResizePreview?.startMinute == 0 || eventResizePreview?.endMinute == 0) {
             newHour = time.tag
         } else {
             newHour = time.tag - 1

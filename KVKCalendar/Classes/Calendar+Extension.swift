@@ -34,6 +34,11 @@ extension CalendarTimer {
     
 }
 
+extension UIScrollView {
+   var currentPage: Int {
+      return Int((contentOffset.x + (0.5 * frame.size.width)) / frame.width) + 1
+   }
+}
 
 extension UIApplication {
     var isAvailableBotomHomeIndicator: Bool {
