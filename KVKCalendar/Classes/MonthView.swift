@@ -267,6 +267,13 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let index = getIndexForDirection(style.month.scrollDirection, indexPath: indexPath)
+        let date = data.days[index.row].date
+        
+        if let size = delegate?.sizeForCell(date, type: .month) {
+            return size
+        }
+        
         let widht: CGFloat
         let height: CGFloat
         

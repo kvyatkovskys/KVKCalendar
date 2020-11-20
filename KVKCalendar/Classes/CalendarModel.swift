@@ -270,6 +270,7 @@ extension DisplayDataSource {
 // MARK: - Delegate protocol
 
 public protocol CalendarDelegate: class {
+    func sizeForCell(_ date: Date?, type: CalendarType) -> CGSize?
     func didSelectDate(_ date: Date?, type: CalendarType, frame: CGRect?)
     func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?)
     func didSelectMore(_ date: Date, frame: CGRect?)
@@ -282,6 +283,7 @@ public protocol CalendarDelegate: class {
 }
 
 public extension CalendarDelegate {
+    func sizeForCell(_ date: Date?, type: CalendarType) -> CGSize? { return nil }
     func didSelectDate(_ date: Date?, type: CalendarType, frame: CGRect?) {}
     func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?) {}
     func didSelectMore(_ date: Date, frame: CGRect?) {}
@@ -297,6 +299,7 @@ public extension CalendarDelegate {
 // MARK: - Private Data protocol
 
 protocol CalendarDataProtocol: class {
+    func sizeForCell(_ date: Date?, type: CalendarType) -> CGSize?
     func didDisplayCalendarEvents(_ events: [Event], dates: [Date?], type: CalendarType)
     func didSelectCalendarDate(_ date: Date?, type: CalendarType, frame: CGRect?)
     func didSelectCalendarEvent(_ event: Event, frame: CGRect?)
