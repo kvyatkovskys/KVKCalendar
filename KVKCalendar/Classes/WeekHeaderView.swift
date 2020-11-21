@@ -15,7 +15,6 @@ final class WeekHeaderView: UIView {
         let label = UILabel()
         label.textAlignment = style.month.titleDateAligment
         label.font = style.month.fontTitleDate
-        label.textColor = style.month.colorTitleDate
         label.tag = -999
         return label
     }()
@@ -89,6 +88,12 @@ final class WeekHeaderView: UIView {
             var monthStyle = style.month
             let formatter = monthStyle.formatter
             titleLabel.text = formatter.string(from: date)
+            
+            if Date().year == date.year && Date().month == date.month {
+                titleLabel.textColor = .systemRed
+            } else {
+                titleLabel.textColor = monthStyle.colorTitleDate
+            }
         }
     }
     

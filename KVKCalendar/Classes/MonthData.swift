@@ -32,10 +32,13 @@ final class MonthData: EventDateProtocol {
         
         let months = yearData.months.reduce([], { (acc, month) -> [Month] in
             var daysTemp = yearData.addStartEmptyDay(days: month.days, startDay: startDay)
-            if daysTemp.count < yearData.boxCount {
-                Array(1...yearData.boxCount - daysTemp.count).forEach { _ in
-                    daysTemp.append(.empty())
+            if let lastDay = daysTemp.last, daysTemp.count < yearData.boxCount {
+                let emptyEndDays = Array(1...(yearData.boxCount - daysTemp.count)).compactMap { (idx) -> Day in
+                    var day = Day.empty()
+                    day.date = yearData.getOffsetDate(offset: idx, to: lastDay.date)
+                    return day
                 }
+                daysTemp += emptyEndDays
             }
             var monthTemp = month
             monthTemp.days = daysTemp

@@ -42,9 +42,18 @@ class DayCell: UICollectionViewCell {
         
     var day: Day = .empty() {
         didSet {
+            isUserInteractionEnabled = day.type != .empty
+            
             guard let tempDay = day.date?.day else {
                 titleLabel.text = nil
                 dateLabel.text = nil
+                return
+            }
+            
+            dateLabel.text = "\(tempDay)"
+            guard day.type != .empty else {
+                titleLabel.text = nil
+                dateLabel.textColor = style.headerScroll.colorNameEmptyDay
                 return
             }
             
@@ -53,13 +62,14 @@ class DayCell: UICollectionViewCell {
             } else {
                 titleLabel.text = day.type.rawValue.capitalized
             }
-            dateLabel.text = "\(tempDay)"
             populateCell(day)
         }
     }
     
     var selectDate: Date = Date() {
         didSet {
+            guard day.type != .empty else { return }
+            
             let nowDate = Date()
             guard nowDate.month != day.date?.month else {
                 // remove the selection if the current date (for the day) does not match the selected one

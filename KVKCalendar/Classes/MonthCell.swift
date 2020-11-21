@@ -16,7 +16,6 @@ final class MonthCell: UICollectionViewCell {
         let label = UILabel()
         label.tag = -1
         label.font = monthStyle.fontNameDate
-        label.textColor = monthStyle.colorNameDay
         label.textAlignment = .center
         label.clipsToBounds = true
         return label
@@ -55,7 +54,7 @@ final class MonthCell: UICollectionViewCell {
     var events: [Event] = [] {
         didSet {
             subviews.filter({ $0.tag != -1 }).forEach({ $0.removeFromSuperview() })
-            guard bounds.height > dateLabel.bounds.height + 10 else { return }
+            guard bounds.height > (dateLabel.bounds.height + 10) && day.type != .empty else { return }
             
             if UIDevice.current.userInterfaceIdiom == .phone, UIDevice.current.orientation.isLandscape {
                 return
@@ -131,11 +130,24 @@ final class MonthCell: UICollectionViewCell {
     
     var day: Day = .empty() {
         didSet {
-            if let tempDay = day.date?.day {
-                dateLabel.text = "\(tempDay)"
-            } else {
-                dateLabel.text = nil
+            isUserInteractionEnabled = day.type != .empty
+            
+            switch day.type {
+            case .empty:
+                if let tempDay = day.date?.day {
+                    dateLabel.text = "\(tempDay)"
+                    dateLabel.textColor = monthStyle.colorNameEmptyDay
+                } else {
+                    dateLabel.text = nil
+                }
+            default:
+                if let tempDay = day.date?.day {
+                    dateLabel.text = "\(tempDay)"
+                } else {
+                    dateLabel.text = nil
+                }
             }
+
             if !monthStyle.isHiddenSeporator {
                 if UIDevice.current.userInterfaceIdiom == .phone {
                     let topLineLayer = CALayer()
@@ -246,13 +258,20 @@ final class MonthCell: UICollectionViewCell {
         let nowDate = Date()
         label.backgroundColor = .clear
         
+        var textColorForEmptyDay: UIColor?
+        if day.type == .empty {
+            textColorForEmptyDay = monthStyle.colorNameEmptyDay
+        }
+        
         if weekend {
-            label.textColor = monthStyle.colorWeekendDate
+            label.textColor = textColorForEmptyDay ?? monthStyle.colorWeekendDate
             view.backgroundColor = monthStyle.colorBackgroundWeekendDate
         } else {
             view.backgroundColor = monthStyle.colorBackgroundDate
-            label.textColor = monthStyle.colorDate
+            label.textColor = textColorForEmptyDay ?? monthStyle.colorDate
         }
+        
+        guard day.type != .empty else { return }
         
         guard date?.year == nowDate.year else {
             if date?.year == selectDate.year && date?.month == selectDate.month && date?.day == selectDate.day {

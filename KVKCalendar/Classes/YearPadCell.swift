@@ -13,7 +13,7 @@ final class YearPadCell: UICollectionViewCell {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontSizeToFitWidth = true
-        label.minimumScaleFactor = 0.6
+        label.minimumScaleFactor = 0.3
         return label
     }()
     
@@ -76,7 +76,7 @@ final class YearPadCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        titleLabel.frame = CGRect(x: 3, y: 3, width: frame.width - 6, height: topHeight)
+        titleLabel.frame = CGRect(x: 3, y: 0, width: frame.width - 6, height: topHeight)
         addSubview(titleLabel)
         
         if #available(iOS 13.4, *) {
@@ -93,7 +93,7 @@ final class YearPadCell: UICollectionViewCell {
         let newY: CGFloat = (topHeight * 2) + 10
         let height: CGFloat = (frame.height - newY) / CGFloat(daysInWeek - 1)
         
-        for (idx, day) in days.enumerated() {
+        for (idx, day) in days.enumerated() where day.type != .empty {
             let frame = CGRect(x: width * CGFloat(idx),
                                y: newY + (CGFloat(step - 1) * height),
                                width: width,

@@ -286,9 +286,6 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
             trackingTranslation = translation.x
             didTrackScrollOffset?(translation.x, false)
         }
-        
-        guard lastContentOffset == 0 else { return }
-        lastContentOffset = scrollView.contentOffset.x
     }
     
 
@@ -301,13 +298,14 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
             }
             currentPage = scrollView.currentPage
         }
+        
+        lastContentOffset = scrollView.contentOffset.x
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         let translation = scrollView.panGestureRecognizer.translation(in: collectionView)
         
         didTrackScrollOffset?(0, true)
-        lastContentOffset = scrollView.contentOffset.x
         trackingTranslation = translation.x
     }
     

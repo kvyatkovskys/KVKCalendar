@@ -72,6 +72,7 @@ public struct HeaderScrollStyle {
     public var titleDateAligment: NSTextAlignment = .left
     public var titleDateFont: UIFont = .boldSystemFont(ofSize: 20)
     public var isAnimateTitleDate: Bool = false
+    public var colorNameEmptyDay: UIColor = gainsboro
     var backgroundBlurStyle: UIBlurEffect.Style? = nil
 }
 
@@ -135,7 +136,7 @@ public struct MonthStyle {
     public var heightTitleDate: CGFloat = 40
     public var isHiddenTitleDate: Bool = false
     public var colorDate: UIColor = .black
-    public var colorNameDay: UIColor = .black
+    public var colorNameEmptyDay: UIColor = gainsboro
     public var fontNameDate: UIFont = .boldSystemFont(ofSize: 16)
     public var colorCurrentDate: UIColor = .white
     public var colorBackgroundCurrentDate: UIColor = .systemRed
@@ -269,6 +270,7 @@ extension Style {
             newStyle.event.colorIconFile = UIColor.useForStyle(dark: .systemGray, white: newStyle.event.colorIconFile)
             
             // header
+            newStyle.headerScroll.colorNameEmptyDay = UIColor.useForStyle(dark: .systemGray6, white: newStyle.headerScroll.colorNameEmptyDay)
             newStyle.headerScroll.colorBackground = UIColor.useForStyle(dark: .black, white: newStyle.headerScroll.colorBackground)
             newStyle.headerScroll.colorTitleDate = UIColor.useForStyle(dark: .white, white: newStyle.headerScroll.colorTitleDate)
             newStyle.headerScroll.colorTitleCornerDate = UIColor.useForStyle(dark: .systemRed, white: newStyle.headerScroll.colorTitleCornerDate)
@@ -300,7 +302,7 @@ extension Style {
             
             // month
             newStyle.month.colorDate = UIColor.useForStyle(dark: .systemGray, white: newStyle.month.colorDate)
-            newStyle.month.colorNameDay = UIColor.useForStyle(dark: .white, white: newStyle.month.colorNameDay)
+            newStyle.month.colorNameEmptyDay = UIColor.useForStyle(dark: .systemGray6, white: newStyle.month.colorNameEmptyDay)
             newStyle.month.colorCurrentDate = UIColor.useForStyle(dark: .white, white: newStyle.month.colorCurrentDate)
             newStyle.month.colorBackgroundCurrentDate = UIColor.useForStyle(dark: .systemRed, white: newStyle.month.colorBackgroundCurrentDate)
             newStyle.month.colorBackgroundSelectDate = UIColor.useForStyle(dark: .white, white: newStyle.month.colorBackgroundSelectDate)
