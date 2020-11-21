@@ -91,11 +91,15 @@ struct YearData {
     
     func addStartEmptyDay(days: [Day], startDay: StartDayType) -> [Day] {
         var tempDays = [Day]()
-        if let firstDay = days.first?.type {
-            if firstDay == .sunday, startDay == .sunday {
+        if let firstDay = days.first {
+            if firstDay.type == .sunday, startDay == .sunday {
                 tempDays = days
             } else {
-                tempDays = Array(0..<firstDay.shiftDay).compactMap({ _ in Day.empty() }) + days
+                tempDays = Array(0..<firstDay.type.shiftDay).compactMap({ (idx) -> Day in
+                    var day = Day.empty()
+                    day.date = getOffsetDate(offset: -(idx + 1), to: firstDay.date)
+                    return day
+                }) + days
             }
         } else {
             tempDays = days
@@ -110,11 +114,15 @@ struct YearData {
     
     func addEndEmptyDay(days: [Day], startDay: StartDayType) -> [Day] {
         var tempDays = [Day]()
-        if let lastDay = days.last?.type {
+        if let lastDay = days.last {
             let maxShift: DayType = startDay == .sunday ? .saturday : .sunday
             var emptyDays = [Day]()
-            if maxShift.shiftDay > lastDay.shiftDay {
-                emptyDays = Array(0..<maxShift.shiftDay - lastDay.shiftDay).compactMap({ _ in Day.empty() })
+            if maxShift.shiftDay > lastDay.type.shiftDay {
+                emptyDays = Array(0..<maxShift.shiftDay - lastDay.type.shiftDay).compactMap({ (idx) -> Day in
+                    var day = Day.empty()
+                    day.date = getOffsetDate(offset: (idx + 1), to: lastDay.date)
+                    return day
+                })
             }
             tempDays = days + emptyDays
         } else {
@@ -123,10 +131,18 @@ struct YearData {
         return tempDays
     }
     
+    func getOffsetDate(offset: Int, to date: Date?) -> Date? {
+        guard let dateTemp = date else { return nil }
+        
+        return style.calendar.date(byAdding: .day, value: offset, to: dateTemp)
+    }
+    
     private func addSundayToBegin(days: [Day]) -> [Day] {
         var days = days
-        if days.first?.type != .sunday {
-            days.insert(.empty(), at: 0)
+        if let firstDay = days.first, firstDay.type != .sunday {
+            var emptyDay = Day.empty()
+            emptyDay.date = getOffsetDate(offset: -1, to: firstDay.date)
+            days.insert(emptyDay, at: 0)
         }
         return days
     }
@@ -140,7 +156,7 @@ struct Month {
 
 struct Day {
     let type: DayType
-    let date: Date?
+    var date: Date?
     var events: [Event]
     
     static func empty() -> Day {
