@@ -71,7 +71,7 @@ final class MonthView: UIView {
     private func scrollToDate(_ date: Date, animated: Bool) {
         delegate?.didSelectCalendarDate(date, type: .month, frame: nil)
         if let idx = data.days.firstIndex(where: { $0.date?.month == date.month && $0.date?.year == date.year }) {
-            scrollToIndex(idx, animated: animated)
+            scrollToIndex(idx + 15, animated: animated)
         }
         
         if !data.isAnimate {
@@ -80,11 +80,11 @@ final class MonthView: UIView {
     }
     
     private func scrollToIndex(_ idx: Int, animated: Bool) {
-        let index = getIndexForDirection(style.month.scrollDirection, indexPath: IndexPath(row: idx, section: 0))
-        let scrollType: UICollectionView.ScrollPosition = style.month.scrollDirection == .horizontal ? .right : .top
+        let newIndex = getIndexForDirection(style.month.scrollDirection, indexPath: IndexPath(row: idx, section: 0))
+        let scrollType: UICollectionView.ScrollPosition = style.month.scrollDirection == .horizontal ? .left : .top
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
-            self?.collectionView.scrollToItem(at: index, at: scrollType, animated: animated)
+            self?.collectionView.scrollToItem(at: newIndex, at: scrollType, animated: animated)
         }
     }
     
@@ -163,9 +163,10 @@ extension MonthView: CalendarSettingProtocol {
     private func getIndexForDirection(_ direction: UICollectionView.ScrollDirection, indexPath: IndexPath) -> IndexPath {
         switch direction {
         case .horizontal:
-            let i = indexPath.row / data.rows
-            let j = indexPath.row % data.rows
-            let newIdx = j * data.columns + i
+            let a = indexPath.item / data.itemsInPage
+            let b = indexPath.item / data.rowsInPage - a * data.columnsInPage
+            let c = indexPath.item % data.rowsInPage
+            let newIdx = (c * data.columnsInPage + b) + a * data.itemsInPage
             return IndexPath(row: newIdx, section: indexPath.section)
         default:
             return indexPath
@@ -174,19 +175,10 @@ extension MonthView: CalendarSettingProtocol {
 }
 
 extension MonthView: UICollectionViewDataSource {
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        switch style.month.scrollDirection {
-        case .horizontal:
-            return data.columns
-        default:
-            return 1
-        }
-    }
-    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         switch style.month.scrollDirection {
         case .horizontal:
-            return data.rows * data.columns
+            return data.rowsInPage * data.columns
         default:
             return data.days.count
         }

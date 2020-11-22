@@ -16,8 +16,17 @@ final class MonthData: EventDateProtocol {
     let eventPreviewYOffset: CGFloat = 30
     var eventPreviewXOffset: CGFloat = 60
     var willSelectDate: Date
-    let rows = 6
-    let columns = 7
+    let rowsInPage = 6
+    let columnsInPage = 7
+    var middleRowInPage: Int {
+        return (rowsInPage * columnsInPage) / 2
+    }
+    var columns: Int {
+        return ((days.count / itemsInPage) * columnsInPage) + (days.count % itemsInPage)
+    }
+    var itemsInPage: Int {
+        return columnsInPage * rowsInPage
+    }
     var isFirstLoad = true
     var movingEvent: EventViewGeneral?
     
