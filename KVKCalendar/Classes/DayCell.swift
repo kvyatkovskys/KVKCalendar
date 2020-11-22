@@ -44,6 +44,10 @@ class DayCell: UICollectionViewCell {
         didSet {
             isUserInteractionEnabled = day.type != .empty
             
+            if day.type == .empty && !style.headerScroll.showDatesForOtherMonths {
+                return
+            }
+            
             guard let tempDay = day.date?.day else {
                 titleLabel.text = nil
                 dateLabel.text = nil
@@ -91,6 +95,7 @@ class DayCell: UICollectionViewCell {
                 populateCell(day)
                 return
             }
+            
             dateLabel.textColor = style.headerScroll.colorSelectDate
             dotView.backgroundColor = style.headerScroll.colorBackgroundSelectDate
             isSelected = true

@@ -134,7 +134,7 @@ final class MonthCell: UICollectionViewCell {
             
             switch day.type {
             case .empty:
-                if let tempDay = day.date?.day {
+                if let tempDay = day.date?.day, monthStyle.showDatesForOtherMonths {
                     dateLabel.text = "\(tempDay)"
                     dateLabel.textColor = monthStyle.colorNameEmptyDay
                 } else {
