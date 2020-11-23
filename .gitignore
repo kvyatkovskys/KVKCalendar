@@ -27,4 +27,4 @@ fastlane/xcov_report/
 Example/build/*
 
 # CocoaPods
-Pods
+#Pods

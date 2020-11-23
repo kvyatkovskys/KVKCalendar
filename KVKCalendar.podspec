@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'KVKCalendar'
-  s.version          = '0.3.9'
+  s.version          = '0.4.1'
   s.summary          = 'A most fully customization calendar library for iOS.'
   
   s.description      = <<-DESC
@@ -17,6 +17,6 @@ Pod::Spec.new do |s|
   s.social_media_url = 'https://github.com/kvyatkovskys'
   s.ios.deployment_target = '10.0'
   s.source_files     = 'KVKCalendar/Classes/*.swift'
-  s.frameworks       = 'EventKit', 'UIKit'
+  s.frameworks       = 'UIKit'
   s.swift_version    = '5.0'
 end
