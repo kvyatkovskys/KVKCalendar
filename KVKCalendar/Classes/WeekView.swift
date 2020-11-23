@@ -17,10 +17,10 @@ final class WeekView: UIView {
     
     lazy var scrollHeaderDay: ScrollDayHeaderView = {
         let heightView: CGFloat
-        if style.headerScroll.isHiddenTitleDate {
+        if style.headerScroll.isHiddenSubview {
             heightView = style.headerScroll.heightHeaderWeek
         } else {
-            heightView = style.headerScroll.heightHeaderWeek + style.headerScroll.heightTitleDate
+            heightView = style.headerScroll.heightHeaderWeek + style.headerScroll.heightSubviewHeader
         }
         let view = ScrollDayHeaderView(frame: CGRect(x: 0, y: 0, width: frame.width, height: heightView),
                                        days: data.days,
@@ -51,10 +51,10 @@ final class WeekView: UIView {
     
     private lazy var topBackgroundView: UIView = {
         let heightView: CGFloat
-        if style.headerScroll.isHiddenTitleDate {
+        if style.headerScroll.isHiddenSubview {
             heightView = style.headerScroll.heightHeaderWeek
         } else {
-            heightView = style.headerScroll.heightHeaderWeek + style.headerScroll.heightTitleDate
+            heightView = style.headerScroll.heightHeaderWeek + style.headerScroll.heightSubviewHeader
         }
         let view = UIView(frame: CGRect(x: 0, y: 0, width: frame.width, height: heightView))
         view.backgroundColor = style.headerScroll.colorBackground
@@ -85,24 +85,6 @@ final class WeekView: UIView {
     func reloadData(events: [Event]) {
         data.events = events
         timelineView.create(dates: visibleDates, events: events, selectedDate: data.date)
-    }
-    
-    private func addCornerLabel() {
-        if !style.headerScroll.isHiddenCornerTitleDate {
-            titleInCornerLabel.frame = CGRect(x: 0, y: 0, width: scrollHeaderDay.frame.origin.x, height: style.headerScroll.heightHeaderWeek)
-            setDateToTitleCorner(data.date)
-            
-            if subviews.contains(titleInCornerLabel) {
-                titleInCornerLabel.removeFromSuperview()
-            }
-            addSubview(titleInCornerLabel)
-        }
-    }
-    
-    private func setDateToTitleCorner(_ date: Date?) {
-        if let date = date, !style.headerScroll.isHiddenCornerTitleDate {
-            titleInCornerLabel.text = style.headerScroll.formatterCornerTitle.string(from: date)
-        }
     }
     
     private func getVisibleDates(date: Date) {
@@ -145,7 +127,6 @@ extension WeekView {
         data.date = selectDate
         getVisibleDates(date: selectDate)
         delegate?.didSelectCalendarDate(selectDate, type: type, frame: nil)
-        setDateToTitleCorner(selectDate)
     }
 }
 
@@ -160,8 +141,6 @@ extension WeekView: CalendarSettingProtocol {
         timelineFrame.size.height = frame.height - scrollHeaderDay.frame.height
         timelineView.reloadFrame(timelineFrame)
         timelineView.create(dates: visibleDates, events: data.events, selectedDate: data.date)
-        
-        addCornerLabel()
     }
     
     func updateStyle(_ style: Style) {
@@ -178,7 +157,6 @@ extension WeekView: CalendarSettingProtocol {
         addSubview(topBackgroundView)
         topBackgroundView.addSubview(scrollHeaderDay)
         addSubview(timelineView)
-        addCornerLabel()
     }
 }
 

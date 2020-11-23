@@ -229,13 +229,18 @@ public protocol CalendarDataSource: class {
     //func willDisplayDate(_ date: Date?, events: [Event])
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral?
     
+    func willDisplayHeaderSubview(date: Date?, frame: CGRect, type: CalendarType) -> UIView?
+    
     /// Use this method to add a custom day cell
     func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell?
 }
 
 public extension CalendarDataSource {
     func willDisplayDate(_ date: Date?, events: [Event]) {}
+    
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? { return nil }
+    
+    func willDisplayHeaderSubview(date: Date?, frame: CGRect, type: CalendarType) -> UIView? { return nil }
     
     func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? { return nil }
 }
@@ -244,6 +249,9 @@ public extension CalendarDataSource {
 
 protocol DisplayDataSource: class {
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral?
+    
+    func willDisplayHeaderSubview(date: Date?, frame: CGRect, type: CalendarType) -> UIView?
+    
     func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell?
     
     @available(iOS 13.0, *)
@@ -252,7 +260,10 @@ protocol DisplayDataSource: class {
 
 extension DisplayDataSource {
     func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? { return nil }
+    
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? { return nil }
+    
+    func willDisplayHeaderSubview(date: Date?, frame: CGRect, type: CalendarType) -> UIView? { return nil }
     
     @available(iOS 13.0, *)
     func willDisplayContextMenu(_ event: Event, date: Date?) -> UIContextMenuConfiguration? { return nil }
@@ -262,28 +273,47 @@ extension DisplayDataSource {
 
 public protocol CalendarDelegate: class {
     func sizeForCell(_ date: Date?, type: CalendarType) -> CGSize?
+    
     func didSelectDate(_ date: Date?, type: CalendarType, frame: CGRect?)
+    
     func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?)
+    
     func didSelectMore(_ date: Date, frame: CGRect?)
+    
     func eventViewerFrame(_ frame: CGRect)
+    
     func didChangeEvent(_ event: Event, start: Date?, end: Date?)
+    
     func didAddNewEvent(_ event: Event, _ date: Date?)
+    
     func didDisplayEvents(_ events: [Event], dates: [Date?])
+    
     func willSelectDate(_ date: Date, type: CalendarType)
+    
     func deselectEvent(_ event: Event, animated: Bool)
 }
 
 public extension CalendarDelegate {
     func sizeForCell(_ date: Date?, type: CalendarType) -> CGSize? { return nil }
+    
     func didSelectDate(_ date: Date?, type: CalendarType, frame: CGRect?) {}
+    
     func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?) {}
+    
     func didSelectMore(_ date: Date, frame: CGRect?) {}
+    
     func eventViewerFrame(_ frame: CGRect) {}
+    
     func didChangeEvent(_ event: Event, start: Date?, end: Date?) {}
+    
     func didAddEvent(_ date: Date?) {}
+    
     func didAddNewEvent(_ event: Event, _ date: Date?) {}
+    
     func didDisplayEvents(_ events: [Event], dates: [Date?]) {}
+    
     func willSelectDate(_ date: Date, type: CalendarType) {}
+    
     func deselectEvent(_ event: Event, animated: Bool) {}
 }
 
@@ -291,13 +321,21 @@ public extension CalendarDelegate {
 
 protocol CalendarDataProtocol: class {
     func sizeForCell(_ date: Date?, type: CalendarType) -> CGSize?
+    
     func didDisplayCalendarEvents(_ events: [Event], dates: [Date?], type: CalendarType)
+    
     func didSelectCalendarDate(_ date: Date?, type: CalendarType, frame: CGRect?)
+    
     func didSelectCalendarEvent(_ event: Event, frame: CGRect?)
+    
     func didSelectCalendarMore(_ date: Date, frame: CGRect?)
+    
     func getEventViewerFrame(_ frame: CGRect)
+    
     func didChangeCalendarEvent(_ event: Event, start: Date?, end: Date?)
+    
     func didAddCalendarEvent(_ event: Event, _ date: Date?)
+    
     func deselectCalendarEvent(_ event: Event)
 }
 

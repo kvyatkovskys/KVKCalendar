@@ -32,10 +32,20 @@ public struct Style {
 public struct HeaderScrollStyle {
     public var titleDays: [String] = []
     public var heightHeaderWeek: CGFloat = 50
+    public var heightSubviewHeader: CGFloat = 30
+    
+    @available(swift, deprecated: 0.3.9, obsoleted: 0.4.0, renamed: "heightSubviewHeader")
     public var heightTitleDate: CGFloat = 30
+    
     public var colorBackground: UIColor = gainsboro.withAlphaComponent(0.4)
+    public var isHiddenSubview: Bool = false
+    
+    @available(swift, deprecated: 0.3.9, obsoleted: 0.4.0, renamed: "isHiddenSubview")
     public var isHiddenTitleDate: Bool = false
+    
+    @available(swift, deprecated: 0.3.9, obsoleted: 0.4.0, renamed: "isHiddenSubview")
     public var isHiddenCornerTitleDate: Bool = true
+    
     public var formatterTitle: DateFormatter = {
         let format = DateFormatter()
         format.dateStyle = .full

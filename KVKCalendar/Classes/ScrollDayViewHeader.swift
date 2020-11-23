@@ -21,6 +21,7 @@ final class ScrollDayHeaderView: UIView {
     private var lastContentOffset: CGFloat = 0
     private var trackingTranslation: CGFloat?
     private var currentPage: Int = 0
+    private var subviewCustomHeader: UIView?
     
     weak var dataSource: DisplayDataSource?
     
@@ -40,6 +41,15 @@ final class ScrollDayHeaderView: UIView {
         return layout
     }()
     
+    private var subviewFrameForDevice: CGRect {
+        switch UIDevice.current.userInterfaceIdiom {
+        case .phone:
+            return CGRect(x: 10, y: frame.height - style.headerScroll.heightSubviewHeader - 5, width: frame.width - 20, height: style.headerScroll.heightSubviewHeader - 5)
+        default:
+            return CGRect(x: 10, y: 5, width: frame.width - 20, height: style.headerScroll.heightSubviewHeader - 5)
+        }
+    }
+    
     init(frame: CGRect, days: [Day], date: Date, type: CalendarType, style: Style) {
         self.days = days
         self.date = date
@@ -54,22 +64,30 @@ final class ScrollDayHeaderView: UIView {
         case .phone:
             newFrame.origin.y = 0
             
-            if !style.headerScroll.isHiddenTitleDate {
-                titleLabel.frame = CGRect(x: 10, y: frame.height - style.headerScroll.heightTitleDate - 5, width: frame.width - 20, height: style.headerScroll.heightTitleDate - 5)
+            if !style.headerScroll.isHiddenSubview {
+                if let subviewHeader = dataSource?.willDisplayHeaderSubview(date: date, frame: subviewFrameForDevice, type: type) {
+                    subviewCustomHeader = subviewHeader
+                    addSubview(subviewHeader)
+                } else {
+                    titleLabel.frame = subviewFrameForDevice
+                    setDateToTitle(date)
+                    addSubview(titleLabel)
+                }
                 
-                setDateToTitle(date)
-                addSubview(titleLabel)
-                
-                newFrame.size.height = frame.height - titleLabel.frame.height
+                newFrame.size.height = frame.height - subviewFrameForDevice.height
             }
         default:
-            if !style.headerScroll.isHiddenTitleDate {
-                titleLabel.frame = CGRect(x: 10, y: 5, width: frame.width - 20, height: style.headerScroll.heightTitleDate - 5)
+            if !style.headerScroll.isHiddenSubview {
+                if let subviewHeader = dataSource?.willDisplayHeaderSubview(date: date, frame: subviewFrameForDevice, type: type) {
+                    subviewCustomHeader = subviewHeader
+                    addSubview(subviewHeader)
+                } else {
+                    titleLabel.frame = subviewFrameForDevice
+                    setDateToTitle(date)
+                    addSubview(titleLabel)
+                }
                 
-                setDateToTitle(date)
-                addSubview(titleLabel)
-                
-                newFrame.origin.y = titleLabel.frame.height + 5
+                newFrame.origin.y = subviewFrameForDevice.height + 5
                 newFrame.size.height = frame.height - newFrame.origin.y
             } else {
                 newFrame.origin.y = 0
@@ -105,7 +123,7 @@ final class ScrollDayHeaderView: UIView {
     func selectDate(offset: Int, needScrollToDate: Bool) {
         guard let nextDate = calendar.date(byAdding: .day, value: offset, to: date) else { return }
         
-        if !style.headerScroll.isHiddenTitleDate && style.headerScroll.isAnimateTitleDate {
+        if !style.headerScroll.isHiddenSubview && style.headerScroll.isAnimateTitleDate && titleLabel.superview != nil {
             let value: CGFloat
             if offset < 0 {
                 value = -40
@@ -116,6 +134,12 @@ final class ScrollDayHeaderView: UIView {
             UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: {
                 self.titleLabel.transform = CGAffineTransform.identity
             })
+        }
+        
+        if subviewCustomHeader != nil, let newSubview = dataSource?.willDisplayHeaderSubview(date: nextDate, frame: subviewFrameForDevice, type: type) {
+            subviewCustomHeader?.removeFromSuperview()
+            subviewCustomHeader = newSubview
+            addSubview(newSubview)
         }
         
         date = nextDate
@@ -136,7 +160,7 @@ final class ScrollDayHeaderView: UIView {
     }
     
     private func setDateToTitle(_ date: Date?) {
-        if let date = date, !style.headerScroll.isHiddenTitleDate {
+        if let date = date, !style.headerScroll.isHiddenSubview {
             titleLabel.text = style.headerScroll.formatterTitle.string(from: date)
         }
     }
@@ -185,7 +209,17 @@ final class ScrollDayHeaderView: UIView {
     
     private func selectDate(_ date: Date, type: CalendarType) {
         didSelectDate?(date, type)
-        setDateToTitle(date)
+        
+        if let newSubview = dataSource?.willDisplayHeaderSubview(date: date, frame: subviewFrameForDevice, type: type) {
+            subviewCustomHeader?.removeFromSuperview()
+            subviewCustomHeader = newSubview
+            addSubview(newSubview)
+        } else {
+            subviewCustomHeader?.removeFromSuperview()
+            subviewCustomHeader = nil
+            
+            setDateToTitle(date)
+        }
     }
         
     required init?(coder aDecoder: NSCoder) {
@@ -202,18 +236,35 @@ extension ScrollDayHeaderView: CalendarSettingProtocol {
         case .phone:
             newFrame.origin.y = 0
             
-            if !style.headerScroll.isHiddenTitleDate {
-                titleLabel.frame = CGRect(x: 10, y: (self.frame.height - style.headerScroll.heightTitleDate) - 5, width: self.frame.width - 20, height: style.headerScroll.heightTitleDate - 5)
+            if !style.headerScroll.isHiddenSubview {
+                subviewCustomHeader?.removeFromSuperview()
+                titleLabel.removeFromSuperview()
                 
-                setDateToTitle(date)
-                addSubview(titleLabel)
+                if let subviewHeader = dataSource?.willDisplayHeaderSubview(date: date, frame: subviewFrameForDevice, type: type) {
+                    subviewCustomHeader = subviewHeader
+                    addSubview(subviewHeader)
+                } else{
+                    titleLabel.frame = subviewFrameForDevice
+                    setDateToTitle(date)
+                    addSubview(titleLabel)
+                }
                 
-                newFrame.size.height = (self.frame.height - titleLabel.frame.height) - titleLabel.frame.origin.x
+                newFrame.size.height = (self.frame.height - subviewFrameForDevice.height) - subviewFrameForDevice.origin.x
             }
         default:
-            if !style.headerScroll.isHiddenTitleDate {
-                titleLabel.frame = CGRect(x: 10, y: 5, width: self.frame.width - 20, height: titleLabel.frame.height)
-                newFrame.origin.y = titleLabel.frame.height + 5
+            if !style.headerScroll.isHiddenSubview {
+                subviewCustomHeader?.removeFromSuperview()
+                titleLabel.removeFromSuperview()
+                
+                if let subviewHeader = dataSource?.willDisplayHeaderSubview(date: date, frame: subviewFrameForDevice, type: type) {
+                    subviewCustomHeader = subviewHeader
+                    addSubview(subviewHeader)
+                } else {
+                    titleLabel.frame = subviewFrameForDevice
+                    setDateToTitle(date)
+                    addSubview(titleLabel)
+                }
+                newFrame.origin.y = subviewFrameForDevice.height + 5
                 newFrame.size.height = self.frame.height - newFrame.origin.y
             } else {
                 newFrame.origin.y = 0
