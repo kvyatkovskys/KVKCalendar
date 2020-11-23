@@ -219,6 +219,10 @@ extension CalendarView: DisplayDataSource {
         return dataSource?.willDisplayEventView(event, frame: frame, date: date)
     }
     
+    func willDisplayHeaderSubview(date: Date?, frame: CGRect, type: CalendarType) -> UIView? {
+        return dataSource?.willDisplayHeaderSubview(date: date, frame: frame, type: type)
+    }
+    
     func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? {
         return dataSource?.dequeueDateCell(date: date, type: type, collectionView: collectionView, indexPath: indexPath)
     }

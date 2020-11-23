@@ -16,10 +16,10 @@ final class DayView: UIView {
     
     lazy var scrollHeaderDay: ScrollDayHeaderView = {
         let heightView: CGFloat
-        if style.headerScroll.isHiddenTitleDate {
+        if style.headerScroll.isHiddenSubview {
             heightView = style.headerScroll.heightHeaderWeek
         } else {
-            heightView = style.headerScroll.heightHeaderWeek + style.headerScroll.heightTitleDate
+            heightView = style.headerScroll.heightHeaderWeek + style.headerScroll.heightSubviewHeader
         }
         let view = ScrollDayHeaderView(frame: CGRect(x: 0, y: 0, width: frame.width, height: heightView),
                                        days: data.days,
@@ -61,10 +61,10 @@ final class DayView: UIView {
     
     private lazy var topBackgroundView: UIView = {
         let heightView: CGFloat
-        if style.headerScroll.isHiddenTitleDate {
+        if style.headerScroll.isHiddenSubview {
             heightView = style.headerScroll.heightHeaderWeek
         } else {
-            heightView = style.headerScroll.heightHeaderWeek + style.headerScroll.heightTitleDate
+            heightView = style.headerScroll.heightHeaderWeek + style.headerScroll.heightSubviewHeader
         }
         let view = UIView(frame: CGRect(x: 0, y: 0, width: frame.width, height: heightView))
         if let blur = style.headerScroll.backgroundBlurStyle {

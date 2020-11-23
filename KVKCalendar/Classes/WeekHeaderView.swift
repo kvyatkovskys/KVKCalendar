@@ -85,7 +85,7 @@ final class WeekHeaderView: UIView {
     
     private func setDateToTitle(date: Date?, style: Style) {
         if let date = date, !style.month.isHiddenTitleDate, !isFromYear {
-            var monthStyle = style.month
+            let monthStyle = style.month
             let formatter = monthStyle.formatter
             titleLabel.text = formatter.string(from: date)
             
