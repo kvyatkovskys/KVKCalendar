@@ -193,6 +193,7 @@ typedef unsigned int swift_uint4  __attribute__((__ext_vector_type__(4)));
 #pragma clang diagnostic ignored "-Watimport-in-framework-header"
 #endif
 @import CoreGraphics;
+@import EventKit;
 @import UIKit;
 #endif
 
@@ -225,6 +226,8 @@ SWIFT_CLASS("_TtC11KVKCalendar12CalendarView")
 
 
 
+
+
 @class UITapGestureRecognizer;
 @class UILongPressGestureRecognizer;
 
@@ -245,6 +248,8 @@ SWIFT_AVAILABILITY(ios,introduced=13)
 @interface EventViewGeneral (SWIFT_EXTENSION(KVKCalendar)) <UIContextMenuInteractionDelegate>
 - (UIContextMenuConfiguration * _Nullable)contextMenuInteraction:(UIContextMenuInteraction * _Nonnull)interaction configurationForMenuAtLocation:(CGPoint)location SWIFT_WARN_UNUSED_RESULT;
 @end
+
+
 
 
 
@@ -459,6 +464,7 @@ typedef unsigned int swift_uint4  __attribute__((__ext_vector_type__(4)));
 #pragma clang diagnostic ignored "-Watimport-in-framework-header"
 #endif
 @import CoreGraphics;
+@import EventKit;
 @import UIKit;
 #endif
 
@@ -491,6 +497,8 @@ SWIFT_CLASS("_TtC11KVKCalendar12CalendarView")
 
 
 
+
+
 @class UITapGestureRecognizer;
 @class UILongPressGestureRecognizer;
 
@@ -511,6 +519,8 @@ SWIFT_AVAILABILITY(ios,introduced=13)
 @interface EventViewGeneral (SWIFT_EXTENSION(KVKCalendar)) <UIContextMenuInteractionDelegate>
 - (UIContextMenuConfiguration * _Nullable)contextMenuInteraction:(UIContextMenuInteraction * _Nonnull)interaction configurationForMenuAtLocation:(CGPoint)location SWIFT_WARN_UNUSED_RESULT;
 @end
+
+
 
 
 
@@ -729,6 +739,7 @@ typedef unsigned int swift_uint4  __attribute__((__ext_vector_type__(4)));
 #pragma clang diagnostic ignored "-Watimport-in-framework-header"
 #endif
 @import CoreGraphics;
+@import EventKit;
 @import UIKit;
 #endif
 
@@ -761,6 +772,8 @@ SWIFT_CLASS("_TtC11KVKCalendar12CalendarView")
 
 
 
+
+
 @class UITapGestureRecognizer;
 @class UILongPressGestureRecognizer;
 
@@ -781,6 +794,8 @@ SWIFT_AVAILABILITY(ios,introduced=13)
 @interface EventViewGeneral (SWIFT_EXTENSION(KVKCalendar)) <UIContextMenuInteractionDelegate>
 - (UIContextMenuConfiguration * _Nullable)contextMenuInteraction:(UIContextMenuInteraction * _Nonnull)interaction configurationForMenuAtLocation:(CGPoint)location SWIFT_WARN_UNUSED_RESULT;
 @end
+
+
 
 
 
@@ -995,6 +1010,7 @@ typedef unsigned int swift_uint4  __attribute__((__ext_vector_type__(4)));
 #pragma clang diagnostic ignored "-Watimport-in-framework-header"
 #endif
 @import CoreGraphics;
+@import EventKit;
 @import UIKit;
 #endif
 
@@ -1027,6 +1043,8 @@ SWIFT_CLASS("_TtC11KVKCalendar12CalendarView")
 
 
 
+
+
 @class UITapGestureRecognizer;
 @class UILongPressGestureRecognizer;
 
@@ -1047,6 +1065,8 @@ SWIFT_AVAILABILITY(ios,introduced=13)
 @interface EventViewGeneral (SWIFT_EXTENSION(KVKCalendar)) <UIContextMenuInteractionDelegate>
 - (UIContextMenuConfiguration * _Nullable)contextMenuInteraction:(UIContextMenuInteraction * _Nonnull)interaction configurationForMenuAtLocation:(CGPoint)location SWIFT_WARN_UNUSED_RESULT;
 @end
+
+
 
 
 
