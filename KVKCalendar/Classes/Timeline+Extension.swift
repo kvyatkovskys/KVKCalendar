@@ -566,10 +566,16 @@ extension TimelineView: EventDelegate {
         let time = calculateChangingTime(pointY: location.y)
         if let minute = time.minute, let hour = time.hour, !event.isNew {
             var newDayEvent: Int?
-            if type == .week, let newDay = shadowView.date?.day {
-                newDayEvent = newDay
+            var updatedEvent = event
+            
+            if type == .week, let newDate = shadowView.date {
+                newDayEvent = newDate.day
+                
+                if event.recurringType != .none {
+                    updatedEvent = event.updateDate(newDate: newDate, calendar: style.calendar) ?? event
+                }
             }
-            delegate?.didChangeEvent(event, minute: minute, hour: hour, point: location, newDay: newDayEvent)
+            delegate?.didChangeEvent(updatedEvent, minute: minute, hour: hour, point: location, newDay: newDayEvent)
         }
         
         shadowView.removeFromSuperview()

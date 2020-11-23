@@ -30,27 +30,23 @@ public struct Style {
 }
 
 public struct HeaderScrollStyle {
-    private let formatFull: DateFormatter = {
-        let format = DateFormatter()
-        format.dateStyle = .full
-        return format
-    }()
-    
-    private let formatSort: DateFormatter = {
-        let format = DateFormatter()
-        format.locale = Locale(identifier: "en_EN")
-        format.dateFormat = "LLL"
-        return format
-    }()
-    
     public var titleDays: [String] = []
     public var heightHeaderWeek: CGFloat = 50
     public var heightTitleDate: CGFloat = 30
     public var colorBackground: UIColor = gainsboro.withAlphaComponent(0.4)
     public var isHiddenTitleDate: Bool = false
     public var isHiddenCornerTitleDate: Bool = true
-    public lazy var formatterTitle: DateFormatter = formatFull
-    public lazy var formatterCornerTitle: DateFormatter = formatSort
+    public var formatterTitle: DateFormatter = {
+        let format = DateFormatter()
+        format.dateStyle = .full
+        return format
+    }()
+    public var formatterCornerTitle: DateFormatter = {
+        let format = DateFormatter()
+        format.locale = Locale(identifier: "en_EN")
+        format.dateFormat = "LLL"
+        return format
+    }()
     public var colorTitleDate: UIColor = .black
     public var colorTitleCornerDate: UIColor = .red
     public var colorDate: UIColor = .black
@@ -126,13 +122,11 @@ public struct WeekStyle {
 }
 
 public struct MonthStyle {
-    private let format: DateFormatter = {
+    public var formatter: DateFormatter = {
         let format = DateFormatter()
         format.dateFormat = "MMMM yyyy"
         return format
     }()
-    
-    public lazy var formatter: DateFormatter = format
     public var heightHeaderWeek: CGFloat = 25
     public var heightTitleDate: CGFloat = 40
     public var isHiddenTitleDate: Bool = false
@@ -175,13 +169,11 @@ public struct MonthStyle {
 }
 
 public struct YearStyle {
-    private let format: DateFormatter = {
+    public var formatter: DateFormatter = {
         let format = DateFormatter()
         format.dateFormat = "yyyy"
         return format
     }()
-    
-    public lazy var formatter: DateFormatter = format
     public var colorCurrentDate: UIColor = .white
     public var colorBackgroundCurrentDate: UIColor = .systemRed
     public var colorBackgroundSelectDate: UIColor = .black

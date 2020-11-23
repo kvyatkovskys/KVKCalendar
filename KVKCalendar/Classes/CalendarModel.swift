@@ -158,14 +158,14 @@ extension Event: EventProtocol {
 extension Event {
     func updateDate(newDate: Date?, calendar: Calendar = Calendar.current) -> Event? {
         var startComponents = DateComponents()
-        startComponents.year = start.year
-        startComponents.month = start.month
+        startComponents.year = newDate?.year
+        startComponents.month = newDate?.month
         startComponents.hour = start.hour
         startComponents.minute = start.minute
         
         var endComponents = DateComponents()
-        endComponents.year = end.year
-        endComponents.month = end.month
+        endComponents.year = newDate?.year
+        endComponents.month = newDate?.month
         endComponents.hour = end.hour
         endComponents.minute = end.minute
         
@@ -175,20 +175,11 @@ extension Event {
         case .everyWeek where newDate?.weekday == start.weekday:
             startComponents.day = newDate?.day
             startComponents.weekday = newDate?.weekday
-            
             endComponents.weekday = newDate?.weekday
         case .everyMonth where newDate?.month != start.month && newDate?.day == start.day:
             startComponents.day = newDate?.day
-            startComponents.month = newDate?.month
-            
-            endComponents.month = newDate?.month
         case .everyYear where newDate?.year != start.year && newDate?.month == start.month && newDate?.day == start.day:
             startComponents.day = newDate?.day
-            startComponents.month = newDate?.month
-            startComponents.year = newDate?.year
-            
-            endComponents.month = newDate?.month
-            endComponents.year = newDate?.year
         default:
             return nil
         }
