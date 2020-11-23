@@ -1,0 +1,6 @@
+framework module KVKCalendar {
+  umbrella header "KVKCalendar-umbrella.h"
+
+  export *
+  module * { export * }
+}
