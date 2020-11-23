@@ -8,13 +8,13 @@
   "tvOS" : [
 
   ],
-  "commitish" : "0.3.9",
+  "commitish" : "1b0324095a81d31f5a7228596db7f4c749f483f6",
   "iOS" : [
     {
-      "hash" : "44e4e89466d8eaa4400a1734930263ea50084417ed7d2bd700c32d0beff5dd86",
+      "hash" : "badb0288227fa80ebccaaf41e6b8d5ae65a55d99fb1241e6ce8147570c2e7b39",
       "name" : "KVKCalendar",
       "linking" : "dynamic",
-      "swiftToolchainVersion" : "5.2.4 (swiftlang-1103.0.32.9 clang-1103.0.32.53)"
+      "swiftToolchainVersion" : "5.1.3 (swiftlang-1100.0.282.1 clang-1100.0.33.15)"
     }
   ]
 }
