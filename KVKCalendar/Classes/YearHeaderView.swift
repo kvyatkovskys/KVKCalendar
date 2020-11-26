@@ -20,7 +20,7 @@ final class YearHeaderView: UIView {
         didSet {
             guard let date = date else { return }
             
-            titleLabel.text = style.year.formatter.string(from: date)
+            titleLabel.text = date.titleForLocale(style.locale, formatter: style.year.titleFormatter)
             if Date().year == date.year {
                 titleLabel.textColor = .systemRed
             } else {

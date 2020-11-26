@@ -10,6 +10,7 @@ import UIKit
 final class WeekHeaderView: UIView {
     private var style: Style
     private let isFromYear: Bool
+    private var days = [Date]()
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -32,13 +33,20 @@ final class WeekHeaderView: UIView {
         addViews(frame: frame, isFromYear: fromYear)
     }
     
-    private func addViews(frame: CGRect, isFromYear: Bool) {
-        var days = DayType.allCases.filter({ $0 != .empty })
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func getOffsetDate(offset: Int, to date: Date?) -> Date? {
+        guard let dateTemp = date else { return nil }
         
-        if let idx = days.firstIndex(where: { $0 == .sunday }), style.startWeekDay == .sunday {
-            let leftDays = days[..<idx]
-            days[..<idx] = []
-            days += leftDays
+        return style.calendar.date(byAdding: .day, value: offset, to: dateTemp)
+    }
+    
+    private func addViews(frame: CGRect, isFromYear: Bool) {
+        let startWeekDate = style.startWeekDay == .sunday ? Date().startSundayOfWeek : Date().startMondayOfWeek
+        if days.isEmpty {
+            days = Array(0..<7).compactMap({ getOffsetDate(offset: $0, to: startWeekDate) })
         }
         
         if !style.month.isHiddenTitleDate && !isFromYear {
@@ -73,41 +81,37 @@ final class WeekHeaderView: UIView {
                 label.backgroundColor = .clear
             }
 
-            if !style.headerScroll.titleDays.isEmpty, let title = style.headerScroll.titleDays[safe: value.shiftDay] {
+            if !style.headerScroll.titleDays.isEmpty, let title = style.headerScroll.titleDays[safe: value.weekday - 1] {
                 label.text = title
             } else {
-                label.text = value.rawValue.capitalized
+                let weekdayFormatter = isFromYear ? style.year.weekdayFormatter : style.month.weekdayFormatter
+                label.text = value.titleForLocale(style.locale, formatter: weekdayFormatter).capitalized
             }
-            label.tag = value.shiftDay
+            label.tag = value.weekday
             addSubview(label)
         }
     }
     
     private func setDateToTitle(date: Date?, style: Style) {
         if let date = date, !style.month.isHiddenTitleDate, !isFromYear {
-            let monthStyle = style.month
-            let formatter = monthStyle.formatter
-            titleLabel.text = formatter.string(from: date)
+            titleLabel.text = date.titleForLocale(style.locale, formatter: style.month.titleFormatter)
             
             if Date().year == date.year && Date().month == date.month {
                 titleLabel.textColor = .systemRed
             } else {
-                titleLabel.textColor = monthStyle.colorTitleDate
+                titleLabel.textColor = style.month.colorTitleDate
             }
         }
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }
 
 extension WeekHeaderView: CalendarSettingProtocol {
     func reloadFrame(_ frame: CGRect) {
         self.frame.size.width = frame.width
+        
         titleLabel.removeFromSuperview()
-        DayType.allCases.filter({ $0 != .empty }).forEach { (day) in
-            subviews.filter({ $0.tag == day.shiftDay }).forEach({ $0.removeFromSuperview() })
+        days.forEach { (day) in
+            subviews.filter({ $0.tag == day.weekday }).forEach({ $0.removeFromSuperview() })
         }
         addViews(frame: self.frame, isFromYear: isFromYear)
     }

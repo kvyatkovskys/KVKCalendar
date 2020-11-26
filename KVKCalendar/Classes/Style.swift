@@ -34,27 +34,33 @@ public struct HeaderScrollStyle {
     public var heightHeaderWeek: CGFloat = 50
     public var heightSubviewHeader: CGFloat = 30
     
-    @available(swift, deprecated: 0.3.9, obsoleted: 0.4.0, renamed: "heightSubviewHeader")
+    @available(swift, deprecated: 0.3.9, obsoleted: 0.4.2, renamed: "heightSubviewHeader")
     public var heightTitleDate: CGFloat = 30
     
     public var colorBackground: UIColor = gainsboro.withAlphaComponent(0.4)
     public var isHiddenSubview: Bool = false
     
-    @available(swift, deprecated: 0.3.9, obsoleted: 0.4.0, renamed: "isHiddenSubview")
+    @available(swift, deprecated: 0.3.9, obsoleted: 0.4.2, renamed: "isHiddenSubview")
     public var isHiddenTitleDate: Bool = false
     
-    @available(swift, deprecated: 0.3.9, obsoleted: 0.4.0, renamed: "isHiddenSubview")
+    @available(swift, deprecated: 0.3.9, obsoleted: 0.4.2, renamed: "isHiddenSubview")
     public var isHiddenCornerTitleDate: Bool = true
     
+    @available(swift, deprecated: 0.3.9, obsoleted: 0.4.2, renamed: "titleFormatter")
     public var formatterTitle: DateFormatter = {
         let format = DateFormatter()
         format.dateStyle = .full
         return format
     }()
-    public var formatterCornerTitle: DateFormatter = {
+    
+    public var titleFormatter: DateFormatter = {
         let format = DateFormatter()
-        format.locale = Locale(identifier: "en_EN")
-        format.dateFormat = "LLL"
+        format.dateStyle = .full
+        return format
+    }()
+    public var weekdayFormatter: DateFormatter = {
+        let format = DateFormatter()
+        format.dateFormat = "EE"
         return format
     }()
     public var colorTitleDate: UIColor = .black
@@ -132,9 +138,21 @@ public struct WeekStyle {
 }
 
 public struct MonthStyle {
+    @available(swift, deprecated: 0.3.9, obsoleted: 0.4.2, renamed: "titleFormatter")
     public var formatter: DateFormatter = {
         let format = DateFormatter()
         format.dateFormat = "MMMM yyyy"
+        return format
+    }()
+    
+    public var titleFormatter: DateFormatter = {
+        let format = DateFormatter()
+        format.dateFormat = "MMMM yyyy"
+        return format
+    }()
+    public var weekdayFormatter: DateFormatter = {
+        let format = DateFormatter()
+        format.dateFormat = "EE"
         return format
     }()
     public var heightHeaderWeek: CGFloat = 25
@@ -179,9 +197,21 @@ public struct MonthStyle {
 }
 
 public struct YearStyle {
+    @available(swift, deprecated: 0.3.9, obsoleted: 0.4.2, renamed: "titleFormatter")
     public var formatter: DateFormatter = {
         let format = DateFormatter()
         format.dateFormat = "yyyy"
+        return format
+    }()
+    
+    public var titleFormatter: DateFormatter = {
+        let format = DateFormatter()
+        format.dateFormat = "yyyy"
+        return format
+    }()
+    public var weekdayFormatter: DateFormatter = {
+        let format = DateFormatter()
+        format.dateFormat = "EE"
         return format
     }()
     public var colorCurrentDate: UIColor = .white
@@ -224,6 +254,7 @@ public struct YearStyle {
     public var isAutoSelectDateScrolling: Bool = true
     public var weekDayAligment: NSTextAlignment = .center
     public var titleDateAligment: NSTextAlignment = .left
+    var scrollDirection: UICollectionView.ScrollDirection = .horizontal
 }
 
 public struct AllDayStyle {

@@ -61,10 +61,10 @@ class DayCell: UICollectionViewCell {
                 return
             }
             
-            if !style.headerScroll.titleDays.isEmpty, let title = style.headerScroll.titleDays[safe: day.type.shiftDay] {
+            if !style.headerScroll.titleDays.isEmpty, let title = style.headerScroll.titleDays[safe: day.date?.weekday ?? 0] {
                 titleLabel.text = title
             } else {
-                titleLabel.text = day.type.rawValue.capitalized
+                titleLabel.text = day.date?.titleForLocale(style.locale, formatter: style.headerScroll.weekdayFormatter).capitalized
             }
             populateCell(day)
         }

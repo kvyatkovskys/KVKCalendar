@@ -85,40 +85,46 @@ struct YearData {
         let formatterDay = DateFormatter()
         formatterDay.dateFormat = "EE"
         formatterDay.locale = Locale(identifier: "en_US")
-        let days = arrDates.map({ Day(type: DayType(rawValue: formatterDay.string(from: $0).uppercased()), date: $0, data: []) })
+        let days = arrDates.map({ Day(type: DayType(rawValue: formatterDay.string(from: $0).uppercased()) ?? .empty, date: $0, data: []) })
         return days
     }
     
-    func addStartEmptyDay(days: [Day], startDay: StartDayType) -> [Day] {
+    func addStartEmptyDays(_ days: [Day], startDay: StartDayType) -> [Day] {
         var tempDays = [Day]()
         if let firstDay = days.first {
-            if firstDay.type == .sunday, startDay == .sunday {
-                tempDays = days
-            } else {
-                tempDays = Array(0..<firstDay.type.shiftDay).compactMap({ (idx) -> Day in
-                    var day = Day.empty()
-                    day.date = getOffsetDate(offset: -(idx + 1), to: firstDay.date)
-                    return day
-                }) + days
+            var endIdx = (firstDay.date?.weekday ?? 1) - 1
+            if startDay == .monday && firstDay.date?.isSunday == false {
+                endIdx -= 1
             }
+            
+            tempDays = Array(0..<endIdx).compactMap({ (idx) -> Day in
+                var day = Day.empty()
+                day.date = getOffsetDate(offset: -(idx + 1), to: firstDay.date)
+                return day
+            }) + days
         } else {
             tempDays = days
-        }
-        
-        if startDay == .sunday {
-            tempDays = addSundayToBegin(days: tempDays)
         }
         
         return tempDays
     }
     
-    func addEndEmptyDay(days: [Day], startDay: StartDayType) -> [Day] {
+    func addEndEmptyDays(_ days: [Day], startDay: StartDayType) -> [Day] {
         var tempDays = [Day]()
         if let lastDay = days.last {
-            let maxShift: DayType = startDay == .sunday ? .saturday : .sunday
             var emptyDays = [Day]()
-            if maxShift.shiftDay > lastDay.type.shiftDay {
-                emptyDays = Array(0..<maxShift.shiftDay - lastDay.type.shiftDay).compactMap({ (idx) -> Day in
+            
+            let maxIdx: Int
+            switch startDay {
+            case .sunday:
+                maxIdx = 6 - 1
+            case .monday:
+                maxIdx = 7 - 1
+            }
+            let lastIdx = (lastDay.date?.weekday ?? 1) - 1
+            
+            if maxIdx > lastIdx {
+                emptyDays = Array(0..<maxIdx - lastIdx).compactMap({ (idx) -> Day in
                     var day = Day.empty()
                     day.date = getOffsetDate(offset: (idx + 1), to: lastDay.date)
                     return day
@@ -137,12 +143,12 @@ struct YearData {
         return style.calendar.date(byAdding: .day, value: offset, to: dateTemp)
     }
     
-    private func addSundayToBegin(days: [Day]) -> [Day] {
+    private func addEmptyDayToEnd(days: [Day]) -> [Day] {
         var days = days
-        if let firstDay = days.first, firstDay.type != .sunday {
+        if let lastDay = days.last {
             var emptyDay = Day.empty()
-            emptyDay.date = getOffsetDate(offset: -1, to: firstDay.date)
-            days.insert(emptyDay, at: 0)
+            emptyDay.date = getOffsetDate(offset: 1, to: lastDay.date)
+            days.append(emptyDay)
         }
         return days
     }
@@ -185,50 +191,6 @@ enum DayType: String, CaseIterable {
     case saturday = "SAT"
     case sunday = "SUN"
     case empty
-    
-    init(rawValue: String) {
-        switch rawValue {
-        case "MON": self = .monday
-        case "TUE": self = .tuesday
-        case "WED": self = .wednesday
-        case "THU": self = .thursday
-        case "FRI": self = .friday
-        case "SAT": self = .saturday
-        case "SUN": self = .sunday
-        default: self = .empty
-        }
-    }
-    
-    var shiftDay: Int {
-        switch self {
-        case .monday: return 0
-        case .tuesday: return 1
-        case .wednesday: return 2
-        case .thursday: return 3
-        case .friday: return 4
-        case .saturday: return 5
-        case .sunday: return 6
-        case .empty: return -1
-        }
-    }
-    
-    var isWeekend: Bool {
-        switch self {
-        case .saturday, .sunday:
-            return true
-        default:
-            return false
-        }
-    }
-    
-    var isWeekday: Bool {
-        switch self {
-        case .monday, .tuesday, .wednesday, .thursday, .friday:
-            return true
-        default:
-            return false
-        }
-    }
 }
 
 public enum StartDayType: Int {

@@ -159,13 +159,13 @@ public final class CalendarView: UIView {
     }
     
     public func reloadData() {
-        let values = events
-//        if !style.systemCalendars.isEmpty {
-//            //authForSystemCalendar()
-//        }
-//        if systemEvents.isEmpty == false {
-//            //values += systemEvents
-//        }
+        var values = events
+        if !style.systemCalendars.isEmpty {
+            authForSystemCalendar()
+        }
+        if systemEvents.isEmpty == false {
+            values += systemEvents
+        }
         
         DispatchQueue.main.async { [weak self] in
             switch self?.type {
