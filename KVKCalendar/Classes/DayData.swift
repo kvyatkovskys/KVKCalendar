@@ -17,9 +17,9 @@ struct DayData {
         self.date = yearData.date
         var tempDays = yearData.months.reduce([], { $0 + $1.days })
         let startIdx = tempDays.count > 7 ? tempDays.count - 7 : tempDays.count
-        let endWeek = yearData.addEndEmptyDay(days: Array(tempDays[startIdx..<tempDays.count]), startDay: startDay)
+        let endWeek = yearData.addEndEmptyDays(Array(tempDays[startIdx..<tempDays.count]), startDay: startDay)
         tempDays.removeSubrange(startIdx..<tempDays.count)
-        self.days = yearData.addStartEmptyDay(days: tempDays, startDay: startDay) + endWeek
+        self.days = yearData.addStartEmptyDays(tempDays, startDay: startDay) + endWeek
         self.timeSystem = timeSystem
     }
 }

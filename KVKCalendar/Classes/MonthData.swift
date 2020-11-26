@@ -40,7 +40,7 @@ final class MonthData: EventDateProtocol {
         self.scrollDirection = scrollDirection
         
         let months = yearData.months.reduce([], { (acc, month) -> [Month] in
-            var daysTemp = yearData.addStartEmptyDay(days: month.days, startDay: startDay)
+            var daysTemp = yearData.addStartEmptyDays(month.days, startDay: startDay)
             if let lastDay = daysTemp.last, daysTemp.count < yearData.boxCount {
                 let emptyEndDays = Array(1...(yearData.boxCount - daysTemp.count)).compactMap { (idx) -> Day in
                     var day = Day.empty()

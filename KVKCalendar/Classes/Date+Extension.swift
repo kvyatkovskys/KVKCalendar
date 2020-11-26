@@ -8,8 +8,25 @@
 import Foundation
 
 public extension Date {
+    func titleForLocale(_ locale: Locale, formatter: DateFormatter) -> String {
+        formatter.locale = locale
+        return formatter.string(from: self).uppercased()
+    }
+    
     var isSunday: Bool {
         return weekday == 1
+    }
+    
+    var isSaturday: Bool {
+        return weekday == 7
+    }
+    
+    var isWeekend: Bool {
+        return isSunday || isSaturday
+    }
+    
+    var isWeekday: Bool {
+        return !isWeekend
     }
     
     var minute: Int {

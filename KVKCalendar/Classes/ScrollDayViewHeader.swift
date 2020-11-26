@@ -161,7 +161,7 @@ final class ScrollDayHeaderView: UIView {
     
     private func setDateToTitle(_ date: Date?) {
         if let date = date, !style.headerScroll.isHiddenSubview {
-            titleLabel.text = style.headerScroll.formatterTitle.string(from: date)
+            titleLabel.text = date.titleForLocale(style.locale, formatter: style.headerScroll.titleFormatter)
         }
     }
     
