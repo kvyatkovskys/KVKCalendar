@@ -83,9 +83,13 @@ extension UICollectionView {
     func register<T: UICollectionViewCell>(_ cell: T.Type) {
         register(T.self, forCellWithReuseIdentifier: cell.identifier)
     }
+    
+    func registerView<T: UICollectionReusableView>(_ view: T.Type, kind: String = UICollectionView.elementKindSectionHeader) {
+        register(T.self, forSupplementaryViewOfKind: kind, withReuseIdentifier: view.identifier)
+    }
 }
 
-public extension UICollectionViewCell {
+public extension UICollectionReusableView {
     static var identifier: String {
         return String(describing: self)
     }
@@ -150,6 +154,24 @@ public extension UICollectionView {
         
         configure(cell)
         return cell
+    }
+    
+    func dequeueView<T: UICollectionReusableView>(id: String = T.identifier,
+                                                  kind: String = UICollectionView.elementKindSectionHeader,
+                                                  indexPath: IndexPath,
+                                                  configure: (T) -> Void) -> T {
+        registerView(T.self, kind: kind)
+        
+        let view: T
+        if let dequeued = dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: id, for: indexPath) as? T {
+            view = dequeued
+        } else {
+            view = T(frame: .zero)
+        }
+        
+        configure(view)
+        
+        return view
     }
 }
 

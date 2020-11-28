@@ -10,7 +10,7 @@ import UIKit
 final class MonthData: EventDateProtocol {
     var days: [Day]
     var date: Date
-    var data: YearData
+    var data: CalendarData
     var isAnimate: Bool = false
     let tagEventPagePreview = -20
     let eventPreviewYOffset: CGFloat = 30
@@ -34,17 +34,17 @@ final class MonthData: EventDateProtocol {
     private let calendar: Calendar
     private let scrollDirection: UICollectionView.ScrollDirection
     
-    init(yearData: YearData, startDay: StartDayType, calendar: Calendar, scrollDirection: UICollectionView.ScrollDirection) {
-        self.data = yearData
+    init(data: CalendarData, startDay: StartDayType, calendar: Calendar, scrollDirection: UICollectionView.ScrollDirection) {
+        self.data = data
         self.calendar = calendar
         self.scrollDirection = scrollDirection
         
-        let months = yearData.months.reduce([], { (acc, month) -> [Month] in
-            var daysTemp = yearData.addStartEmptyDays(month.days, startDay: startDay)
-            if let lastDay = daysTemp.last, daysTemp.count < yearData.boxCount {
-                let emptyEndDays = Array(1...(yearData.boxCount - daysTemp.count)).compactMap { (idx) -> Day in
+        let months = data.months.reduce([], { (acc, month) -> [Month] in
+            var daysTemp = data.addStartEmptyDays(month.days, startDay: startDay)
+            if let lastDay = daysTemp.last, daysTemp.count < data.boxCount {
+                let emptyEndDays = Array(1...(data.boxCount - daysTemp.count)).compactMap { (idx) -> Day in
                     var day = Day.empty()
-                    day.date = yearData.getOffsetDate(offset: idx, to: lastDay.date)
+                    day.date = data.getOffsetDate(offset: idx, to: lastDay.date)
                     return day
                 }
                 daysTemp += emptyEndDays
@@ -53,9 +53,9 @@ final class MonthData: EventDateProtocol {
             monthTemp.days = daysTemp
             return acc + [monthTemp]
         })
-        data.months = months
-        self.date = yearData.date
-        self.willSelectDate = yearData.date
+        self.data.months = months
+        self.date = data.date
+        self.willSelectDate = data.date
         self.days = months.flatMap({ $0.days })
         self.cachedDays = days
     }
