@@ -17,7 +17,7 @@ public final class CalendarView: UIView {
     
     private var style: Style
     private var type = CalendarType.day
-    private var yearData: YearData
+    private var calendarData: CalendarData
     private var weekData: WeekData
     private let monthData: MonthData
     private var dayData: DayData
@@ -61,7 +61,7 @@ public final class CalendarView: UIView {
     }()
     
     private lazy var yearView: YearView = {
-        let year = YearView(data: monthData.data, frame: frame, style: style)
+        let year = YearView(data: YearData(data: monthData.data, date: calendarData.date, style: style), frame: frame)
         year.delegate = self
         year.dataSource = self
         return year
@@ -69,10 +69,10 @@ public final class CalendarView: UIView {
     
     public init(frame: CGRect, date: Date = Date(), style: Style = Style(), years: Int = 4) {
         self.style = style.checkStyle
-        self.yearData = YearData(date: date, years: years, style: style)
-        self.dayData = DayData(yearData: yearData, timeSystem: style.timeSystem, startDay: style.startWeekDay)
-        self.weekData = WeekData(yearData: yearData, timeSystem: style.timeSystem, startDay: style.startWeekDay)
-        self.monthData = MonthData(yearData: yearData, startDay: style.startWeekDay, calendar: style.calendar, scrollDirection: style.month.scrollDirection)
+        self.calendarData = CalendarData(date: date, years: years, style: style)
+        self.dayData = DayData(data: calendarData, timeSystem: style.timeSystem, startDay: style.startWeekDay)
+        self.weekData = WeekData(data: calendarData, timeSystem: style.timeSystem, startDay: style.startWeekDay)
+        self.monthData = MonthData(data: calendarData, startDay: style.startWeekDay, calendar: style.calendar, scrollDirection: style.month.scrollDirection)
         super.init(frame: frame)
         
         if let defaultType = style.defaultType {
@@ -90,16 +90,16 @@ public final class CalendarView: UIView {
     
     private func getSystemEvents(eventStore: EKEventStore, calendars: [EKCalendar]) -> [EKEvent] {
             var startOffset = 0
-            if yearData.yearsCount.count > 1 {
-                startOffset = yearData.yearsCount.first ?? 0
+            if calendarData.yearsCount.count > 1 {
+                startOffset = calendarData.yearsCount.first ?? 0
             }
             var endOffset = 1
-            if yearData.yearsCount.count > 1 {
-                endOffset = yearData.yearsCount.last ?? 1
+            if calendarData.yearsCount.count > 1 {
+                endOffset = calendarData.yearsCount.last ?? 1
             }
             
-            guard let startDate = style.calendar.date(byAdding: .year, value: startOffset, to: yearData.date),
-                  let endDate = style.calendar.date(byAdding: .year, value: endOffset, to: yearData.date) else {
+            guard let startDate = style.calendar.date(byAdding: .year, value: startOffset, to: calendarData.date),
+                  let endDate = style.calendar.date(byAdding: .year, value: endOffset, to: calendarData.date) else {
                 return []
             }
             

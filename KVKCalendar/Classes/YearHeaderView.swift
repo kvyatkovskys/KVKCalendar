@@ -7,8 +7,7 @@
 
 import UIKit
 
-final class YearHeaderView: UIView {
-    static let identifier = #file
+final class YearHeaderView: UICollectionReusableView {
     
     private let titleLabel: UILabel = {
         let label = UILabel()

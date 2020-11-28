@@ -34,19 +34,19 @@ public struct HeaderScrollStyle {
     public var heightHeaderWeek: CGFloat = 50
     public var heightSubviewHeader: CGFloat = 30
     
-    @available(swift, deprecated: 0.3.9, obsoleted: 0.4.2, renamed: "heightSubviewHeader")
+    @available(swift, deprecated: 0.4.1, obsoleted: 0.4.2, renamed: "heightSubviewHeader")
     public var heightTitleDate: CGFloat = 30
     
     public var colorBackground: UIColor = gainsboro.withAlphaComponent(0.4)
     public var isHiddenSubview: Bool = false
     
-    @available(swift, deprecated: 0.3.9, obsoleted: 0.4.2, renamed: "isHiddenSubview")
+    @available(swift, deprecated: 0.4.1, obsoleted: 0.4.2, renamed: "isHiddenSubview")
     public var isHiddenTitleDate: Bool = false
     
-    @available(swift, deprecated: 0.3.9, obsoleted: 0.4.2, renamed: "isHiddenSubview")
+    @available(swift, deprecated: 0.4.1, obsoleted: 0.4.2, renamed: "isHiddenSubview")
     public var isHiddenCornerTitleDate: Bool = true
     
-    @available(swift, deprecated: 0.3.9, obsoleted: 0.4.2, renamed: "titleFormatter")
+    @available(swift, deprecated: 0.4.1, obsoleted: 0.4.2, renamed: "titleFormatter")
     public var formatterTitle: DateFormatter = {
         let format = DateFormatter()
         format.dateStyle = .full
@@ -138,7 +138,7 @@ public struct WeekStyle {
 }
 
 public struct MonthStyle {
-    @available(swift, deprecated: 0.3.9, obsoleted: 0.4.2, renamed: "titleFormatter")
+    @available(swift, deprecated: 0.4.1, obsoleted: 0.4.2, renamed: "titleFormatter")
     public var formatter: DateFormatter = {
         let format = DateFormatter()
         format.dateFormat = "MMMM yyyy"
@@ -197,7 +197,7 @@ public struct MonthStyle {
 }
 
 public struct YearStyle {
-    @available(swift, deprecated: 0.3.9, obsoleted: 0.4.2, renamed: "titleFormatter")
+    @available(swift, deprecated: 0.4.1, obsoleted: 0.4.2, renamed: "titleFormatter")
     public var formatter: DateFormatter = {
         let format = DateFormatter()
         format.dateFormat = "yyyy"
@@ -249,12 +249,12 @@ public struct YearStyle {
     }
     public var colorDayTitle: UIColor = .black
     public var selectCalendarType: CalendarType = .month
-    public var isAnimateSelection: Bool = true
+    public var isAnimateSelection: Bool = false
     public var isPagingEnabled: Bool = true
     public var isAutoSelectDateScrolling: Bool = true
     public var weekDayAligment: NSTextAlignment = .center
     public var titleDateAligment: NSTextAlignment = .left
-    var scrollDirection: UICollectionView.ScrollDirection = .horizontal
+    var scrollDirection: UICollectionView.ScrollDirection = .vertical
 }
 
 public struct AllDayStyle {
