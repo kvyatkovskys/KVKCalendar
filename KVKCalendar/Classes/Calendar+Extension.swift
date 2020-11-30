@@ -36,7 +36,7 @@ extension CalendarTimer {
 
 extension UIScrollView {
    var currentPage: Int {
-      return Int((contentOffset.x + (0.5 * frame.size.width)) / frame.width) + 1
+      return Int((contentOffset.x + (0.5 * frame.width)) / frame.width) + 1
    }
 }
 

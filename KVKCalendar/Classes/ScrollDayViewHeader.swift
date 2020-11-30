@@ -8,8 +8,9 @@
 import UIKit
 
 final class ScrollDayHeaderView: UIView {
-    var didTrackScrollOffset: ((CGFloat, Bool) -> Void)?
+    var didTrackScrollOffset: ((CGFloat?, Bool) -> Void)?
     var didSelectDate: ((Date?, CalendarType) -> Void)?
+    var didHideEvents: (() -> Void)?
     
     private let days: [Day]
     private var date: Date
@@ -20,7 +21,6 @@ final class ScrollDayHeaderView: UIView {
     private let calendar: Calendar
     private var lastContentOffset: CGFloat = 0
     private var trackingTranslation: CGFloat?
-    private var currentPage: Int = 0
     private var subviewCustomHeader: UIView?
     
     weak var dataSource: DisplayDataSource?
@@ -339,30 +339,27 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
         }
     }
     
+    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        let translation = scrollView.panGestureRecognizer.translation(in: collectionView)
+        trackingTranslation = translation.x
+        
+        let targetOffset = targetContentOffset.pointee
 
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        if currentPage != scrollView.currentPage {
-            if (trackingTranslation ?? 0) > 0 {
-                selectDate(offset: -7, needScrollToDate: false)
-            } else if (trackingTranslation ?? 0) < 0 {
-                selectDate(offset: 7, needScrollToDate: false)
-            }
-            currentPage = scrollView.currentPage
+        if targetOffset.x == lastContentOffset {
+            didTrackScrollOffset?(translation.x, true)
+        } else if targetOffset.x < lastContentOffset {
+            didHideEvents?()
+            selectDate(offset: -7, needScrollToDate: false)
+        } else if targetOffset.x > lastContentOffset {
+            didHideEvents?()
+            selectDate(offset: 7, needScrollToDate: false)
         }
         
-        lastContentOffset = scrollView.contentOffset.x
-    }
-    
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        let translation = scrollView.panGestureRecognizer.translation(in: collectionView)
-        
-        didTrackScrollOffset?(0, true)
-        trackingTranslation = translation.x
+        lastContentOffset = targetOffset.x
     }
     
     func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
         lastContentOffset = scrollView.contentOffset.x
-        currentPage = scrollView.currentPage
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
