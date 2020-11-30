@@ -32,6 +32,9 @@ final class DayView: UIView {
         view.didTrackScrollOffset = { [weak self] (offset, stop) in
             self?.timelineView.moveEvents(offset: offset, stop: stop)
         }
+        view.didHideEvents = { [weak self] in
+            self?.timelineView.hideEvents()
+        }
         return view
     }()
     

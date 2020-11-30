@@ -314,14 +314,22 @@ extension TimelineView {
         }
     }
     
-    func moveEvents(offset: CGFloat, stop: Bool = false) {
-        guard !stop else {
+    func hideEvents() {
+        self.scrollableEventViews.forEach({ view in
+            view.isHidden = true
+        })
+    }
+    
+    func moveEvents(offset: CGFloat?, stop: Bool = false) {
+        if stop {
             identityViews(scrollableEventViews)
             return
         }
         
+        guard let offsetEvents = offset else { return }
+        
         scrollableEventViews.forEach { (view) in
-            view.transform = CGAffineTransform(translationX: offset, y: 0)
+            view.transform = CGAffineTransform(translationX: offsetEvents, y: 0)
         }
     }
     
