@@ -13,7 +13,7 @@ final class StubEventView: UIView {
     private let color: UIColor
     
     init(event: Event, frame: CGRect) {
-        self.color = EventColor(event.color?.value ?? event.backgroundColor).value
+        self.color = Event.Color(event.color?.value ?? event.backgroundColor).value
         super.init(frame: frame)
         backgroundColor = event.backgroundColor
     }

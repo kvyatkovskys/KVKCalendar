@@ -86,8 +86,9 @@ extension ViewController {
 }
 
 extension ViewController: CalendarDataSource {
-    func eventsForCalendar() -> [Event] {
-        return events
+    func eventsForCalendar(systemEvents: [EKEvent]) -> [Event] {
+        let mappedEvents = systemEvents.compactMap({ $0.transform() }) // if you want to get events from iOS calendars
+        return events + mappedEvents
     }
 }
 ```
@@ -96,25 +97,6 @@ Implement `CalendarDelegate` to handle user action and control calenadr behavior
 
 ```swift
 calendar.delegate = self
-
-extension ViewController: CalendarDelegate {
-    // get a selecting date
-    func didSelectDate(_ date: Date?, type: CalendarType, frame: CGRect?) {}
-    // get a selecting event
-    func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?) {}
-    // tap on more fro month view
-    func didSelectMore(_ date: Date, frame: CGRect?) {}
-    // event's viewer for iPad
-    func eventViewerFrame(_ frame: CGRect) {}
-    // drag & drop events
-    func didChangeEvent(_ event: Event, start: Date?, end: Date?) {}
-    // tap on timeline or month cell
-    func didAddNewEvent(_ event: Event, _ date: Date?) {}
-    // get current displaying events
-    func didDisplayEvents(_ events: [Event], dates: [Date?]) {}
-    // get next date when the calendar scrolls (works for month view)
-    func willSelectDate(_ date: Date, type: CalendarType) {}
-}
 ```
 
 To use a custom view for specific event or date you need to create a new view of class `EventViewGeneral` and return the view in function.
@@ -185,7 +167,7 @@ struct CalendarDisplayView: UIViewRepresentable {
             super.init()
         }
         
-        func eventsForCalendar() -> [Event] {
+        func eventsForCalendar(systemEvents: [EKEvent]) -> [Event] {
             return events
         }
     }
@@ -233,7 +215,8 @@ public struct Style {
     public var defaultType: CalendarType?
     public var timeHourSystem: TimeHourSystem = .twentyFourHour
     public var startWeekDay: StartDayType = .monday
-    public var followInSystemTheme: Bool = false    
+    public var followInSystemTheme: Bool = false 
+    public var systemCalendars: Set<String> = []
 }
 ```
 

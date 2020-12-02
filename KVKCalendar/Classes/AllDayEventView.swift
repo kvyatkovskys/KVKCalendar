@@ -16,8 +16,8 @@ final class AllDayEventView: UIView {
         super.init(frame: frame)
         backgroundColor = style.backgroundColor
         
-        let startEvents = events.map({ AllDayEvent(id: $0.ID, text: $0.text, date: $0.start, color: EventColor($0.color?.value ?? $0.backgroundColor).value) })
-        let endEvents = events.map({ AllDayEvent(id: $0.ID, text: $0.text, date: $0.end, color: EventColor($0.color?.value ?? $0.backgroundColor).value) })
+        let startEvents = events.map({ AllDayEvent(id: $0.ID, text: $0.text, date: $0.start, color: Event.Color($0.color?.value ?? $0.backgroundColor).value) })
+        let endEvents = events.map({ AllDayEvent(id: $0.ID, text: $0.text, date: $0.end, color: Event.Color($0.color?.value ?? $0.backgroundColor).value) })
         let result = startEvents + endEvents
         let distinct = result.reduce([]) { (acc, event) -> [AllDayEvent] in
             guard acc.contains(where: { $0.date.day == event.date.day && $0.id.hashValue == event.id.hashValue }) else {

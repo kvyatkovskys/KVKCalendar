@@ -90,7 +90,7 @@ final class WeekView: UIView {
         timelineView.create(dates: visibleDates, events: events, selectedDate: data.date)
     }
     
-    private func getVisibleDates(date: Date) {
+    private func setVisibleDatesFor(date: Date) {
         guard let scrollDate = getScrollDate(date: date),
             let idx = data.days.firstIndex(where: { $0.date?.year == scrollDate.year
                 && $0.date?.month == scrollDate.month
@@ -128,7 +128,7 @@ extension WeekView {
         guard let selectDate = date else { return }
         
         data.date = selectDate
-        getVisibleDates(date: selectDate)
+        setVisibleDatesFor(date: selectDate)
         delegate?.didSelectCalendarDate(selectDate, type: type, frame: nil)
     }
 }

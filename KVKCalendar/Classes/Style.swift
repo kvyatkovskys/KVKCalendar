@@ -86,7 +86,7 @@ public struct HeaderScrollStyle {
     public var isAnimateTitleDate: Bool = false
     public var colorNameEmptyDay: UIColor = gainsboro
     var backgroundBlurStyle: UIBlurEffect.Style? = nil
-    public var showDatesForOtherMonths: Bool = false
+    public var showDatesForOtherMonths: Bool = true
 }
 
 public struct TimelineStyle {
@@ -193,7 +193,7 @@ public struct MonthStyle {
     public var titleDateAligment: NSTextAlignment = .left
     public var fontTitleDate: UIFont = .boldSystemFont(ofSize: 30)
     public var colorTitleDate: UIColor = .black
-    public var showDatesForOtherMonths: Bool = false
+    public var showDatesForOtherMonths: Bool = true
 }
 
 public struct YearStyle {

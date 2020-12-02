@@ -34,7 +34,7 @@ open class EventViewGeneral: UIView, CalendarTimer {
     public init(style: Style, event: Event, frame: CGRect) {
         self.style = style
         self.event = event
-        self.color = EventColor(event.color?.value ?? event.backgroundColor).value
+        self.color = Event.Color(event.color?.value ?? event.backgroundColor).value
         self.states = style.event.states
         super.init(frame: frame)
         

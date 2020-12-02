@@ -65,6 +65,7 @@ public enum CalendarType: String, CaseIterable {
     case day, week, month, year
 }
 
+@available(swift, deprecated: 0.4.1, obsoleted: 0.4.2, renamed: "Event.Color")
 public struct EventColor {
     let value: UIColor
     let alpha: CGFloat
@@ -83,7 +84,7 @@ public struct Event {
     public var text: String
     public var start: Date
     public var end: Date
-    public var color: EventColor? {
+    public var color: Event.Color? {
         didSet {
             guard let tempColor = color else { return }
             
@@ -98,9 +99,9 @@ public struct Event {
     public var isContainsFile: Bool
     public var textForMonth: String
     public var eventData: Any?
-    public var recurringType: RecurringType
+    public var recurringType: Event.RecurringType
     
-    public init(ID: String, text: String = "", start: Date = Date(), end: Date = Date(), color: EventColor? = EventColor(UIColor.systemBlue), backgroundColor: UIColor = UIColor.systemBlue.withAlphaComponent(0.3), textColor: UIColor = .white, isAllDay: Bool = false, isContainsFile: Bool = false, textForMonth: String = "", eventData: Any? = nil, recurringType: RecurringType = .none) {
+    public init(ID: String, text: String = "", start: Date = Date(), end: Date = Date(), color: Event.Color? = Event.Color(UIColor.systemBlue), backgroundColor: UIColor = UIColor.systemBlue.withAlphaComponent(0.3), textColor: UIColor = .white, isAllDay: Bool = false, isContainsFile: Bool = false, textForMonth: String = "", eventData: Any? = nil, recurringType: Event.RecurringType = .none) {
         self.ID = ID
         self.text = text
         self.start = start
@@ -121,7 +122,7 @@ public struct Event {
         self.textColor = value.text
     }
     
-    func prepareColor(_ color: EventColor) -> (background: UIColor, text: UIColor) {
+    func prepareColor(_ color: Event.Color) -> (background: UIColor, text: UIColor) {
         let bgColor = color.value.withAlphaComponent(color.alpha)
         var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 0
         color.value.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
@@ -143,8 +144,23 @@ public extension Event {
     var isNew: Bool {
         return ID == Event.idForNewEvent
     }
+    
+    enum RecurringType: Int {
+        case everyDay, everyWeek, everyMonth, everyYear, none
+    }
+    
+    struct Color {
+        let value: UIColor
+        let alpha: CGFloat
+        
+        public init(_ color: UIColor, alpha: CGFloat = 0.3) {
+            self.value = color
+            self.alpha = alpha
+        }
+    }
 }
 
+@available(swift, deprecated: 0.4.1, obsoleted: 0.4.2, renamed: "Event.RecurringType")
 public enum RecurringType: Int {
     case everyDay, everyWeek, everyMonth, everyYear, none
 }
@@ -223,12 +239,17 @@ extension CalendarSettingProtocol {
 // MARK: - Data source protocol
 
 public protocol CalendarDataSource: class {
-    func eventsForCalendar() -> [Event]
+    /// get events to display on view
+    /// also this method returns a system events from iOS calendars if you set the property `systemCalendar` in style
+    func eventsForCalendar(systemEvents: [EKEvent]) -> [Event]
     
-    /// deprecated method use func dequeueDayCell(:)
+    // deprecated method use func dequeueDayCell(:)
     //func willDisplayDate(_ date: Date?, events: [Event])
+    
+    /// Use this method to add a custom event view
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral?
     
+    /// Use this method to add a custom header view (works on Day, Week, Year)
     func willDisplayHeaderSubview(date: Date?, frame: CGRect, type: CalendarType) -> UIView?
     
     /// Use this method to add a custom day cell
@@ -272,24 +293,34 @@ extension DisplayDataSource {
 // MARK: - Delegate protocol
 
 public protocol CalendarDelegate: class {
+    /// size cell for month view
     func sizeForCell(_ date: Date?, type: CalendarType) -> CGSize?
     
+    /// get a selecting date
     func didSelectDate(_ date: Date?, type: CalendarType, frame: CGRect?)
     
+    /// get a selecting event
     func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?)
     
+    /// tap on more fro month view
     func didSelectMore(_ date: Date, frame: CGRect?)
     
+    /// event's viewer for iPad
     func eventViewerFrame(_ frame: CGRect)
     
+    /// drag & drop events and resize
     func didChangeEvent(_ event: Event, start: Date?, end: Date?)
     
+    /// add new event
     func didAddNewEvent(_ event: Event, _ date: Date?)
     
+    /// get current displaying events
     func didDisplayEvents(_ events: [Event], dates: [Date?])
     
+    /// get next date when the calendar scrolls (works for month view)
     func willSelectDate(_ date: Date, type: CalendarType)
     
+    /// deselect event on timeline
     func deselectEvent(_ event: Event, animated: Bool)
 }
 
@@ -341,13 +372,15 @@ protocol CalendarDataProtocol: class {
 
 // MARK: EKEvent
 
-extension EKEvent {
-    var transform: Event {
+public extension EKEvent {
+    func transform(text: String? = nil) -> Event {
         let event = Event(ID: eventIdentifier,
-                          text: title,
+                          text: text ?? title,
                           start: startDate,
                           end: endDate,
-                          isAllDay: isAllDay)
+                          color: Event.Color(UIColor(cgColor: calendar.cgColor)),
+                          isAllDay: isAllDay,
+                          textForMonth: title)
         return event
     }
 }
