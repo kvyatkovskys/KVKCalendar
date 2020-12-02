@@ -29,6 +29,8 @@ public struct Style {
     public init() {}
 }
 
+// MARK: Header scroll style
+
 public struct HeaderScrollStyle {
     public var titleDays: [String] = []
     public var heightHeaderWeek: CGFloat = 50
@@ -89,6 +91,8 @@ public struct HeaderScrollStyle {
     public var showDatesForOtherMonths: Bool = true
 }
 
+// MARK: Timeline style
+
 public struct TimelineStyle {
     public var startFromFirstEvent: Bool = false
     public var eventFont: UIFont = .boldSystemFont(ofSize: 12)
@@ -122,6 +126,8 @@ public struct TimelineStyle {
     public var isHiddenStubEvent: Bool = false
 }
 
+// MARK: Week style
+
 public struct WeekStyle {
     public var colorBackground: UIColor = gainsboro.withAlphaComponent(0.2)
     public var colorDate: UIColor = .black
@@ -136,6 +142,8 @@ public struct WeekStyle {
     public var selectCalendarType: CalendarType = .day
     public var showVerticalDayDivider: Bool = true
 }
+
+// MARK: Month style
 
 public struct MonthStyle {
     @available(swift, deprecated: 0.4.1, obsoleted: 0.4.2, renamed: "titleFormatter")
@@ -155,6 +163,11 @@ public struct MonthStyle {
         format.dateFormat = "EE"
         return format
     }()
+    public var shortInDayMonthFormatter: DateFormatter {
+        let format = DateFormatter()
+        format.dateFormat = "MMM"
+        return format
+    }
     public var heightHeaderWeek: CGFloat = 25
     public var heightTitleDate: CGFloat = 40
     public var isHiddenTitleDate: Bool = false
@@ -194,7 +207,10 @@ public struct MonthStyle {
     public var fontTitleDate: UIFont = .boldSystemFont(ofSize: 30)
     public var colorTitleDate: UIColor = .black
     public var showDatesForOtherMonths: Bool = true
+    public var colorBackground: UIColor = .white
 }
+
+// MARK: Year style
 
 public struct YearStyle {
     @available(swift, deprecated: 0.4.1, obsoleted: 0.4.2, renamed: "titleFormatter")
@@ -255,7 +271,10 @@ public struct YearStyle {
     public var weekDayAligment: NSTextAlignment = .center
     public var titleDateAligment: NSTextAlignment = .left
     var scrollDirection: UICollectionView.ScrollDirection = .vertical
+    public var colorBackground: UIColor = .white
 }
+
+// MARK: All Day style
 
 public struct AllDayStyle {
     public var backgroundColor: UIColor = gainsboro
@@ -272,6 +291,8 @@ public struct AllDayStyle {
     public var eventCorners: UIRectCorner = .allCorners
     public var eventCornersRadius: CGSize = CGSize(width: 5, height: 5)
 }
+
+// MARK: Event style
 
 public struct EventStyle {
     @available(swift, deprecated: 0.3.8, obsoleted: 0.3.9, renamed: "states")
@@ -349,6 +370,7 @@ extension Style {
             newStyle.month.colorBackgroundWeekendDate = UIColor.useForStyle(dark: .systemGray6, white: newStyle.month.colorBackgroundWeekendDate)
             newStyle.month.colorBackgroundDate = UIColor.useForStyle(dark: .black, white: newStyle.month.colorBackgroundDate)
             newStyle.month.colorTitleDate = UIColor.useForStyle(dark: .white, white: newStyle.month.colorTitleDate)
+            newStyle.month.colorBackground = UIColor.useForStyle(dark: .black, white: newStyle.month.colorBackground)
             
             // year
             newStyle.year.colorCurrentDate = UIColor.useForStyle(dark: .white, white: newStyle.year.colorCurrentDate)
@@ -361,6 +383,7 @@ extension Style {
             newStyle.year.colorBackgroundHeader = UIColor.useForStyle(dark: .black, white: newStyle.year.colorBackgroundHeader)
             newStyle.year.colorTitleHeader = UIColor.useForStyle(dark: .white, white: newStyle.year.colorTitleHeader)
             newStyle.year.colorDayTitle = UIColor.useForStyle(dark: .systemGray, white: newStyle.year.colorDayTitle)
+            newStyle.year.colorBackground = UIColor.useForStyle(dark: .black, white: newStyle.year.colorBackground)
             
             // all day
             newStyle.allDay.backgroundColor = UIColor.useForStyle(dark: .systemGray6, white: newStyle.allDay.backgroundColor)

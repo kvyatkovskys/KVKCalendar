@@ -54,7 +54,18 @@ final class MonthCell: UICollectionViewCell {
     var events: [Event] = [] {
         didSet {
             subviews.filter({ $0.tag != -1 }).forEach({ $0.removeFromSuperview() })
-            guard bounds.height > (dateLabel.bounds.height + 10) && day.type != .empty else { return }
+            guard bounds.height > (dateLabel.bounds.height + 10) && day.type != .empty else {
+                let monthLabel = UILabel(frame: CGRect(x: dateLabel.frame.origin.x - 50, y: dateLabel.frame.origin.y, width: 50, height: dateLabel.bounds.height))
+                if let date = day.date, date.day == 1 {
+                    monthLabel.textAlignment = .right
+                    monthLabel.textColor = monthStyle.colorNameEmptyDay
+                    monthLabel.text = "\(date.titleForLocale(style.locale, formatter: monthStyle.shortInDayMonthFormatter))".capitalized
+                    addSubview(monthLabel)
+                } else {
+                    monthLabel.removeFromSuperview()
+                }
+                return
+            }
             
             if UIDevice.current.userInterfaceIdiom == .phone, UIDevice.current.orientation.isLandscape {
                 return
@@ -78,6 +89,7 @@ final class MonthCell: UICollectionViewCell {
                     label.tag = event.start.day
                     label.addGestureRecognizer(tap)
                     label.textColor = monthStyle.colorMoreTitle
+                    
                     if !monthStyle.isHiddenMoreTitle {
                         let text: String
                         if monthStyle.moreTitle.isEmpty {
@@ -118,6 +130,7 @@ final class MonthCell: UICollectionViewCell {
                     let tap = UITapGestureRecognizer(target: self, action: #selector(tapOneEvent))
                     label.addGestureRecognizer(tap)
                     label.tag = event.hash
+                    
                     if style.event.states.contains(.move), UIDevice.current.userInterfaceIdiom != .phone, !event.isAllDay {
                         label.addGestureRecognizer(longGesture)
                         label.addGestureRecognizer(panGesture)
@@ -134,13 +147,15 @@ final class MonthCell: UICollectionViewCell {
             
             switch day.type {
             case .empty:
-                if let tempDay = day.date?.day, monthStyle.showDatesForOtherMonths {
-                    dateLabel.text = "\(tempDay)"
+                if let tempDate = day.date, monthStyle.showDatesForOtherMonths {
+                    dateLabel.text = "\(tempDate.day)"
                     dateLabel.textColor = monthStyle.colorNameEmptyDay
                 } else {
                     dateLabel.text = nil
                 }
             default:
+                subviews.filter({ $0.tag == -2 }).forEach({ $0.removeFromSuperview() })
+                
                 if let tempDay = day.date?.day {
                     dateLabel.text = "\(tempDay)"
                 } else {

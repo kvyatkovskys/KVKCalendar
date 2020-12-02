@@ -96,16 +96,11 @@ final class WeekView: UIView {
                 && $0.date?.month == scrollDate.month
                 && $0.date?.day == scrollDate.day }) else { return }
         
-        var endIdx: Int
-        if idx < 6 {
-            endIdx = 0
-        } else {
-            endIdx = (idx + 6) >= data.days.count ? (data.days.count - 1) : (idx + 6)
-        }
-        let visibleDates = data.days[idx...endIdx].map({ $0.date })
+        let endIdx = idx + 7
+        let newVisibleDates = data.days[idx..<endIdx].map({ $0.date })
+        guard visibleDates != newVisibleDates else { return }
         
-        guard self.visibleDates != visibleDates else { return }
-        self.visibleDates = visibleDates
+        visibleDates = newVisibleDates
     }
     
     private func getScrollDate(date: Date) -> Date? {
