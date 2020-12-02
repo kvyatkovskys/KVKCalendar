@@ -46,10 +46,12 @@ final class YearView: UIView {
     
     private func createCollectionView(frame: CGRect, style: YearStyle)  -> UICollectionView {
         let collection = UICollectionView(frame: frame, collectionViewLayout: layout)
-        collection.backgroundColor = .clear
+        collection.backgroundColor = style.colorBackground
         collection.isPagingEnabled = style.isPagingEnabled
         collection.dataSource = self
         collection.delegate = self
+        collection.showsVerticalScrollIndicator = false
+        collection.showsHorizontalScrollIndicator = false
         return collection
     }
     
@@ -128,7 +130,7 @@ extension YearView: UICollectionViewDataSource {
         if let cell = dataSource?.dequeueDateCell(date: month.date, type: .year, collectionView: collectionView, indexPath: indexPath) {
             return cell
         } else {
-            return collectionView.dequeueCell(indexPath: indexPath) { (cell: YearPadCell) in
+            return collectionView.dequeueCell(indexPath: indexPath) { (cell: YearCell) in
                 cell.style = data.style
                 cell.selectDate = data.date
                 cell.title = month.name
@@ -193,6 +195,10 @@ extension YearView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        if let size = delegate?.sizeForCell(data.sections[indexPath.section].months[indexPath.row].date, type: .year) {
+            return size
+        }
+        
         let widht: CGFloat
         let height: CGFloat
         if UIDevice.current.userInterfaceIdiom == .pad {

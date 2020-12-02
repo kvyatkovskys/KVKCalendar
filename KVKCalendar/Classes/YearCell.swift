@@ -1,5 +1,5 @@
 //
-//  YearCollectionViewCell.swift
+//  YearCell.swift
 //  KVKCalendar
 //
 //  Created by Sergei Kviatkovskii on 02/01/2019.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class YearPadCell: UICollectionViewCell {
+final class YearCell: UICollectionViewCell {
     private let daysInWeek = 7
     
     private let titleLabel: UILabel = {
@@ -191,7 +191,7 @@ final class YearPadCell: UICollectionViewCell {
 }
 
 @available(iOS 13.4, *)
-extension YearPadCell: PointerInteractionProtocol {
+extension YearCell: PointerInteractionProtocol {
     func pointerInteraction(_ interaction: UIPointerInteraction, styleFor region: UIPointerRegion) -> UIPointerStyle? {
         var pointerStyle: UIPointerStyle?
         

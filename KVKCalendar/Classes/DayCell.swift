@@ -56,8 +56,9 @@ class DayCell: UICollectionViewCell {
             
             dateLabel.text = "\(tempDay)"
             guard day.type != .empty else {
-                titleLabel.text = nil
+                titleLabel.text = day.date?.titleForLocale(style.locale, formatter: style.headerScroll.weekdayFormatter).capitalized
                 dateLabel.textColor = style.headerScroll.colorNameEmptyDay
+                titleLabel.textColor = style.headerScroll.colorNameEmptyDay
                 return
             }
             
