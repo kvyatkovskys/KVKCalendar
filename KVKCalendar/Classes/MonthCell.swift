@@ -56,7 +56,7 @@ final class MonthCell: UICollectionViewCell {
             subviews.filter({ $0.tag != -1 }).forEach({ $0.removeFromSuperview() })
             guard bounds.height > (dateLabel.bounds.height + 10) && day.type != .empty else {
                 let monthLabel = UILabel(frame: CGRect(x: dateLabel.frame.origin.x - 50, y: dateLabel.frame.origin.y, width: 50, height: dateLabel.bounds.height))
-                if let date = day.date, date.day == 1 {
+                if let date = day.date, date.day == 1, UIDevice.current.userInterfaceIdiom != .phone {
                     monthLabel.textAlignment = .right
                     monthLabel.textColor = monthStyle.colorNameEmptyDay
                     monthLabel.text = "\(date.titleForLocale(style.locale, formatter: monthStyle.shortInDayMonthFormatter))".capitalized
