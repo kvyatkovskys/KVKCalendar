@@ -212,6 +212,9 @@ public struct Style {
     public var headerScroll = HeaderScrollStyle()
     public var month = MonthStyle()
     public var year = YearStyle()
+    public var locale = Locale.current
+    public var calendar = Calendar.current
+    public var timezone = TimeZone.current
     public var defaultType: CalendarType?
     public var timeHourSystem: TimeHourSystem = .twentyFourHour
     public var startWeekDay: StartDayType = .monday
