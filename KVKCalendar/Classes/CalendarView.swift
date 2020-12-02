@@ -21,17 +21,15 @@ public final class CalendarView: UIView {
     private var weekData: WeekData
     private let monthData: MonthData
     private var dayData: DayData
-    private var events: [Event] {
-        return dataSource?.eventsForCalendar() ?? []
-    }
-    
     private let eventStore = EKEventStore()
     
-    private var systemEvents: [Event] {
+    private var systemEvents: [EKEvent] {
+        guard !style.systemCalendars.isEmpty else { return [] }
+
         let systemCalendars = eventStore.calendars(for: .event).filter({ style.systemCalendars.contains($0.title) })
         guard !systemCalendars.isEmpty else { return [] }
         
-        return getSystemEvents(eventStore: eventStore, calendars: systemCalendars).compactMap({ $0.transform })
+        return getSystemEvents(eventStore: eventStore, calendars: systemCalendars)
     }
     
     private lazy var dayView: DayView = {
@@ -89,50 +87,50 @@ public final class CalendarView: UIView {
     // MARK: Private methods
     
     private func getSystemEvents(eventStore: EKEventStore, calendars: [EKCalendar]) -> [EKEvent] {
-            var startOffset = 0
-            if calendarData.yearsCount.count > 1 {
-                startOffset = calendarData.yearsCount.first ?? 0
-            }
-            var endOffset = 1
-            if calendarData.yearsCount.count > 1 {
-                endOffset = calendarData.yearsCount.last ?? 1
-            }
-            
-            guard let startDate = style.calendar.date(byAdding: .year, value: startOffset, to: calendarData.date),
-                  let endDate = style.calendar.date(byAdding: .year, value: endOffset, to: calendarData.date) else {
-                return []
-            }
-            
-            let predicate = eventStore.predicateForEvents(withStart: startDate, end: endDate, calendars: calendars)
-            return eventStore.events(matching: predicate)
+        var startOffset = 0
+        if calendarData.yearsCount.count > 1 {
+            startOffset = calendarData.yearsCount.first ?? 0
+        }
+        var endOffset = 1
+        if calendarData.yearsCount.count > 1 {
+            endOffset = calendarData.yearsCount.last ?? 1
         }
         
-        private func authForSystemCalendar() {
-            let status = EKEventStore.authorizationStatus(for: .event)
-            
-            switch (status) {
-            case .notDetermined:
-                requestAccessToSystemCalendar { [weak self] (_) in
-                    self?.reloadData()
-                }
-            default:
-                break
-            }
+        guard let startDate = style.calendar.date(byAdding: .year, value: startOffset, to: calendarData.date),
+              let endDate = style.calendar.date(byAdding: .year, value: endOffset, to: calendarData.date) else {
+            return []
         }
         
-        private func requestAccessToSystemCalendar(completion: @escaping (Bool) -> Void) {
-            eventStore.requestAccess(to: .event) { (access, error) in
-                print(access, error ?? "")
-                completion(access)
+        let predicate = eventStore.predicateForEvents(withStart: startDate, end: endDate, calendars: calendars)
+        return eventStore.events(matching: predicate)
+    }
+    
+    private func authForSystemCalendars() {
+        let status = EKEventStore.authorizationStatus(for: .event)
+        
+        switch (status) {
+        case .notDetermined:
+            requestAccessToSystemCalendar { [weak self] (_) in
+                self?.reloadData()
             }
+        default:
+            break
         }
+    }
+    
+    private func requestAccessToSystemCalendar(completion: @escaping (Bool) -> Void) {
+        eventStore.requestAccess(to: .event) { [weak self] (access, error) in
+            print("System calendars = \(self?.style.systemCalendars ?? []) - access = \(access), error = \(error?.localizedDescription ?? "nil")")
+            completion(access)
+        }
+    }
     
     private func switchTypeCalendar(type: CalendarType) {
         self.type = type
         subviews.filter({ $0 is DayView
-            || $0 is WeekView
-            || $0 is MonthView
-            || $0 is YearView }).forEach({ $0.removeFromSuperview() })
+                            || $0 is WeekView
+                            || $0 is MonthView
+                            || $0 is YearView }).forEach({ $0.removeFromSuperview() })
         
         switch self.type {
         case .day:
@@ -159,25 +157,21 @@ public final class CalendarView: UIView {
     }
     
     public func reloadData() {
-        var values = events
         if !style.systemCalendars.isEmpty {
-            authForSystemCalendar()
-        }
-        if systemEvents.isEmpty == false {
-            values += systemEvents
+            authForSystemCalendars()
         }
         
-        DispatchQueue.main.async { [weak self] in
-            switch self?.type {
-            case .day:
-                self?.dayView.reloadData(events: values)
-            case .week:
-                self?.weekView.reloadData(events: values)
-            case .month:
-                self?.monthView.reloadData(events: values)
-            default:
-                break
-            }
+        let events = dataSource?.eventsForCalendar(systemEvents: systemEvents) ?? []
+        
+        switch type {
+        case .day:
+            dayView.reloadData(events: events)
+        case .week:
+            weekView.reloadData(events: events)
+        case .month:
+            monthView.reloadData(events: events)
+        default:
+            break
         }
     }
     
@@ -203,14 +197,6 @@ public final class CalendarView: UIView {
         default:
             break
         }
-    }
-    
-    public func addEventsToSystemCalendars(events: [Event], calendars: [String], span: EKSpan = .thisEvent) throws {
-        try eventStore.save(EKEvent(), span: span)
-    }
-    
-    public func removeEventsFromSystemCalendar(events: [Event], calendars: [String], span: EKSpan = .thisEvent) throws {
-        try eventStore.remove(EKEvent(), span: span)
     }
 }
 

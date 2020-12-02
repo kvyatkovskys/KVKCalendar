@@ -43,7 +43,7 @@ extension TimelineView: UIScrollViewDelegate {
             stubView.valueHash = eventView.event.hash
             
             if scrollView.contentOffset.y > eventView.frame.origin.y {
-                stack.top.insertArrangedSubview(stubView, at: 0)
+                stack.top.addArrangedSubview(stubView)
                 
                 if stack.top.subviews.count >= 1 {
                     switch stack.top.axis {
@@ -423,20 +423,18 @@ extension TimelineView: ResizeEventViewDelegate {
         switch type {
         case .top:
             let offset = location.y + (eventResizePreview?.mainYOffset ?? 0) + style.timeline.offsetEvent
-            showChangingMinute(pointY: offset)
-            
             let offsetY = (eventResizePreview?.frame.origin.y ?? 0) - location.y
             let endY = (eventResizePreview?.originalFrameEventView.height ?? 0) + (eventResizePreview?.originalFrameEventView.origin.y ?? 0)
             guard endY - location.y > 70 else { return }
             
+            showChangingMinute(pointY: offset)
             eventResizePreview?.frame.origin.y = location.y
             eventResizePreview?.frame.size.height += offsetY
         case .bottom:
             let offset = location.y - (eventResizePreview?.mainYOffset ?? 0) + style.timeline.offsetEvent
-            showChangingMinute(pointY: offset)
-            
             guard (location.y - (eventResizePreview?.frame.origin.y ?? 0)) > 80 else { return }
             
+            showChangingMinute(pointY: offset)
             eventResizePreview?.frame.size.height = location.y - (eventResizePreview?.frame.origin.y ?? 0)
         }
         
@@ -493,6 +491,9 @@ extension TimelineView: EventDelegate {
         var viewFrame = view.frame
         if viewFrame.width < 50 {
             viewFrame.size.width = 50
+        }
+        if viewFrame.height < 60 {
+            viewFrame.size.height = 60
         }
         
         let viewTmp: UIView

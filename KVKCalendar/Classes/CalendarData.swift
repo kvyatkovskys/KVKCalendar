@@ -97,7 +97,7 @@ struct CalendarData {
                 endIdx -= 1
             }
             
-            tempDays = Array(0..<endIdx).compactMap({ (idx) -> Day in
+            tempDays = Array(0..<endIdx).reversed().compactMap({ (idx) -> Day in
                 var day = Day.empty()
                 day.date = getOffsetDate(offset: -(idx + 1), to: firstDay.date)
                 return day

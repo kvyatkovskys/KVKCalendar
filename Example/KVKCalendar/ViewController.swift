@@ -8,6 +8,7 @@
 
 import UIKit
 import KVKCalendar
+import EventKit
 
 final class ViewController: UIViewController {
     private var events = [Event]()
@@ -38,12 +39,11 @@ final class ViewController: UIViewController {
             style.month.isHiddenTitle = true
         } else {
             style.timeline.widthEventViewer = 350
-            style.headerScroll.fontDate = .systemFont(ofSize: 17)
             style.headerScroll.fontNameDay = .systemFont(ofSize: 17)
         }
+        style.month.scrollDirection = .horizontal
         style.startWeekDay = .sunday
         style.timeSystem = TimeHourSystem.currentSystemOnDevice ?? .twelve
-        style.systemCalendars = ["Test"]
         if #available(iOS 13.0, *) {
             style.event.iconFile = UIImage(systemName: "paperclip")
         }
@@ -179,8 +179,14 @@ extension ViewController: CalendarDelegate {
 }
 
 extension ViewController: CalendarDataSource {
-    func eventsForCalendar() -> [Event] {
-        return events
+    func eventsForCalendar(systemEvents: [EKEvent]) -> [Event] {
+        let mappedEvents = systemEvents.compactMap { (event) -> Event in
+            let startTime = timeFormatter(date: event.startDate)
+            let endTime = timeFormatter(date: event.endDate)
+            
+            return event.transform(text: "\(startTime) - \(endTime)\n\(event.title ?? "")")
+        }
+        return events + mappedEvents
     }
     
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? {
@@ -194,11 +200,13 @@ extension ViewController: CalendarDataSource {
             cell.imageView.image = UIImage(named: "ic_stub")
         }
         
-        if type == .year, date?.month == Date().month {
+        switch type {
+        case .year where date?.month == Date().month:
             return cell
-        } else if date?.day == Date().day {
+        case .day, .week, .month:
+            guard date?.day == Date().day else { return nil }
             return cell
-        } else {
+        default:
             return nil
         }
     }
@@ -221,7 +229,7 @@ extension ViewController {
             var event = Event(ID: item.id)
             event.start = startDate
             event.end = endDate
-            event.color = EventColor(item.color)
+            event.color = Event.Color(item.color)
             event.isAllDay = item.allDay
             event.isContainsFile = !item.files.isEmpty
             event.textForMonth = "\(item.title) \(startTime)"
