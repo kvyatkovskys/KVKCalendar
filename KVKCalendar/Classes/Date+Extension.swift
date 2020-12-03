@@ -10,7 +10,7 @@ import Foundation
 public extension Date {
     func titleForLocale(_ locale: Locale, formatter: DateFormatter) -> String {
         formatter.locale = locale
-        return formatter.string(from: self).uppercased()
+        return formatter.string(from: self)
     }
     
     var isSunday: Bool {
