@@ -295,6 +295,8 @@ extension TimelineView {
         newEventPreview.editEvent(gesture: gesture)
         
         switch gesture.state {
+        case .began:
+            UIImpactFeedbackGenerator().impactOccurred()
         case .ended, .failed, .cancelled:
             guard let minute = time.minute, let hour = time.hour else { return }
             
