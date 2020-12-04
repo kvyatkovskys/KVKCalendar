@@ -39,10 +39,9 @@ final class DayView: UIView {
     }()
     
     lazy var timelineView: TimelineView = {
-        var timelineFrame = frame
+        var timelineFrame = CGRect(origin: .zero, size: frame.size)
         
         if !style.headerScroll.isHidden {
-            timelineFrame.origin.y = scrollHeaderDay.frame.height
             timelineFrame.size.height -= scrollHeaderDay.frame.height
         }
         
@@ -60,6 +59,26 @@ final class DayView: UIView {
             self?.delegate?.deselectCalendarEvent(event)
         }
         return view
+    }()
+    
+    private lazy var timelinePageViews: TimelinePageView = {
+        var timelineFrame = frame
+        
+        if !style.headerScroll.isHidden {
+            timelineFrame.origin.y = scrollHeaderDay.frame.height
+            timelineFrame.size.height -= scrollHeaderDay.frame.height
+        }
+        
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            if UIDevice.current.orientation.isPortrait {
+                timelineFrame.size.width = UIScreen.main.bounds.width * 0.5
+            } else {
+                timelineFrame.size.width -= style.timeline.widthEventViewer
+            }
+        }
+        
+        let page = TimelinePageView(pages: [timelineView], frame: timelineFrame)
+        return page
     }()
     
     private lazy var topBackgroundView: UIView = {
@@ -83,6 +102,10 @@ final class DayView: UIView {
         self.data = data
         super.init(frame: frame)
         setUI()
+        
+        timelinePageViews.didGetCurrentIndex = { (index) in
+            
+        }
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -92,7 +115,8 @@ final class DayView: UIView {
     func addEventView(view: UIView) {
         guard UIDevice.current.userInterfaceIdiom == .pad else { return }
         
-        var eventFrame = timelineView.frame
+        var eventFrame = timelinePageViews.frame
+        
         eventFrame.origin.x = eventFrame.width
         if UIDevice.current.orientation.isPortrait {
             eventFrame.size.width = UIScreen.main.bounds.width * 0.5
@@ -211,7 +235,7 @@ extension DayView: TimelineDelegate {
 extension DayView: CalendarSettingProtocol {
     func reloadFrame(_ frame: CGRect) {
         self.frame = frame
-        var timelineFrame = timelineView.frame
+        var timelineFrame = timelinePageViews.frame
         
         if !style.headerScroll.isHidden {
             topBackgroundView.frame.size.width = frame.width
@@ -246,6 +270,9 @@ extension DayView: CalendarSettingProtocol {
         } else {
             timelineFrame.size.width = frame.width
         }
+        
+        timelinePageViews.frame = timelineFrame
+        timelineFrame.origin.y = 0
         timelineView.reloadFrame(timelineFrame)
         timelineView.create(dates: [data.date], events: data.events, selectedDate: data.date)
     }
@@ -265,6 +292,6 @@ extension DayView: CalendarSettingProtocol {
             addSubview(topBackgroundView)
             topBackgroundView.addSubview(scrollHeaderDay)
         }
-        addSubview(timelineView)
+        addSubview(timelinePageViews)
     }
 }
