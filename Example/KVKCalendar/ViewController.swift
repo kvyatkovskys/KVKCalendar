@@ -37,6 +37,7 @@ final class ViewController: UIViewController {
             style.headerScroll.heightHeaderWeek = 70
             style.event.isEnableVisualSelect = false
             style.month.isHiddenTitle = true
+            style.month.weekDayAligment = .center
         } else {
             style.timeline.widthEventViewer = 350
             style.headerScroll.fontNameDay = .systemFont(ofSize: 17)
