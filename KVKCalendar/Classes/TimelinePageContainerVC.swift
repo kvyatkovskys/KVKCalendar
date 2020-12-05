@@ -9,7 +9,7 @@ import UIKit
 
 final class TimelinePageContainerVC: UIViewController {
     
-    let index: Int
+    var index: Int
     
     private let contentView: UIView
     

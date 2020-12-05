@@ -9,25 +9,54 @@ import UIKit
 
 final class TimelinePageView: UIView {
     
-    private var pages: [UIView]
+    enum SwitchPageType: Int {
+        case next, previous
+    }
     
-    var didGetCurrentIndex: ((Int) -> Void)?
+    enum AddNewTimelineViewType: Int {
+        case begin, end
+    }
+    
+    private var pages: [TimelineView]
+    private var currentIndex: Int
+    
+    var didSwitchTimelineView: ((SwitchPageType) -> Void)?
+    var willDisplayTimelineView: ((TimelineView, SwitchPageType) -> Void)?
+    
+    var timelineView: TimelineView {
+        return pages[currentIndex]
+    }
     
     private lazy var mainPageView: UIPageViewController = {
-        let pageView = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
+        let pageView = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: [:])
         pageView.dataSource = self
         pageView.delegate = self
         return pageView
     }()
     
-    init(pages: [UIView], frame: CGRect) {
+    init(pages: [TimelineView], frame: CGRect) {
         self.pages = pages
+        self.currentIndex = (pages.count / 2) - 1
         super.init(frame: frame)
         
-        let containers = pages.enumerated().compactMap({ TimelinePageContainerVC(index: $0.offset, contentView: $0.element) })
-        mainPageView.setViewControllers(containers, direction: .forward, animated: false, completion: nil)
+        let timelineView = pages[currentIndex]
+        let container = TimelinePageContainerVC(index: currentIndex, contentView: timelineView)
+        mainPageView.setViewControllers([container], direction: .forward, animated: false, completion: nil)
         mainPageView.view.frame = CGRect(origin: .zero, size: frame.size)
         addSubview(mainPageView.view)
+    }
+    
+    func addNewTimelineView(_ timeline: TimelineView, to: AddNewTimelineViewType) {
+        switch to {
+        case .end:
+            pages.append(timeline)
+        case .begin:
+            pages.insert(timeline, at: 0)
+            
+//            if currentIndex == 0 {
+//                currentIndex += 1
+//            }
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -37,22 +66,53 @@ final class TimelinePageView: UIView {
 
 extension TimelinePageView: UIPageViewControllerDataSource, UIPageViewControllerDelegate {
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
-        guard let newIndex = (viewController as? TimelinePageContainerVC)?.index, (newIndex - 1) >= 0 else { return nil }
+        guard var newIndex = (viewController as? TimelinePageContainerVC)?.index else {
+            return nil
+        }
         
-        let container = TimelinePageContainerVC(index: newIndex, contentView: pages[newIndex])
+        if newIndex == 0 {
+            newIndex = 0
+        } else {
+            newIndex -= 1
+        }
+        
+        let newTimelineView = pages[newIndex]
+        willDisplayTimelineView?(newTimelineView, .previous)
+        let container = TimelinePageContainerVC(index: newIndex, contentView: newTimelineView)
         return container
     }
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
-        guard let newIndex = (viewController as? TimelinePageContainerVC)?.index, (newIndex + 1) < pages.count else { return nil }
+        guard var newIndex = (viewController as? TimelinePageContainerVC)?.index, (newIndex + 1) < pages.count else {
+            return nil
+        }
         
-        let container = TimelinePageContainerVC(index: newIndex, contentView: pages[newIndex])
+        newIndex += 1
+        let newTimelineView = pages[newIndex]
+        willDisplayTimelineView?(newTimelineView, .next)
+        let container = TimelinePageContainerVC(index: newIndex, contentView: newTimelineView)
         return container
     }
     
     func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
         guard let index = (pageViewController.viewControllers?.first as? TimelinePageContainerVC)?.index, completed else { return }
         
-        didGetCurrentIndex?(index)
+        if index == 0 {
+            currentIndex = 1
+        }
+        
+        print(index, currentIndex, (mainPageView.viewControllers?.first as? TimelinePageContainerVC)?.index)
+        let type: SwitchPageType
+        
+        if index > currentIndex {
+            type = .next
+            currentIndex = index
+        } else {
+            type = .previous
+            currentIndex = index
+        }
+        
+        currentIndex = index
+        didSwitchTimelineView?(type)
     }
 }

@@ -84,7 +84,7 @@ final class TimelineView: UIView, EventDateProtocol {
         
         // moving events
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(swipeEvent))
-        addGestureRecognizer(panGesture)
+        //addGestureRecognizer(panGesture)
         
         // long tap to create a new event preview
         let longTap = UILongPressGestureRecognizer(target: self, action: #selector(addNewEvent))
