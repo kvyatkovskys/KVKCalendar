@@ -82,10 +82,6 @@ final class TimelineView: UIView, EventDateProtocol {
         scrollView.frame = scrollFrame
         addSubview(scrollView)
         
-        // moving events
-        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(swipeEvent))
-        //addGestureRecognizer(panGesture)
-        
         // long tap to create a new event preview
         let longTap = UILongPressGestureRecognizer(target: self, action: #selector(addNewEvent))
         longTap.minimumPressDuration = style.timeline.minimumPressDuration
