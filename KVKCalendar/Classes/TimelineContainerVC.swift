@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class TimelinePageContainerVC: UIViewController {
+final class TimelineContainerVC: UIViewController {
     
     var index: Int
     

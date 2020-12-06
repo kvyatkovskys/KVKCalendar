@@ -30,10 +30,10 @@ final class DayView: UIView {
             self?.didSelectDateScrollHeader(date, type: type)
         }
         view.didTrackScrollOffset = { [weak self] (offset, stop) in
-            self?.timelinePages.timelineView.moveEvents(offset: offset, stop: stop)
+            self?.timelinePages.timelineView?.moveEvents(offset: offset, stop: stop)
         }
         view.didHideEvents = { [weak self] in
-            self?.timelinePages.timelineView.hideEvents()
+            self?.timelinePages.timelineView?.hideEvents()
         }
         return view
     }()
@@ -64,7 +64,7 @@ final class DayView: UIView {
             }
         }
         
-        let timelineViews = Array(0...6).reduce([]) { (acc, _) -> [TimelineView] in
+        let timelineViews = Array(0...9).reduce([]) { (acc, _) -> [TimelineView] in
             return acc + [createTimelineView(frame: CGRect(origin: .zero,
                                                            size: CGSize(width: timelineFrame.width,
                                                                         height: timelineFrame.height - timelineFrame.origin.y)))]
@@ -98,8 +98,7 @@ final class DayView: UIView {
         timelinePages.didSwitchTimelineView = { [weak self] (type) in
             guard let self = self else { return }
             
-            let newTimeline = self.createTimelineView(frame: CGRect(origin: .zero, size: CGSize(width: self.timelinePages.bounds.width,
-                                                                                                height: self.timelinePages.frame.height)))
+            let newTimeline = self.createTimelineView(frame: CGRect(origin: .zero, size: self.timelinePages.bounds.size))
             switch type {
             case .next:
                 self.nextDate()
@@ -153,7 +152,7 @@ final class DayView: UIView {
     
     func reloadData(events: [Event]) {
         data.events = events
-        timelinePages.timelineView.create(dates: [data.date], events: events, selectedDate: data.date)
+        timelinePages.timelineView?.create(dates: [data.date], events: events, selectedDate: data.date)
     }
 }
 
@@ -172,7 +171,7 @@ extension DayView {
     func didSelectDateScrollHeader(_ date: Date?, type: CalendarType) {
         guard let selectDate = date else { return }
         
-        timelinePages.timelineView.firstAutoScrollIsCompleted = false
+        timelinePages.timelineView?.firstAutoScrollIsCompleted = false
         data.date = selectDate
         delegate?.didSelectCalendarDate(selectDate, type: type, frame: nil)
     }
@@ -290,14 +289,14 @@ extension DayView: CalendarSettingProtocol {
         
         timelinePages.frame = timelineFrame
         timelineFrame.origin.y = 0
-        timelinePages.timelineView.reloadFrame(timelineFrame)
-        timelinePages.timelineView.create(dates: [data.date], events: data.events, selectedDate: data.date)
+        timelinePages.timelineView?.reloadFrame(timelineFrame)
+        timelinePages.timelineView?.create(dates: [data.date], events: data.events, selectedDate: data.date)
     }
     
     func updateStyle(_ style: Style) {
         self.style = style
         scrollHeaderDay.updateStyle(style)
-        timelinePages.timelineView.updateStyle(style)
+        timelinePages.timelineView?.updateStyle(style)
         setUI()
         setDate(data.date)
     }
