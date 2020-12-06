@@ -191,9 +191,9 @@ public final class CalendarView: UIView {
     public func deselectEvent(_ event: Event, animated: Bool) {
         switch type {
         case .day:
-            dayView.timelinePages.timelineView.deselectEvent(event, animated: animated)
+            dayView.timelinePages.timelineView?.deselectEvent(event, animated: animated)
         case .week:
-            weekView.timelineView.deselectEvent(event, animated: animated)
+            weekView.timelinePages.timelineView?.deselectEvent(event, animated: animated)
         default:
             break
         }

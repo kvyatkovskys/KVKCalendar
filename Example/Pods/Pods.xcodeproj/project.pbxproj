@@ -52,7 +52,7 @@
 		E19095543278BED09861D42D4E404BE8 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C5A90FE617151266B4E8FA4FAFEE59 /* TimelineView.swift */; };
 		E683FEE1ABC8C3A00107324CF9C30716 /* DayPhoneCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970FA0939A7FDF72D6B4B7068F0E8B87 /* DayPhoneCell.swift */; };
 		F98CA38A257AE11D0052B7FA /* TimelinePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F98CA389257AE11D0052B7FA /* TimelinePageView.swift */; };
-		F98CA38F257AE29F0052B7FA /* TimelinePageContainerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F98CA38E257AE29F0052B7FA /* TimelinePageContainerVC.swift */; };
+		F98CA38F257AE29F0052B7FA /* TimelineContainerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F98CA38E257AE29F0052B7FA /* TimelineContainerVC.swift */; };
 		F9958FC6257835C600796BAE /* YearCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9958FC5257835C600796BAE /* YearCell.swift */; };
 		F9E6253F257247C700AC9F30 /* YearData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E6253E257247C700AC9F30 /* YearData.swift */; };
 		FE4878003BD31EB707F0E9048108E4AB /* ScrollDayViewHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CA1E48760EAE4E556BEEAB2829C6D79 /* ScrollDayViewHeader.swift */; };
@@ -142,7 +142,7 @@
 		F436BB928454924957D4C1208F6A5BB5 /* Style.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Style.swift; path = KVKCalendar/Classes/Style.swift; sourceTree = "<group>"; };
 		F4A1CD4D330AF3C089B7DDDBED55AFCC /* KVKCalendar.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = KVKCalendar.modulemap; sourceTree = "<group>"; };
 		F98CA389257AE11D0052B7FA /* TimelinePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TimelinePageView.swift; path = KVKCalendar/Classes/TimelinePageView.swift; sourceTree = "<group>"; };
-		F98CA38E257AE29F0052B7FA /* TimelinePageContainerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TimelinePageContainerVC.swift; path = KVKCalendar/Classes/TimelinePageContainerVC.swift; sourceTree = "<group>"; };
+		F98CA38E257AE29F0052B7FA /* TimelineContainerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TimelineContainerVC.swift; path = KVKCalendar/Classes/TimelineContainerVC.swift; sourceTree = "<group>"; };
 		F9958FC5257835C600796BAE /* YearCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = YearCell.swift; path = KVKCalendar/Classes/YearCell.swift; sourceTree = "<group>"; };
 		F9A5FE2DD23FBAFCC63D57A554B1036E /* Pods-KVKCalendar_Example-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-KVKCalendar_Example-frameworks.sh"; sourceTree = "<group>"; };
 		F9E6253E257247C700AC9F30 /* YearData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = YearData.swift; path = KVKCalendar/Classes/YearData.swift; sourceTree = "<group>"; };
@@ -241,7 +241,7 @@
 				F436BB928454924957D4C1208F6A5BB5 /* Style.swift */,
 				1E10124A80BF64566970BA6ECA72EFBA /* Timeline+Extension.swift */,
 				F98CA389257AE11D0052B7FA /* TimelinePageView.swift */,
-				F98CA38E257AE29F0052B7FA /* TimelinePageContainerVC.swift */,
+				F98CA38E257AE29F0052B7FA /* TimelineContainerVC.swift */,
 				CFA7C8FB618B32AE8582318BB3ECF70F /* TimelineLabel.swift */,
 				E66EB853DDC6584DF0663E898402F37C /* TimelineModel.swift */,
 				44C5A90FE617151266B4E8FA4FAFEE59 /* TimelineView.swift */,
@@ -501,7 +501,7 @@
 				F9958FC6257835C600796BAE /* YearCell.swift in Sources */,
 				D50F1DFE7503E03C1760039DD24BF3F0 /* CurrentLineView.swift in Sources */,
 				F98CA38A257AE11D0052B7FA /* TimelinePageView.swift in Sources */,
-				F98CA38F257AE29F0052B7FA /* TimelinePageContainerVC.swift in Sources */,
+				F98CA38F257AE29F0052B7FA /* TimelineContainerVC.swift in Sources */,
 				914C8B8181D74AC27697AD5A78DF4235 /* Date+Extension.swift in Sources */,
 				C0BB8AD41B23A255D370D4B5066EF6E8 /* DayCell.swift in Sources */,
 				C711F93FF2F66046C5419EB6BC5F0F80 /* DayData.swift in Sources */,
