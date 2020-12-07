@@ -8,6 +8,16 @@
 import Foundation
 
 extension TimelineView: UIScrollViewDelegate {
+    
+    var contentOffset: CGPoint {
+        get {
+            return scrollView.contentOffset
+        }
+        set {
+            scrollView.setContentOffset(newValue, animated: false)
+        }
+    }
+    
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         addStubUnvisibaleEvents()
     }
@@ -183,7 +193,7 @@ extension TimelineView {
     }
     
     func reloadData() {
-        create(dates: dates, events: events, selectedDate: selectedDate)
+        create(dates: dates, events: events, selectedDate: selectedDate, scrollToCurrentHour: false)
     }
     
     func deselectEvent(_ event: Event, animated: Bool) {
@@ -351,6 +361,7 @@ extension TimelineView {
         return eventViews
     }
     
+    @available(swift, deprecated: 0.4.3)
     @objc func swipeEvent(gesture: UIPanGestureRecognizer) {
         guard !isResizeEnableMode else { return }
         

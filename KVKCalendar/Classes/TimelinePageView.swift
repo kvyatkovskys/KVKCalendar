@@ -20,7 +20,7 @@ final class TimelinePageView: UIView {
     private var pages: [Int: TimelineView]
     private var currentIndex: Int
     
-    var didSwitchTimelineView: ((SwitchPageType) -> Void)?
+    var didSwitchTimelineView: ((TimelineView?, SwitchPageType) -> Void)?
     var willDisplayTimelineView: ((TimelineView, SwitchPageType) -> Void)?
     
     var timelineView: TimelineView? {
@@ -104,6 +104,6 @@ extension TimelinePageView: UIPageViewControllerDataSource, UIPageViewController
         }
         
         currentIndex = index
-        didSwitchTimelineView?(type)
+        didSwitchTimelineView?(timelineView, type)
     }
 }

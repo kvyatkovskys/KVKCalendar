@@ -92,10 +92,11 @@ final class WeekView: UIView {
         super.init(frame: frame)
         setUI()
         
-        timelinePages.didSwitchTimelineView = { [weak self] (type) in
+        timelinePages.didSwitchTimelineView = { [weak self] (timeline, type) in
             guard let self = self else { return }
             
             let newTimeline = self.createTimelineView(frame: CGRect(origin: .zero, size: self.timelinePages.bounds.size))
+            
             switch type {
             case .next:
                 self.nextDate()
@@ -117,19 +118,22 @@ final class WeekView: UIView {
                 nextDate = self.style.calendar.date(byAdding: .day, value: -7, to: self.data.date)
             }
             
-            timeline.create(dates: self.getVisibleDatesFor(date: nextDate ?? self.data.date), events: self.data.events, selectedDate: self.data.date)
+            if let offset = self.timelinePages.timelineView?.contentOffset {
+                timeline.contentOffset = offset
+            }
+            
+            timeline.create(dates: self.getVisibleDatesFor(date: nextDate ?? self.data.date), events: self.data.events, selectedDate: self.data.date, scrollToCurrentHour: false)
         }
     }
     
     func setDate(_ date: Date) {
-        timelinePages.timelineView?.firstAutoScrollIsCompleted = false
         data.date = date
         scrollHeaderDay.setDate(date)
     }
     
     func reloadData(events: [Event]) {
         data.events = events
-        timelinePages.timelineView?.create(dates: visibleDates, events: events, selectedDate: data.date)
+        timelinePages.timelineView?.create(dates: visibleDates, events: events, selectedDate: data.date, scrollToCurrentHour: false)
     }
     
     private func getVisibleDatesFor(date: Date) -> [Date?] {
@@ -181,7 +185,7 @@ extension WeekView: CalendarSettingProtocol {
         timelineFrame.size.width = frame.width
         timelineFrame.size.height = frame.height - scrollHeaderDay.frame.height
         timelinePages.timelineView?.reloadFrame(timelineFrame)
-        timelinePages.timelineView?.create(dates: visibleDates, events: data.events, selectedDate: data.date)
+        timelinePages.timelineView?.create(dates: visibleDates, events: data.events, selectedDate: data.date, scrollToCurrentHour: false)
     }
     
     func updateStyle(_ style: Style) {
