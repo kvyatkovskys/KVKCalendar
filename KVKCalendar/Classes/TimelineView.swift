@@ -148,7 +148,7 @@ final class TimelineView: UIView, EventDateProtocol {
     private func movingCurrentLineHour() {
         guard !(timer?.isValid ?? false) else { return }
         
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] (_) in
             guard let self = self else { return }
             
             let nextDate = Date().convertTimeZone(TimeZone.current, to: self.style.timezone)
@@ -234,13 +234,6 @@ final class TimelineView: UIView, EventDateProtocol {
         var frame = scrollView.frame
         frame.origin.y = time.frame.origin.y - 10
         scrollView.scrollRectToVisible(frame, animated: true)
-    }
-    
-    private func fillBackgroundDayColor(_ color: UIColor, pointX: CGFloat, width: CGFloat) -> UIView {
-        let view = UIView(frame: CGRect(x: pointX, y: 0.0, width: width, height: scrollView.contentSize.height))
-        view.backgroundColor = color
-        view.tag = tagBackgroundView
-        return view
     }
     
     func create(dates: [Date?], events: [Event], selectedDate: Date?, scrollToCurrentHour: Bool) {

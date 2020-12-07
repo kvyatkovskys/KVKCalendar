@@ -40,7 +40,7 @@ final class WeekView: UIView {
     }()
     
     private func createTimelineView(frame: CGRect) -> TimelineView {
-        let view = TimelineView(type: .day, timeHourSystem: data.timeSystem, style: style, frame: frame)
+        let view = TimelineView(type: .week, timeHourSystem: data.timeSystem, style: style, frame: frame)
         view.delegate = self
         view.dataSource = self
         view.deselectEvent = { [weak self] (event) in
