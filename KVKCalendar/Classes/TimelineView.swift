@@ -181,7 +181,7 @@ final class TimelineView: UIView, EventDateProtocol {
     
     private func showCurrentLineHour() {
         let date = Date().convertTimeZone(TimeZone.current, to: self.style.timezone)
-        guard style.timeline.showCurrentLineHour, let time = getTimelineLabel(hour: date.hour) else {
+        guard style.timeline.showLineHourMode.showForDates(dates), let time = getTimelineLabel(hour: date.hour) else {
             currentLineView.removeFromSuperview()
             timer?.invalidate()
             return
@@ -220,23 +220,21 @@ final class TimelineView: UIView, EventDateProtocol {
         return pointY
     }
     
-    private func scrollToCurrentTime(_ startHour: Int, scrollToHour: Bool) {
-        guard style.timeline.scrollToCurrentHour else { return }
+    private func scrollToCurrentTime(_ startHour: Int) {
+        guard style.timeline.scrollLineHourMode.scrollForDates(dates) else { return }
         
         let date = Date().convertTimeZone(TimeZone.current, to: style.timezone)
         guard let time = getTimelineLabel(hour: date.hour)else {
             scrollView.setContentOffset(.zero, animated: true)
             return
         }
-        
-        guard scrollToHour else { return }
-        
+                
         var frame = scrollView.frame
         frame.origin.y = time.frame.origin.y - 10
         scrollView.scrollRectToVisible(frame, animated: true)
     }
     
-    func create(dates: [Date?], events: [Event], selectedDate: Date?, scrollToCurrentHour: Bool) {
+    func create(dates: [Date?], events: [Event], selectedDate: Date?) {
         isResizeEnableMode = false
         delegate?.didDisplayEvents(events, dates: dates)
         
@@ -400,7 +398,7 @@ final class TimelineView: UIView, EventDateProtocol {
             }
         }
         setOffsetScrollView()
-        scrollToCurrentTime(startHour, scrollToHour: scrollToCurrentHour)
+        scrollToCurrentTime(startHour)
         showCurrentLineHour()
         addStubUnvisibaleEvents()
     }

@@ -121,10 +121,7 @@ final class DayView: UIView {
                 nextDate = self.style.calendar.date(byAdding: .day, value: -1, to: self.data.date)
             }
             
-            if let offset = self.timelinePages.timelineView?.contentOffset {
-                timeline.contentOffset = offset
-            }
-            timeline.create(dates: [nextDate], events: self.data.events, selectedDate: self.data.date, scrollToCurrentHour: false)
+            timeline.create(dates: [nextDate], events: self.data.events, selectedDate: self.data.date)
         }
     }
     
@@ -156,7 +153,7 @@ final class DayView: UIView {
     
     func reloadData(events: [Event]) {
         data.events = events
-        timelinePages.timelineView?.create(dates: [data.date], events: events, selectedDate: data.date, scrollToCurrentHour: false)
+        timelinePages.timelineView?.create(dates: [data.date], events: events, selectedDate: data.date)
     }
 }
 
@@ -293,7 +290,7 @@ extension DayView: CalendarSettingProtocol {
         timelinePages.frame = timelineFrame
         timelineFrame.origin.y = 0
         timelinePages.timelineView?.reloadFrame(timelineFrame)
-        timelinePages.timelineView?.create(dates: [data.date], events: data.events, selectedDate: data.date, scrollToCurrentHour: false)
+        timelinePages.timelineView?.create(dates: [data.date], events: data.events, selectedDate: data.date)
     }
     
     func updateStyle(_ style: Style) {

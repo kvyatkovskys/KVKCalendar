@@ -65,6 +65,14 @@ final class TimelinePageView: UIView {
 }
 
 extension TimelinePageView: UIPageViewControllerDataSource, UIPageViewControllerDelegate {
+    
+    func pageViewController(_ pageViewController: UIPageViewController, willTransitionTo pendingViewControllers: [UIViewController]) {
+        if let vc = pendingViewControllers.first as? TimelineContainerVC, let contentOffset = timelineView?.contentOffset {
+            let pendingTimelineView = pages[vc.index]
+            pendingTimelineView?.contentOffset = contentOffset
+        }
+    }
+    
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
         guard var newIndex = (viewController as? TimelineContainerVC)?.index else {
             return nil

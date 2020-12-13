@@ -109,9 +109,16 @@ public struct TimelineStyle {
     public var offsetTimeY: CGFloat = 80
     public var timeColor: UIColor = .systemGray
     public var timeFont: UIFont = .systemFont(ofSize: 12)
-    public var scrollToCurrentHour: Bool = true
     public var widthEventViewer: CGFloat = 0
+    
+    @available(swift, deprecated: 0.4.2, obsoleted: 0.4.3, renamed: "showLineHourMode")
     public var showCurrentLineHour: Bool = true
+    public var showLineHourMode: CurrentLineHourShowMode = .today
+    
+    @available(swift, deprecated: 0.4.2, obsoleted: 0.4.3, renamed: "scrollLineHourMode")
+    public var scrollToCurrentHour: Bool = true
+    public var scrollLineHourMode: CurrentLineHourScrollMode = .today
+    
     public var currentLineHourFont: UIFont = .systemFont(ofSize: 12)
     public var currentLineHourColor: UIColor = .red
     public var currentLineHourDotSize: CGSize = CGSize(width: 5, height: 5)
@@ -124,6 +131,39 @@ public struct TimelineStyle {
     public var shadowColumnAlpha: CGFloat = 0.1
     public var minimumPressDuration: TimeInterval = 0.5
     public var isHiddenStubEvent: Bool = false
+    
+    public enum CurrentLineHourShowMode {
+        case always, today, forDate(Date)
+        
+        func showForDates(_ dates: [Date?]) -> Bool {
+            switch self {
+            case .always:
+                return true
+            case .today:
+                let todayDate = Date()
+                return dates.contains(where: { todayDate.year == $0?.year && todayDate.month == $0?.month && todayDate.day == $0?.day })
+            case let .forDate(cutomDate):
+                return dates.contains(where: { cutomDate.year == $0?.year && cutomDate.month == $0?.month && cutomDate.day == $0?.day })
+            }
+        }
+
+    }
+    
+    public enum CurrentLineHourScrollMode {
+        case always, today, forDate(Date)
+        
+        func scrollForDates(_ dates: [Date?]) -> Bool {
+            switch self {
+            case .always:
+                return true
+            case .today:
+                let todayDate = Date()
+                return dates.contains(where: { todayDate.year == $0?.year && todayDate.month == $0?.month && todayDate.day == $0?.day })
+            case let .forDate(cutomDate):
+                return dates.contains(where: { cutomDate.year == $0?.year && cutomDate.month == $0?.month && cutomDate.day == $0?.day })
+            }
+        }
+    }
 }
 
 // MARK: Week style

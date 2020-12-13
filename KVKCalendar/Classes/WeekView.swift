@@ -58,9 +58,7 @@ final class WeekView: UIView {
         }
         
         let timelineViews = Array(0...9).reduce([]) { (acc, _) -> [TimelineView] in
-            return acc + [createTimelineView(frame: CGRect(origin: .zero,
-                                                           size: CGSize(width: timelineFrame.width,
-                                                                        height: timelineFrame.height - timelineFrame.origin.y)))]
+            return acc + [createTimelineView(frame: CGRect(origin: .zero, size: timelineFrame.size))]
         }
         let page = TimelinePageView(pages: timelineViews, frame: timelineFrame)
         return page
@@ -122,7 +120,7 @@ final class WeekView: UIView {
                 timeline.contentOffset = offset
             }
             
-            timeline.create(dates: self.getVisibleDatesFor(date: nextDate ?? self.data.date), events: self.data.events, selectedDate: self.data.date, scrollToCurrentHour: false)
+            timeline.create(dates: self.getVisibleDatesFor(date: nextDate ?? self.data.date), events: self.data.events, selectedDate: self.data.date)
         }
     }
     
@@ -133,7 +131,7 @@ final class WeekView: UIView {
     
     func reloadData(events: [Event]) {
         data.events = events
-        timelinePages.timelineView?.create(dates: visibleDates, events: events, selectedDate: data.date, scrollToCurrentHour: false)
+        timelinePages.timelineView?.create(dates: visibleDates, events: events, selectedDate: data.date)
     }
     
     private func getVisibleDatesFor(date: Date) -> [Date?] {
@@ -185,7 +183,7 @@ extension WeekView: CalendarSettingProtocol {
         timelineFrame.size.width = frame.width
         timelineFrame.size.height = frame.height - scrollHeaderDay.frame.height
         timelinePages.timelineView?.reloadFrame(timelineFrame)
-        timelinePages.timelineView?.create(dates: visibleDates, events: data.events, selectedDate: data.date, scrollToCurrentHour: false)
+        timelinePages.timelineView?.create(dates: visibleDates, events: data.events, selectedDate: data.date)
     }
     
     func updateStyle(_ style: Style) {
