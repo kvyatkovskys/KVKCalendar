@@ -193,7 +193,7 @@ extension TimelineView {
     }
     
     func reloadData() {
-        create(dates: dates, events: events, selectedDate: selectedDate, scrollToCurrentHour: false)
+        create(dates: dates, events: events, selectedDate: selectedDate)
     }
     
     func deselectEvent(_ event: Event, animated: Bool) {
