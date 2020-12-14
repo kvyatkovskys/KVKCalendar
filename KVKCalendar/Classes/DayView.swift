@@ -11,7 +11,7 @@ final class DayView: UIView {
     private var style: Style
     private var data: DayData
 
-    weak var delegate: CalendarDataProtocol?
+    weak var delegate: DisplayDelegate?
     weak var dataSource: DisplayDataSource?
     
     lazy var scrollHeaderDay: ScrollDayHeaderView = {
@@ -32,8 +32,18 @@ final class DayView: UIView {
         view.didTrackScrollOffset = { [weak self] (offset, stop) in
             self?.timelinePages.timelineView?.moveEvents(offset: offset, stop: stop)
         }
-        view.didHideEvents = { [weak self] in
-            self?.timelinePages.timelineView?.hideEvents()
+        view.didChangeDay = { [weak self] (type) in
+            guard let self = self else { return }
+            
+            self.timelinePages.changePage(type)
+            let newTimeline = self.createTimelineView(frame: CGRect(origin: .zero, size: self.timelinePages.bounds.size))
+            
+            switch type {
+            case .next:
+                self.timelinePages.addNewTimelineView(newTimeline, to: .end)
+            case .previous:
+                self.timelinePages.addNewTimelineView(newTimeline, to: .begin)
+            }
         }
         return view
     }()

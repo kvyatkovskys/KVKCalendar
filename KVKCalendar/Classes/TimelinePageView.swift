@@ -11,6 +11,15 @@ final class TimelinePageView: UIView {
     
     enum SwitchPageType: Int {
         case next, previous
+        
+        var direction: UIPageViewController.NavigationDirection {
+            switch self {
+            case .next:
+                return .forward
+            case .previous:
+                return .reverse
+            }
+        }
     }
     
     enum AddNewTimelineViewType: Int {
@@ -57,6 +66,21 @@ final class TimelinePageView: UIView {
         case .begin:
             pages[currentIndex - 1] = timeline
         }
+    }
+    
+    func changePage(_ type: SwitchPageType) {
+        switch type {
+        case .previous:
+            currentIndex -= 1
+        case .next:
+            currentIndex += 1
+        }
+        
+        guard let newTimelineView = pages[currentIndex] else { return }
+        
+        willDisplayTimelineView?(newTimelineView, type)
+        let container = TimelineContainerVC(index: currentIndex, contentView: newTimelineView)
+        mainPageView.setViewControllers([container], direction: type.direction, animated: true, completion: nil)
     }
     
     required init?(coder: NSCoder) {

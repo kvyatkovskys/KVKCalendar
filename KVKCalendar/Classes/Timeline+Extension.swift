@@ -326,12 +326,6 @@ extension TimelineView {
         }
     }
     
-    func hideEvents() {
-        self.scrollableEventViews.forEach({ view in
-            view.isHidden = true
-        })
-    }
-    
     func moveEvents(offset: CGFloat?, stop: Bool = false) {
         if stop {
             identityViews(scrollableEventViews)

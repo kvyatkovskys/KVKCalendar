@@ -44,7 +44,7 @@ final class ViewController: UIViewController {
         }
         style.month.scrollDirection = .horizontal
         style.startWeekDay = .sunday
-        style.timeSystem = TimeHourSystem.currentSystemOnDevice ?? .twelve
+        style.timeSystem = TimeHourSystem.current ?? .twelve
         if #available(iOS 13.0, *) {
             style.event.iconFile = UIImage(systemName: "paperclip")
         }

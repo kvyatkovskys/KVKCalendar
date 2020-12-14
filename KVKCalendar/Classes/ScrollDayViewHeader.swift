@@ -8,9 +8,10 @@
 import UIKit
 
 final class ScrollDayHeaderView: UIView {
+    
     var didTrackScrollOffset: ((CGFloat?, Bool) -> Void)?
     var didSelectDate: ((Date?, CalendarType) -> Void)?
-    var didHideEvents: (() -> Void)?
+    var didChangeDay: ((TimelinePageView.SwitchPageType) -> Void)?
     
     private let days: [Day]
     private var date: Date
@@ -348,10 +349,10 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
         if targetOffset.x == lastContentOffset {
             didTrackScrollOffset?(translation.x, true)
         } else if targetOffset.x < lastContentOffset {
-            didHideEvents?()
+            didChangeDay?(.previous)
             selectDate(offset: -7, needScrollToDate: false)
         } else if targetOffset.x > lastContentOffset {
-            didHideEvents?()
+            didChangeDay?(.next)
             selectDate(offset: 7, needScrollToDate: false)
         }
         
