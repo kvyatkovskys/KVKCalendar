@@ -40,7 +40,19 @@ public enum TimeHourSystem: Int {
         }
     }
     
+    @available(swift, deprecated: 0.4.2, obsoleted: 0.4.3, renamed: "current")
     public static var currentSystemOnDevice: TimeHourSystem? {
+        let locale = NSLocale.current
+        guard let formatter = DateFormatter.dateFormat(fromTemplate: "j", options: 0, locale: locale) else { return nil }
+        
+        if formatter.contains("a") {
+            return .twelve
+        } else {
+            return .twentyFour
+        }
+    }
+    
+    public static var current: TimeHourSystem? {
         let locale = NSLocale.current
         guard let formatter = DateFormatter.dateFormat(fromTemplate: "j", options: 0, locale: locale) else { return nil }
         
@@ -348,9 +360,9 @@ public extension CalendarDelegate {
     func deselectEvent(_ event: Event, animated: Bool) {}
 }
 
-// MARK: - Private Data protocol
+// MARK: - Private Display delegate
 
-protocol CalendarDataProtocol: class {
+protocol DisplayDelegate: class {
     func sizeForCell(_ date: Date?, type: CalendarType) -> CGSize?
     
     func didDisplayCalendarEvents(_ events: [Event], dates: [Date?], type: CalendarType)

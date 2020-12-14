@@ -12,7 +12,7 @@ final class YearView: UIView {
     private var animated: Bool = false
     private var collectionView: UICollectionView?
     
-    weak var delegate: CalendarDataProtocol?
+    weak var delegate: DisplayDelegate?
     weak var dataSource: DisplayDataSource?
     
     private lazy var layout: UICollectionViewLayout = {
