@@ -49,7 +49,10 @@ final class DayView: UIView {
     }()
     
     private func createTimelineView(frame: CGRect) -> TimelineView {
-        let view = TimelineView(type: .day, timeHourSystem: data.timeSystem, style: style, frame: frame)
+        var viewFrame = frame
+        viewFrame.origin = .zero
+        
+        let view = TimelineView(type: .day, timeHourSystem: data.timeSystem, style: style, frame: viewFrame)
         view.delegate = self
         view.dataSource = self
         view.deselectEvent = { [weak self] (event) in
@@ -75,9 +78,7 @@ final class DayView: UIView {
         }
         
         let timelineViews = Array(0...9).reduce([]) { (acc, _) -> [TimelineView] in
-            return acc + [createTimelineView(frame: CGRect(origin: .zero,
-                                                           size: CGSize(width: timelineFrame.width,
-                                                                        height: timelineFrame.height - timelineFrame.origin.y)))]
+            return acc + [createTimelineView(frame: timelineFrame)]
         }
         let page = TimelinePageView(pages: timelineViews, frame: timelineFrame)
         return page
@@ -108,7 +109,7 @@ final class DayView: UIView {
         timelinePages.didSwitchTimelineView = { [weak self] (_, type) in
             guard let self = self else { return }
             
-            let newTimeline = self.createTimelineView(frame: CGRect(origin: .zero, size: self.timelinePages.bounds.size))
+            let newTimeline = self.createTimelineView(frame: self.timelinePages.frame)
             
             switch type {
             case .next:
@@ -298,9 +299,9 @@ extension DayView: CalendarSettingProtocol {
         }
         
         timelinePages.frame = timelineFrame
-        timelineFrame.origin.y = 0
-        timelinePages.timelineView?.reloadFrame(timelineFrame)
+        timelinePages.timelineView?.reloadFrame(CGRect(origin: .zero, size: timelineFrame.size))
         timelinePages.timelineView?.create(dates: [data.date], events: data.events, selectedDate: data.date)
+        timelinePages.reloadCacheControllers()
     }
     
     func updateStyle(_ style: Style) {

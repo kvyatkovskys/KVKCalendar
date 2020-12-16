@@ -36,10 +36,8 @@ final class TimelinePageView: UIView {
         return pages[currentIndex]
     }
     
-    private lazy var mainPageView: UIPageViewController = {
+    private let mainPageView: UIPageViewController = {
         let pageView = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: [:])
-        pageView.dataSource = self
-        pageView.delegate = self
         return pageView
     }()
     
@@ -52,11 +50,25 @@ final class TimelinePageView: UIView {
         self.currentIndex = (pages.count / 2) - 1
         super.init(frame: frame)
         
-        let timelineView = pages[currentIndex]
-        let container = TimelineContainerVC(index: currentIndex, contentView: timelineView)
+        let view = pages[currentIndex]
+        let container = TimelineContainerVC(index: currentIndex, contentView: view)
         mainPageView.setViewControllers([container], direction: .forward, animated: false, completion: nil)
         mainPageView.view.frame = CGRect(origin: .zero, size: frame.size)
         addSubview(mainPageView.view)
+        
+        mainPageView.dataSource = self
+        mainPageView.delegate = self
+    }
+    
+    func reloadCacheControllers() {
+        pages = pages.reduce([:], { (acc, item) -> [Int: TimelineView] in
+            var accTemp = acc
+            item.value.reloadFrame(CGRect(origin: .zero, size: bounds.size))
+            accTemp[item.key] = item.value
+            return accTemp
+        })
+        mainPageView.dataSource = nil
+        mainPageView.dataSource = self
     }
     
     func addNewTimelineView(_ timeline: TimelineView, to: AddNewTimelineViewType) {
@@ -91,10 +103,10 @@ final class TimelinePageView: UIView {
 extension TimelinePageView: UIPageViewControllerDataSource, UIPageViewControllerDelegate {
     
     func pageViewController(_ pageViewController: UIPageViewController, willTransitionTo pendingViewControllers: [UIViewController]) {
-        if let vc = pendingViewControllers.first as? TimelineContainerVC, let contentOffset = timelineView?.contentOffset {
-            let pendingTimelineView = pages[vc.index]
-            pendingTimelineView?.contentOffset = contentOffset
-        }
+        guard let vc = pendingViewControllers.first as? TimelineContainerVC, let contentOffset = timelineView?.contentOffset else { return }
+        
+        let pendingTimelineView = pages[vc.index]
+        pendingTimelineView?.contentOffset = contentOffset
     }
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
