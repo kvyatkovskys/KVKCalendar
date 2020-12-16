@@ -50,7 +50,10 @@ final class WeekView: UIView {
     }()
     
     private func createTimelineView(frame: CGRect) -> TimelineView {
-        let view = TimelineView(type: .week, timeHourSystem: data.timeSystem, style: style, frame: frame)
+        var viewFrame = frame
+        viewFrame.origin = .zero
+        
+        let view = TimelineView(type: .week, timeHourSystem: data.timeSystem, style: style, frame: viewFrame)
         view.delegate = self
         view.dataSource = self
         view.deselectEvent = { [weak self] (event) in
@@ -68,7 +71,7 @@ final class WeekView: UIView {
         }
         
         let timelineViews = Array(0...9).reduce([]) { (acc, _) -> [TimelineView] in
-            return acc + [createTimelineView(frame: CGRect(origin: .zero, size: timelineFrame.size))]
+            return acc + [createTimelineView(frame: timelineFrame)]
         }
         let page = TimelinePageView(pages: timelineViews, frame: timelineFrame)
         return page
@@ -103,7 +106,7 @@ final class WeekView: UIView {
         timelinePages.didSwitchTimelineView = { [weak self] (timeline, type) in
             guard let self = self else { return }
             
-            let newTimeline = self.createTimelineView(frame: CGRect(origin: .zero, size: self.timelinePages.bounds.size))
+            let newTimeline = self.createTimelineView(frame: self.timelinePages.frame)
             
             switch type {
             case .next:
@@ -186,14 +189,21 @@ extension WeekView {
 extension WeekView: CalendarSettingProtocol {
     func reloadFrame(_ frame: CGRect) {
         self.frame = frame
-        topBackgroundView.frame.size.width = frame.width
-        scrollHeaderDay.reloadFrame(frame)
-        
         var timelineFrame = timelinePages.frame
         timelineFrame.size.width = frame.width
-        timelineFrame.size.height = frame.height - scrollHeaderDay.frame.height
-        timelinePages.timelineView?.reloadFrame(timelineFrame)
+        
+        if !style.headerScroll.isHidden {
+            topBackgroundView.frame.size.width = frame.width
+            scrollHeaderDay.reloadFrame(frame)
+            timelineFrame.size.height = frame.height - scrollHeaderDay.frame.height
+        } else {
+            timelineFrame.size.height = frame.height
+        }
+        
+        timelinePages.frame = timelineFrame
+        timelinePages.timelineView?.reloadFrame(CGRect(origin: .zero, size: timelineFrame.size))
         timelinePages.timelineView?.create(dates: visibleDates, events: data.events, selectedDate: data.date)
+        timelinePages.reloadCacheControllers()
     }
     
     func updateStyle(_ style: Style) {
