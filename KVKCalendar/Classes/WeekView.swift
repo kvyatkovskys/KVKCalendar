@@ -142,7 +142,7 @@ final class WeekView: UIView {
         scrollHeaderDay.setDate(date)
     }
     
-    func reloadData(events: [Event]) {
+    func reloadData(_ events: [Event]) {
         data.events = events
         timelinePages.timelineView?.create(dates: visibleDates, events: events, selectedDate: data.date)
     }

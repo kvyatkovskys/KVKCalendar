@@ -76,10 +76,6 @@ extension Collection {
 }
 
 extension UICollectionView {
-    func reuseIndentifier<T>(for type: T.Type) -> String {
-        return String(describing: type)
-    }
-    
     func register<T: UICollectionViewCell>(_ cell: T.Type) {
         register(T.self, forCellWithReuseIdentifier: cell.identifier)
     }
@@ -89,9 +85,19 @@ extension UICollectionView {
     }
 }
 
-public extension UICollectionReusableView {
+public extension UIView {
     static var identifier: String {
         return String(describing: self)
+    }
+}
+
+extension UITableView {
+    func register<T: UITableViewCell>(_ cell: T.Type) {
+        register(T.self, forCellReuseIdentifier: cell.identifier)
+    }
+    
+    func registerView<T: UITableViewHeaderFooterView>(_ view: T.Type) {
+        register(T.self, forHeaderFooterViewReuseIdentifier: view.identifier)
     }
 }
 
@@ -139,10 +145,40 @@ extension UIView {
     }
 }
 
+public extension UITableView {
+    func dequeueCell<T: UITableViewCell>(id: String = T.identifier, indexPath: IndexPath? = nil, configure: (T) -> Void) -> T {
+        register(T.self)
+        
+        let cell: T
+        if let index = indexPath, let dequeued = dequeueReusableCell(withIdentifier: id, for: index) as? T {
+            cell = dequeued
+        } else if let dequeued = dequeueReusableCell(withIdentifier: id) as? T {
+            cell = dequeued
+        } else {
+            cell = T(frame: .zero)
+        }
+        
+        configure(cell)
+        return cell
+    }
+    
+    func dequeueView<T: UITableViewHeaderFooterView>(id: String = T.identifier, configure: (T) -> Void) -> T {
+        registerView(T.self)
+        
+        let view: T
+        if let dequeued = dequeueReusableHeaderFooterView(withIdentifier: id) as? T {
+            view = dequeued
+        } else {
+            view = T(frame: .zero)
+        }
+        
+        configure(view)
+        return view
+    }
+}
+
 public extension UICollectionView {
-    func dequeueCell<T: UICollectionViewCell>(id: String = T.identifier,
-                                              indexPath: IndexPath,
-                                              configure: (T) -> Void) -> T {
+    func dequeueCell<T: UICollectionViewCell>(id: String = T.identifier, indexPath: IndexPath, configure: (T) -> Void) -> T {
         register(T.self)
         
         let cell: T
@@ -156,10 +192,7 @@ public extension UICollectionView {
         return cell
     }
     
-    func dequeueView<T: UICollectionReusableView>(id: String = T.identifier,
-                                                  kind: String = UICollectionView.elementKindSectionHeader,
-                                                  indexPath: IndexPath,
-                                                  configure: (T) -> Void) -> T {
+    func dequeueView<T: UICollectionReusableView>(id: String = T.identifier, kind: String = UICollectionView.elementKindSectionHeader, indexPath: IndexPath, configure: (T) -> Void) -> T {
         registerView(T.self, kind: kind)
         
         let view: T
@@ -170,7 +203,6 @@ public extension UICollectionView {
         }
         
         configure(view)
-        
         return view
     }
 }
