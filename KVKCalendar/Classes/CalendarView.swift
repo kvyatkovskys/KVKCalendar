@@ -23,6 +23,7 @@ public final class CalendarView: UIView {
     private var weekData: WeekData
     private let monthData: MonthData
     private var dayData: DayData
+    private let listData: ListViewData
     
     var systemEvents: [EKEvent] {
         guard !style.systemCalendars.isEmpty else { return [] }
@@ -66,12 +67,21 @@ public final class CalendarView: UIView {
         return year
     }()
     
+    private(set) lazy var listView: ListView = {
+        var params = ListView.Parameters(style: style, data: listData)
+        params.dataSource = self
+        params.delegate = self
+        let list = ListView(parameters: params, frame: frame)
+        return list
+    }()
+    
     public init(frame: CGRect, date: Date = Date(), style: Style = Style(), years: Int = 4) {
         self.style = style.checkStyle
         self.calendarData = CalendarData(date: date, years: years, style: style)
         self.dayData = DayData(data: calendarData, timeSystem: style.timeSystem, startDay: style.startWeekDay)
         self.weekData = WeekData(data: calendarData, timeSystem: style.timeSystem, startDay: style.startWeekDay)
         self.monthData = MonthData(data: calendarData, startDay: style.startWeekDay, calendar: style.calendar, scrollDirection: style.month.scrollDirection)
+        self.listData = ListViewData(data: calendarData)
         super.init(frame: frame)
         
         if let defaultType = style.defaultType {

@@ -40,7 +40,7 @@ public enum TimeHourSystem: Int {
         }
     }
     
-    @available(swift, deprecated: 0.4.2, obsoleted: 0.4.3, renamed: "current")
+    @available(*, deprecated, renamed: "current")
     public static var currentSystemOnDevice: TimeHourSystem? {
         let locale = NSLocale.current
         guard let formatter = DateFormatter.dateFormat(fromTemplate: "j", options: 0, locale: locale) else { return nil }
@@ -74,7 +74,7 @@ public enum TimeHourSystem: Int {
 }
 
 public enum CalendarType: String, CaseIterable {
-    case day, week, month, year
+    case day, week, month, year, list
 }
 
 @available(swift, deprecated: 0.4.1, obsoleted: 0.4.2, renamed: "Event.Color")
@@ -241,11 +241,16 @@ public protocol EventProtocol {
 protocol CalendarSettingProtocol: class {
     func reloadFrame(_ frame: CGRect)
     func updateStyle(_ style: Style)
+    func reloadData(_ events: [Event])
+    func setDate(_ date: Date)
     func setUI()
 }
 
 extension CalendarSettingProtocol {
     func setUI() {}
+    func updateStyle(_ style: Style) {}
+    func reloadData(_ events: [Event]) {}
+    func setDate(_ date: Date) {}
 }
 
 // MARK: - Data source protocol
@@ -287,11 +292,19 @@ protocol DisplayDataSource: class {
     
     func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell?
     
+    func dequeueListCell(date: Date?, tableView: UITableView, indexPath: IndexPath) -> UITableViewCell?
+    
+    func dequeueListHeader(date: Date?, tableView: UITableView, section: Int) -> UIView?
+    
     @available(iOS 13.0, *)
     func willDisplayContextMenu(_ event: Event, date: Date?) -> UIContextMenuConfiguration?
 }
 
 extension DisplayDataSource {
+    func dequeueListHeader(date: Date?, tableView: UITableView, section: Int) -> UIView? { return nil }
+    
+    func dequeueListCell(date: Date?, tableView: UITableView, indexPath: IndexPath) -> UITableViewCell? { return nil }
+    
     func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? { return nil }
     
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? { return nil }

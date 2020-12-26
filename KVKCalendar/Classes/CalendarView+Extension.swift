@@ -30,11 +30,13 @@ extension CalendarView {
         
         switch type {
         case .day:
-            dayView.reloadData(events: events)
+            dayView.reloadData(events)
         case .week:
-            weekView.reloadData(events: events)
+            weekView.reloadData(events)
         case .month:
-            monthView.reloadData(events: events)
+            monthView.reloadData(events)
+        case .list:
+            listView.reloadData(events)
         default:
             break
         }
@@ -50,6 +52,8 @@ extension CalendarView {
             monthView.setDate(date)
         case .year:
             yearView.setDate(date)
+        case .list:
+            listView.setDate(date)
         }
     }
     
@@ -127,10 +131,7 @@ extension CalendarView {
     
     private func switchTypeCalendar(type: CalendarType) {
         self.type = type
-        subviews.filter({ $0 is DayView
-                            || $0 is WeekView
-                            || $0 is MonthView
-                            || $0 is YearView }).forEach({ $0.removeFromSuperview() })
+        [dayView, weekView, monthView, yearView, listView].forEach({ $0.removeFromSuperview() })
         
         switch self.type {
         case .day:
@@ -141,6 +142,9 @@ extension CalendarView {
             addSubview(monthView)
         case .year:
             addSubview(yearView)
+        case .list:
+            addSubview(listView)
+            reloadData()
         }
     }
 }
