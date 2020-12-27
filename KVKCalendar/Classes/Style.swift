@@ -17,6 +17,7 @@ public struct Style {
     public var headerScroll = HeaderScrollStyle()
     public var month = MonthStyle()
     public var year = YearStyle()
+    public var list = ListViewStyle()
     public var locale = Locale.current
     public var calendar = Calendar.current
     public var timezone = TimeZone.current
@@ -354,6 +355,13 @@ public struct EventStyle {
     public var states: Set<EventViewGeneral.EventViewState> = [.move, .resize]
     
     var isEnableContextMenu: Bool = false
+}
+
+// MARK: List View Style
+
+public struct ListViewStyle {
+    public var fontBullet: UIFont = .boldSystemFont(ofSize: 50)
+    public var fontTitle: UIFont = .systemFont(ofSize: 17)
 }
 
 extension Style {

@@ -96,7 +96,7 @@ extension UITableView {
         register(T.self, forCellReuseIdentifier: cell.identifier)
     }
     
-    func registerView<T: UITableViewHeaderFooterView>(_ view: T.Type) {
+    func register<T: UIView>(_ view: T.Type) {
         register(T.self, forHeaderFooterViewReuseIdentifier: view.identifier)
     }
 }
@@ -162,8 +162,8 @@ public extension UITableView {
         return cell
     }
     
-    func dequeueView<T: UITableViewHeaderFooterView>(id: String = T.identifier, configure: (T) -> Void) -> T {
-        registerView(T.self)
+    func dequeueView<T: UIView>(id: String = T.identifier, configure: (T) -> Void) -> T {
+        register(T.self)
         
         let view: T
         if let dequeued = dequeueReusableHeaderFooterView(withIdentifier: id) as? T {
