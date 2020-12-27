@@ -43,7 +43,8 @@ final class ListView: UIView, CalendarSettingProtocol {
     }
     
     func reloadFrame(_ frame: CGRect) {
-        
+        self.frame = frame
+        tableView.frame = CGRect(origin: .zero, size: frame.size)
     }
     
     func reloadData(_ events: [Event]) {
@@ -72,15 +73,20 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
         if let cell = params.dataSource?.dequeueListCell(date: event.start, tableView: tableView, indexPath: indexPath) {
             return cell
         } else {
-            return tableView.dequeueCell(indexPath: indexPath) { (cell: UITableViewCell) in
-                
+            return tableView.dequeueCell(indexPath: indexPath) { (cell: ListViewCell) in
+                cell.txt = event.text.replacingOccurrences(of: "\n", with: "   ")
             }
         }
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        return tableView.dequeueView { (view: UITableViewHeaderFooterView) in
-            
+        let date = params.data.sections[section].date
+        if let headerView = params.dataSource?.dequeueListHeader(date: date, tableView: tableView, section: section) {
+            return headerView
+        } else {
+            return tableView.dequeueView { (view: ListViewHeader) in
+                view.title = params.data.titleOfHeader(section: section)
+            }
         }
     }
     

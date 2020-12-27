@@ -17,9 +17,20 @@ final class ListViewData {
     var sections: [SectionListView]
     var date: Date
     
+    private var dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .full
+        return formatter
+    }()
+    
     init(data: CalendarData) {
         self.date = data.date
         self.sections = []
+    }
+    
+    func titleOfHeader(section: Int) -> String {
+        let dateSection = sections[section].date
+        return dateFormatter.string(from: dateSection)
     }
     
     func reloadEvents(_ events: [Event]) {
@@ -27,7 +38,9 @@ final class ListViewData {
             var accTemp = acc
             
             guard let idx = accTemp.firstIndex(where: { $0.date.year == event.start.year && $0.date.month == event.start.month && $0.date.day == event.start.day }) else {
-                return accTemp + [SectionListView(date: event.start, events: [event])]
+                accTemp += [SectionListView(date: event.start, events: [event])]
+                accTemp = accTemp.sorted(by: { $0.date < $1.date })
+                return accTemp
             }
             
             accTemp[idx].events.append(event)

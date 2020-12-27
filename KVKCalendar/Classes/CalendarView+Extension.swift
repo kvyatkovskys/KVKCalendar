@@ -217,6 +217,7 @@ extension CalendarView: CalendarSettingProtocol {
         weekView.reloadFrame(frame)
         monthView.reloadFrame(frame)
         yearView.reloadFrame(frame)
+        listView.reloadFrame(frame)
     }
     
     // MARK: in progress
