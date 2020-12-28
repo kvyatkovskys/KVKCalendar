@@ -111,7 +111,11 @@ public struct Event {
     public var isContainsFile: Bool = false
     public var textForMonth: String = ""
     public var textForList: String = ""
+    
+    @available(*, deprecated, renamed: "data")
     public var eventData: Any? = nil
+    public var data: Any? = nil
+    
     public var recurringType: Event.RecurringType = .none
     
     public init(ID: String) {

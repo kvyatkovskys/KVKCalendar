@@ -65,8 +65,7 @@ extension ViewController {
         let models = // Get events from storage / API
         
         let events = models.compactMap({ (item) in
-            var event = Event()
-            event.ID = item.id
+            var event = Event(ID: item.id)
             event.start = item.startDate // start date event
             event.end = item.endDate // end date event
             event.color = item.color
