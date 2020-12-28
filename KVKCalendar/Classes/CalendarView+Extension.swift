@@ -169,6 +169,10 @@ extension CalendarView: DisplayDataSource {
 }
 
 extension CalendarView: DisplayDelegate {
+    func sizeForHeader(_ date: Date?, type: CalendarType) -> CGSize? {
+        delegate?.sizeForHeader(date, type: type)
+    }
+    
     func sizeForCell(_ date: Date?, type: CalendarType) -> CGSize? {
         delegate?.sizeForCell(date, type: type)
     }

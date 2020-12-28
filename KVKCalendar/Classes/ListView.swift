@@ -55,6 +55,13 @@ final class ListView: UIView, CalendarSettingProtocol {
     func setDate(_ date: Date) {
         params.data.date = date
         
+        if let idx = params.data.sections.firstIndex(where: { $0.date.year == date.year && $0.date.month == date.month && $0.date.day == date.day }) {
+            tableView.scrollToRow(at: IndexPath(row: 0, section: idx), at: .top, animated: true)
+        } else if let idx = params.data.sections.firstIndex(where: { $0.date.year == date.year && $0.date.month == date.month }) {
+            tableView.scrollToRow(at: IndexPath(row: 0, section: idx), at: .top, animated: true)
+        } else if let idx = params.data.sections.firstIndex(where: { $0.date.year == date.year }) {
+            tableView.scrollToRow(at: IndexPath(row: 0, section: idx), at: .top, animated: true)
+        }
     }
     
 }
@@ -74,7 +81,8 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
             return cell
         } else {
             return tableView.dequeueCell(indexPath: indexPath) { (cell: ListViewCell) in
-                cell.txt = event.text.replacingOccurrences(of: "\n", with: "   ")
+                cell.txt = event.textForList
+                cell.dotColor = event.color?.value
             }
         }
     }
@@ -91,14 +99,28 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return UITableView.automaticDimension
+        let event = params.data.event(indexPath: indexPath)
+        if let height = params.delegate?.sizeForCell(event.start, type: .list)?.height {
+            return height
+        } else {
+            return UITableView.automaticDimension
+        }
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 50
+        let date = params.data.sections[section].date
+        if let height = params.delegate?.sizeForHeader(date, type: .list)?.height {
+            return height
+        } else {
+            return params.style.list.heightHeaderView
+        }
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        
+        let event = params.data.event(indexPath: indexPath)
+        let frameCell = tableView.cellForRow(at: indexPath)?.frame
+        params.delegate?.didSelectCalendarEvent(event, frame: frameCell)
     }
 }
