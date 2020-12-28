@@ -234,12 +234,13 @@ extension ViewController {
             event.isAllDay = item.allDay
             event.isContainsFile = !item.files.isEmpty
             event.textForMonth = "\(item.title) \(startTime)"
-            event.textForList = "\(startTime) - \(endTime)   \(item.title)"
             
             if item.allDay {
-                event.text = "\(item.title)"
+                event.text = item.title
+                event.textForList = item.title
             } else {
                 event.text = "\(startTime) - \(endTime)\n\(item.title)"
+                event.textForList = "\(startTime) - \(endTime)   \(item.title)"
             }
             
             if item.id == "14" {
