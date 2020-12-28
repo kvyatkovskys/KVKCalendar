@@ -362,6 +362,7 @@ public struct EventStyle {
 public struct ListViewStyle {
     public var fontBullet: UIFont = .boldSystemFont(ofSize: 50)
     public var fontTitle: UIFont = .systemFont(ofSize: 17)
+    public var heightHeaderView: CGFloat = 50
 }
 
 extension Style {

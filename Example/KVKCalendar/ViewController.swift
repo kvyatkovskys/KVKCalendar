@@ -222,10 +222,10 @@ extension ViewController {
             let result = try? decoder.decode(ItemData.self, from: data) else { return }
         
         let events = result.data.compactMap({ (item) -> Event in
-            let startDate = self.formatter(date: item.start)
-            let endDate = self.formatter(date: item.end)
-            let startTime = self.timeFormatter(date: startDate)
-            let endTime = self.timeFormatter(date: endDate)
+            let startDate = formatter(date: item.start)
+            let endDate = formatter(date: item.end)
+            let startTime = timeFormatter(date: startDate)
+            let endTime = timeFormatter(date: endDate)
             
             var event = Event(ID: item.id)
             event.start = startDate
@@ -234,6 +234,7 @@ extension ViewController {
             event.isAllDay = item.allDay
             event.isContainsFile = !item.files.isEmpty
             event.textForMonth = "\(item.title) \(startTime)"
+            event.textForList = "\(startTime) - \(endTime)   \(item.title)"
             
             if item.allDay {
                 event.text = "\(item.title)"
