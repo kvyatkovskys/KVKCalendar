@@ -1,6 +1,7 @@
-<img src="Screenshots/iphone.png" width="280"> <img src="Screenshots/ipad.png" width="530">
+<img src="Screenshots/iphone_month.png" width="280"> <img src="Screenshots/ipad_white.png" width="530">
 
 [![CI Status](https://img.shields.io/travis/kvyatkovskys/KVKCalendar.svg?style=flat)](https://travis-ci.org/kvyatkovskys/KVKCalendar)
+[![Tag](https://img.shields.io/github/v/tag/kvyatkovskys/KVKCalendar)](https://cocoapods.org/pods/KVKCalendar)
 [![Version](https://img.shields.io/cocoapods/v/KVKCalendar.svg?style=flat)](https://cocoapods.org/pods/KVKCalendar)
 [![Carthage](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=fla)](https://github.com/Carthage/Carthage/)
 [![License](https://img.shields.io/cocoapods/l/KVKCalendar.svg?style=flat)](https://cocoapods.org/pods/KVKCalendar)
