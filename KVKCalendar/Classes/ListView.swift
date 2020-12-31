@@ -40,6 +40,7 @@ final class ListView: UIView, CalendarSettingProtocol {
         backgroundColor = .white
         tableView.frame = CGRect(origin: .zero, size: frame.size)
         addSubview(tableView)
+        setDate(params.data.date)
     }
     
     func reloadFrame(_ frame: CGRect) {
@@ -53,6 +54,7 @@ final class ListView: UIView, CalendarSettingProtocol {
     }
     
     func setDate(_ date: Date) {
+        params.delegate?.didSelectCalendarDate(date, type: .list, frame: nil)
         params.data.date = date
         
         if let idx = params.data.sections.firstIndex(where: { $0.date.year == date.year && $0.date.month == date.month && $0.date.day == date.day }) {
