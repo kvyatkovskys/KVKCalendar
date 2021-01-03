@@ -27,16 +27,40 @@ final class AllDayEventView: UIView {
         }
         let filtered = distinct.filter({ $0.date.day == date?.day })
         
-        let eventWidth = frame.width / CGFloat(filtered.count)
-        for (idx, event) in filtered.enumerated() {
-            let label = UILabel(frame: CGRect(x: (CGFloat(idx) * eventWidth) + style.offsetWidth,
-                                              y: style.offsetHeight,
-                                              width: eventWidth - (style.offsetWidth * 2),
-                                              height: frame.height - (style.offsetHeight * 2)))
+        let eventWidth: CGFloat
+        let eventHeight: CGFloat
+        switch style.axis {
+        case .horizontal:
+            eventWidth = (frame.width / CGFloat(filtered.count))
+            eventHeight = frame.height - style.offsetHeight
+        case .vertical:
+            eventWidth = frame.width - style.offsetWidth
+            eventHeight = (frame.height / CGFloat(filtered.count))
+        }
+        
+        filtered.enumerated().forEach { (idx, event) in
+            let x: CGFloat
+            let y: CGFloat
+            switch style.axis {
+            case .horizontal:
+                x = (CGFloat(idx) * eventWidth) + style.offsetWidth
+                y = style.offsetHeight
+            case .vertical:
+                x = 0
+                if idx == 0 {
+                    y = style.offsetHeight * 0.4
+                } else {
+                    y = (CGFloat(idx) * eventHeight) + (style.offsetHeight * 0.2)
+                }
+            }
+            
+            let label = UILabel(frame: CGRect(x: x, y: y,
+                                              width: eventWidth - (style.offsetWidth * 0.7),
+                                              height: eventHeight - (style.offsetHeight * 0.7)))
             label.textColor = style.textColor
             label.isUserInteractionEnabled = true
             label.font = style.font
-            label.text = " \(event.text)"
+            label.text = "\(event.text)"
             label.backgroundColor = event.color.withAlphaComponent(0.8)
             label.tag = event.id.hashValue
             label.setRoundCorners(style.eventCorners, radius: style.eventCornersRadius)
