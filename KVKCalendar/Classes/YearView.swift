@@ -15,9 +15,21 @@ final class YearView: UIView {
     weak var delegate: DisplayDelegate?
     weak var dataSource: DisplayDataSource?
     
-    private lazy var layout: UICollectionViewLayout = {
+    private lazy var layout: UICollectionViewFlowLayout = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = data.style.year.scrollDirection
+        
+        switch data.style.year.scrollDirection {
+        case .horizontal:
+            layout.minimumLineSpacing = 0
+            layout.minimumInteritemSpacing = 0
+        case .vertical:
+            layout.minimumLineSpacing = 0
+            layout.minimumInteritemSpacing = 5
+        @unknown default:
+            fatalError()
+        }
+        
         return layout
     }()
     
@@ -66,6 +78,19 @@ final class YearView: UIView {
         }
         if !self.animated {
             self.animated = true
+        }
+    }
+    
+    private func getIndexForDirection(_ direction: UICollectionView.ScrollDirection, indexPath: IndexPath) -> IndexPath {
+        switch direction {
+        case .horizontal:
+            let a = indexPath.item / data.itemsInPage
+            let b = indexPath.item / data.rowsInPage - a * data.columnsInPage
+            let c = indexPath.item % data.rowsInPage
+            let newIdx = (c * data.columnsInPage + b) + a * data.itemsInPage
+            return IndexPath(row: newIdx, section: indexPath.section)
+        default:
+            return indexPath
         }
     }
     
@@ -125,12 +150,13 @@ extension YearView: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let month = data.sections[indexPath.section].months[indexPath.row]
+        let index = getIndexForDirection(data.style.year.scrollDirection, indexPath: indexPath)
+        let month = data.sections[index.section].months[index.row]
         
-        if let cell = dataSource?.dequeueDateCell(date: month.date, type: .year, collectionView: collectionView, indexPath: indexPath) {
+        if let cell = dataSource?.dequeueDateCell(date: month.date, type: .year, collectionView: collectionView, indexPath: index) {
             return cell
         } else {
-            return collectionView.dequeueCell(indexPath: indexPath) { (cell: YearCell) in
+            return collectionView.dequeueCell(indexPath: index) { (cell: YearCell) in
                 cell.style = data.style
                 cell.selectDate = data.date
                 cell.title = month.name
@@ -141,9 +167,10 @@ extension YearView: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        return collectionView.dequeueView(indexPath: indexPath) { (headerView: YearHeaderView) in
+        let index = getIndexForDirection(data.style.year.scrollDirection, indexPath: indexPath)
+        return collectionView.dequeueView(indexPath: index) { (headerView: YearHeaderView) in
             headerView.style = data.style
-            headerView.date = data.sections[indexPath.section].date
+            headerView.date = data.sections[index.section].date
         }
     }
 }
@@ -158,7 +185,8 @@ extension YearView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let date = data.sections[indexPath.section].months[indexPath.row].date
+        let index = getIndexForDirection(data.style.year.scrollDirection, indexPath: indexPath)
+        let date = data.sections[index.section].months[index.row].date
         let formatter = DateFormatter()
         formatter.dateFormat = "dd.MM.yyyy"
         let newDate = formatter.date(from: "\(data.date.day).\(date.month).\(date.year)")
@@ -172,54 +200,32 @@ extension YearView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
         collectionView.reloadData()
     }
     
-    func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
-        guard data.style.year.isAnimateSelection else { return }
-        
-        let cell = collectionView.cellForItem(at: indexPath)
-        UIView.animate(withDuration: 0.4,
-                       delay: 0,
-                       usingSpringWithDamping: 0.3,
-                       initialSpringVelocity: 0.8,
-                       options: .curveLinear,
-                       animations: { cell?.transform = CGAffineTransform(scaleX: 0.95, y: 0.95) },
-                       completion: nil)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didUnhighlightItemAt indexPath: IndexPath) {
-        guard data.style.year.isAnimateSelection else { return }
-        
-        let cell = collectionView.cellForItem(at: indexPath)
-        UIView.animate(withDuration: 0.1) {
-            cell?.transform = CGAffineTransform(scaleX: 1, y: 1)
-        }
-    }
-    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        if let size = delegate?.sizeForCell(data.sections[indexPath.section].months[indexPath.row].date, type: .year) {
+        let index = getIndexForDirection(data.style.year.scrollDirection, indexPath: indexPath)
+        if let size = delegate?.sizeForCell(data.sections[index.section].months[index.row].date, type: .year) {
             return size
         }
         
         let widht: CGFloat
         let height: CGFloat
         if UIDevice.current.userInterfaceIdiom == .pad {
-            widht = (collectionView.frame.width / 4) - 5
+            widht = (collectionView.frame.width / 4) - layout.minimumInteritemSpacing
             height = (collectionView.frame.height - data.style.year.heightTitleHeader) / 3
         } else {
-            widht = (collectionView.frame.width / 3) - 5
+            widht = (collectionView.frame.width / 3) - layout.minimumInteritemSpacing
             height = (collectionView.frame.height - data.style.year.heightTitleHeader) / 4
         }
         return CGSize(width: widht, height: height)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSize(width: collectionView.bounds.width, height: data.style.year.heightTitleHeader)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 0
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return 5
+        switch data.style.year.scrollDirection {
+        case .horizontal:
+            return .zero
+        case .vertical:
+            return CGSize(width: collectionView.bounds.width, height: data.style.year.heightTitleHeader)
+        @unknown default:
+            fatalError()
+        }
     }
 }

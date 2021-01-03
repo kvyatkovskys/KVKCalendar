@@ -26,6 +26,10 @@ final class ListView: UIView, CalendarSettingProtocol {
         return table
     }()
     
+    private var style: ListViewStyle {
+        return params.style.list
+    }
+    
     init(parameters: Parameters, frame: CGRect) {
         self.params = parameters
         super.init(frame: frame)
@@ -37,7 +41,8 @@ final class ListView: UIView, CalendarSettingProtocol {
     }
     
     func setUI() {
-        backgroundColor = .white
+        backgroundColor = style.backgroundColor
+        tableView.backgroundColor = style.backgroundColor
         tableView.frame = CGRect(origin: .zero, size: frame.size)
         addSubview(tableView)
         setDate(params.data.date)

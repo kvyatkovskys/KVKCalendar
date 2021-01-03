@@ -43,6 +43,23 @@ final class MonthCell: UICollectionViewCell {
         return longGesture
     }()
     
+    override var isHighlighted: Bool {
+        didSet {
+            guard style.month.isAnimateSelection else { return }
+            
+            setTappedState(isHighlighted)
+        }
+    }
+    
+    override var isSelected: Bool {
+        didSet {
+            dateLabel.textColor = isSelected ? monthStyle.colorSelectDate : monthStyle.colorDate
+            dateLabel.backgroundColor = isSelected ? monthStyle.colorBackgroundSelectDate : monthStyle.colorBackgroundWeekendDate
+            dateLabel.layer.cornerRadius = dateLabel.frame.height / 2
+            dateLabel.clipsToBounds = true
+        }
+    }
+    
     var style = Style() {
         didSet {
             monthStyle = style.month

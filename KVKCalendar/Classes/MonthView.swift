@@ -206,6 +206,11 @@ extension MonthView: UICollectionViewDataSource {
                 cell.events = day.events
                 cell.delegate = self
                 cell.isHidden = index.row > data.days.count
+                if let date = day.date {
+                    cell.isSelected = data.selectedDates.contains(date)
+                } else {
+                    cell.isSelected = false
+                }
             }
         }
     }
@@ -239,30 +244,29 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let index = getIndexForDirection(style.month.scrollDirection, indexPath: indexPath)
-        let date = data.days[index.row].date
-        didSelectDate(date ?? data.date, indexPath: index)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
-        guard style.month.isAnimateSelection else { return }
+        let date = data.days[index.row].date ?? data.date
         
-        let cell = collectionView.cellForItem(at: indexPath)
-        UIView.animate(withDuration: 0.4,
-                       delay: 0,
-                       usingSpringWithDamping: 0.3,
-                       initialSpringVelocity: 0.8,
-                       options: .curveLinear,
-                       animations: { cell?.transform = CGAffineTransform(scaleX: 0.95, y: 0.95) },
-                       completion: nil)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didUnhighlightItemAt indexPath: IndexPath) {
-        guard style.month.isAnimateSelection else { return }
-        
-        let index = getIndexForDirection(style.month.scrollDirection, indexPath: indexPath)
-        let cell = collectionView.cellForItem(at: index)
-        UIView.animate(withDuration: 0.1) {
-            cell?.transform = CGAffineTransform(scaleX: 1, y: 1)
+        switch style.month.selectionMode {
+        case .multiple:
+            if let firstDate = data.selectedDates.min(by: { $0 < $1 }), firstDate.compare(date) == .orderedDescending {
+                data.selectedDates.removeAll()
+                data.selectedDates.insert(date)
+            } else if let lastDate = data.selectedDates.max(by: { $0 < $1 }) {
+                let offset = date.day - lastDate.day
+                if offset >= 1 {
+                    let dates = (1...offset).compactMap({ style.calendar.date(byAdding: .day, value: $0, to: lastDate) })
+                    data.selectedDates.formUnion(dates)
+                } else if offset < 0 {
+                    data.selectedDates = data.selectedDates.filter({ $0.compare(date) == .orderedAscending })
+                    data.selectedDates.insert(date)
+                }
+            } else {
+                data.selectedDates.insert(date)
+            }
+            
+            collectionView.reloadData()
+        case .single:
+            didSelectDate(date, indexPath: index)
         }
     }
     
