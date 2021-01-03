@@ -212,6 +212,7 @@ public struct Style {
     public var headerScroll = HeaderScrollStyle()
     public var month = MonthStyle()
     public var year = YearStyle()
+    public var list = ListViewStyle()
     public var locale = Locale.current
     public var calendar = Calendar.current
     public var timezone = TimeZone.current
