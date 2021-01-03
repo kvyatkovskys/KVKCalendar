@@ -143,6 +143,23 @@ extension UIView {
         }
         return image
     }
+    
+    func setTappedState(_ tapped: Bool, animated: Bool = true) {
+        let action = { [weak self] in
+            if tapped {
+                let scale: CGFloat = 0.95
+                self?.transform = CGAffineTransform(scaleX: scale, y: scale)
+            } else {
+                self?.transform = .identity
+            }
+        }
+
+        if animated {
+            UIView.animate(withDuration: 0.2, animations: action)
+        } else {
+            action()
+        }
+    }
 }
 
 public extension UITableView {

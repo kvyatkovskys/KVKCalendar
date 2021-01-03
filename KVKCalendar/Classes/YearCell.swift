@@ -26,6 +26,14 @@ final class YearCell: UICollectionViewCell {
         }
     }
     
+    override var isHighlighted: Bool {
+        didSet {
+            guard style.year.isAnimateSelection else { return }
+            
+            setTappedState(isHighlighted)
+        }
+    }
+    
     var title: String? {
         didSet {
             titleLabel.text = title

@@ -90,6 +90,7 @@ public struct HeaderScrollStyle {
     public var colorNameEmptyDay: UIColor = gainsboro
     var backgroundBlurStyle: UIBlurEffect.Style? = nil
     public var showDatesForOtherMonths: Bool = true
+    public var isAnimateSelection: Bool = true
 }
 
 // MARK: Timeline style
@@ -236,7 +237,7 @@ public struct MonthStyle {
     public var colorBackgroundDate: UIColor = .white
     public var scrollDirection: UICollectionView.ScrollDirection = .vertical
     public var selectCalendarType: CalendarType = .week
-    public var isAnimateSelection: Bool = false
+    public var isAnimateSelection: Bool = true
     public var isPagingEnabled: Bool = true
     public var isAutoSelectDateScrolling: Bool = false
     public var eventCorners: UIRectCorner = .allCorners
@@ -249,6 +250,11 @@ public struct MonthStyle {
     public var colorTitleDate: UIColor = .black
     public var showDatesForOtherMonths: Bool = true
     public var colorBackground: UIColor = .white
+    var selectionMode: SelectionMode = .multiple
+    
+    public enum SelectionMode: Int {
+        case single, multiple
+    }
 }
 
 // MARK: Year style
@@ -306,12 +312,12 @@ public struct YearStyle {
     }
     public var colorDayTitle: UIColor = .black
     public var selectCalendarType: CalendarType = .month
-    public var isAnimateSelection: Bool = false
+    public var isAnimateSelection: Bool = true
     public var isPagingEnabled: Bool = true
     public var isAutoSelectDateScrolling: Bool = true
     public var weekDayAligment: NSTextAlignment = .center
     public var titleDateAligment: NSTextAlignment = .left
-    var scrollDirection: UICollectionView.ScrollDirection = .vertical
+    public var scrollDirection: UICollectionView.ScrollDirection = .horizontal
     public var colorBackground: UIColor = .white
 }
 
@@ -363,6 +369,7 @@ public struct ListViewStyle {
     public var fontBullet: UIFont = .boldSystemFont(ofSize: 50)
     public var fontTitle: UIFont = .systemFont(ofSize: 17)
     public var heightHeaderView: CGFloat = 50
+    public var backgroundColor: UIColor = .white
 }
 
 extension Style {
@@ -438,6 +445,9 @@ extension Style {
             newStyle.allDay.backgroundColor = UIColor.useForStyle(dark: .systemGray6, white: newStyle.allDay.backgroundColor)
             newStyle.allDay.titleColor = UIColor.useForStyle(dark: .white, white: newStyle.allDay.titleColor)
             newStyle.allDay.textColor = UIColor.useForStyle(dark: .white, white: newStyle.allDay.textColor)
+            
+            // list view
+            newStyle.list.backgroundColor = UIColor.useForStyle(dark: .black, white: newStyle.list.backgroundColor)
         }
         return newStyle
     }

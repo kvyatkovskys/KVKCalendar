@@ -300,9 +300,10 @@ final class TimelineView: UIView, EventDateProtocol {
             let allDayEvents = filteredAllDayEvents.filter({ compareStartDate(date, with: $0) || compareEndDate(date, with: $0) })
             
             let recurringEventByDate: [Event]
-            if !recurringEvents.isEmpty {
+            if !recurringEvents.isEmpty, let dt = date {
                 recurringEventByDate = recurringEvents.reduce([], { (acc, event) -> [Event] in
-                    guard !eventsByDate.contains(where: { $0.ID == event.ID }) else { return acc }
+                    guard !eventsByDate.contains(where: { $0.ID == event.ID })
+                            && dt.compare(event.start) == .orderedDescending else { return acc }
                     
                     guard let recurringEvent = event.updateDate(newDate: date, calendar: style.calendar) else {
                         return acc

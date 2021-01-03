@@ -25,6 +25,14 @@ class DayCell: UICollectionViewCell {
         return label
     }()
     
+    override var isHighlighted: Bool {
+        didSet {
+            guard style.headerScroll.isAnimateSelection else { return }
+            
+            setTappedState(isHighlighted)
+        }
+    }
+    
     var dotView: UIView = {
         let view = UIView()
         return view
