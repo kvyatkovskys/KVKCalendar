@@ -171,9 +171,9 @@ extension TimelineView {
     
     private func enableAllEvents(enable: Bool) {
         if style.allDay.isPinned {
-            subviews.filter({ $0 is AllDayEventView || $0 is AllDayTitleView }).forEach({ $0.isUserInteractionEnabled = enable })
+            subviews.filter({ $0 is AllDayEventView }).forEach({ $0.isUserInteractionEnabled = enable })
         } else {
-            scrollView.subviews.filter({ $0 is AllDayEventView || $0 is AllDayTitleView }).forEach({ $0.isUserInteractionEnabled = enable })
+            scrollView.subviews.filter({ $0 is AllDayEventView }).forEach({ $0.isUserInteractionEnabled = enable })
         }
         
         scrollView.subviews.filter({ $0 is EventViewGeneral }).forEach({ $0.isUserInteractionEnabled = enable })
@@ -209,9 +209,18 @@ extension TimelineView {
     
     func createAllDayEvents(events: [Event], date: Date?, width: CGFloat, originX: CGFloat) {
         guard !events.isEmpty else { return }
+        
         let pointY = style.allDay.isPinned ? 0 : -style.allDay.height
+        let allDayHeight: CGFloat
+        switch style.allDay.axis {
+        case .horizontal:
+            allDayHeight = style.allDay.height
+        case .vertical:
+            allDayHeight = style.allDay.height * CGFloat(events.count)
+        }
+        
         let allDayEvent = AllDayEventView(events: events,
-                                          frame: CGRect(x: originX, y: pointY, width: width, height: style.allDay.height),
+                                          frame: CGRect(x: originX, y: pointY, width: width, height: allDayHeight),
                                           style: style.allDay,
                                           date: date)
         allDayEvent.tag = tagAllDayEvent
