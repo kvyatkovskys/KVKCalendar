@@ -183,8 +183,8 @@ extension CalendarView: DisplayDelegate {
         delegate?.didDisplayEvents(events, dates: dates)
     }
     
-    func didSelectCalendarDate(_ date: Date?, type: CalendarType, frame: CGRect?) {
-        delegate?.didSelectDate(date, type: type, frame: frame)
+    func didSelectCalendarDates(_ dates: [Date?], type: CalendarType, frame: CGRect?) {
+        delegate?.didSelectDates(dates.compactMap({ $0 }), type: type, frame: frame)
     }
     
     func deselectCalendarEvent(_ event: Event) {

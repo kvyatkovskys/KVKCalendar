@@ -182,7 +182,7 @@ extension WeekView {
         if visibleDates != newDates {
             visibleDates = newDates
         }
-        delegate?.didSelectCalendarDate(selectDate, type: type, frame: nil)
+        delegate?.didSelectCalendarDates([selectDate], type: type, frame: nil)
     }
 }
 

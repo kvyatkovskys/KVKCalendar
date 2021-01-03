@@ -65,6 +65,29 @@ final class MonthData: EventDateProtocol {
         return day.date?.year == date?.year && day.date?.month == date?.month
     }
     
+    func updateSelectedDates(_ dates: Set<Date>, date: Date, calendar: Calendar) -> Set<Date> {
+        var selectedDates = dates
+        if let firstDate = selectedDates.min(by: { $0 < $1 }), firstDate.compare(date) == .orderedDescending {
+            selectedDates.removeAll()
+            selectedDates.insert(date)
+        } else if let lastDate = selectedDates.max(by: { $0 < $1 }) {
+            let offset = date.day - lastDate.day
+            if offset >= 1 {
+                let dates = (1...offset).compactMap({ calendar.date(byAdding: .day, value: $0, to: lastDate) })
+                selectedDates.formUnion(dates)
+            } else if offset < 0 {
+                selectedDates = selectedDates.filter({ $0.compare(date) == .orderedAscending })
+                selectedDates.insert(date)
+            } else {
+                selectedDates.remove(date)
+            }
+        } else {
+            selectedDates.insert(date)
+        }
+        
+        return selectedDates
+    }
+    
     func reloadEventsInDays(events: [Event]) -> (events: [Event], dates: [Date?]) {
         let recurringEvents = events.filter({ $0.recurringType != .none })
         let startDate = date.startOfMonth

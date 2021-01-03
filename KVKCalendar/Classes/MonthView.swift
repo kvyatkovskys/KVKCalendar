@@ -71,7 +71,7 @@ final class MonthView: UIView {
     }
     
     private func scrollToDate(_ date: Date, animated: Bool) {
-        delegate?.didSelectCalendarDate(date, type: .month, frame: nil)
+        delegate?.didSelectCalendarDates([date], type: .month, frame: nil)
         if let idx = data.days.firstIndex(where: { $0.date?.month == date.month && $0.date?.year == date.year }) {
             scrollToIndex(idx + 15, animated: animated)
         }
@@ -90,7 +90,12 @@ final class MonthView: UIView {
         }
     }
     
-    private func didSelectDate(_ date: Date, indexPath: IndexPath) {
+    private func didSelectDates(_ dates: [Date], indexPath: IndexPath) {
+        guard let date = dates.first else {
+            collectionView?.reloadData()
+            return
+        }
+        
         data.date = date
         headerView.date = date
         
@@ -98,7 +103,7 @@ final class MonthView: UIView {
         let attributes = collectionView?.layoutAttributesForItem(at: index)
         let frame = collectionView?.convert(attributes?.frame ?? .zero, to: collectionView) ?? .zero
         
-        delegate?.didSelectCalendarDate(date, type: style.month.selectCalendarType, frame: frame)
+        delegate?.didSelectCalendarDates(dates, type: style.month.selectCalendarType, frame: frame)
         collectionView?.reloadData()
     }
     
@@ -200,7 +205,13 @@ extension MonthView: UICollectionViewDataSource {
             return cell
         } else {
             return collectionView.dequeueCell(indexPath: index) { (cell: MonthCell) in
-                cell.selectDate = data.date
+                let date = day.date ?? Date()
+                switch style.month.selectionMode {
+                case .multiple:
+                    cell.selectDate = data.selectedDates.contains(date) ? date : Date()
+                case .single:
+                    cell.selectDate = data.date
+                }
                 cell.style = style
                 cell.day = day
                 cell.events = day.events
@@ -238,7 +249,7 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         guard style.month.isAutoSelectDateScrolling else { return }
         
         data.date = newMoveDate
-        delegate?.didSelectCalendarDate(newMoveDate, type: .month, frame: nil)
+        delegate?.didSelectCalendarDates([newMoveDate], type: .month, frame: nil)
         collectionView?.reloadData()
     }
     
@@ -248,25 +259,10 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         
         switch style.month.selectionMode {
         case .multiple:
-            if let firstDate = data.selectedDates.min(by: { $0 < $1 }), firstDate.compare(date) == .orderedDescending {
-                data.selectedDates.removeAll()
-                data.selectedDates.insert(date)
-            } else if let lastDate = data.selectedDates.max(by: { $0 < $1 }) {
-                let offset = date.day - lastDate.day
-                if offset >= 1 {
-                    let dates = (1...offset).compactMap({ style.calendar.date(byAdding: .day, value: $0, to: lastDate) })
-                    data.selectedDates.formUnion(dates)
-                } else if offset < 0 {
-                    data.selectedDates = data.selectedDates.filter({ $0.compare(date) == .orderedAscending })
-                    data.selectedDates.insert(date)
-                }
-            } else {
-                data.selectedDates.insert(date)
-            }
-            
-            collectionView.reloadData()
+            data.selectedDates = data.updateSelectedDates(data.selectedDates, date: date, calendar: style.calendar)
+            didSelectDates(data.selectedDates.compactMap({ $0 }), indexPath: index)
         case .single:
-            didSelectDate(date, indexPath: index)
+            didSelectDates([date], indexPath: index)
         }
     }
     
@@ -366,7 +362,7 @@ extension MonthView: MonthCellDelegate {
 
         delegate?.didChangeCalendarEvent(event, start: startDate, end: endDate)
         scrollToDate(newDate, animated: true)
-        didSelectDate(newDate, indexPath: index)
+        didSelectDates([newDate], indexPath: index)
         collectionView?.isScrollEnabled = true
     }
     
