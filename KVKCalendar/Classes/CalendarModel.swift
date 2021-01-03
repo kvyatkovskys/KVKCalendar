@@ -318,7 +318,11 @@ public protocol CalendarDelegate: class {
     func sizeForCell(_ date: Date?, type: CalendarType) -> CGSize?
     
     /// get a selecting date
+    @available(*, deprecated, renamed: "didSelectDates")
     func didSelectDate(_ date: Date?, type: CalendarType, frame: CGRect?)
+    
+    /// get selected dates
+    func didSelectDates(_ dates: [Date], type: CalendarType, frame: CGRect?)
     
     /// get a selecting event
     func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?)
@@ -352,6 +356,8 @@ public extension CalendarDelegate {
     
     func didSelectDate(_ date: Date?, type: CalendarType, frame: CGRect?) {}
     
+    func didSelectDates(_ dates: [Date], type: CalendarType, frame: CGRect?)  {}
+    
     func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?) {}
     
     func didSelectMore(_ date: Date, frame: CGRect?) {}
@@ -380,7 +386,7 @@ protocol DisplayDelegate: class {
     
     func didDisplayCalendarEvents(_ events: [Event], dates: [Date?], type: CalendarType)
     
-    func didSelectCalendarDate(_ date: Date?, type: CalendarType, frame: CGRect?)
+    func didSelectCalendarDates(_ dates: [Date?], type: CalendarType, frame: CGRect?)
     
     func didSelectCalendarEvent(_ event: Event, frame: CGRect?)
     
