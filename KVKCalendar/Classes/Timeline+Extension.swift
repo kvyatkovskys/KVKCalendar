@@ -107,7 +107,8 @@ extension TimelineView: UIScrollViewDelegate {
     
     func getStubStackView(day: Int) -> (top: StubStackView, bottom: StubStackView)? {
         let filtered = subviews.filter({ $0.tag == tagStubEvent }).compactMap({ $0 as? StubStackView })
-        guard let topStack = filtered.first(where: { $0.type == .top && $0.day == day }), let bottomStack = filtered.first(where: { $0.type == .bottom && $0.day == day }) else { return nil }
+        guard let topStack = filtered.first(where: { $0.type == .top && $0.day == day }),
+              let bottomStack = filtered.first(where: { $0.type == .bottom && $0.day == day }) else { return nil }
         
         return (topStack, bottomStack)
     }
@@ -128,8 +129,13 @@ extension TimelineView {
         return UIApplication.shared.isAvailableBotomHomeIndicator ? 30 : 5
     }
     
-    func topStabStackOffsetY(allDayEventsIsPinned: Bool) -> CGFloat {
-        return allDayEventsIsPinned ? 30 : 5
+    func topStabStackOffsetY(allDayEventsIsPinned: Bool, axis: AllDayStyle.AxisMode, eventsCount: Int, height: CGFloat) -> CGFloat {
+        switch axis {
+        case .horizontal:
+            return allDayEventsIsPinned ? 30 : 5
+        case .vertical:
+            return allDayEventsIsPinned ? (CGFloat(eventsCount) * height) + 5 : 5
+        }
     }
     
     var scrollableEventViews: [UIView] {

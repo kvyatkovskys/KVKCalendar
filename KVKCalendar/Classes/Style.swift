@@ -250,7 +250,7 @@ public struct MonthStyle {
     public var colorTitleDate: UIColor = .black
     public var showDatesForOtherMonths: Bool = true
     public var colorBackground: UIColor = .white
-    var selectionMode: SelectionMode = .multiple
+    public var selectionMode: SelectionMode = .multiple
     
     public enum SelectionMode: Int {
         case single, multiple
@@ -317,7 +317,7 @@ public struct YearStyle {
     public var isAutoSelectDateScrolling: Bool = true
     public var weekDayAligment: NSTextAlignment = .center
     public var titleDateAligment: NSTextAlignment = .left
-    public var scrollDirection: UICollectionView.ScrollDirection = .horizontal
+    var scrollDirection: UICollectionView.ScrollDirection = .vertical
     public var colorBackground: UIColor = .white
 }
 
