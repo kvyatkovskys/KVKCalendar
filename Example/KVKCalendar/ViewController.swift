@@ -128,6 +128,8 @@ extension ViewController: CalendarDelegate {
         eventTemp.start = startTemp
         eventTemp.end = endTemp
         eventTemp.text = "\(startTime) - \(endTime)\n new time"
+        eventTemp.textForList = "\(startTime) - \(endTime)\n new time"
+        eventTemp.textForMonth = "\(startTime) - \(endTime)\n new time"
         
         if let idx = events.firstIndex(where: { $0.compare(eventTemp) }) {
             events.remove(at: idx)
@@ -236,7 +238,7 @@ extension ViewController {
             event.textForMonth = "\(item.title) \(startTime)"
             
             if item.allDay {
-                event.text = item.title
+                event.text = " \(item.title)"
                 event.textForList = item.title
             } else {
                 event.text = "\(startTime) - \(endTime)\n\(item.title)"

@@ -22,9 +22,7 @@ final class YearData {
     var middleRowInPage: Int {
         return (rowsInPage * columnsInPage) / 2
     }
-//    var columns: Int {
-//        return ((days.count / itemsInPage) * columnsInPage) + (days.count % itemsInPage)
-//    }
+
     var itemsInPage: Int {
         return columnsInPage * rowsInPage
     }
