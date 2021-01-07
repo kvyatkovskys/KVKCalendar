@@ -108,6 +108,7 @@ final class ViewController: UIViewController {
     @objc func switchCalendar(sender: UISegmentedControl) {
         let type = CalendarType.allCases[sender.selectedSegmentIndex]
         calendarView.set(type: type, date: selectDate)
+        calendarView.reloadData()
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

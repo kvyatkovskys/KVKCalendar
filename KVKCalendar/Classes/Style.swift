@@ -239,6 +239,7 @@ public struct MonthStyle {
     public var selectCalendarType: CalendarType = .week
     public var isAnimateSelection: Bool = true
     public var isPagingEnabled: Bool = true
+    public var isScrollEnabled: Bool = true
     public var isAutoSelectDateScrolling: Bool = false
     public var eventCorners: UIRectCorner = .allCorners
     public var eventCornersRadius: CGSize = CGSize(width: 5, height: 5)

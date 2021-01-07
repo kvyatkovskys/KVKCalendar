@@ -265,6 +265,8 @@ public protocol CalendarDataSource: class {
     
     /// Use this method to add a custom day cell
     func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell?
+    
+    func willDisplayCollectionView(frame: CGRect, type: CalendarType) -> UICollectionView?
 }
 
 public extension CalendarDataSource {
@@ -275,6 +277,8 @@ public extension CalendarDataSource {
     func willDisplayHeaderSubview(date: Date?, frame: CGRect, type: CalendarType) -> UIView? { return nil }
     
     func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? { return nil }
+    
+    func willDisplayCollectionView(frame: CGRect, type: CalendarType) -> UICollectionView? { return nil }
 }
 
 // MARK: - Private Display data source
@@ -283,6 +287,8 @@ protocol DisplayDataSource: class {
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral?
     
     func willDisplayHeaderSubview(date: Date?, frame: CGRect, type: CalendarType) -> UIView?
+    
+    func willDisplayCollectionView(frame: CGRect, type: CalendarType) -> UICollectionView?
     
     func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell?
     
@@ -300,6 +306,8 @@ extension DisplayDataSource {
     func dequeueListCell(date: Date?, tableView: UITableView, indexPath: IndexPath) -> UITableViewCell? { return nil }
     
     func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? { return nil }
+    
+    func willDisplayCollectionView(frame: CGRect, type: CalendarType) -> UICollectionView? { return nil }
     
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? { return nil }
     
