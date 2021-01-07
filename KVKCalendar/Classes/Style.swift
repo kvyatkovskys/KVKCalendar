@@ -249,7 +249,7 @@ public struct MonthStyle {
     public var titleDateAligment: NSTextAlignment = .left
     public var fontTitleDate: UIFont = .boldSystemFont(ofSize: 30)
     public var colorTitleDate: UIColor = .black
-    public var showDatesForOtherMonths: Bool = true
+    public var showDatesForOtherMonths: Bool = false
     public var colorBackground: UIColor = .white
     public var selectionMode: SelectionMode = .multiple
     
