@@ -209,8 +209,6 @@ final class ScrollDayHeaderView: UIView {
     }
     
     private func selectDate(_ date: Date, type: CalendarType) {
-        didSelectDate?(date, type)
-        
         if let newSubview = dataSource?.willDisplayHeaderSubview(date: date, frame: subviewFrameForDevice, type: type) {
             subviewCustomHeader?.removeFromSuperview()
             subviewCustomHeader = newSubview
@@ -351,9 +349,11 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
         } else if targetOffset.x < lastContentOffset {
             didChangeDay?(.previous)
             selectDate(offset: -7, needScrollToDate: false)
+            didSelectDate?(date, type)
         } else if targetOffset.x > lastContentOffset {
             didChangeDay?(.next)
             selectDate(offset: 7, needScrollToDate: false)
+            didSelectDate?(date, type)
         }
         
         lastContentOffset = targetOffset.x
@@ -379,6 +379,7 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
             break
         }
         
+        didSelectDate?(date, type)
         collectionView.reloadData()
     }
     

@@ -15,10 +15,13 @@ extension CalendarView {
         dayView.addEventView(view: view)
     }
     
-    public func set(type: CalendarType, date: Date) {
+    public func set(type: CalendarType, date: Date? = nil) {
         self.type = type
         switchTypeCalendar(type: type)
-        scrollTo(date)
+        
+        if let dt = date {
+            scrollTo(dt)
+        }
     }
     
     public func reloadData() {
@@ -150,6 +153,10 @@ extension CalendarView {
 }
 
 extension CalendarView: DisplayDataSource {
+    func willDisplayCollectionView(frame: CGRect, type: CalendarType) -> UICollectionView? {
+        return dataSource?.willDisplayCollectionView(frame: frame, type: type)
+    }
+    
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? {
         return dataSource?.willDisplayEventView(event, frame: frame, date: date)
     }

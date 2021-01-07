@@ -49,6 +49,7 @@ final class MonthView: UIView {
     func setDate(_ date: Date) {
         headerView.date = date
         data.date = date
+        data.selectedDates.removeAll()
         scrollToDate(date, animated: data.isAnimate)
         collectionView?.reloadData()
     }
@@ -60,9 +61,20 @@ final class MonthView: UIView {
     }
     
     private func createCollectionView(frame: CGRect, style: MonthStyle) -> UICollectionView {
+        if let customCollectionView = dataSource?.willDisplayCollectionView(frame: frame, type: .month) {
+            if customCollectionView.delegate == nil {
+                customCollectionView.delegate = self
+            }
+            if customCollectionView.dataSource == nil {
+                customCollectionView.dataSource = self
+            }
+            return customCollectionView
+        }
+        
         let collection = UICollectionView(frame: frame, collectionViewLayout: layout)
         collection.backgroundColor = style.colorBackground
         collection.isPagingEnabled = style.isPagingEnabled
+        collection.isScrollEnabled = style.isScrollEnabled
         collection.dataSource = self
         collection.delegate = self
         collection.showsVerticalScrollIndicator = false
@@ -71,7 +83,6 @@ final class MonthView: UIView {
     }
     
     private func scrollToDate(_ date: Date, animated: Bool) {
-        delegate?.didSelectCalendarDates([date], type: .month, frame: nil)
         if let idx = data.days.firstIndex(where: { $0.date?.month == date.month && $0.date?.year == date.year }) {
             scrollToIndex(idx + 15, animated: animated)
         }
@@ -208,7 +219,7 @@ extension MonthView: UICollectionViewDataSource {
                 let date = day.date ?? Date()
                 switch style.month.selectionMode {
                 case .multiple:
-                    cell.selectDate = data.selectedDates.contains(date) ? date : Date()
+                    cell.selectDate = data.selectedDates.contains(date) ? date : data.date
                 case .single:
                     cell.selectDate = data.date
                 }

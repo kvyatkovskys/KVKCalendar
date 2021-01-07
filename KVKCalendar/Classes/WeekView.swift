@@ -140,6 +140,7 @@ final class WeekView: UIView {
     func setDate(_ date: Date) {
         data.date = date
         scrollHeaderDay.setDate(date)
+        visibleDates = getVisibleDatesFor(date: data.date)
     }
     
     func reloadData(_ events: [Event]) {
