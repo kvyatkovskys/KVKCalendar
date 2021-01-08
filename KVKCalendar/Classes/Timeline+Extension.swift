@@ -149,16 +149,14 @@ extension TimelineView {
             var startTime: (hour: Int?, minute: Int?)
             var endTime: (hour: Int?, minute: Int?)
             
-            if let startMinute = eventResizePreview?.startMinute {
-                startTime = calculateChangingTime(pointY: value.frame.origin.y, isForResizeEvent: true)
-                startTime.minute = startMinute
+            if let time = eventResizePreview?.startTime {
+                startTime = (time.hour, time.minute)
             } else {
                 startTime = (eventResizePreview?.event.start.hour, eventResizePreview?.event.start.minute)
             }
             
-            if let endMinute = eventResizePreview?.endMinute {
-                endTime = calculateChangingTime(pointY: value.frame.origin.y + value.frame.height, isForResizeEvent: true)
-                endTime.minute = endMinute
+            if let time = eventResizePreview?.endTime {
+                endTime = (time.hour, time.minute)
             } else {
                 endTime = (eventResizePreview?.event.end.hour, eventResizePreview?.event.end.minute)
             }
@@ -453,25 +451,20 @@ extension TimelineView: ResizeEventViewDelegate {
             showChangingMinute(pointY: offset)
             eventResizePreview?.frame.origin.y = location.y
             eventResizePreview?.frame.size.height += offsetY
+            eventResizePreview?.startTime = movingMinuteLabel.time
         case .bottom:
             let offset = location.y - (eventResizePreview?.mainYOffset ?? 0) + style.timeline.offsetEvent
             guard (location.y - (eventResizePreview?.frame.origin.y ?? 0)) > 80 else { return }
             
             showChangingMinute(pointY: offset)
             eventResizePreview?.frame.size.height = location.y - (eventResizePreview?.frame.origin.y ?? 0)
+            eventResizePreview?.endTime = movingMinuteLabel.time
         }
         
         eventResizePreview?.updateHeight()
     }
     
     func didEnd(gesture: UIPanGestureRecognizer, type: ResizeEventView.ResizeEventViewType) {
-        switch type {
-        case .bottom:
-            eventResizePreview?.endMinute = movingMinuteLabel.minute
-        case .top:
-            eventResizePreview?.startMinute = movingMinuteLabel.minute
-        }
-        
         movingMinuteLabel.removeFromSuperview()
     }
     
@@ -595,8 +588,8 @@ extension TimelineView: EventDelegate {
         guard scrollView.frame.width >= (location.x + 30), (location.x - 10) >= leftOffset else { return }
         
         location.y = (location.y - eventPreviewYOffset) - style.timeline.offsetEvent - 6
-        let time = calculateChangingTime(pointY: location.y)
-        if let minute = time.minute, let hour = time.hour, !event.isNew {
+        let startTime = calculateChangingTime(pointY: location.y)
+        if let minute = startTime.minute, let hour = startTime.hour, !event.isNew {
             var newDayEvent: Int?
             var updatedEvent = event
             
@@ -643,16 +636,18 @@ extension TimelineView: EventDelegate {
         movingMinuteLabel.removeFromSuperview()
         
         let pointTempY = (pointY - eventPreviewYOffset) - style.timeline.offsetEvent - 6
-        let time = calculateChangingTime(pointY: pointTempY)
+        let time = calculateChangingTime(pointY: pointTempY, isForResizeEvent: eventResizePreview != nil)
+        movingMinuteLabel.time = TimeContainer(minute: 0, hour: time.hour ?? 0)
+        
         if style.timeline.offsetTimeY > 50, let minute = time.minute, 0...59 ~= minute {
             movingMinuteLabel.frame = CGRect(x: style.timeline.offsetTimeX, y: (pointY - offset) - style.timeline.heightTime,
                                              width: style.timeline.widthTime, height: style.timeline.heightTime)
             scrollView.addSubview(movingMinuteLabel)
             movingMinuteLabel.text = ":\(minute)"
-            movingMinuteLabel.minute = minute
+            movingMinuteLabel.time?.minute = minute
         } else {
             movingMinuteLabel.text = ":0"
-            movingMinuteLabel.minute = 0
+            movingMinuteLabel.time?.minute = 0
         }
     }
     
@@ -664,7 +659,7 @@ extension TimelineView: EventDelegate {
         let percent = (pointY - firstY) / (style.timeline.offsetTimeY + style.timeline.heightTime)
         let newMinute = Int(60.0 * percent)
         let newHour: Int
-        if isForResizeEvent && (eventResizePreview?.startMinute == 0 || eventResizePreview?.endMinute == 0) {
+        if isForResizeEvent {
             newHour = time.tag
         } else {
             newHour = time.tag - 1

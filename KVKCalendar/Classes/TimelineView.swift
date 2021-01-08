@@ -350,7 +350,7 @@ final class TimelineView: UIView, EventDateProtocol {
                                 timeTemp = newTime
                             }
                             let summHeight = (CGFloat(timeTemp.tag) * (style.timeline.offsetTimeY + timeTemp.frame.height)) - newFrame.origin.y + (timeTemp.frame.height / 2)
-                            if 0..<59 ~= event.end.minute {
+                            if 0...59 ~= event.end.minute {
                                 let minutePercent = 59.0 / CGFloat(event.end.minute)
                                 let newY = (style.timeline.offsetTimeY + timeTemp.frame.height) / minutePercent
                                 newFrame.size.height = summHeight + newY - style.timeline.offsetEvent
