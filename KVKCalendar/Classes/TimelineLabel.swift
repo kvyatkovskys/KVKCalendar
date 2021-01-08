@@ -10,7 +10,7 @@ import UIKit
 final class TimelineLabel: UILabel {
     var valueHash: Int?
     
-    var minute: Int?
+    var time: TimeContainer?
     
     override init(frame: CGRect) {
         super.init(frame: frame)

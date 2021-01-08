@@ -28,6 +28,11 @@ extension CrossEvent {
     }
 }
 
+struct TimeContainer {
+    var minute: Int
+    var hour: Int
+}
+
 struct EventTime: Equatable, Hashable {
     let start: TimeInterval
     let end: TimeInterval

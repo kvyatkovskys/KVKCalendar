@@ -22,8 +22,8 @@ final class ResizeEventView: UIView {
     let event: Event
     let mainYOffset: CGFloat = 15
     let originalFrameEventView: CGRect
-    var startMinute: Int?
-    var endMinute: Int?
+    var startTime: TimeContainer?
+    var endTime: TimeContainer?
     
     private lazy var eventView: UIView = {
         let view = UIView()
@@ -72,6 +72,8 @@ final class ResizeEventView: UIView {
         self.event = event
         self.originalFrameEventView = frame
         self.style = style
+        self.startTime = TimeContainer(minute: event.start.minute, hour: event.start.hour)
+        self.endTime = TimeContainer(minute: event.end.minute, hour: event.end.hour)
         
         var newFrame = frame
         newFrame.origin.y -= mainYOffset
