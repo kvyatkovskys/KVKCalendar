@@ -116,6 +116,8 @@ final class WeekView: UIView {
                 self.previousDate()
                 self.timelinePages.addNewTimelineView(newTimeline, to: .begin)
             }
+            
+            self.didSelectDateScrollHeader(self.scrollHeaderDay.date, type: .week)
         }
         
         timelinePages.willDisplayTimelineView = { [weak self] (timeline, type) in
