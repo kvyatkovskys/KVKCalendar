@@ -119,6 +119,8 @@ final class DayView: UIView {
                 self.previousDate()
                 self.timelinePages.addNewTimelineView(newTimeline, to: .begin)
             }
+            
+            self.didSelectDateScrollHeader(self.scrollHeaderDay.date, type: .day)
         }
         
         timelinePages.willDisplayTimelineView = { [weak self] (timeline, type) in

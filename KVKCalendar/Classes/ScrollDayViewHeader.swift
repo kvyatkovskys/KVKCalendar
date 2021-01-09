@@ -14,7 +14,7 @@ final class ScrollDayHeaderView: UIView {
     var didChangeDay: ((TimelinePageView.SwitchPageType) -> Void)?
     
     private let days: [Day]
-    private var date: Date
+    var date: Date
     private var style: Style
     private var collectionView: UICollectionView!
     private var isAnimate: Bool = false
@@ -216,7 +216,6 @@ final class ScrollDayHeaderView: UIView {
         } else {
             subviewCustomHeader?.removeFromSuperview()
             subviewCustomHeader = nil
-            
             setDateToTitle(date)
         }
     }
