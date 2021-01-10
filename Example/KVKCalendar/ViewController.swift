@@ -101,8 +101,10 @@ final class ViewController: UIViewController {
         calendarView.reloadFrame(frame)
     }
     
-    @objc func today(sender: UIBarButtonItem) {
-        calendarView.scrollTo(Date())
+    @objc func today() {
+        selectDate = Date()
+        calendarView.scrollTo(selectDate)
+        calendarView.reloadData()
     }
     
     @objc func switchCalendar(sender: UISegmentedControl) {
