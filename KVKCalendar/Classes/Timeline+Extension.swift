@@ -227,6 +227,9 @@ extension TimelineView {
                                           frame: CGRect(x: originX, y: pointY, width: width, height: allDayHeight),
                                           style: style.allDay,
                                           date: date)
+        if style.allDay.axis == .vertical {
+            allDayEvent.setRoundCorners([.bottomLeft, .bottomRight], radius: CGSize(width: 5, height: 5))
+        }
         allDayEvent.tag = tagAllDayEvent
         allDayEvent.delegate = self
         if style.allDay.isPinned {
