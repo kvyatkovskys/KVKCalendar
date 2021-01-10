@@ -266,6 +266,7 @@ public protocol CalendarDataSource: class {
     /// Use this method to add a custom day cell
     func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell?
     
+    /// Use the method to replace the collectionView. Works for monthView
     func willDisplayCollectionView(frame: CGRect, type: CalendarType) -> UICollectionView?
 }
 
