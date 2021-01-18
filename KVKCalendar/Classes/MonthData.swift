@@ -8,46 +8,50 @@
 import UIKit
 
 final class MonthData: EventDateProtocol {
-    var days: [Day]
+    
+    struct Parameters {
+        let data: CalendarData
+        let startDay: StartDayType
+        let calendar: Calendar
+        let monthStyle: MonthStyle
+    }
+    
+    var willSelectDate: Date
     var date: Date
     var data: CalendarData
+    let daysCount: Int
+    
     var isAnimate: Bool = false
     let tagEventPagePreview = -20
     let eventPreviewYOffset: CGFloat = 30
     var eventPreviewXOffset: CGFloat = 60
-    var willSelectDate: Date
     let rowsInPage = 6
     let columnsInPage = 7
-    var middleRowInPage: Int {
-        return (rowsInPage * columnsInPage) / 2
-    }
-    var columns: Int {
-        return ((days.count / itemsInPage) * columnsInPage) + (days.count % itemsInPage)
-    }
-    var itemsInPage: Int {
-        return columnsInPage * rowsInPage
-    }
     var isFirstLoad = true
     var movingEvent: EventViewGeneral?
     var selectedDates: Set<Date> = []
     
-    private let cachedDays: [Day]
     private let calendar: Calendar
     private let scrollDirection: UICollectionView.ScrollDirection
     
-    init(data: CalendarData, startDay: StartDayType, calendar: Calendar, scrollDirection: UICollectionView.ScrollDirection) {
-        self.data = data
-        self.calendar = calendar
-        self.scrollDirection = scrollDirection
+    init(parameters: Parameters) {
+        self.data = parameters.data
+        self.calendar = parameters.calendar
+        self.scrollDirection = parameters.monthStyle.scrollDirection
         
-        let months = data.months.reduce([], { (acc, month) -> [Month] in
-            var daysTemp = data.addStartEmptyDays(month.days, startDay: startDay)
-            if let lastDay = daysTemp.last, daysTemp.count < data.boxCount {
-                let emptyEndDays = Array(1...(data.boxCount - daysTemp.count)).compactMap { (idx) -> Day in
+        let months = parameters.data.months.reduce([], { (acc, month) -> [Month] in
+            var daysTemp = parameters.data.addStartEmptyDays(month.days, startDay: parameters.startDay)
+            if let lastDay = daysTemp.last, daysTemp.count < parameters.data.boxCount {
+                var emptyEndDays = Array(1...(parameters.data.boxCount - daysTemp.count)).compactMap { (idx) -> Day in
                     var day = Day.empty()
-                    day.date = data.getOffsetDate(offset: idx, to: lastDay.date)
+                    day.date = parameters.data.getOffsetDate(offset: idx, to: lastDay.date)
                     return day
                 }
+                
+                if !parameters.monthStyle.isPagingEnabled && emptyEndDays.count > 7 {
+                    emptyEndDays = emptyEndDays.dropLast(7)
+                }
+                
                 daysTemp += emptyEndDays
             }
             var monthTemp = month
@@ -55,10 +59,9 @@ final class MonthData: EventDateProtocol {
             return acc + [monthTemp]
         })
         self.data.months = months
-        self.date = data.date
+        self.date = parameters.data.date
         self.willSelectDate = data.date
-        self.days = months.flatMap({ $0.days })
-        self.cachedDays = days
+        self.daysCount = months.reduce(0, { $0 + $1.days.count })
     }
     
     private func compareDate(day: Day, date: Date?) -> Bool {
@@ -66,6 +69,11 @@ final class MonthData: EventDateProtocol {
     }
     
     func updateSelectedDates(_ dates: Set<Date>, date: Date, calendar: Calendar) -> Set<Date> {
+        // works only in one month
+        if selectedDates.contains(where: { $0.month != date.month || $0.year != date.year }) {
+            return [date]
+        }
+        
         var selectedDates = dates
         if let firstDate = selectedDates.min(by: { $0 < $1 }), firstDate.compare(date) == .orderedDescending {
             selectedDates.removeAll()
@@ -88,15 +96,15 @@ final class MonthData: EventDateProtocol {
         return selectedDates
     }
     
-    func reloadEventsInDays(events: [Event]) -> (events: [Event], dates: [Date?]) {
+    func reloadEventsInDays(events: [Event], date: Date) -> (events: [Event], dates: [Date?]) {
         let recurringEvents = events.filter({ $0.recurringType != .none })
-        let startDate = date.startOfMonth
-        let endDate = date.endOfMonth?.startOfDay
-        let startIdx = cachedDays.firstIndex(where: { $0.date?.day == startDate?.day && compareDate(day: $0, date: startDate) }) ?? 0
-        let endIdx = cachedDays.firstIndex(where: { $0.date?.day == endDate?.day && compareDate(day: $0, date: endDate) }) ?? 0
+        guard let idxSection = data.months.firstIndex(where: { $0.date.month == date.month && $0.date.year == date.year }) else {
+            return ([], [])
+        }
         
+        let days = data.months[idxSection].days
         var displayableEvents = [Event]()
-        let newDays = cachedDays[startIdx...endIdx].reduce([], { (acc, day) -> [Day] in
+        let updatedDays = days.reduce([], { (acc, day) -> [Day] in
             var newDay = day
             guard newDay.events.isEmpty else { return acc + [day] }
             
@@ -126,7 +134,19 @@ final class MonthData: EventDateProtocol {
             return acc + [newDay]
         })
         
-        days[startIdx...endIdx] = ArraySlice(newDays)
-        return (displayableEvents, newDays.map({ $0.date }))
+        data.months[idxSection].days = updatedDays
+        return (displayableEvents, updatedDays.map({ $0.date }))
+    }
+}
+
+extension MonthData {
+    var middleRowInPage: Int {
+        return (rowsInPage * columnsInPage) / 2
+    }
+    var columns: Int {
+        return ((daysCount / itemsInPage) * columnsInPage) + (daysCount % itemsInPage)
+    }
+    var itemsInPage: Int {
+        return columnsInPage * rowsInPage
     }
 }
