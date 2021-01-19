@@ -69,7 +69,7 @@ final class MonthData: EventDateProtocol {
     }
     
     func updateSelectedDates(_ dates: Set<Date>, date: Date, calendar: Calendar) -> Set<Date> {
-        // works only in one month
+        // works only in the same month
         if selectedDates.contains(where: { $0.month != date.month || $0.year != date.year }) {
             return [date]
         }
