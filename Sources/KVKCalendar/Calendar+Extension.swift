@@ -41,7 +41,7 @@ extension UIScrollView {
 }
 
 extension UIApplication {
-    var isAvailableBotomHomeIndicator: Bool {
+    var isAvailableBottomHomeIndicator: Bool {
         if #available(iOS 13.0, *), let keyWindow = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) {
             return keyWindow.safeAreaInsets.bottom > 0
         } else if #available(iOS 11.0, *), let keyWindow = UIApplication.shared.keyWindow {

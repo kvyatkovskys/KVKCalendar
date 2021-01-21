@@ -84,7 +84,7 @@ public struct HeaderScrollStyle {
     public var isHidden: Bool = false
     public var dotCorners: UIRectCorner = .allCorners
     public var dotCornersRadius: CGSize?
-    public var titleDateAligment: NSTextAlignment = .left
+    public var titleDateAlignment: NSTextAlignment = .left
     public var titleDateFont: UIFont = .boldSystemFont(ofSize: 20)
     public var isAnimateTitleDate: Bool = false
     public var colorNameEmptyDay: UIColor = gainsboro
@@ -144,8 +144,8 @@ public struct TimelineStyle {
             case .today:
                 let todayDate = Date()
                 return dates.contains(where: { todayDate.year == $0?.year && todayDate.month == $0?.month && todayDate.day == $0?.day })
-            case let .forDate(cutomDate):
-                return dates.contains(where: { cutomDate.year == $0?.year && cutomDate.month == $0?.month && cutomDate.day == $0?.day })
+            case let .forDate(customDate):
+                return dates.contains(where: { customDate.year == $0?.year && customDate.month == $0?.month && customDate.day == $0?.day })
             }
         }
 
@@ -161,8 +161,8 @@ public struct TimelineStyle {
             case .today:
                 let todayDate = Date()
                 return dates.contains(where: { todayDate.year == $0?.year && todayDate.month == $0?.month && todayDate.day == $0?.day })
-            case let .forDate(cutomDate):
-                return dates.contains(where: { cutomDate.year == $0?.year && cutomDate.month == $0?.month && cutomDate.day == $0?.day })
+            case let .forDate(customDate):
+                return dates.contains(where: { customDate.year == $0?.year && customDate.month == $0?.month && customDate.day == $0?.day })
             }
         }
     }
@@ -229,10 +229,10 @@ public struct MonthStyle {
     public var fontEventTitle: UIFont = .systemFont(ofSize: 14)
     public var fontEventTime: UIFont = .systemFont(ofSize: 10)
     public var fontEventBullet: UIFont = .boldSystemFont(ofSize: 18)
-    public var isHiddenSeporator: Bool = false
-    public var isHiddenSeporatorOnEmptyDate: Bool = false
-    public var widthSeporator: CGFloat = 0.4
-    public var colorSeporator: UIColor = gainsboro.withAlphaComponent(0.9)
+    public var isHiddenSeparator: Bool = false
+    public var isHiddenSeparatorOnEmptyDate: Bool = false
+    public var widthSeparator: CGFloat = 0.4
+    public var colorSeparator: UIColor = gainsboro.withAlphaComponent(0.9)
     public var colorBackgroundWeekendDate: UIColor = gainsboro.withAlphaComponent(0.2)
     public var colorBackgroundDate: UIColor = .white
     public var scrollDirection: UICollectionView.ScrollDirection = .vertical
@@ -245,8 +245,8 @@ public struct MonthStyle {
     public var eventCornersRadius: CGSize = CGSize(width: 5, height: 5)
     public var isHiddenDotInTitle: Bool = false
     public var isHiddenTitle: Bool = false
-    public var weekDayAligment: NSTextAlignment = .right
-    public var titleDateAligment: NSTextAlignment = .left
+    public var weekDayAlignment: NSTextAlignment = .right
+    public var titleDateAlignment: NSTextAlignment = .left
     public var fontTitleDate: UIFont = .boldSystemFont(ofSize: 30)
     public var colorTitleDate: UIColor = .black
     public var showDatesForOtherMonths: Bool = false
@@ -300,7 +300,7 @@ public struct YearStyle {
     public var fontTitleHeader: UIFont = .boldSystemFont(ofSize: 40)
     public var colorTitleHeader: UIColor = .black
     public var heightTitleHeader: CGFloat = 50
-    public var aligmentTitleHeader: NSTextAlignment = .left
+    public var alignmentTitleHeader: NSTextAlignment = .left
     public var fontDayTitlePad: UIFont = .systemFont(ofSize: 15)
     public var fontDayTitlePhone: UIFont = .systemFont(ofSize: 11)
     public var fontDayTitle: UIFont {
@@ -316,8 +316,8 @@ public struct YearStyle {
     public var isAnimateSelection: Bool = true
     public var isPagingEnabled: Bool = true
     public var isAutoSelectDateScrolling: Bool = true
-    public var weekDayAligment: NSTextAlignment = .center
-    public var titleDateAligment: NSTextAlignment = .left
+    public var weekDayAlignment: NSTextAlignment = .center
+    public var titleDateAlignment: NSTextAlignment = .left
     var scrollDirection: UICollectionView.ScrollDirection = .vertical
     public var colorBackground: UIColor = .white
 }
@@ -359,7 +359,7 @@ public struct EventStyle {
     public var isEnableVisualSelect: Bool = true
     public var colorStubView: UIColor? = nil
     public var heightStubView: CGFloat = 5
-    public var aligmentStubView: NSLayoutConstraint.Axis = .vertical
+    public var alignmentStubView: NSLayoutConstraint.Axis = .vertical
     public var spacingStubView: CGFloat = 1
     public var eventCorners: UIRectCorner = .allCorners
     public var eventCornersRadius: CGSize = CGSize(width: 2.5, height: 2.5)
@@ -428,7 +428,7 @@ extension Style {
             newStyle.month.colorWeekendDate = UIColor.useForStyle(dark: .systemGray2, white: newStyle.month.colorWeekendDate)
             newStyle.month.colorMoreTitle = UIColor.useForStyle(dark: .systemGray3, white: newStyle.month.colorMoreTitle)
             newStyle.month.colorEventTitle = UIColor.useForStyle(dark: .systemGray, white: newStyle.month.colorEventTitle)
-            newStyle.month.colorSeporator = UIColor.useForStyle(dark: .systemGray, white: newStyle.month.colorSeporator)
+            newStyle.month.colorSeparator = UIColor.useForStyle(dark: .systemGray, white: newStyle.month.colorSeparator)
             newStyle.month.colorBackgroundWeekendDate = UIColor.useForStyle(dark: .systemGray6, white: newStyle.month.colorBackgroundWeekendDate)
             newStyle.month.colorBackgroundDate = UIColor.useForStyle(dark: .black, white: newStyle.month.colorBackgroundDate)
             newStyle.month.colorTitleDate = UIColor.useForStyle(dark: .white, white: newStyle.month.colorTitleDate)

@@ -8,7 +8,7 @@
 
 # KVKCalendar
 
-**KVKCalendar** is a most fully customization calendar and timleline library. Library consists of four modules for displaying various types of calendar (*day*, *week*, *month*, *year*). You can choose any module or use all. It is designed based on a standard iOS calendar, but with additional features. Timeline displays the schedule for the day and week.
+**KVKCalendar** is a most fully customization calendar and timeline library. Library consists of four modules for displaying various types of calendar (*day*, *week*, *month*, *year*). You can choose any module or use all. It is designed based on a standard iOS calendar, but with additional features. Timeline displays the schedule for the day and week.
 
 ## Need Help?
 If you have a **question** about how to use KVKCalendar in your application, ask it on StackOverflow using the [KVKCalendar](https://stackoverflow.com/questions/tagged/kvkcalendar) tag.
@@ -93,7 +93,7 @@ extension ViewController: CalendarDataSource {
 }
 ```
 
-Implement `CalendarDelegate` to handle user action and control calenadr behavior.
+Implement `CalendarDelegate` to handle user action and control calendar behaviour.
 
 ```swift
 calendar.delegate = self
@@ -118,11 +118,11 @@ func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventVi
 
 <img src="Screenshots/custom_event_view.png" width="300">
 
-To use a custom date cell, just subscribe on this optional method from `CalendarDataSourcse` (works for Day/Week/Month/Year views).
+To use a custom date cell, just subscribe on this optional method from `CalendarDataSource` (works for Day/Week/Month/Year views).
 ```swift
 func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? {    
     return collectionView.dequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
-        configurate a cell
+        // configure a cell
     }
 }
 ```
