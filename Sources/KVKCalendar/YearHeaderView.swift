@@ -32,7 +32,7 @@ final class YearHeaderView: UICollectionReusableView {
         didSet {
             titleLabel.textColor = style.year.colorTitleHeader
             titleLabel.font = style.year.fontTitleHeader
-            titleLabel.textAlignment = style.year.aligmentTitleHeader
+            titleLabel.textAlignment = style.year.alignmentTitleHeader
             backgroundColor = style.year.colorBackgroundHeader
         }
     }

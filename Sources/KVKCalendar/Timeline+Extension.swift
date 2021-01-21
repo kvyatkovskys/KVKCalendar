@@ -19,10 +19,10 @@ extension TimelineView: UIScrollViewDelegate {
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        addStubUnvisibaleEvents()
+        addStubInvisibleEvents()
     }
     
-    func addStubUnvisibaleEvents() {
+    func addStubInvisibleEvents() {
         guard !style.timeline.isHiddenStubEvent else { return }
         
         let events = scrollView.subviews.compactMap { (view) -> StubEvent? in
@@ -47,7 +47,7 @@ extension TimelineView: UIScrollViewDelegate {
             stack.top.subviews.filter({ ($0 as? StubEventView)?.valueHash == eventView.event.hash }).forEach({ $0.removeFromSuperview() })
             stack.bottom.subviews.filter({ ($0 as? StubEventView)?.valueHash == eventView.event.hash }).forEach({ $0.removeFromSuperview() })
 
-            guard !visibaleView(eventView.frame) else { return }
+            guard !visibleView(eventView.frame) else { return }
             
             let stubView = StubEventView(event: eventView.event, frame: CGRect(x: 0, y: 0, width: stack.top.frame.width, height: style.event.heightStubView))
             stubView.valueHash = eventView.event.hash
@@ -100,7 +100,7 @@ extension TimelineView: UIScrollViewDelegate {
         }
     }
     
-    private func visibaleView(_ frame: CGRect) -> Bool {
+    private func visibleView(_ frame: CGRect) -> Bool {
         let container = CGRect(origin: scrollView.contentOffset, size: scrollView.frame.size)
         return frame.intersects(container)
     }
@@ -116,7 +116,7 @@ extension TimelineView: UIScrollViewDelegate {
     func createStackView(day: Int, type: StubStackView.PositionType, frame: CGRect) -> StubStackView {
         let view = StubStackView(type: type, frame: frame, day: day)
         view.distribution = .fillEqually
-        view.axis = style.event.aligmentStubView
+        view.axis = style.event.alignmentStubView
         view.alignment = .fill
         view.spacing = style.event.spacingStubView
         view.tag = tagStubEvent
@@ -126,7 +126,7 @@ extension TimelineView: UIScrollViewDelegate {
 
 extension TimelineView {
     var bottomStabStackOffsetY: CGFloat {
-        return UIApplication.shared.isAvailableBotomHomeIndicator ? 30 : 5
+        return UIApplication.shared.isAvailableBottomHomeIndicator ? 30 : 5
     }
     
     func topStabStackOffsetY(allDayEventsIsPinned: Bool, axis: AllDayStyle.AxisMode, eventsCount: Int, height: CGFloat) -> CGFloat {
@@ -378,12 +378,12 @@ extension TimelineView {
         
         let translation = gesture.translation(in: self)
         let velocity = gesture.velocity(in: self)
-        let endGesure = abs(translation.x) > (frame.width / 3.5)
+        let endGesture = abs(translation.x) > (frame.width / 3.5)
         
         switch gesture.state {
         case .began, .changed:
             guard abs(velocity.y) < abs(velocity.x) else { break }
-            guard endGesure else {
+            guard endGesture else {
                 delegate?.swipeX(transform: CGAffineTransform(translationX: translation.x, y: 0), stop: false)
                 
                 scrollableEventViews.forEach { (view) in
@@ -397,7 +397,7 @@ extension TimelineView {
             delegate?.swipeX(transform: .identity, stop: false)
             identityViews(scrollableEventViews)
         case .cancelled, .ended:
-            guard endGesure else {
+            guard endGesture else {
                 delegate?.swipeX(transform: .identity, stop: false)
                 identityViews(scrollableEventViews)
                 break

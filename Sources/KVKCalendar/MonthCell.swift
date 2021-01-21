@@ -173,19 +173,19 @@ final class MonthCell: UICollectionViewCell {
                 }
             }
 
-            if !monthStyle.isHiddenSeporator {
+            if !monthStyle.isHiddenSeparator {
                 if UIDevice.current.userInterfaceIdiom == .phone {
                     let topLineLayer = CALayer()
-                    topLineLayer.frame = CGRect(x: 0, y: 0, width: frame.width, height: monthStyle.widthSeporator)
-                    topLineLayer.backgroundColor = monthStyle.colorSeporator.cgColor
+                    topLineLayer.frame = CGRect(x: 0, y: 0, width: frame.width, height: monthStyle.widthSeparator)
+                    topLineLayer.backgroundColor = monthStyle.colorSeparator.cgColor
                     layer.addSublayer(topLineLayer)
                 } else {
                     if day.type != .empty {
-                        layer.borderWidth = monthStyle.isHiddenSeporatorOnEmptyDate ? 0 : monthStyle.widthSeporator
-                        layer.borderColor = monthStyle.isHiddenSeporatorOnEmptyDate ? UIColor.clear.cgColor : monthStyle.colorSeporator.cgColor
+                        layer.borderWidth = monthStyle.isHiddenSeparatorOnEmptyDate ? 0 : monthStyle.widthSeparator
+                        layer.borderColor = monthStyle.isHiddenSeparatorOnEmptyDate ? UIColor.clear.cgColor : monthStyle.colorSeparator.cgColor
                     } else {
-                        layer.borderWidth = monthStyle.widthSeporator
-                        layer.borderColor = monthStyle.colorSeporator.cgColor
+                        layer.borderWidth = monthStyle.widthSeparator
+                        layer.borderColor = monthStyle.colorSeparator.cgColor
                     }
                 }
             }
@@ -266,9 +266,9 @@ final class MonthCell: UICollectionViewCell {
                                                               indentation: 0,
                                                               lineSpacing: 0,
                                                               paragraphSpacing: 0)
-            let snpashot = event.isAllDay ? view.snapshotView(afterScreenUpdates: false) : snapshotLabel
+            let snapshot = event.isAllDay ? view.snapshotView(afterScreenUpdates: false) : snapshotLabel
             let eventView = EventViewGeneral(style: style, event: event, frame: view.frame)
-            delegate?.didStartMoveEvent(eventView, snapshot: snpashot, gesture: gesture)
+            delegate?.didStartMoveEvent(eventView, snapshot: snapshot, gesture: gesture)
         case .cancelled, .ended, .failed:
             delegate?.didEndMoveEvent(gesture: gesture)
         default:

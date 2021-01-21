@@ -32,12 +32,12 @@ final class ViewController: UIViewController {
             style.timeline.currentLineHourWidth = 45
             style.timeline.offsetTimeX = 2
             style.timeline.offsetLineLeft = 2
-            style.headerScroll.titleDateAligment = .center
+            style.headerScroll.titleDateAlignment = .center
             style.headerScroll.isAnimateTitleDate = true
             style.headerScroll.heightHeaderWeek = 70
             style.event.isEnableVisualSelect = false
             style.month.isHiddenTitle = true
-            style.month.weekDayAligment = .center
+            style.month.weekDayAlignment = .center
         } else {
             style.timeline.widthEventViewer = 350
             style.headerScroll.fontNameDay = .systemFont(ofSize: 17)

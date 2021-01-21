@@ -117,7 +117,7 @@ final class MonthView: UIView {
         collectionView?.reloadData()
     }
     
-    private func getVisibaleDate() -> Date? {
+    private func getVisibleDate() -> Date? {
         let cells = collectionView?.indexPathsForVisibleItems ?? []
         let days = cells.compactMap { (indexPath) -> Day in
             let index = getIndexForDirection(style.month.scrollDirection, indexPath: indexPath)
@@ -246,7 +246,7 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
             return
         }
         
-        guard let newMoveDate = getVisibaleDate(), monthData.willSelectDate.month != newMoveDate.month, monthData.date != newMoveDate else {
+        guard let newMoveDate = getVisibleDate(), monthData.willSelectDate.month != newMoveDate.month, monthData.date != newMoveDate else {
             return
         }
         
@@ -295,18 +295,18 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
             return size
         }
         
-        let widht: CGFloat
+        let width: CGFloat
         let height: CGFloat
         
         switch style.month.scrollDirection {
         case .horizontal:
-            widht = collectionView.frame.width / 7
+            width = collectionView.frame.width / 7
             height = collectionView.frame.height / 6
         case .vertical:
             if collectionView.frame.width > 0 {
-                widht = collectionView.frame.width / 7 - 0.2
+                width = collectionView.frame.width / 7 - 0.2
             } else {
-                widht = 0
+                width = 0
             }
             
             if style.month.isPagingEnabled {
@@ -323,7 +323,7 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
             fatalError()
         }
         
-        return CGSize(width: widht, height: height)
+        return CGSize(width: width, height: height)
     }
 }
 

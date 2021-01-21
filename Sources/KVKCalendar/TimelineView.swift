@@ -270,9 +270,9 @@ final class TimelineView: UIView, EventDateProtocol {
             }
         }
         
-        // add time label to timline
+        // add time label to timeline
         let times = createTimesLabel(start: startHour)
-        // add seporator line
+        // add separator line
         let lines = createLines(times: times)
         
         // calculate all height by time label minus the last offset
@@ -404,6 +404,6 @@ final class TimelineView: UIView, EventDateProtocol {
         setOffsetScrollView()
         scrollToCurrentTime(startHour)
         showCurrentLineHour()
-        addStubUnvisibaleEvents()
+        addStubInvisibleEvents()
     }
 }
