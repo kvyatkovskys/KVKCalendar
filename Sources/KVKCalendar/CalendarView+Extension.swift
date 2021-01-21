@@ -5,7 +5,7 @@
 //  Created by Sergei Kviatkovskii on 14.12.2020.
 //
 
-import Foundation
+import UIKit
 import EventKit
 
 extension CalendarView {
