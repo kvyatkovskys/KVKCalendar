@@ -5,7 +5,7 @@
 //  Created by Sergei Kviatkovskii on 09.03.2020.
 //
 
-import Foundation
+import UIKit
 
 struct CrossEvent: Hashable {
     let eventTime: EventTime
