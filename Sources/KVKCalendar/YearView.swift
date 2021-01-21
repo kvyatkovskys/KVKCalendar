@@ -206,16 +206,16 @@ extension YearView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
             return size
         }
         
-        let widht: CGFloat
+        let width: CGFloat
         let height: CGFloat
         if UIDevice.current.userInterfaceIdiom == .pad {
-            widht = (collectionView.frame.width / 4) - layout.minimumInteritemSpacing
+            width = (collectionView.frame.width / 4) - layout.minimumInteritemSpacing
             height = (collectionView.frame.height - data.style.year.heightTitleHeader) / 3
         } else {
-            widht = (collectionView.frame.width / 3) - layout.minimumInteritemSpacing
+            width = (collectionView.frame.width / 3) - layout.minimumInteritemSpacing
             height = (collectionView.frame.height - data.style.year.heightTitleHeader) / 4
         }
-        return CGSize(width: widht, height: height)
+        return CGSize(width: width, height: height)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {

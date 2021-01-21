@@ -28,7 +28,7 @@ final class ScrollDayHeaderView: UIView {
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.textAlignment = style.headerScroll.titleDateAligment
+        label.textAlignment = style.headerScroll.titleDateAlignment
         label.textColor = style.headerScroll.colorTitleDate
         label.font = style.headerScroll.titleDateFont
         return label
@@ -383,8 +383,8 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let widht = collectionView.frame.width / 7
+        let width = collectionView.frame.width / 7
         let height = collectionView.frame.height
-        return CGSize(width: widht, height: height)
+        return CGSize(width: width, height: height)
     }
 }

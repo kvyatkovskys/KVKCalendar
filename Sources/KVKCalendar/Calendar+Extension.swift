@@ -12,7 +12,7 @@ private enum AssociatedKeys {
 }
 
 /// Any object can start and stop delayed action for key
-protocol CalendarTimer: class {}
+protocol CalendarTimer: AnyObject {}
 
 extension CalendarTimer {
     
@@ -41,7 +41,7 @@ extension UIScrollView {
 }
 
 extension UIApplication {
-    var isAvailableBotomHomeIndicator: Bool {
+    var isAvailableBottomHomeIndicator: Bool {
         if #available(iOS 13.0, *), let keyWindow = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) {
             return keyWindow.safeAreaInsets.bottom > 0
         } else if #available(iOS 11.0, *), let keyWindow = UIApplication.shared.keyWindow {
@@ -225,7 +225,7 @@ public extension UICollectionView {
 }
 
 @available(iOS 13.4, *)
-protocol PointerInteractionProtocol: class, UIPointerInteractionDelegate {
+protocol PointerInteractionProtocol: AnyObject, UIPointerInteractionDelegate {
     func addPointInteraction(on view: UIView, delegate: UIPointerInteractionDelegate)
 }
 

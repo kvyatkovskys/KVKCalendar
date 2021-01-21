@@ -34,6 +34,10 @@ public final class CalendarView: UIView {
         return getSystemEvents(eventStore: eventStore, calendars: systemCalendars)
     }
     
+    /// references the current visible View (to allow lazy loading of views)
+    // cannot be private unfortunately, because private only allows access to extensions that are in the same file...
+    internal lazy var currentViewCache: UIView? = nil
+    
     private(set) lazy var dayView: DayView = {
         let day = DayView(data: dayData, frame: frame, style: style)
         day.delegate = self

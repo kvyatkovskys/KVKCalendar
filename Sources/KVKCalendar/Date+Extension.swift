@@ -31,38 +31,38 @@ public extension Date {
     
     var minute: Int {
         let calendar = Calendar.current
-        let componet = calendar.dateComponents([.minute], from: self)
-        return componet.minute ?? 0
+        let component = calendar.dateComponents([.minute], from: self)
+        return component.minute ?? 0
     }
     
     var hour: Int {
         let calendar = Calendar.current
-        let componet = calendar.dateComponents([.hour], from: self)
-        return componet.hour ?? 0
+        let component = calendar.dateComponents([.hour], from: self)
+        return component.hour ?? 0
     }
     
     var day: Int {
         let calendar = Calendar.current
-        let componet = calendar.dateComponents([.day], from: self)
-        return componet.day ?? 0
+        let component = calendar.dateComponents([.day], from: self)
+        return component.day ?? 0
     }
     
     var weekday: Int {
         let calendar = Calendar.current
-        let componet = calendar.dateComponents([.weekday], from: self)
-        return componet.weekday ?? 0
+        let component = calendar.dateComponents([.weekday], from: self)
+        return component.weekday ?? 0
     }
     
     var month: Int {
         let calendar = Calendar.current
-        let componet = calendar.dateComponents([.month], from: self)
-        return componet.month ?? 0
+        let component = calendar.dateComponents([.month], from: self)
+        return component.month ?? 0
     }
     
     var year: Int {
         let calendar = Calendar.current
-        let componet = calendar.dateComponents([.year], from: self)
-        return componet.year ?? 0
+        let component = calendar.dateComponents([.year], from: self)
+        return component.year ?? 0
     }
     
     var startOfDay: Date? {

@@ -141,7 +141,7 @@ final class ResizeEventView: UIView {
 }
 
 @available(iOS 13.4, *)
-extension ResizeEventView:PointerInteractionProtocol {
+extension ResizeEventView: PointerInteractionProtocol {
     func pointerInteraction(_ interaction: UIPointerInteraction, styleFor region: UIPointerRegion) -> UIPointerStyle? {
         var pointerStyle: UIPointerStyle?
         
@@ -165,7 +165,7 @@ extension ResizeEventView:PointerInteractionProtocol {
     }
 }
 
-protocol ResizeEventViewDelegate: class {
+protocol ResizeEventViewDelegate: AnyObject {
     func didStart(gesture: UIPanGestureRecognizer, type: ResizeEventView.ResizeEventViewType)
     func didEnd(gesture: UIPanGestureRecognizer, type: ResizeEventView.ResizeEventViewType)
     func didStartMoveResizeEvent(_ event: Event, gesture: UIPanGestureRecognizer, view: UIView)

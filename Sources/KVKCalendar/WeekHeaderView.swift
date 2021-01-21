@@ -14,7 +14,7 @@ final class WeekHeaderView: UIView {
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.textAlignment = style.month.titleDateAligment
+        label.textAlignment = style.month.titleDateAlignment
         label.font = style.month.fontTitleDate
         label.tag = -999
         return label
@@ -67,7 +67,7 @@ final class WeekHeaderView: UIView {
                                               height: isFromYear ? frame.height : style.month.heightHeaderWeek))
             label.adjustsFontSizeToFitWidth = true
             label.minimumScaleFactor = 0.6
-            label.textAlignment = isFromYear ? style.year.weekDayAligment : style.month.weekDayAligment
+            label.textAlignment = isFromYear ? style.year.weekDayAlignment : style.month.weekDayAlignment
             label.font = isFromYear ? style.year.weekFont : style.month.weekFont
             
             if value.isWeekend {
