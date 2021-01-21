@@ -5,7 +5,7 @@
 //  Created by Sergei Kviatkovskii on 19.07.2020.
 //
 
-import Foundation
+import UIKit
 
 extension TimelineView: UIScrollViewDelegate {
     
