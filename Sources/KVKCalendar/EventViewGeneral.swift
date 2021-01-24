@@ -202,7 +202,7 @@ extension EventViewGeneral: UIContextMenuInteractionDelegate {
     }
 }
 
-protocol EventDelegate: class {
+protocol EventDelegate: AnyObject {
     func didStartResizeEvent(_ event: Event, gesture: UILongPressGestureRecognizer, view: UIView)
     func didEndResizeEvent(_ event: Event, gesture: UILongPressGestureRecognizer)
     func didStartMovingEvent(_ event: Event, gesture: UILongPressGestureRecognizer, view: UIView)
@@ -212,7 +212,7 @@ protocol EventDelegate: class {
     func deselectEvent(_ event: Event)
 }
 
-protocol EventDataSource: class {
+protocol EventDataSource: AnyObject {
     @available(iOS 13.0, *)
     func willDisplayContextMenu(_ event: Event, date: Date?) -> UIContextMenuConfiguration?
 }

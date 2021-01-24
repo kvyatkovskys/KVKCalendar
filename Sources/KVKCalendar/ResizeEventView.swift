@@ -165,7 +165,7 @@ extension ResizeEventView:PointerInteractionProtocol {
     }
 }
 
-protocol ResizeEventViewDelegate: class {
+protocol ResizeEventViewDelegate: AnyObject {
     func didStart(gesture: UIPanGestureRecognizer, type: ResizeEventView.ResizeEventViewType)
     func didEnd(gesture: UIPanGestureRecognizer, type: ResizeEventView.ResizeEventViewType)
     func didStartMoveResizeEvent(_ event: Event, gesture: UIPanGestureRecognizer, view: UIView)
