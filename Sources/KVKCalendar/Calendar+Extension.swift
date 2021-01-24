@@ -12,7 +12,7 @@ private enum AssociatedKeys {
 }
 
 /// Any object can start and stop delayed action for key
-protocol CalendarTimer: class {}
+protocol CalendarTimer: AnyObject {}
 
 extension CalendarTimer {
     
@@ -225,7 +225,7 @@ public extension UICollectionView {
 }
 
 @available(iOS 13.4, *)
-protocol PointerInteractionProtocol: class, UIPointerInteractionDelegate {
+protocol PointerInteractionProtocol: AnyObject, UIPointerInteractionDelegate {
     func addPointInteraction(on view: UIView, delegate: UIPointerInteractionDelegate)
 }
 
