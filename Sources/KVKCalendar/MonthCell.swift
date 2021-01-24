@@ -402,7 +402,7 @@ extension MonthCell: PointerInteractionProtocol {
     }
 }
 
-protocol MonthCellDelegate: class {
+protocol MonthCellDelegate: AnyObject {
     func didSelectEvent(_ event: Event, frame: CGRect?)
     func didSelectMore(_ date: Date, frame: CGRect?)
     func didStartMoveEvent(_ event: EventViewGeneral, snapshot: UIView?, gesture: UILongPressGestureRecognizer)
