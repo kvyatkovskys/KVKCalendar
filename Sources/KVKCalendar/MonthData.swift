@@ -48,7 +48,7 @@ final class MonthData: EventDateProtocol {
                     return day
                 }
                 
-                if !parameters.monthStyle.isPagingEnabled && emptyEndDays.count > 7 {
+                if !parameters.monthStyle.isPagingEnabled && emptyEndDays.count > 7 && parameters.monthStyle.scrollDirection == .vertical {
                     emptyEndDays = emptyEndDays.dropLast(7)
                 }
                 
@@ -66,6 +66,13 @@ final class MonthData: EventDateProtocol {
     
     private func compareDate(day: Day, date: Date?) -> Bool {
         return day.date?.year == date?.year && day.date?.month == date?.month
+    }
+    
+    func getDay(indexPath: IndexPath) -> Day? {
+        // TODO: we got a crash sometime when use a horizontal scroll direction
+        // got index out of array
+        // safe: -> optional subscript
+        return data.months[indexPath.section].days[safe: indexPath.row]
     }
     
     func updateSelectedDates(_ dates: Set<Date>, date: Date, calendar: Calendar) -> Set<Date> {
