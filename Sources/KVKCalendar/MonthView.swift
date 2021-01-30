@@ -211,7 +211,7 @@ extension MonthView: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let index = getIndexForDirection(style.month.scrollDirection, indexPath: indexPath)
-        let day = monthData.data.months[index.section].days[index.row]
+        guard let day = monthData.getDay(indexPath: index) else { return UICollectionViewCell() }
         
         if let cell = dataSource?.dequeueDateCell(date: day.date, type: .month, collectionView: collectionView, indexPath: index), day.type != .empty {
             return cell
@@ -292,7 +292,7 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let index = getIndexForDirection(style.month.scrollDirection, indexPath: indexPath)
-        let date = monthData.data.months[index.section].days[index.row].date ?? monthData.date
+        guard let date = monthData.getDay(indexPath: index)?.date else { return }
         
         switch style.month.selectionMode {
         case .multiple:
@@ -305,9 +305,9 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let index = getIndexForDirection(style.month.scrollDirection, indexPath: indexPath)
-        let date = monthData.data.months[index.section].days[index.row].date
+        guard let day = monthData.getDay(indexPath: index) else { return .zero }
         
-        if let size = delegate?.sizeForCell(date, type: .month) {
+        if let size = delegate?.sizeForCell(day.date, type: .month) {
             return size
         }
         
