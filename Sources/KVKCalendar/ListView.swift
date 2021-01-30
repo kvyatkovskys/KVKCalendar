@@ -45,7 +45,6 @@ final class ListView: UIView, CalendarSettingProtocol {
         tableView.backgroundColor = style.backgroundColor
         tableView.frame = CGRect(origin: .zero, size: frame.size)
         addSubview(tableView)
-        setDate(params.data.date)
     }
     
     func reloadFrame(_ frame: CGRect) {

@@ -254,7 +254,23 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         willSelectDate?(newMoveDate)
     }
     
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        if !style.month.isPagingEnabled, let visibleItems = collectionView?.indexPathsForVisibleItems.sorted(by: { $0.row < $1.row }) {
+            let middleIndex = visibleItems[visibleItems.count / 2]
+            let newDate = monthData.data.months[middleIndex.section].date
+            headerView.date = newDate
+            
+            if style.month.isAutoSelectDateScrolling {
+                monthData.date = newDate
+                delegate?.didSelectCalendarDates([newDate], type: .month, frame: nil)
+                collectionView?.reloadData()
+            }
+        }
+    }
+    
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        guard style.month.isPagingEnabled else { return }
+        
         let visibleIndex: Int
         switch style.month.scrollDirection {
         case .vertical:
