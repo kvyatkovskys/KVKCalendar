@@ -36,7 +36,7 @@ pod 'KVKCalendar'
 github "kvyatkovskys/KVKCalendar"
 ~~~
 
-[Adding Frameworks to an Xcode project]
+[Adding Frameworks to an Xcode project](https://github.com/Carthage/Carthage#quick-start)
 
 ### Swift Package Manager (Xcode 12 or higher)
 
