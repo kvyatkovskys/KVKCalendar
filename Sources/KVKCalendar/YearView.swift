@@ -57,6 +57,16 @@ final class YearView: UIView {
     }
     
     private func createCollectionView(frame: CGRect, style: YearStyle)  -> UICollectionView {
+        if let customCollectionView = dataSource?.willDisplayCollectionView(frame: frame, type: .year) {
+            if customCollectionView.delegate == nil {
+                customCollectionView.delegate = self
+            }
+            if customCollectionView.dataSource == nil {
+                customCollectionView.dataSource = self
+            }
+            return customCollectionView
+        }
+        
         let collection = UICollectionView(frame: frame, collectionViewLayout: layout)
         collection.backgroundColor = style.colorBackground
         collection.isPagingEnabled = style.isPagingEnabled

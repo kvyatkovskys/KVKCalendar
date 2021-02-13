@@ -18,6 +18,8 @@ final class MonthView: UIView {
     
     var willSelectDate: ((Date) -> Void)?
     
+    private var headerViewFrame: CGRect = .zero
+    
     private lazy var headerView: WeekHeaderView = {
         let height: CGFloat
         if style.month.isHiddenTitleDate {
@@ -47,7 +49,7 @@ final class MonthView: UIView {
     }
     
     func setDate(_ date: Date) {
-        headerView.date = date
+        updateHeaderView(date, frame: headerViewFrame)
         monthData.date = date
         monthData.selectedDates.removeAll()
         scrollToDate(date, animated: monthData.isAnimate)
@@ -58,6 +60,17 @@ final class MonthView: UIView {
         let displayableValues = monthData.reloadEventsInDays(events: events, date: monthData.date)
         delegate?.didDisplayCalendarEvents(displayableValues.events, dates: displayableValues.dates, type: .month)
         collectionView?.reloadData()
+    }
+    
+    // MARK: private func
+    
+    private func updateHeaderView(_ date: Date, frame: CGRect) {
+        if let customHeaderView = dataSource?.willDisplayHeaderSubview(date: date, frame: frame, type: .month) {
+            headerViewFrame = customHeaderView.frame
+            addSubview(customHeaderView)
+        } else {
+            headerView.date = date
+        }
     }
     
     private func createCollectionView(frame: CGRect, style: MonthStyle) -> UICollectionView {
@@ -107,7 +120,7 @@ final class MonthView: UIView {
         }
         
         monthData.date = date
-        headerView.date = date
+        updateHeaderView(date, frame: headerViewFrame)
         
         let index = getIndexForDirection(style.month.scrollDirection, indexPath: indexPath)
         let attributes = collectionView?.layoutAttributesForItem(at: index)
@@ -141,14 +154,21 @@ final class MonthView: UIView {
 extension MonthView: CalendarSettingProtocol {
     func reloadFrame(_ frame: CGRect) {
         self.frame = frame
-        headerView.reloadFrame(frame)
+        
+        headerViewFrame.size.width = frame.width
+        if let customHeaderView = dataSource?.willDisplayHeaderSubview(date: monthData.date, frame: headerViewFrame, type: .month) {
+            headerViewFrame = customHeaderView.frame
+            addSubview(customHeaderView)
+        } else {
+            headerView.reloadFrame(frame)
+        }
         
         collectionView?.removeFromSuperview()
         collectionView = nil
         
         var collectionFrame = frame
-        collectionFrame.origin.y = headerView.frame.height
-        collectionFrame.size.height = collectionFrame.height - headerView.frame.height
+        collectionFrame.origin.y = headerViewFrame.height
+        collectionFrame.size.height = collectionFrame.height - headerViewFrame.height
         collectionView = createCollectionView(frame: collectionFrame, style: style.month)
         if let tempView = collectionView {
             addSubview(tempView)
@@ -170,11 +190,26 @@ extension MonthView: CalendarSettingProtocol {
     func setUI() {
         subviews.forEach({ $0.removeFromSuperview() })
         
-        addSubview(headerView)
+        let height: CGFloat
+        if style.month.isHiddenTitleDate {
+            height = style.month.heightHeaderWeek
+        } else {
+            height = style.month.heightHeaderWeek + style.month.heightTitleDate + 5
+        }
+        headerViewFrame = CGRect(x: 0, y: 0, width: frame.width, height: height)
+        
+        if let customHeaderView = dataSource?.willDisplayHeaderSubview(date: monthData.date, frame: headerViewFrame, type: .month) {
+            headerViewFrame = customHeaderView.frame
+            addSubview(customHeaderView)
+        } else {
+            headerView.frame = headerViewFrame
+            addSubview(headerView)
+        }
+        
         collectionView = nil
         var collectionFrame = frame
-        collectionFrame.origin.y = headerView.frame.height
-        collectionFrame.size.height = collectionFrame.height - headerView.frame.height
+        collectionFrame.origin.y = headerViewFrame.height
+        collectionFrame.size.height = collectionFrame.height - headerViewFrame.height
         collectionView = createCollectionView(frame: collectionFrame, style: style.month)
         if let tempView = collectionView {
             addSubview(tempView)
