@@ -186,6 +186,17 @@ extension ViewController: CalendarDelegate {
 }
 
 extension ViewController: CalendarDataSource {
+    func willDisplayHeaderSubview(date: Date?, frame: CGRect, type: CalendarType) -> UIView? {
+        switch type {
+        case .month:
+            let view = UIView(frame: frame)
+            view.backgroundColor = .systemRed
+            return view
+        default:
+            return nil
+        }
+    }
+    
     func eventsForCalendar(systemEvents: [EKEvent]) -> [Event] {
         let mappedEvents = systemEvents.compactMap { (event) -> Event in
             let startTime = timeFormatter(date: event.startDate)
