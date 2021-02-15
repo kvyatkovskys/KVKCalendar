@@ -638,11 +638,14 @@ extension TimelineView: EventDelegate {
     private func showChangingMinute(pointY: CGFloat, offset: CGFloat = 0) {
         movingMinuteLabel.removeFromSuperview()
         
-        let pointTempY = (pointY - eventPreviewYOffset) - style.timeline.offsetEvent - 6
-        let time = calculateChangingTime(pointY: pointTempY, isForResizeEvent: eventResizePreview != nil)
+        var pointTempY = pointY - style.timeline.offsetEvent - 6
+        if eventResizePreview == nil {
+            pointTempY -= eventPreviewYOffset
+        }
+        let time = calculateChangingTime(pointY: pointTempY)
         movingMinuteLabel.time = TimeContainer(minute: 0, hour: time.hour ?? 0)
         
-        if style.timeline.offsetTimeY > 50, let minute = time.minute, 0...59 ~= minute {
+        if let minute = time.minute, 0...59 ~= minute {
             movingMinuteLabel.frame = CGRect(x: style.timeline.offsetTimeX, y: (pointY - offset) - style.timeline.heightTime,
                                              width: style.timeline.widthTime, height: style.timeline.heightTime)
             scrollView.addSubview(movingMinuteLabel)
@@ -654,19 +657,13 @@ extension TimelineView: EventDelegate {
         }
     }
     
-    func calculateChangingTime(pointY: CGFloat, isForResizeEvent: Bool = false) -> (hour: Int?, minute: Int?) {
-        let times = scrollView.subviews.filter({ ($0 is TimelineLabel) }).compactMap({ $0 as? TimelineLabel })
-        guard let time = times.first( where: { $0.frame.origin.y >= pointY }) else { return (nil, nil) }
+    func calculateChangingTime(pointY: CGFloat) -> (hour: Int?, minute: Int?) {
+        guard let time = timeLabels.first(where: { $0.frame.origin.y >= pointY }) else { return (nil, nil) }
 
         let firstY = time.frame.origin.y - (style.timeline.offsetTimeY + style.timeline.heightTime)
         let percent = (pointY - firstY) / (style.timeline.offsetTimeY + style.timeline.heightTime)
         let newMinute = Int(60.0 * percent)
-        let newHour: Int
-        if isForResizeEvent {
-            newHour = time.tag
-        } else {
-            newHour = time.tag - 1
-        }
+        let newHour = time.tag - 1
         return (newHour, newMinute)
     }
     

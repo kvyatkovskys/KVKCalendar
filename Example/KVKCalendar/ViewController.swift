@@ -42,6 +42,7 @@ final class ViewController: UIViewController {
             style.timeline.widthEventViewer = 350
             style.headerScroll.fontNameDay = .systemFont(ofSize: 17)
         }
+        style.timeline.offsetTimeY = 25
         style.startWeekDay = .sunday
         style.timeSystem = TimeHourSystem.current ?? .twelve
         if #available(iOS 13.0, *) {
