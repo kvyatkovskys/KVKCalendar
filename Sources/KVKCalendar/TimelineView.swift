@@ -28,7 +28,7 @@ final class TimelineView: UIView, EventDateProtocol {
     private(set) var tagAllDayPlaceholder = -60
     private(set) var tagAllDayEvent = -70
     private(set) var tagStubEvent = -80
-    
+    private(set) var timeLabels = [TimelineLabel]()
     private(set) var hours: [String]
     private let timeHourSystem: TimeHourSystem
     private var timer: Timer?
@@ -273,14 +273,14 @@ final class TimelineView: UIView, EventDateProtocol {
         }
         
         // add time label to timeline
-        let times = createTimesLabel(start: startHour)
+        timeLabels = createTimesLabel(start: startHour)
         // add separator line
-        let lines = createLines(times: times)
+        let lines = createLines(times: timeLabels)
         
         // calculate all height by time label minus the last offset
-        let heightAllTimes = times.reduce(0, { $0 + ($1.frame.height + style.timeline.offsetTimeY) }) - style.timeline.offsetTimeY
+        let heightAllTimes = timeLabels.reduce(0, { $0 + ($1.frame.height + style.timeline.offsetTimeY) }) - style.timeline.offsetTimeY
         scrollView.contentSize = CGSize(width: frame.width, height: heightAllTimes)
-        times.forEach({ scrollView.addSubview($0) })
+        timeLabels.forEach({ scrollView.addSubview($0) })
         lines.forEach({ scrollView.addSubview($0) })
 
         let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
@@ -333,10 +333,10 @@ final class TimelineView: UIView, EventDateProtocol {
                 // create event
                 var newFrame = CGRect(x: 0, y: 0, width: 0, height: heightPage)
                 sortedEventsByDate.forEach { (event) in
-                    times.forEach({ (time) in                        
+                    timeLabels.forEach({ (time) in
                         // calculate position 'y'
                         if event.start.hour.hashValue == time.valueHash, event.start.day == date?.day {
-                            if time.tag == midnight, let newTime = times.first(where: { $0.tag == 0 }) {
+                            if time.tag == midnight, let newTime = timeLabels.first(where: { $0.tag == 0 }) {
                                 newFrame.origin.y = calculatePointYByMinute(event.start.minute, time: newTime)
                             } else {
                                 newFrame.origin.y = calculatePointYByMinute(event.start.minute, time: time)
@@ -348,7 +348,7 @@ final class TimelineView: UIView, EventDateProtocol {
                         // calculate 'height' event
                         if event.end.hour.hashValue == time.valueHash, event.end.day == date?.day {
                             var timeTemp = time
-                            if time.tag == midnight, let newTime = times.first(where: { $0.tag == 0 }) {
+                            if time.tag == midnight, let newTime = timeLabels.first(where: { $0.tag == 0 }) {
                                 timeTemp = newTime
                             }
                             let summHeight = (CGFloat(timeTemp.tag) * (style.timeline.offsetTimeY + timeTemp.frame.height)) - newFrame.origin.y + (timeTemp.frame.height / 2)
