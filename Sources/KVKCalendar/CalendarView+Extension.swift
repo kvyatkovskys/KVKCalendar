@@ -158,25 +158,24 @@ extension CalendarView {
 }
 
 extension CalendarView: DisplayDataSource {
-    func willDisplayCollectionView(frame: CGRect, type: CalendarType) -> UICollectionView? {
+    public func dequeueCell<T, U>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> U? where T : UIScrollView {
+        return dataSource?.dequeueCell(date: date, type: type, view: view, indexPath: indexPath)
+    }
+    
+    public func dequeueHeader<T, U>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> U? where T : UIScrollView {
+        return dataSource?.dequeueHeader(date: date, type: type, view: view, indexPath: indexPath)
+    }
+    
+    public func willDisplayCollectionView(frame: CGRect, type: CalendarType) -> UICollectionView? {
         return dataSource?.willDisplayCollectionView(frame: frame, type: type)
     }
     
-    func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? {
+    public func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? {
         return dataSource?.willDisplayEventView(event, frame: frame, date: date)
     }
-    
-    func willDisplayHeaderSubview(date: Date?, frame: CGRect, type: CalendarType) -> UIView? {
+
+    public func willDisplayHeaderSubview(date: Date?, frame: CGRect, type: CalendarType) -> UIView? {
         return dataSource?.willDisplayHeaderSubview(date: date, frame: frame, type: type)
-    }
-    
-    func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? {
-        return dataSource?.dequeueDateCell(date: date, type: type, collectionView: collectionView, indexPath: indexPath)
-    }
-    
-    @available(iOS 13.0, *)
-    func willDisplayContextMenu(_ event: Event, date: Date?) -> UIContextMenuConfiguration? {
-        return nil //dataSource?.willDisplayContextMenu(event, date: date)
     }
 }
 

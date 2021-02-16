@@ -436,7 +436,7 @@ extension TimelineView {
 extension TimelineView: EventDataSource {
     @available(iOS 13, *)
     func willDisplayContextMenu(_ event: Event, date: Date?) -> UIContextMenuConfiguration? {
-        return dataSource?.willDisplayContextMenu(event, date: date)
+        return nil
     }
 }
 

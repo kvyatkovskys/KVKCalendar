@@ -214,17 +214,27 @@ extension ViewController: CalendarDataSource {
         return CustomViewEvent(style: style, event: event, frame: frame)
     }
     
-    func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? {
-        let cell = collectionView.dequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
-            cell.imageView.image = UIImage(named: "ic_stub")
-        }
-        
+    func dequeueCell<T, U>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> U? where T: UIScrollView {
         switch type {
         case .year where date?.month == Date().month:
-            return cell
+            let cell = (view as? UICollectionView)?.dequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
+                cell.imageView.image = UIImage(named: "ic_stub")
+            }
+            return cell as? U
         case .day, .week, .month:
             guard date?.day == Date().day else { return nil }
-            return cell
+            
+            let cell = (view as? UICollectionView)?.dequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
+                cell.imageView.image = UIImage(named: "ic_stub")
+            }
+            return cell as? U
+        case .list:
+            guard date?.day == 14 else { return nil }
+            
+            let cell = (view as? UITableView)?.dequeueCell { (cell) in
+                cell.backgroundColor = .systemRed
+            }
+            return cell as? U
         default:
             return nil
         }
