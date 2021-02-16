@@ -177,7 +177,7 @@ extension DayView: DisplayDataSource {
     
     @available(iOS 13.0, *)
     func willDisplayContextMenu(_ event: Event, date: Date?) -> UIContextMenuConfiguration? {
-        return dataSource?.willDisplayContextMenu(event, date: date)
+        return nil
     }
 }
 

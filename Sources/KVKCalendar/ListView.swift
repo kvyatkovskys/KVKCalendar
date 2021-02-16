@@ -83,7 +83,7 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let event = params.data.event(indexPath: indexPath)
-        if let cell = params.dataSource?.dequeueListCell(date: event.start, tableView: tableView, indexPath: indexPath) {
+        if let cell: UITableViewCell = params.dataSource?.dequeueCell(date: event.start, type: .list, view: tableView, indexPath: indexPath) {
             return cell
         } else {
             return tableView.dequeueCell(indexPath: indexPath) { (cell: ListViewCell) in
@@ -95,7 +95,7 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let date = params.data.sections[section].date
-        if let headerView = params.dataSource?.dequeueListHeader(date: date, tableView: tableView, section: section) {
+        if let headerView: UIView = params.dataSource?.dequeueHeader(date: date, type: .list, view: tableView, indexPath: IndexPath(row: 0, section: section)) {
             return headerView
         } else {
             return tableView.dequeueView { (view: ListViewHeader) in

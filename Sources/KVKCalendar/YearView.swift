@@ -163,7 +163,7 @@ extension YearView: UICollectionViewDataSource {
         let index = getIndexForDirection(data.style.year.scrollDirection, indexPath: indexPath)
         let month = data.sections[index.section].months[index.row]
         
-        if let cell = dataSource?.dequeueDateCell(date: month.date, type: .year, collectionView: collectionView, indexPath: index) {
+        if let cell: UICollectionViewCell = dataSource?.dequeueCell(date: month.date, type: .year, view: collectionView, indexPath: index) {
             return cell
         } else {
             return collectionView.dequeueCell(indexPath: index) { (cell: YearCell) in
@@ -178,9 +178,15 @@ extension YearView: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let index = getIndexForDirection(data.style.year.scrollDirection, indexPath: indexPath)
-        return collectionView.dequeueView(indexPath: index) { (headerView: YearHeaderView) in
-            headerView.style = data.style
-            headerView.date = data.sections[index.section].date
+        let date = data.sections[index.section].date
+        
+        if let headerView: UICollectionReusableView = dataSource?.dequeueHeader(date: date, type: .year, view: collectionView, indexPath: index) {
+            return headerView
+        } else {
+            return collectionView.dequeueView(indexPath: index) { (headerView: YearHeaderView) in
+                headerView.style = data.style
+                headerView.date = date
+            }
         }
     }
 }
@@ -216,26 +222,43 @@ extension YearView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
             return size
         }
         
-        let width: CGFloat
-        let height: CGFloat
-        if UIDevice.current.userInterfaceIdiom == .pad {
-            width = (collectionView.frame.width / 4) - layout.minimumInteritemSpacing
-            height = (collectionView.frame.height - data.style.year.heightTitleHeader) / 3
-        } else {
-            width = (collectionView.frame.width / 3) - layout.minimumInteritemSpacing
-            height = (collectionView.frame.height - data.style.year.heightTitleHeader) / 4
+        var width: CGFloat
+        var height = collectionView.frame.height
+        
+        if height > 0 {
+            height -= data.style.year.heightTitleHeader
         }
+        
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            width = collectionView.frame.width / 4
+            height /= 3
+        } else {
+            width = collectionView.frame.width / 3
+            height /= 4
+        }
+        
+        if width > 0 {
+            width -= layout.minimumInteritemSpacing
+        }
+        
         return CGSize(width: width, height: height)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        switch data.style.year.scrollDirection {
-        case .horizontal:
-            return .zero
-        case .vertical:
-            return CGSize(width: collectionView.bounds.width, height: data.style.year.heightTitleHeader)
-        @unknown default:
-            fatalError()
+        let index = getIndexForDirection(data.style.year.scrollDirection, indexPath: IndexPath(row: 0, section: section))
+        let date = data.sections[index.section].date
+        
+        if let size = delegate?.sizeForHeader(date, type: .year) {
+            return size
+        } else {
+            switch data.style.year.scrollDirection {
+            case .horizontal:
+                return .zero
+            case .vertical:
+                return CGSize(width: collectionView.bounds.width, height: data.style.year.heightTitleHeader)
+            @unknown default:
+                fatalError()
+            }
         }
     }
 }
