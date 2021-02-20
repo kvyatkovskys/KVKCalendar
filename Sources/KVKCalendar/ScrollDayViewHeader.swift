@@ -306,7 +306,7 @@ extension ScrollDayHeaderView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let day = days[indexPath.row]
         
-        if let cell: UICollectionViewCell = dataSource?.dequeueCell(date: day.date, type: type, view: collectionView, indexPath: indexPath) {
+        if let cell = dataSource?.dequeueCell(date: day.date, type: type, view: collectionView, indexPath: indexPath) as? UICollectionViewCell {
             return cell
         } else {
             switch UIDevice.current.userInterfaceIdiom {

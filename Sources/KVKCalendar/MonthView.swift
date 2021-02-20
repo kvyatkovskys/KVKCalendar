@@ -58,7 +58,7 @@ final class MonthView: UIView {
     
     func reloadData(_ events: [Event]) {
         let displayableValues = monthData.reloadEventsInDays(events: events, date: monthData.date)
-        delegate?.didDisplayCalendarEvents(displayableValues.events, dates: displayableValues.dates, type: .month)
+        delegate?.didDisplayEvents(displayableValues.events, dates: displayableValues.dates, type: .month)
         collectionView?.reloadData()
     }
     
@@ -126,7 +126,7 @@ final class MonthView: UIView {
         let attributes = collectionView?.layoutAttributesForItem(at: index)
         let frame = collectionView?.convert(attributes?.frame ?? .zero, to: collectionView) ?? .zero
         
-        delegate?.didSelectCalendarDates(dates, type: style.month.selectCalendarType, frame: frame)
+        delegate?.didSelectDates(dates, type: style.month.selectCalendarType, frame: frame)
         collectionView?.reloadData()
     }
     
@@ -248,7 +248,7 @@ extension MonthView: UICollectionViewDataSource {
         let index = getIndexForDirection(style.month.scrollDirection, indexPath: indexPath)
         guard let day = monthData.getDay(indexPath: index) else { return UICollectionViewCell() }
         
-        if let cell: UICollectionViewCell = dataSource?.dequeueCell(date: day.date, type: .month, view: collectionView, indexPath: index), day.type != .empty {
+        if let cell = dataSource?.dequeueCell(date: day.date, type: .month, view: collectionView, indexPath: index) as? UICollectionViewCell, day.type != .empty {
             return cell
         } else {
             return collectionView.dequeueCell(indexPath: index) { (cell: MonthCell) in
@@ -297,7 +297,7 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
             
             if style.month.isAutoSelectDateScrolling {
                 monthData.date = newDate
-                delegate?.didSelectCalendarDates([newDate], type: .month, frame: nil)
+                delegate?.didSelectDates([newDate], type: .month, frame: nil)
                 collectionView?.reloadData()
             }
         }
@@ -321,7 +321,7 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         guard style.month.isAutoSelectDateScrolling else { return }
         
         monthData.date = newDate
-        delegate?.didSelectCalendarDates([newDate], type: .month, frame: nil)
+        delegate?.didSelectDates([newDate], type: .month, frame: nil)
         collectionView?.reloadData()
     }
     
@@ -380,11 +380,11 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
 
 extension MonthView: MonthCellDelegate {
     func didSelectEvent(_ event: Event, frame: CGRect?) {
-        delegate?.didSelectCalendarEvent(event, frame: frame)
+        delegate?.didSelectEvent(event, type: .month, frame: frame)
     }
     
     func didSelectMore(_ date: Date, frame: CGRect?) {
-        delegate?.didSelectCalendarMore(date, frame: frame)
+        delegate?.didSelectMore(date, frame: frame)
     }
     
     func didStartMoveEvent(_ event: EventViewGeneral, snapshot: UIView?, gesture: UILongPressGestureRecognizer) {
@@ -436,7 +436,7 @@ extension MonthView: MonthCellDelegate {
         endComponents.minute = event.end.minute
         let endDate = style.calendar.date(from: endComponents)
 
-        delegate?.didChangeCalendarEvent(event, start: startDate, end: endDate)
+        delegate?.didChangeEvent(event, start: startDate, end: endDate)
         scrollToDate(newDate, animated: true)
         didSelectDates([newDate], indexPath: index)
         collectionView?.isScrollEnabled = true

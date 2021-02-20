@@ -58,7 +58,7 @@ final class ListView: UIView, CalendarSettingProtocol {
     }
     
     func setDate(_ date: Date) {
-        params.delegate?.didSelectCalendarDates([date], type: .list, frame: nil)
+        params.delegate?.didSelectDates([date], type: .list, frame: nil)
         params.data.date = date
         
         if let idx = params.data.sections.firstIndex(where: { $0.date.year == date.year && $0.date.month == date.month && $0.date.day == date.day }) {
@@ -83,7 +83,7 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let event = params.data.event(indexPath: indexPath)
-        if let cell: UITableViewCell = params.dataSource?.dequeueCell(date: event.start, type: .list, view: tableView, indexPath: indexPath) {
+        if let cell = params.dataSource?.dequeueCell(date: event.start, type: .list, view: tableView, indexPath: indexPath) as? UITableViewCell {
             return cell
         } else {
             return tableView.dequeueCell(indexPath: indexPath) { (cell: ListViewCell) in
@@ -127,6 +127,6 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
         
         let event = params.data.event(indexPath: indexPath)
         let frameCell = tableView.cellForRow(at: indexPath)?.frame
-        params.delegate?.didSelectCalendarEvent(event, frame: frameCell)
+        params.delegate?.didSelectEvent(event, type: .list, frame: frameCell)
     }
 }

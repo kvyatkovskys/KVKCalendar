@@ -112,11 +112,15 @@ public struct Event {
     public var textForMonth: String = ""
     public var textForList: String = ""
     
-    @available(*, deprecated, renamed: "data")
+    @available(swift, deprecated: 0.4.6, obsoleted: 0.4.7, renamed: "data")
     public var eventData: Any? = nil
     public var data: Any? = nil
     
     public var recurringType: Event.RecurringType = .none
+    
+    ///individual event customization
+    ///(in-progress) works only a default height
+    public var style: EventStyle? = nil
     
     public init(ID: String) {
         self.ID = ID
@@ -277,7 +281,7 @@ public protocol CalendarDataSource: AnyObject {
     @available(*, deprecated, renamed: "dequeueCell")
     func dequeueListCell(date: Date?, tableView: UITableView, indexPath: IndexPath) -> UITableViewCell?
     
-    func dequeueCell<T: UIScrollView, U>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> U?
+    func dequeueCell<T: UIScrollView>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol?
     
     func dequeueHeader<T: UIScrollView, U>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> U?
 }
@@ -297,7 +301,7 @@ public extension CalendarDataSource {
     
     func dequeueListCell(date: Date?, tableView: UITableView, indexPath: IndexPath) -> UITableViewCell? { return nil }
     
-    func dequeueCell<T: UIScrollView, U>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> U? { return nil }
+    func dequeueCell<T: UIScrollView>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol? { return nil }
     
     func dequeueHeader<T: UIScrollView, U>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> U? { return nil }
 }
@@ -339,7 +343,10 @@ public protocol CalendarDelegate: AnyObject {
     func willSelectDate(_ date: Date, type: CalendarType)
     
     /// deselect event on timeline
+    @available(*, deprecated, renamed: "didDeselectEvent")
     func deselectEvent(_ event: Event, animated: Bool)
+    
+    func didDeselectEvent(_ event: Event, animated: Bool)
 }
 
 public extension CalendarDelegate {
@@ -347,6 +354,7 @@ public extension CalendarDelegate {
     
     func sizeForCell(_ date: Date?, type: CalendarType) -> CGSize? { return nil }
     
+    @available(*, deprecated, renamed: "didSelectDates")
     func didSelectDate(_ date: Date?, type: CalendarType, frame: CGRect?) {}
     
     func didSelectDates(_ dates: [Date], type: CalendarType, frame: CGRect?)  {}
@@ -358,21 +366,22 @@ public extension CalendarDelegate {
     func eventViewerFrame(_ frame: CGRect) {}
     
     func didChangeEvent(_ event: Event, start: Date?, end: Date?) {}
-    
-    func didAddEvent(_ date: Date?) {}
-    
+        
     func didAddNewEvent(_ event: Event, _ date: Date?) {}
     
     func didDisplayEvents(_ events: [Event], dates: [Date?]) {}
     
     func willSelectDate(_ date: Date, type: CalendarType) {}
     
+    @available(*, deprecated, renamed: "didDeselectEvent")
     func deselectEvent(_ event: Event, animated: Bool) {}
+    
+    func didDeselectEvent(_ event: Event, animated: Bool) {}
 }
 
 // MARK: - Private Display dataSource
 
-protocol DisplayDataSource: CalendarDataSource { }
+protocol DisplayDataSource: CalendarDataSource {}
 
 extension DisplayDataSource {
     public func eventsForCalendar(systemEvents: [EKEvent]) -> [Event] { return [] }
@@ -380,26 +389,14 @@ extension DisplayDataSource {
 
 // MARK: - Private Display delegate
 
-protocol DisplayDelegate: AnyObject {
-    func sizeForHeader(_ date: Date?, type: CalendarType) -> CGSize?
+protocol DisplayDelegate: CalendarDelegate {
+    func didDisplayEvents(_ events: [Event], dates: [Date?], type: CalendarType)
+}
+
+extension DisplayDelegate {
+    public func willSelectDate(_ date: Date, type: CalendarType) {}
     
-    func sizeForCell(_ date: Date?, type: CalendarType) -> CGSize?
-    
-    func didDisplayCalendarEvents(_ events: [Event], dates: [Date?], type: CalendarType)
-    
-    func didSelectCalendarDates(_ dates: [Date?], type: CalendarType, frame: CGRect?)
-    
-    func didSelectCalendarEvent(_ event: Event, frame: CGRect?)
-    
-    func didSelectCalendarMore(_ date: Date, frame: CGRect?)
-    
-    func getEventViewerFrame(_ frame: CGRect)
-    
-    func didChangeCalendarEvent(_ event: Event, start: Date?, end: Date?)
-    
-    func didAddCalendarEvent(_ event: Event, _ date: Date?)
-    
-    func deselectCalendarEvent(_ event: Event)
+    func deselectEvent(_ event: Event, animated: Bool) {}
 }
 
 // MARK: - EKEvent
@@ -417,3 +414,9 @@ public extension EKEvent {
         return event
     }
 }
+
+public protocol KVKCalendarCellProtocol: AnyObject {}
+
+extension UICollectionViewCell: KVKCalendarCellProtocol {}
+
+extension UITableViewCell: KVKCalendarCellProtocol {}

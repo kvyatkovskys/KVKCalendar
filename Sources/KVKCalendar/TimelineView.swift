@@ -346,7 +346,11 @@ final class TimelineView: UIView, EventDateProtocol {
                         }
                         
                         // calculate 'height' event
-                        if event.end.hour.hashValue == time.valueHash, event.end.day == date?.day {
+                        if let defaultHeight = event.style?.defaultHeight {
+                            newFrame.size.height = defaultHeight
+                        } else if let globalDefaultHeight = style.event.defaultHeight {
+                            newFrame.size.height = globalDefaultHeight
+                        } else if event.end.hour.hashValue == time.valueHash, event.end.day == date?.day {
                             var timeTemp = time
                             if time.tag == midnight, let newTime = timeLabels.first(where: { $0.tag == 0 }) {
                                 timeTemp = newTime

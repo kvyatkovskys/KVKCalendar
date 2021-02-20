@@ -78,7 +78,7 @@ final class YearView: UIView {
     }
     
     private func scrollToDate(date: Date, animated: Bool) {
-        delegate?.didSelectCalendarDates([date], type: .year, frame: nil)
+        delegate?.didSelectDates([date], type: .year, frame: nil)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             if let idx = self.data.sections.firstIndex(where: { $0.date.year == date.year }) {
                 self.collectionView?.scrollToItem(at: IndexPath(row: 0, section: idx),
@@ -163,7 +163,7 @@ extension YearView: UICollectionViewDataSource {
         let index = getIndexForDirection(data.style.year.scrollDirection, indexPath: indexPath)
         let month = data.sections[index.section].months[index.row]
         
-        if let cell: UICollectionViewCell = dataSource?.dequeueCell(date: month.date, type: .year, view: collectionView, indexPath: index) {
+        if let cell = dataSource?.dequeueCell(date: month.date, type: .year, view: collectionView, indexPath: index) as? UICollectionViewCell {
             return cell
         } else {
             return collectionView.dequeueCell(indexPath: index) { (cell: YearCell) in
@@ -197,7 +197,7 @@ extension YearView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
         
         let cells = collectionView?.indexPathsForVisibleItems ?? []
         let dates = cells.compactMap { data.sections[$0.section].months[$0.row].date }
-        delegate?.didDisplayCalendarEvents([], dates: dates, type: .year)
+        delegate?.didDisplayEvents([], dates: dates, type: .year)
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -212,7 +212,7 @@ extension YearView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
         let attributes = collectionView.layoutAttributesForItem(at: indexPath)
         let frame = collectionView.convert(attributes?.frame ?? .zero, to: collectionView)
         
-        delegate?.didSelectCalendarDates([newDate], type: data.style.year.selectCalendarType, frame: frame)
+        delegate?.didSelectDates([newDate].compactMap({ $0 }), type: data.style.year.selectCalendarType, frame: frame)
         collectionView.reloadData()
     }
     
