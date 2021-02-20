@@ -57,7 +57,7 @@ final class WeekView: UIView {
         view.delegate = self
         view.dataSource = self
         view.deselectEvent = { [weak self] (event) in
-            self?.delegate?.deselectCalendarEvent(event)
+            self?.delegate?.didDeselectEvent(event, animated: true)
         }
         return view
     }
@@ -185,7 +185,7 @@ extension WeekView {
         if visibleDates != newDates {
             visibleDates = newDates
         }
-        delegate?.didSelectCalendarDates([selectDate], type: type, frame: nil)
+        delegate?.didSelectDates([selectDate], type: type, frame: nil)
     }
 }
 
@@ -228,11 +228,11 @@ extension WeekView: CalendarSettingProtocol {
 
 extension WeekView: TimelineDelegate {
     func didDisplayEvents(_ events: [Event], dates: [Date?]) {
-        delegate?.didDisplayCalendarEvents(events, dates: dates, type: .week)
+        delegate?.didDisplayEvents(events, dates: dates, type: .week)
     }
     
     func didSelectEvent(_ event: Event, frame: CGRect?) {
-        delegate?.didSelectCalendarEvent(event, frame: frame)
+        delegate?.didSelectEvent(event, type: .week, frame: frame)
     }
     
     func nextDate() {
@@ -266,7 +266,7 @@ extension WeekView: TimelineDelegate {
         endComponents.minute = endTime.minute
         let endDate = style.calendar.date(from: endComponents)
                 
-        delegate?.didChangeCalendarEvent(event, start: startDate, end: endDate)
+        delegate?.didChangeEvent(event, start: startDate, end: endDate)
     }
     
     func didAddNewEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint) {
@@ -277,7 +277,7 @@ extension WeekView: TimelineDelegate {
         components.hour = hour
         components.minute = minute
         let newDate = style.calendar.date(from: components)
-        delegate?.didAddCalendarEvent(event, newDate)
+        delegate?.didAddNewEvent(event, newDate)
     }
     
     func didChangeEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint, newDay: Int?) {
@@ -311,6 +311,6 @@ extension WeekView: TimelineDelegate {
         endComponents.minute = minute + minuteOffset
         let endDate = style.calendar.date(from: endComponents)
         
-        delegate?.didChangeCalendarEvent(event, start: startDate, end: endDate)
+        delegate?.didChangeEvent(event, start: startDate, end: endDate)
     }
 }

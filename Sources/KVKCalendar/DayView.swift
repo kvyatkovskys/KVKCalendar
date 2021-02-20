@@ -56,7 +56,7 @@ final class DayView: UIView {
         view.delegate = self
         view.dataSource = self
         view.deselectEvent = { [weak self] (event) in
-            self?.delegate?.deselectCalendarEvent(event)
+            self?.delegate?.didDeselectEvent(event, animated: true)
         }
         return view
     }
@@ -156,7 +156,7 @@ final class DayView: UIView {
         view.frame = eventFrame
         view.tag = -1
         addSubview(view)
-        delegate?.getEventViewerFrame(eventFrame)
+        delegate?.eventViewerFrame(eventFrame)
     }
     
     func setDate(_ date: Date) {
@@ -186,17 +186,17 @@ extension DayView {
         guard let selectDate = date else { return }
         
         data.date = selectDate
-        delegate?.didSelectCalendarDates([selectDate], type: type, frame: nil)
+        delegate?.didSelectDates([selectDate], type: type, frame: nil)
     }
 }
 
 extension DayView: TimelineDelegate {
     func didDisplayEvents(_ events: [Event], dates: [Date?]) {
-        delegate?.didDisplayCalendarEvents(events, dates: dates, type: .day)
+        delegate?.didDisplayEvents(events, dates: dates, type: .day)
     }
     
     func didSelectEvent(_ event: Event, frame: CGRect?) {
-        delegate?.didSelectCalendarEvent(event, frame: frame)
+        delegate?.didSelectEvent(event, type: .day, frame: frame)
     }
     
     func nextDate() {
@@ -224,7 +224,7 @@ extension DayView: TimelineDelegate {
         endComponents.minute = endTime.minute
         let endDate = style.calendar.date(from: endComponents)
                 
-        delegate?.didChangeCalendarEvent(event, start: startDate, end: endDate)
+        delegate?.didChangeEvent(event, start: startDate, end: endDate)
     }
     
     func didAddNewEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint) {
@@ -235,7 +235,7 @@ extension DayView: TimelineDelegate {
         components.hour = hour
         components.minute = minute
         let date = style.calendar.date(from: components)
-        delegate?.didAddCalendarEvent(event, date)
+        delegate?.didAddNewEvent(event, date)
     }
     
     func didChangeEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint, newDay: Int?) {
@@ -257,7 +257,7 @@ extension DayView: TimelineDelegate {
         endComponents.minute = minute + minuteOffset
         let endDate = style.calendar.date(from: endComponents)
                 
-        delegate?.didChangeCalendarEvent(event, start: startDate, end: endDate)
+        delegate?.didChangeEvent(event, start: startDate, end: endDate)
     }
 }
 
@@ -294,7 +294,7 @@ extension DayView: CalendarSettingProtocol {
                 eventFrame.origin.x = pointX
                 eventFrame.size.width = width
                 eventView.frame = eventFrame
-                delegate?.getEventViewerFrame(eventFrame)
+                delegate?.eventViewerFrame(eventFrame)
             }
         } else {
             timelineFrame.size.width = frame.width

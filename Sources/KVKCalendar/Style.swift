@@ -66,6 +66,7 @@ public struct HeaderScrollStyle {
         format.dateFormat = "EE"
         return format
     }()
+    
     public var colorTitleDate: UIColor = .black
     public var colorTitleCornerDate: UIColor = .red
     public var colorDate: UIColor = .black
@@ -88,9 +89,10 @@ public struct HeaderScrollStyle {
     public var titleDateFont: UIFont = .boldSystemFont(ofSize: 20)
     public var isAnimateTitleDate: Bool = false
     public var colorNameEmptyDay: UIColor = gainsboro
-    var backgroundBlurStyle: UIBlurEffect.Style? = nil
     public var showDatesForOtherMonths: Bool = true
     public var isAnimateSelection: Bool = true
+    
+    var backgroundBlurStyle: UIBlurEffect.Style? = nil
 }
 
 // MARK: Timeline style
@@ -319,8 +321,9 @@ public struct YearStyle {
     public var isAutoSelectDateScrolling: Bool = true
     public var weekDayAlignment: NSTextAlignment = .center
     public var titleDateAlignment: NSTextAlignment = .left
-    var scrollDirection: UICollectionView.ScrollDirection = .vertical
     public var colorBackground: UIColor = .white
+    
+    var scrollDirection: UICollectionView.ScrollDirection = .vertical
 }
 
 // MARK: All Day style
@@ -366,7 +369,9 @@ public struct EventStyle {
     public var eventCornersRadius: CGSize = CGSize(width: 2.5, height: 2.5)
     public var delayForStartMove: TimeInterval = 1.5
     public var states: Set<EventViewGeneral.EventViewState> = [.move, .resize]
+    public var defaultHeight: CGFloat? = nil
     
+    var defaultWidth: CGFloat? = nil
     var isEnableContextMenu: Bool = false
 }
 

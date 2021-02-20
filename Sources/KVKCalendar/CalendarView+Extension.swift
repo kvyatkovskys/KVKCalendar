@@ -158,7 +158,7 @@ extension CalendarView {
 }
 
 extension CalendarView: DisplayDataSource {
-    public func dequeueCell<T, U>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> U? where T : UIScrollView {
+    public func dequeueCell<T>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol? where T : UIScrollView {
         return dataSource?.dequeueCell(date: date, type: type, view: view, indexPath: indexPath)
     }
     
@@ -180,45 +180,45 @@ extension CalendarView: DisplayDataSource {
 }
 
 extension CalendarView: DisplayDelegate {
-    func sizeForHeader(_ date: Date?, type: CalendarType) -> CGSize? {
+    public func sizeForHeader(_ date: Date?, type: CalendarType) -> CGSize? {
         delegate?.sizeForHeader(date, type: type)
     }
     
-    func sizeForCell(_ date: Date?, type: CalendarType) -> CGSize? {
+    public func sizeForCell(_ date: Date?, type: CalendarType) -> CGSize? {
         delegate?.sizeForCell(date, type: type)
     }
     
-    func didDisplayCalendarEvents(_ events: [Event], dates: [Date?], type: CalendarType) {
+    func didDisplayEvents(_ events: [Event], dates: [Date?], type: CalendarType) {
         guard self.type == type else { return }
         
         delegate?.didDisplayEvents(events, dates: dates)
     }
     
-    func didSelectCalendarDates(_ dates: [Date?], type: CalendarType, frame: CGRect?) {
-        delegate?.didSelectDates(dates.compactMap({ $0 }), type: type, frame: frame)
+    public func didSelectDates(_ dates: [Date], type: CalendarType, frame: CGRect?) {
+        delegate?.didSelectDates(dates, type: type, frame: frame)
     }
     
-    func deselectCalendarEvent(_ event: Event) {
-        delegate?.deselectEvent(event, animated: true)
+    public func didDeselectEvent(_ event: Event, animated: Bool) {
+        delegate?.didDeselectEvent(event, animated: animated)
     }
     
-    func didSelectCalendarEvent(_ event: Event, frame: CGRect?) {
+    public func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?) {
         delegate?.didSelectEvent(event, type: type, frame: frame)
     }
     
-    func didSelectCalendarMore(_ date: Date, frame: CGRect?) {
+    public func didSelectMore(_ date: Date, frame: CGRect?) {
         delegate?.didSelectMore(date, frame: frame)
     }
     
-    func didAddCalendarEvent(_ event: Event, _ date: Date?) {
+    public func didAddNewEvent(_ event: Event, _ date: Date?) {
         delegate?.didAddNewEvent(event, date)
     }
     
-    func didChangeCalendarEvent(_ event: Event, start: Date?, end: Date?) {
+    public func didChangeEvent(_ event: Event, start: Date?, end: Date?) {
         delegate?.didChangeEvent(event, start: start, end: end)
     }
     
-    func getEventViewerFrame(_ frame: CGRect) {
+    public func eventViewerFrame(_ frame: CGRect) {
         var newFrame = frame
         newFrame.origin = .zero
         delegate?.eventViewerFrame(newFrame)
