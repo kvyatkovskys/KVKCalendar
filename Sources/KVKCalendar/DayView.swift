@@ -83,10 +83,12 @@ final class DayView: UIView {
             }
         }
         
-        let timelineViews = Array(0...9).reduce([]) { (acc, _) -> [TimelineView] in
+        let timelineViews = Array(0..<parameters.style.timeline.maxLimitChachedPages).reduce([]) { (acc, _) -> [TimelineView] in
             return acc + [createTimelineView(frame: timelineFrame)]
         }
-        let page = TimelinePageView(pages: timelineViews, frame: timelineFrame)
+        let page = TimelinePageView(maxLimit: parameters.style.timeline.maxLimitChachedPages,
+                                    pages: timelineViews,
+                                    frame: timelineFrame)
         return page
     }()
     
@@ -177,7 +179,6 @@ final class DayView: UIView {
         }
         guard let eventViewer = dataSource?.willDisplayEventViewer(date: parameters.data.date, frame: viewerFrame) else { return nil }
         
-        print(eventViewer)
         eventViewer.tag = tagEventViewer
         addSubview(eventViewer)
         return viewerFrame

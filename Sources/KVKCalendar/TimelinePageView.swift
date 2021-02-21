@@ -28,6 +28,7 @@ final class TimelinePageView: UIView {
     
     private var pages: [Int: TimelineView]
     private var currentIndex: Int
+    private let maxLimit: UInt
     
     var didSwitchTimelineView: ((TimelineView?, SwitchPageType) -> Void)?
     var willDisplayTimelineView: ((TimelineView, SwitchPageType) -> Void)?
@@ -41,7 +42,8 @@ final class TimelinePageView: UIView {
         return pageView
     }()
     
-    init(pages: [TimelineView], frame: CGRect) {
+    init(maxLimit: UInt, pages: [TimelineView], frame: CGRect) {
+        self.maxLimit = maxLimit
         self.pages = pages.enumerated().reduce([:], { (acc, item) -> [Int: TimelineView] in
             var accTemp = acc
             accTemp[item.offset] = item.element
@@ -77,7 +79,7 @@ final class TimelinePageView: UIView {
             pages[currentIndex + 1] = timeline
         case .begin:
             pages[currentIndex - 1] = timeline
-        }
+        }        
     }
     
     func changePage(_ type: SwitchPageType) {
@@ -147,7 +149,6 @@ extension TimelinePageView: UIPageViewControllerDataSource, UIPageViewController
             currentIndex = index
         }
         
-        currentIndex = index
         didSwitchTimelineView?(timelineView, type)
     }
 }
