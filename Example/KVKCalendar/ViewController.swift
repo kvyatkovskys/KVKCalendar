@@ -68,7 +68,7 @@ final class ViewController: UIViewController {
     }()
     
     private lazy var eventViewer: EventViewer = {
-        let view = EventViewer(frame: CGRect(x: 0, y: 0, width: 500, height: calendarView.frame.height))
+        let view = EventViewer()
         return view
     }()
         
@@ -83,9 +83,7 @@ final class ViewController: UIViewController {
         view.addSubview(calendarView)
         navigationItem.titleView = segmentedControl
         navigationItem.rightBarButtonItem = todayButton
-        
-        calendarView.addEventViewToDay(view: eventViewer)
-        
+                
         loadEvents { [weak self] (events) in
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                 self?.events = events
@@ -164,7 +162,7 @@ extension ViewController: CalendarDelegate {
         print(date)
     }
     
-    func eventViewerFrame(_ frame: CGRect) {
+    func didChangeViewerFrame(_ frame: CGRect) {
         eventViewer.reloadFrame(frame: frame)
     }
     
@@ -238,6 +236,11 @@ extension ViewController: CalendarDataSource {
         default:
             return nil
         }
+    }
+    
+    func willDisplayEventViewer(date: Date, frame: CGRect) -> UIView? {
+        eventViewer.frame = frame
+        return eventViewer
     }
 }
 

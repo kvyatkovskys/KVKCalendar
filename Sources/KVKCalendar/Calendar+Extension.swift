@@ -225,7 +225,7 @@ public extension UICollectionView {
 }
 
 @available(iOS 13.4, *)
-protocol PointerInteractionProtocol: AnyObject, UIPointerInteractionDelegate {
+protocol PointerInteractionProtocol: UIPointerInteractionDelegate {
     func addPointInteraction(on view: UIView, delegate: UIPointerInteractionDelegate)
 }
 

@@ -269,6 +269,8 @@ public protocol CalendarDataSource: AnyObject {
     /// Use the method to replace the collectionView. Works for month/year View
     func willDisplayCollectionView(frame: CGRect, type: CalendarType) -> UICollectionView?
     
+    func willDisplayEventViewer(date: Date, frame: CGRect) -> UIView?
+    
     /// Use this method to add a custom day cell **DEPRECATED**
     @available(*, deprecated, renamed: "dequeueCell")
     func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell?
@@ -287,18 +289,26 @@ public protocol CalendarDataSource: AnyObject {
 }
 
 public extension CalendarDataSource {
+    func willDisplayEventViewer(date: Date, frame: CGRect) -> UIView? { return nil }
+    
     func willDisplayDate(_ date: Date?, events: [Event]) {}
     
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? { return nil }
     
     func willDisplayHeaderSubview(date: Date?, frame: CGRect, type: CalendarType) -> UIView? { return nil }
     
-    func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? { return nil }
-    
-    func dequeueHeaderView(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionReusableView? { return nil }
-    
     func willDisplayCollectionView(frame: CGRect, type: CalendarType) -> UICollectionView? { return nil }
     
+    /// **DEPRECATED**
+    @available(*, deprecated, renamed: "dequeueCell")
+    func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? { return nil }
+    
+    /// **DEPRECATED**
+    @available(*, deprecated, renamed: "dequeueHeader")
+    func dequeueHeaderView(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionReusableView? { return nil }
+        
+    /// **DEPRECATED**
+    @available(*, deprecated, renamed: "dequeueCell")
     func dequeueListCell(date: Date?, tableView: UITableView, indexPath: IndexPath) -> UITableViewCell? { return nil }
     
     func dequeueCell<T: UIScrollView>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol? { return nil }
@@ -328,7 +338,12 @@ public protocol CalendarDelegate: AnyObject {
     func didSelectMore(_ date: Date, frame: CGRect?)
     
     /// event's viewer for iPad
+    /// **DEPRECATED**
+    @available(*, deprecated, renamed: "didChangeViewerFrame")
     func eventViewerFrame(_ frame: CGRect)
+    
+    /// event's viewer for iPad
+    func didChangeViewerFrame(_ frame: CGRect)
     
     /// drag & drop events and resize
     func didChangeEvent(_ event: Event, start: Date?, end: Date?)
@@ -377,6 +392,8 @@ public extension CalendarDelegate {
     func deselectEvent(_ event: Event, animated: Bool) {}
     
     func didDeselectEvent(_ event: Event, animated: Bool) {}
+    
+    func didChangeViewerFrame(_ frame: CGRect) {}
 }
 
 // MARK: - Private Display dataSource

@@ -10,7 +10,11 @@ import EventKit
 
 public final class CalendarView: UIView {
     public weak var delegate: CalendarDelegate?
-    public weak var dataSource: CalendarDataSource?
+    public weak var dataSource: CalendarDataSource? {
+        didSet {
+            dayView.reloadEventViewer()
+        }
+    }
     public var selectedType: CalendarType {
         return type
     }
@@ -39,9 +43,9 @@ public final class CalendarView: UIView {
     internal lazy var currentViewCache: UIView? = nil
     
     private(set) lazy var dayView: DayView = {
-        let day = DayView(data: dayData, frame: frame, style: style)
-        day.delegate = self
+        let day = DayView(parameters: .init(style: style, data: dayData), frame: frame)
         day.dataSource = self
+        day.delegate = self
         day.scrollHeaderDay.dataSource = self
         return day
     }()

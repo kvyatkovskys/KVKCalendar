@@ -113,7 +113,7 @@ public struct TimelineStyle {
     public var offsetTimeY: CGFloat = 80
     public var timeColor: UIColor = .systemGray
     public var timeFont: UIFont = .systemFont(ofSize: 12)
-    public var widthEventViewer: CGFloat = 0
+    public var widthEventViewer: CGFloat? = nil
     
     @available(swift, deprecated: 0.4.2, obsoleted: 0.4.3, renamed: "showLineHourMode")
     public var showCurrentLineHour: Bool = true
