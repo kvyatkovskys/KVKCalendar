@@ -291,7 +291,7 @@ extension TimelineView {
     }
     
     func createVerticalLine(pointX: CGFloat, date: Date?) -> VerticalLineView {
-        let frame = CGRect(x: pointX, y: 0, width: style.timeline.widthLine, height: (CGFloat(25) * (style.timeline.heightTime + style.timeline.offsetTimeY)) - 75)
+        let frame = CGRect(x: pointX, y: 0, width: style.timeline.widthLine, height: scrollView.contentSize.height)
         let line = VerticalLineView(frame: frame)
         line.tag = tagVerticalLine
         line.backgroundColor = .systemGray

@@ -11,8 +11,10 @@ import EventKit
 extension CalendarView {
     // MARK: Public methods
     
+    /// **DEPRECATED**
+    @available(*, deprecated, renamed: "CalendarDataSource.willDisplayEventViewer")
     public func addEventViewToDay(view: UIView) {
-        dayView.addEventView(view: view)
+        
     }
     
     public func set(type: CalendarType, date: Date? = nil) {
@@ -177,6 +179,10 @@ extension CalendarView: DisplayDataSource {
     public func willDisplayHeaderSubview(date: Date?, frame: CGRect, type: CalendarType) -> UIView? {
         return dataSource?.willDisplayHeaderSubview(date: date, frame: frame, type: type)
     }
+    
+    public func willDisplayEventViewer(date: Date, frame: CGRect) -> UIView? {
+        return dataSource?.willDisplayEventViewer(date: date, frame: frame)
+    }
 }
 
 extension CalendarView: DisplayDelegate {
@@ -218,10 +224,10 @@ extension CalendarView: DisplayDelegate {
         delegate?.didChangeEvent(event, start: start, end: end)
     }
     
-    public func eventViewerFrame(_ frame: CGRect) {
+    public func didChangeViewerFrame(_ frame: CGRect) {
         var newFrame = frame
         newFrame.origin = .zero
-        delegate?.eventViewerFrame(newFrame)
+        delegate?.didChangeViewerFrame(newFrame)
     }
 }
 

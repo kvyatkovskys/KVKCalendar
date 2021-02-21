@@ -296,7 +296,9 @@ final class TimelineView: UIView, EventDateProtocol {
             } else {
                 pointX = CGFloat(idx) * widthPage + leftOffset
             }
-            scrollView.addSubview(createVerticalLine(pointX: pointX, date: date))
+            
+            let verticalLine = createVerticalLine(pointX: pointX, date: date)
+            scrollView.addSubview(verticalLine)
             
             let eventsByDate = filteredEvents.filter({ compareStartDate(date, with: $0) || compareEndDate(date, with: $0) || checkMultipleDate(date, with: $0) })
             let allDayEvents = filteredAllDayEvents.filter({ compareStartDate(date, with: $0) || compareEndDate(date, with: $0) })

@@ -8,24 +8,30 @@
 import UIKit
 
 final class DayView: UIView {
-    private var style: Style
-    private var data: DayData
-
+    
     weak var delegate: DisplayDelegate?
     weak var dataSource: DisplayDataSource?
     
+    private var parameters: Parameters
+    private let tagEventViewer = -10
+    
+    struct Parameters {
+        var style: Style
+        var data: DayData
+    }
+    
     lazy var scrollHeaderDay: ScrollDayHeaderView = {
         let heightView: CGFloat
-        if style.headerScroll.isHiddenSubview {
-            heightView = style.headerScroll.heightHeaderWeek
+        if parameters.style.headerScroll.isHiddenSubview {
+            heightView = parameters.style.headerScroll.heightHeaderWeek
         } else {
-            heightView = style.headerScroll.heightHeaderWeek + style.headerScroll.heightSubviewHeader
+            heightView = parameters.style.headerScroll.heightHeaderWeek + parameters.style.headerScroll.heightSubviewHeader
         }
         let view = ScrollDayHeaderView(frame: CGRect(x: 0, y: 0, width: frame.width, height: heightView),
-                                       days: data.days,
-                                       date: data.date,
+                                       days: parameters.data.days,
+                                       date: parameters.data.date,
                                        type: .day,
-                                       style: style)
+                                       style: parameters.style)
         view.didSelectDate = { [weak self] (date, type) in
             self?.didSelectDateScrollHeader(date, type: type)
         }
@@ -52,7 +58,7 @@ final class DayView: UIView {
         var viewFrame = frame
         viewFrame.origin = .zero
         
-        let view = TimelineView(type: .day, timeHourSystem: data.timeSystem, style: style, frame: viewFrame)
+        let view = TimelineView(type: .day, timeHourSystem: parameters.data.timeSystem, style: parameters.style, frame: viewFrame)
         view.delegate = self
         view.dataSource = self
         view.deselectEvent = { [weak self] (event) in
@@ -64,7 +70,7 @@ final class DayView: UIView {
     lazy var timelinePages: TimelinePageView = {
         var timelineFrame = frame
         
-        if !style.headerScroll.isHidden {
+        if !parameters.style.headerScroll.isHidden {
             timelineFrame.origin.y = scrollHeaderDay.frame.height
             timelineFrame.size.height -= scrollHeaderDay.frame.height
         }
@@ -73,7 +79,7 @@ final class DayView: UIView {
             if UIDevice.current.orientation.isPortrait {
                 timelineFrame.size.width = UIScreen.main.bounds.width * 0.5
             } else {
-                timelineFrame.size.width -= style.timeline.widthEventViewer
+                timelineFrame.size.width -= parameters.style.timeline.widthEventViewer ?? 0
             }
         }
         
@@ -86,23 +92,22 @@ final class DayView: UIView {
     
     private lazy var topBackgroundView: UIView = {
         let heightView: CGFloat
-        if style.headerScroll.isHiddenSubview {
-            heightView = style.headerScroll.heightHeaderWeek
+        if parameters.style.headerScroll.isHiddenSubview {
+            heightView = parameters.style.headerScroll.heightHeaderWeek
         } else {
-            heightView = style.headerScroll.heightHeaderWeek + style.headerScroll.heightSubviewHeader
+            heightView = parameters.style.headerScroll.heightHeaderWeek + parameters.style.headerScroll.heightSubviewHeader
         }
         let view = UIView(frame: CGRect(x: 0, y: 0, width: frame.width, height: heightView))
-        if let blur = style.headerScroll.backgroundBlurStyle {
+        if let blur = parameters.style.headerScroll.backgroundBlurStyle {
             view.setBlur(style: blur)
         } else {
-            view.backgroundColor = style.headerScroll.colorBackground
+            view.backgroundColor = parameters.style.headerScroll.colorBackground
         }
         return view
     }()
     
-    init(data: DayData, frame: CGRect, style: Style) {
-        self.style = style
-        self.data = data
+    init(parameters: Parameters, frame: CGRect) {
+        self.parameters = parameters
         super.init(frame: frame)
         setUI()
         
@@ -129,12 +134,12 @@ final class DayView: UIView {
             let nextDate: Date?
             switch type {
             case .next:
-                nextDate = self.style.calendar.date(byAdding: .day, value: 1, to: self.data.date)
+                nextDate = self.parameters.style.calendar.date(byAdding: .day, value: 1, to: self.parameters.data.date)
             case .previous:
-                nextDate = self.style.calendar.date(byAdding: .day, value: -1, to: self.data.date)
+                nextDate = self.parameters.style.calendar.date(byAdding: .day, value: -1, to: self.parameters.data.date)
             }
             
-            timeline.create(dates: [nextDate], events: self.data.events, selectedDate: self.data.date)
+            timeline.create(dates: [nextDate], events: self.parameters.data.events, selectedDate: self.parameters.data.date)
         }
     }
     
@@ -142,31 +147,35 @@ final class DayView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func addEventView(view: UIView) {
-        guard UIDevice.current.userInterfaceIdiom == .pad else { return }
-        
-        var eventFrame = timelinePages.frame
-        
-        eventFrame.origin.x = eventFrame.width
-        if UIDevice.current.orientation.isPortrait {
-            eventFrame.size.width = UIScreen.main.bounds.width * 0.5
-        } else {
-            eventFrame.size.width = style.timeline.widthEventViewer
-        }
-        view.frame = eventFrame
-        view.tag = -1
-        addSubview(view)
-        delegate?.eventViewerFrame(eventFrame)
-    }
-    
     func setDate(_ date: Date) {
-        data.date = date
+        parameters.data.date = date
         scrollHeaderDay.setDate(date)
     }
     
     func reloadData(_ events: [Event]) {
-        data.events = events
-        timelinePages.timelineView?.create(dates: [data.date], events: events, selectedDate: data.date)
+        parameters.data.events = events
+        timelinePages.timelineView?.create(dates: [parameters.data.date], events: events, selectedDate: parameters.data.date)
+    }
+    
+    func reloadEventViewer() {
+        updateEventViewer(frame: timelinePages.frame, width: parameters.style.timeline.widthEventViewer)
+    }
+    
+    private func updateEventViewer(frame: CGRect, width: CGFloat?) {
+        guard let viewerWidth = width else { return }
+        
+        var viewerFrame = frame
+        viewerFrame.origin.x = viewerFrame.width
+        if UIDevice.current.orientation.isPortrait {
+            viewerFrame.size.width = UIScreen.main.bounds.width * 0.5
+        } else {
+            viewerFrame.size.width = viewerWidth
+        }
+        
+        guard let eventViewer = dataSource?.willDisplayEventViewer(date: parameters.data.date, frame: viewerFrame) else { return }
+        
+        eventViewer.tag = tagEventViewer
+        addSubview(eventViewer)
     }
 }
 
@@ -174,18 +183,13 @@ extension DayView: DisplayDataSource {
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? {
         return dataSource?.willDisplayEventView(event, frame: frame, date: date)
     }
-    
-    @available(iOS 13.0, *)
-    func willDisplayContextMenu(_ event: Event, date: Date?) -> UIContextMenuConfiguration? {
-        return nil
-    }
 }
 
 extension DayView {
     func didSelectDateScrollHeader(_ date: Date?, type: CalendarType) {
         guard let selectDate = date else { return }
         
-        data.date = selectDate
+        parameters.data.date = selectDate
         delegate?.didSelectDates([selectDate], type: type, frame: nil)
     }
 }
@@ -214,7 +218,7 @@ extension DayView: TimelineDelegate {
         startComponents.day = event.start.day
         startComponents.hour = startTime.hour
         startComponents.minute = startTime.minute
-        let startDate = style.calendar.date(from: startComponents)
+        let startDate = parameters.style.calendar.date(from: startComponents)
         
         var endComponents = DateComponents()
         endComponents.year = event.end.year
@@ -222,19 +226,19 @@ extension DayView: TimelineDelegate {
         endComponents.day = event.end.day
         endComponents.hour = endTime.hour
         endComponents.minute = endTime.minute
-        let endDate = style.calendar.date(from: endComponents)
+        let endDate = parameters.style.calendar.date(from: endComponents)
                 
         delegate?.didChangeEvent(event, start: startDate, end: endDate)
     }
     
     func didAddNewEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint) {
         var components = DateComponents()
-        components.year = data.date.year
-        components.month = data.date.month
-        components.day = data.date.day
+        components.year = parameters.data.date.year
+        components.month = parameters.data.date.month
+        components.day = parameters.data.date.day
         components.hour = hour
         components.minute = minute
-        let date = style.calendar.date(from: components)
+        let date = parameters.style.calendar.date(from: components)
         delegate?.didAddNewEvent(event, date)
     }
     
@@ -245,7 +249,7 @@ extension DayView: TimelineDelegate {
         startComponents.day = event.start.day
         startComponents.hour = hour
         startComponents.minute = minute
-        let startDate = style.calendar.date(from: startComponents)
+        let startDate = parameters.style.calendar.date(from: startComponents)
         
         let hourOffset = event.end.hour - event.start.hour
         let minuteOffset = event.end.minute - event.start.minute
@@ -255,7 +259,7 @@ extension DayView: TimelineDelegate {
         endComponents.day = event.end.day
         endComponents.hour = hour + hourOffset
         endComponents.minute = minute + minuteOffset
-        let endDate = style.calendar.date(from: endComponents)
+        let endDate = parameters.style.calendar.date(from: endComponents)
                 
         delegate?.didChangeEvent(event, start: startDate, end: endDate)
     }
@@ -266,7 +270,7 @@ extension DayView: CalendarSettingProtocol {
         self.frame = frame
         var timelineFrame = timelinePages.frame
         
-        if !style.headerScroll.isHidden {
+        if !parameters.style.headerScroll.isHidden {
             topBackgroundView.frame.size.width = frame.width
             scrollHeaderDay.reloadFrame(frame)
             timelineFrame.size.height = frame.height - scrollHeaderDay.frame.height
@@ -275,26 +279,31 @@ extension DayView: CalendarSettingProtocol {
         }
         
         if UIDevice.current.userInterfaceIdiom == .pad {
-            timelineFrame.size.width = frame.width - style.timeline.widthEventViewer
-            if let idx = subviews.firstIndex(where: { $0.tag == -1 }) {
-                let eventView = subviews[idx]
-                var eventFrame = timelineFrame
+            if let viewerWidth = parameters.style.timeline.widthEventViewer {
+                timelineFrame.size.width = frame.width - viewerWidth
                 
-                let pointX: CGFloat
-                let width: CGFloat
-                if UIDevice.current.orientation.isPortrait {
-                    width = frame.width * 0.5
-                    pointX = frame.width - width
-                    timelineFrame.size.width = frame.width - width
-                } else {
-                    pointX = eventFrame.width
-                    width = style.timeline.widthEventViewer
+                if let idx = subviews.firstIndex(where: { $0.tag == tagEventViewer }) {
+                    subviews[idx].removeFromSuperview()
+                    var viewerFrame = timelineFrame
+                    
+                    let pointX: CGFloat
+                    let width: CGFloat
+                    if UIDevice.current.orientation.isPortrait {
+                        width = frame.width * 0.5
+                        pointX = frame.width - width
+                        timelineFrame.size.width = frame.width - width
+                    } else {
+                        pointX = viewerFrame.width
+                        width = viewerWidth
+                    }
+                    
+                    viewerFrame.origin.x = pointX
+                    viewerFrame.size.width = width
+                    updateEventViewer(frame: viewerFrame, width: viewerWidth)
+                    delegate?.didChangeViewerFrame(viewerFrame)
                 }
-                
-                eventFrame.origin.x = pointX
-                eventFrame.size.width = width
-                eventView.frame = eventFrame
-                delegate?.eventViewerFrame(eventFrame)
+            } else {
+                timelineFrame.size.width = frame.width
             }
         } else {
             timelineFrame.size.width = frame.width
@@ -302,25 +311,26 @@ extension DayView: CalendarSettingProtocol {
         
         timelinePages.frame = timelineFrame
         timelinePages.timelineView?.reloadFrame(CGRect(origin: .zero, size: timelineFrame.size))
-        timelinePages.timelineView?.create(dates: [data.date], events: data.events, selectedDate: data.date)
+        timelinePages.timelineView?.create(dates: [parameters.data.date], events: parameters.data.events, selectedDate: parameters.data.date)
         timelinePages.reloadCacheControllers()
     }
     
     func updateStyle(_ style: Style) {
-        self.style = style
+        self.parameters.style = style
         scrollHeaderDay.updateStyle(style)
         timelinePages.timelineView?.updateStyle(style)
         setUI()
-        setDate(data.date)
+        setDate(parameters.data.date)
     }
     
     func setUI() {
         subviews.forEach({ $0.removeFromSuperview() })
         
-        if !style.headerScroll.isHidden {
+        if !parameters.style.headerScroll.isHidden {
             addSubview(topBackgroundView)
             topBackgroundView.addSubview(scrollHeaderDay)
         }
         addSubview(timelinePages)
+        updateEventViewer(frame: timelinePages.frame, width: parameters.style.timeline.widthEventViewer)
     }
 }
