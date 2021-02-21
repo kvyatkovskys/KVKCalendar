@@ -70,10 +70,12 @@ final class WeekView: UIView {
             timelineFrame.size.height -= scrollHeaderDay.frame.height
         }
         
-        let timelineViews = Array(0...9).reduce([]) { (acc, _) -> [TimelineView] in
+        let timelineViews = Array(0..<style.timeline.maxLimitChachedPages).reduce([]) { (acc, _) -> [TimelineView] in
             return acc + [createTimelineView(frame: timelineFrame)]
         }
-        let page = TimelinePageView(pages: timelineViews, frame: timelineFrame)
+        let page = TimelinePageView(maxLimit: style.timeline.maxLimitChachedPages,
+                                    pages: timelineViews,
+                                    frame: timelineFrame)
         return page
     }()
     
