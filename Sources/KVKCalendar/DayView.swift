@@ -158,24 +158,29 @@ final class DayView: UIView {
     }
     
     func reloadEventViewer() {
-        updateEventViewer(frame: timelinePages.frame, width: parameters.style.timeline.widthEventViewer)
+        var defaultFrame = timelinePages.frame
+        if let defaultWidth = parameters.style.timeline.widthEventViewer {
+            defaultFrame.size.width = defaultWidth
+        }
+        updateEventViewer(frame: defaultFrame)
     }
     
-    private func updateEventViewer(frame: CGRect, width: CGFloat?) {
-        guard let viewerWidth = width else { return }
-        
+    @discardableResult
+    private func updateEventViewer(frame: CGRect) -> CGRect? {
         var viewerFrame = frame
-        viewerFrame.origin.x = viewerFrame.width
+        // hard reset the width when we change the orientation
         if UIDevice.current.orientation.isPortrait {
             viewerFrame.size.width = UIScreen.main.bounds.width * 0.5
+            viewerFrame.origin.x = viewerFrame.width
         } else {
-            viewerFrame.size.width = viewerWidth
+            viewerFrame.origin.x = bounds.width - viewerFrame.width
         }
+        guard let eventViewer = dataSource?.willDisplayEventViewer(date: parameters.data.date, frame: viewerFrame) else { return nil }
         
-        guard let eventViewer = dataSource?.willDisplayEventViewer(date: parameters.data.date, frame: viewerFrame) else { return }
-        
+        print(eventViewer)
         eventViewer.tag = tagEventViewer
         addSubview(eventViewer)
+        return viewerFrame
     }
 }
 
@@ -279,28 +284,26 @@ extension DayView: CalendarSettingProtocol {
         }
         
         if UIDevice.current.userInterfaceIdiom == .pad {
-            if let viewerWidth = parameters.style.timeline.widthEventViewer {
-                timelineFrame.size.width = frame.width - viewerWidth
+            if let defaultWidth = parameters.style.timeline.widthEventViewer {
+                timelineFrame.size.width = frame.width - defaultWidth
                 
                 if let idx = subviews.firstIndex(where: { $0.tag == tagEventViewer }) {
                     subviews[idx].removeFromSuperview()
                     var viewerFrame = timelineFrame
                     
-                    let pointX: CGFloat
                     let width: CGFloat
                     if UIDevice.current.orientation.isPortrait {
                         width = frame.width * 0.5
-                        pointX = frame.width - width
                         timelineFrame.size.width = frame.width - width
                     } else {
-                        pointX = viewerFrame.width
-                        width = viewerWidth
+                        width = defaultWidth
                     }
                     
-                    viewerFrame.origin.x = pointX
                     viewerFrame.size.width = width
-                    updateEventViewer(frame: viewerFrame, width: viewerWidth)
-                    delegate?.didChangeViewerFrame(viewerFrame)
+                    if let resultViewerFrame = updateEventViewer(frame: viewerFrame) {
+                        // notify when we did change the frame of viewer
+                        delegate?.didChangeViewerFrame(resultViewerFrame)
+                    }
                 }
             } else {
                 timelineFrame.size.width = frame.width
@@ -331,6 +334,5 @@ extension DayView: CalendarSettingProtocol {
             topBackgroundView.addSubview(scrollHeaderDay)
         }
         addSubview(timelinePages)
-        updateEventViewer(frame: timelinePages.frame, width: parameters.style.timeline.widthEventViewer)
     }
 }
