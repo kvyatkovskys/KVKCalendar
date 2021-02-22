@@ -160,6 +160,8 @@ final class DayView: UIView {
     }
     
     func reloadEventViewer() {
+        guard UIDevice.current.userInterfaceIdiom == .pad else { return }
+        
         var defaultFrame = timelinePages.frame
         if let defaultWidth = parameters.style.timeline.widthEventViewer {
             defaultFrame.size.width = defaultWidth
@@ -167,8 +169,7 @@ final class DayView: UIView {
         updateEventViewer(frame: defaultFrame)
     }
     
-    @discardableResult
-    private func updateEventViewer(frame: CGRect) -> CGRect? {
+    @discardableResult private func updateEventViewer(frame: CGRect) -> CGRect? {
         var viewerFrame = frame
         // hard reset the width when we change the orientation
         if UIDevice.current.orientation.isPortrait {

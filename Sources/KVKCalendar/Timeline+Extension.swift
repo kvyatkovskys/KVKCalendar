@@ -243,6 +243,9 @@ extension TimelineView {
                                                               width: style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft,
                                                               height: style.allDay.height),
                                                 style: style.allDay)
+        if type == .week {
+            allDayPlaceholder.setRoundCorners([.bottomRight], radius: .init(width: 5, height: 5))
+        }
         allDayPlaceholder.tag = tagAllDayPlaceholder
         if style.allDay.isPinned {
             addSubview(allDayPlaceholder)
