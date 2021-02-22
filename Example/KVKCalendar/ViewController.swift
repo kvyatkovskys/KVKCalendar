@@ -84,8 +84,8 @@ final class ViewController: UIViewController {
         navigationItem.titleView = segmentedControl
         navigationItem.rightBarButtonItem = todayButton
                 
-        loadEvents { [weak self] (events) in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+        loadEvents { (events) in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
                 self?.events = events
                 self?.calendarView.reloadData()
             }
@@ -99,13 +99,13 @@ final class ViewController: UIViewController {
         calendarView.reloadFrame(frame)
     }
     
-    @objc func today() {
+    @objc private func today() {
         selectDate = Date()
         calendarView.scrollTo(selectDate)
         calendarView.reloadData()
     }
     
-    @objc func switchCalendar(sender: UISegmentedControl) {
+    @objc private func switchCalendar(sender: UISegmentedControl) {
         let type = CalendarType.allCases[sender.selectedSegmentIndex]
         calendarView.set(type: type, date: selectDate)
         calendarView.reloadData()
@@ -118,6 +118,8 @@ final class ViewController: UIViewController {
         }
     }
 }
+
+// MARK: - Calendar delegate
 
 extension ViewController: CalendarDelegate {
     func didChangeEvent(_ event: Event, start: Date?, end: Date?) {
@@ -154,8 +156,8 @@ extension ViewController: CalendarDelegate {
         }
     }
     
-    func deselectEvent(_ event: Event, animated: Bool) {
-        print(event, animated)
+    func didDeselectEvent(_ event: Event, animated: Bool) {
+        print(event)
     }
     
     func didSelectMore(_ date: Date, frame: CGRect?) {
@@ -184,25 +186,18 @@ extension ViewController: CalendarDelegate {
     }
 }
 
+// MARK: - Calendar datasource
+
 extension ViewController: CalendarDataSource {
-    func willDisplayHeaderSubview(date: Date?, frame: CGRect, type: CalendarType) -> UIView? {
-        switch type {
-        case .month:
-            let view = UIView(frame: frame)
-            view.backgroundColor = .systemRed
-            return view
-        default:
-            return nil
-        }
-    }
-    
     func eventsForCalendar(systemEvents: [EKEvent]) -> [Event] {
+        // if you want to get a system events, you need to set style.systemCalendars = ["test"]
         let mappedEvents = systemEvents.compactMap { (event) -> Event in
             let startTime = timeFormatter(date: event.startDate)
             let endTime = timeFormatter(date: event.endDate)
             
             return event.transform(text: "\(startTime) - \(endTime)\n\(event.title ?? "")")
         }
+        
         return events + mappedEvents
     }
     
@@ -243,6 +238,8 @@ extension ViewController: CalendarDataSource {
         return eventViewer
     }
 }
+
+// MARK: - load events
 
 extension ViewController {
     func loadEvents(completion: ([Event]) -> Void) {
