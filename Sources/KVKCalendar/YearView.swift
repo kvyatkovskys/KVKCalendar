@@ -180,7 +180,7 @@ extension YearView: UICollectionViewDataSource {
         let index = getIndexForDirection(data.style.year.scrollDirection, indexPath: indexPath)
         let date = data.sections[index.section].date
         
-        if let headerView: UICollectionReusableView = dataSource?.dequeueHeader(date: date, type: .year, view: collectionView, indexPath: index) {
+        if let headerView = dataSource?.dequeueHeader(date: date, type: .year, view: collectionView, indexPath: index) as? UICollectionReusableView {
             return headerView
         } else {
             return collectionView.dequeueView(indexPath: index) { (headerView: YearHeaderView) in

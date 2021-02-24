@@ -283,9 +283,11 @@ public protocol CalendarDataSource: AnyObject {
     @available(*, deprecated, renamed: "dequeueCell")
     func dequeueListCell(date: Date?, tableView: UITableView, indexPath: IndexPath) -> UITableViewCell?
     
+    /// Use this method to add a custom day cell
     func dequeueCell<T: UIScrollView>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol?
     
-    func dequeueHeader<T: UIScrollView, U>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> U?
+    /// Use this method to add a header view
+    func dequeueHeader<T: UIScrollView>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarHeaderProtocol?
 }
 
 public extension CalendarDataSource {
@@ -313,7 +315,7 @@ public extension CalendarDataSource {
     
     func dequeueCell<T: UIScrollView>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol? { return nil }
     
-    func dequeueHeader<T: UIScrollView, U>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> U? { return nil }
+    func dequeueHeader<T: UIScrollView>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarHeaderProtocol? { return nil }
 }
 
 // MARK: - Delegate protocol
@@ -357,10 +359,11 @@ public protocol CalendarDelegate: AnyObject {
     /// get next date when the calendar scrolls (works for month view)
     func willSelectDate(_ date: Date, type: CalendarType)
     
-    /// deselect event on timeline
+    /// **DEPRECATED**
     @available(*, deprecated, renamed: "didDeselectEvent")
     func deselectEvent(_ event: Event, animated: Bool)
     
+    /// deselect event on timeline
     func didDeselectEvent(_ event: Event, animated: Bool)
 }
 
@@ -432,8 +435,13 @@ public extension EKEvent {
     }
 }
 
+// MARK: - Protocols to customize calendar
+
 public protocol KVKCalendarCellProtocol: AnyObject {}
 
 extension UICollectionViewCell: KVKCalendarCellProtocol {}
-
 extension UITableViewCell: KVKCalendarCellProtocol {}
+
+public protocol KVKCalendarHeaderProtocol: AnyObject {}
+
+extension UIView: KVKCalendarHeaderProtocol {}

@@ -164,7 +164,7 @@ extension CalendarView: DisplayDataSource {
         return dataSource?.dequeueCell(date: date, type: type, view: view, indexPath: indexPath)
     }
     
-    public func dequeueHeader<T, U>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> U? where T : UIScrollView {
+    public func dequeueHeader<T>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarHeaderProtocol? where T : UIScrollView {
         return dataSource?.dequeueHeader(date: date, type: type, view: view, indexPath: indexPath)
     }
     

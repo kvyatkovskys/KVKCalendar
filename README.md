@@ -123,7 +123,7 @@ class CustomViewEvent: EventViewGeneral {
     }
 }
 
-// optional function from CalendarDataSource
+// an optional function from CalendarDataSource
 func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? {
     guard event.ID == id else { return nil }
     
@@ -135,9 +135,23 @@ func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventVi
 
 To use a custom date cell, just subscribe on this optional method from `CalendarDataSource` (works for Day/Week/Month/Year views).
 ```swift
-func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? {    
-    return collectionView.dequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
-        // configure a cell
+func dequeueCell<T>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol? where T: UIScrollView { 
+    switch type {
+    case .year:
+        let cell = (view as? UICollectionView)?.dequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
+            // configure the cell
+        }
+        return cell
+    case .day, .week, .month:    
+        let cell = (view as? UICollectionView)?.dequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
+            // configure the cell
+        }
+        return cell
+    case .list:    
+        let cell = (view as? UITableView)?.dequeueCell { (cell) in
+            // configure the cell
+        }
+        return cell
     }
 }
 ```

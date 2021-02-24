@@ -136,8 +136,7 @@ public struct TimelineStyle {
     public var minimumPressDuration: TimeInterval = 0.5
     public var isHiddenStubEvent: Bool = false
     public var isEnabledCreateNewEvent: Bool = true
-    
-    var maxLimitChachedPages: UInt = 10
+    public var maxLimitChachedPages: UInt = 10
     
     public enum CurrentLineHourShowMode {
         case always, today, forDate(Date)

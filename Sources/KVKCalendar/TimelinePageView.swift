@@ -77,9 +77,17 @@ final class TimelinePageView: UIView {
         switch to {
         case .end:
             pages[currentIndex + 1] = timeline
+            
+            if pages.count > maxLimit, let firstKey = pages.max(by: { $0.key > $1.key }) {
+                pages.removeValue(forKey: firstKey.key)
+            }
         case .begin:
             pages[currentIndex - 1] = timeline
-        }        
+            
+            if pages.count > maxLimit, let lastKey = pages.max(by: { $0.key < $1.key }) {
+                pages.removeValue(forKey: lastKey.key)
+            }
+        }
     }
     
     func changePage(_ type: SwitchPageType) {
@@ -112,9 +120,7 @@ extension TimelinePageView: UIPageViewControllerDataSource, UIPageViewController
     }
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
-        guard var newIndex = (viewController as? TimelineContainerVC)?.index else {
-            return nil
-        }
+        guard var newIndex = (viewController as? TimelineContainerVC)?.index else { return nil }
         
         newIndex -= 1
         guard let newTimelineView = pages[newIndex] else { return nil }
@@ -125,9 +131,7 @@ extension TimelinePageView: UIPageViewControllerDataSource, UIPageViewController
     }
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
-        guard var newIndex = (viewController as? TimelineContainerVC)?.index, (newIndex + 1) < pages.count else {
-            return nil
-        }
+        guard var newIndex = (viewController as? TimelineContainerVC)?.index else { return nil }
         
         newIndex += 1
         guard let newTimelineView = pages[newIndex] else { return nil }
