@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 VALUE=${1?Error: no number given}
-carthage build --no-skip-current
+carthage.sh build --no-skip-current
 echo "Created build for Carthage!"
 
 git add .
