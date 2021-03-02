@@ -182,7 +182,7 @@ struct Day {
     }
 }
 
-enum DayType: String, CaseIterable {
+public enum DayType: String, CaseIterable {
     case monday = "MON"
     case tuesday = "TUE"
     case wednesday = "WED"
