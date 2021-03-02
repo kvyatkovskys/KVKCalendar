@@ -278,7 +278,7 @@ final class MonthCell: UICollectionViewCell {
     
     private func populateCell(day: Day, label: UILabel, view: UIView) {
         let date = day.date
-        let weekend = day.type == .saturday || day.type == .sunday
+        let weekend = day.type == .saturday || day.type == .sunday || (date?.isWeekend == true)
         
         let nowDate = Date()
         label.backgroundColor = .clear

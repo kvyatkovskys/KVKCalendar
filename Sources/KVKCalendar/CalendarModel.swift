@@ -8,6 +8,11 @@
 import UIKit
 import EventKit
 
+public struct DateParameter {
+    public var date: Date?
+    public var type: DayType?
+}
+
 public enum TimeHourSystem: Int {
     @available(swift, deprecated: 0.3.6, obsoleted: 0.3.7, renamed: "twelve")
     case twelveHour = 0
@@ -77,6 +82,8 @@ public enum CalendarType: String, CaseIterable {
     case day, week, month, year, list
 }
 
+// MARK: Event model
+
 @available(swift, deprecated: 0.4.1, obsoleted: 0.4.2, renamed: "Event.Color")
 public struct EventColor {
     let value: UIColor
@@ -119,7 +126,7 @@ public struct Event {
     public var recurringType: Event.RecurringType = .none
     
     ///individual event customization
-    ///(in-progress) works only a default height
+    ///(in-progress) works only with a default height
     public var style: EventStyle? = nil
     
     public init(ID: String) {
@@ -271,7 +278,7 @@ public protocol CalendarDataSource: AnyObject {
     
     func willDisplayEventViewer(date: Date, frame: CGRect) -> UIView?
     
-    /// Use this method to add a custom day cell **DEPRECATED**
+    /// **DEPRECATED**
     @available(*, deprecated, renamed: "dequeueCell")
     func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell?
     
@@ -284,7 +291,7 @@ public protocol CalendarDataSource: AnyObject {
     func dequeueListCell(date: Date?, tableView: UITableView, indexPath: IndexPath) -> UITableViewCell?
     
     /// Use this method to add a custom day cell
-    func dequeueCell<T: UIScrollView>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol?
+    func dequeueCell<T: UIScrollView>(dateParameter: DateParameter, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol?
     
     /// Use this method to add a header view
     func dequeueHeader<T: UIScrollView>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarHeaderProtocol?
@@ -313,7 +320,7 @@ public extension CalendarDataSource {
     @available(*, deprecated, renamed: "dequeueCell")
     func dequeueListCell(date: Date?, tableView: UITableView, indexPath: IndexPath) -> UITableViewCell? { return nil }
     
-    func dequeueCell<T: UIScrollView>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol? { return nil }
+    func dequeueCell<T: UIScrollView>(dateParameter: DateParameter, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol? { return nil }
     
     func dequeueHeader<T: UIScrollView>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarHeaderProtocol? { return nil }
 }
@@ -339,7 +346,6 @@ public protocol CalendarDelegate: AnyObject {
     /// tap on more fro month view
     func didSelectMore(_ date: Date, frame: CGRect?)
     
-    /// event's viewer for iPad
     /// **DEPRECATED**
     @available(*, deprecated, renamed: "didChangeViewerFrame")
     func eventViewerFrame(_ frame: CGRect)
@@ -381,6 +387,7 @@ public extension CalendarDelegate {
     
     func didSelectMore(_ date: Date, frame: CGRect?) {}
     
+    @available(*, deprecated, renamed: "didChangeViewerFrame")
     func eventViewerFrame(_ frame: CGRect) {}
     
     func didChangeEvent(_ event: Event, start: Date?, end: Date?) {}
