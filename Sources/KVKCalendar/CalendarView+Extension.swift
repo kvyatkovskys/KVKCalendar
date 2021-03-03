@@ -119,8 +119,10 @@ extension CalendarView {
         
         switch (status) {
         case .notDetermined:
-            requestAccessToSystemCalendar { [weak self] (_) in
-                self?.reloadData()
+            requestAccessToSystemCalendar { (_) in
+                DispatchQueue.main.async { [weak self] in
+                    self?.reloadData()
+                }
             }
         default:
             break
