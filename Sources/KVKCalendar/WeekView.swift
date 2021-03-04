@@ -53,7 +53,7 @@ final class WeekView: UIView {
         var viewFrame = frame
         viewFrame.origin = .zero
         
-        let view = TimelineView(type: .week, timeHourSystem: data.timeSystem, style: style, frame: viewFrame)
+        let view = TimelineView(type: .week, style: style, frame: viewFrame)
         view.delegate = self
         view.dataSource = self
         view.deselectEvent = { [weak self] (event) in

@@ -39,8 +39,7 @@ final class YearHeaderView: UICollectionReusableView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        titleLabel.frame = CGRect(x: 20, y: 0, width: frame.width - 10, height: frame.height)
-        addSubview(titleLabel)
+        setUI()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -49,6 +48,11 @@ final class YearHeaderView: UICollectionReusableView {
 }
 
 extension YearHeaderView: CalendarSettingProtocol {
+    func setUI() {
+        titleLabel.frame = CGRect(x: 20, y: 0, width: frame.width - 10, height: frame.height)
+        addSubview(titleLabel)
+    }
+    
     func reloadFrame(_ frame: CGRect) {
         self.frame.size.width = frame.width
         titleLabel.frame.size.width = frame.width

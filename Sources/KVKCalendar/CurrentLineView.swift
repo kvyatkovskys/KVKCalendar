@@ -9,7 +9,7 @@ import UIKit
 
 final class CurrentLineView: UIView {
     
-    private let style: Style
+    private var style: Style
     private let timeHourSystem: TimeHourSystem
 
     private lazy var timeLabel: TimelineLabel = {
@@ -55,11 +55,7 @@ final class CurrentLineView: UIView {
         self.timeHourSystem = timeHourSystem
         super.init(frame: frame)
         
-        timeLabel.frame = CGRect(x: 2, y: 0, width: style.timeline.currentLineHourWidth - 5, height: frame.height)
-        dotView.frame = CGRect(origin: CGPoint(x: style.timeline.currentLineHourWidth - (style.timeline.currentLineHourDotSize.width * 0.5), y: (frame.height * 0.5) - 2), size: style.timeline.currentLineHourDotSize)
-        lineView.frame = CGRect(x: style.timeline.currentLineHourWidth, y: frame.height * 0.5, width: frame.width - style.timeline.currentLineHourWidth, height: style.timeline.currentLineHourHeight)
-        [timeLabel, lineView, dotView].forEach({ addSubview($0) })
-        dotView.setRoundCorners(radius: style.timeline.currentLineHourDotCornersRadius)
+        
     }
     
     required init?(coder: NSCoder) {
@@ -68,8 +64,19 @@ final class CurrentLineView: UIView {
 }
 
 extension CurrentLineView: CalendarSettingProtocol {
-    func updateStyle(_ style: Style) {
+    func setUI() {
+        subviews.forEach({ $0.removeFromSuperview() })
         
+        timeLabel.frame = CGRect(x: 2, y: 0, width: style.timeline.currentLineHourWidth - 5, height: frame.height)
+        dotView.frame = CGRect(origin: CGPoint(x: style.timeline.currentLineHourWidth - (style.timeline.currentLineHourDotSize.width * 0.5), y: (frame.height * 0.5) - 2), size: style.timeline.currentLineHourDotSize)
+        lineView.frame = CGRect(x: style.timeline.currentLineHourWidth, y: frame.height * 0.5, width: frame.width - style.timeline.currentLineHourWidth, height: style.timeline.currentLineHourHeight)
+        [timeLabel, lineView, dotView].forEach({ addSubview($0) })
+        dotView.setRoundCorners(radius: style.timeline.currentLineHourDotCornersRadius)
+    }
+    
+    func updateStyle(_ style: Style) {
+        self.style = style
+        setUI()
     }
     
     func reloadFrame(_ frame: CGRect) {

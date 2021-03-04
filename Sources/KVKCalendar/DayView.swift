@@ -58,7 +58,7 @@ final class DayView: UIView {
         var viewFrame = frame
         viewFrame.origin = .zero
         
-        let view = TimelineView(type: .day, timeHourSystem: parameters.data.timeSystem, style: parameters.style, frame: viewFrame)
+        let view = TimelineView(type: .day, style: parameters.style, frame: viewFrame)
         view.delegate = self
         view.dataSource = self
         view.deselectEvent = { [weak self] (event) in

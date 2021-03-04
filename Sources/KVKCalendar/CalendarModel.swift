@@ -252,8 +252,6 @@ protocol CalendarSettingProtocol: AnyObject {
 }
 
 extension CalendarSettingProtocol {
-    func setUI() {}
-    func updateStyle(_ style: Style) {}
     func reloadData(_ events: [Event]) {}
     func setDate(_ date: Date) {}
 }
