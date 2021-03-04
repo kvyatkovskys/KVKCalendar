@@ -14,11 +14,22 @@ final class TimelineView: UIView, EventDateProtocol {
     
     var deselectEvent: ((Event) -> Void)?
     
-    var style: Style
+    var style: Style {
+        didSet {
+            timeSystem = style.timeSystem
+            availabilityHours = timeSystem.hours
+        }
+    }
     var eventPreview: UIView?
     var eventResizePreview: ResizeEventView?
     var eventPreviewSize = CGSize(width: 150, height: 150)
     var isResizeEnableMode = false
+    
+    let timeLabelFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        return formatter
+    }()
     
     private(set) var tagCurrentHourLine = -10
     private(set) var tagEventPagePreview = -20
@@ -29,8 +40,8 @@ final class TimelineView: UIView, EventDateProtocol {
     private(set) var tagAllDayEvent = -70
     private(set) var tagStubEvent = -80
     private(set) var timeLabels = [TimelineLabel]()
-    private(set) var hours: [String]
-    private let timeHourSystem: TimeHourSystem
+    private(set) var availabilityHours: [String]
+    private var timeSystem: TimeHourSystem
     private var timer: Timer?
     private(set) var events = [Event]()
     private(set) var dates = [Date?]()
@@ -57,7 +68,7 @@ final class TimelineView: UIView, EventDateProtocol {
     private(set) lazy var currentLineView: CurrentLineView = {
         let view = CurrentLineView(style: style,
                                    frame: CGRect(x: 0, y: 0, width: scrollView.frame.width, height: 15),
-                                   timeHourSystem: timeHourSystem)
+                                   timeHourSystem: timeSystem)
         view.tag = tagCurrentHourLine
         return view
     }()
@@ -69,10 +80,10 @@ final class TimelineView: UIView, EventDateProtocol {
         return scroll
     }()
     
-    init(type: CalendarType, timeHourSystem: TimeHourSystem, style: Style, frame: CGRect) {
+    init(type: CalendarType, style: Style, frame: CGRect) {
         self.type = type
-        self.timeHourSystem = timeHourSystem
-        self.hours = timeHourSystem.hours
+        self.timeSystem = style.timeSystem
+        self.availabilityHours = timeSystem.hours
         self.style = style
         super.init(frame: frame)
         
@@ -80,13 +91,7 @@ final class TimelineView: UIView, EventDateProtocol {
         scrollFrame.origin.y = 0
         scrollView.frame = scrollFrame
         addSubview(scrollView)
-        
-        if style.timeline.isEnabledCreateNewEvent {
-            // long tap to create a new event preview
-            let longTap = UILongPressGestureRecognizer(target: self, action: #selector(addNewEvent))
-            longTap.minimumPressDuration = style.timeline.minimumPressDuration
-            addGestureRecognizer(longTap)
-        }
+        setUI()
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(forceDeselectEvent))
         addGestureRecognizer(tap)
@@ -169,7 +174,7 @@ final class TimelineView: UIView, EventDateProtocol {
             self.currentLineView.valueHash = nextDate.minute.hashValue
             
             let formatter = DateFormatter()
-            formatter.dateFormat = self.timeHourSystem.format
+            formatter.dateFormat = self.timeSystem.format
             self.currentLineView.time = formatter.string(from: nextDate)
             self.currentLineView.date = nextDate
             

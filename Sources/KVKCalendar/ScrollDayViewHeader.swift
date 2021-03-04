@@ -59,44 +59,7 @@ final class ScrollDayHeaderView: UIView {
         self.calendar = style.calendar
         super.init(frame: frame)
         
-        var newFrame = frame
-        
-        switch UIDevice.current.userInterfaceIdiom {
-        case .phone:
-            newFrame.origin.y = 0
-            
-            if !style.headerScroll.isHiddenSubview {
-                if let subviewHeader = dataSource?.willDisplayHeaderSubview(date: date, frame: subviewFrameForDevice, type: type) {
-                    subviewCustomHeader = subviewHeader
-                    addSubview(subviewHeader)
-                } else {
-                    titleLabel.frame = subviewFrameForDevice
-                    setDateToTitle(date)
-                    addSubview(titleLabel)
-                }
-                
-                newFrame.size.height = frame.height - subviewFrameForDevice.height
-            }
-        default:
-            if !style.headerScroll.isHiddenSubview {
-                if let subviewHeader = dataSource?.willDisplayHeaderSubview(date: date, frame: subviewFrameForDevice, type: type) {
-                    subviewCustomHeader = subviewHeader
-                    addSubview(subviewHeader)
-                } else {
-                    titleLabel.frame = subviewFrameForDevice
-                    setDateToTitle(date)
-                    addSubview(titleLabel)
-                }
-                
-                newFrame.origin.y = subviewFrameForDevice.height + 5
-                newFrame.size.height = frame.height - newFrame.origin.y
-            } else {
-                newFrame.origin.y = 0
-            }
-        }
-        
-        collectionView = createCollectionView(frame: newFrame, isScrollEnabled: style.headerScroll.isScrollEnabled)
-        addSubview(collectionView)
+        setUI()
     }
     
     func scrollHeaderByTransform(_ transform: CGAffineTransform) {
@@ -226,6 +189,48 @@ final class ScrollDayHeaderView: UIView {
 }
 
 extension ScrollDayHeaderView: CalendarSettingProtocol {
+    func setUI() {
+        subviews.forEach({ $0.removeFromSuperview() })
+        var newFrame = frame
+        
+        switch UIDevice.current.userInterfaceIdiom {
+        case .phone:
+            newFrame.origin.y = 0
+            
+            if !style.headerScroll.isHiddenSubview {
+                if let subviewHeader = dataSource?.willDisplayHeaderSubview(date: date, frame: subviewFrameForDevice, type: type) {
+                    subviewCustomHeader = subviewHeader
+                    addSubview(subviewHeader)
+                } else {
+                    titleLabel.frame = subviewFrameForDevice
+                    setDateToTitle(date)
+                    addSubview(titleLabel)
+                }
+                
+                newFrame.size.height = frame.height - subviewFrameForDevice.height
+            }
+        default:
+            if !style.headerScroll.isHiddenSubview {
+                if let subviewHeader = dataSource?.willDisplayHeaderSubview(date: date, frame: subviewFrameForDevice, type: type) {
+                    subviewCustomHeader = subviewHeader
+                    addSubview(subviewHeader)
+                } else {
+                    titleLabel.frame = subviewFrameForDevice
+                    setDateToTitle(date)
+                    addSubview(titleLabel)
+                }
+                
+                newFrame.origin.y = subviewFrameForDevice.height + 5
+                newFrame.size.height = frame.height - newFrame.origin.y
+            } else {
+                newFrame.origin.y = 0
+            }
+        }
+        
+        collectionView = createCollectionView(frame: newFrame, isScrollEnabled: style.headerScroll.isScrollEnabled)
+        addSubview(collectionView)
+    }
+    
     func reloadFrame(_ frame: CGRect) {
         self.frame.size.width = frame.width - self.frame.origin.x
         var newFrame = self.frame
@@ -287,6 +292,7 @@ extension ScrollDayHeaderView: CalendarSettingProtocol {
     
     func updateStyle(_ style: Style) {
         self.style = style
+        setUI()
     }
     
     private func getScrollDate(_ date: Date) -> Date? {

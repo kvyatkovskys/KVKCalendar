@@ -25,6 +25,11 @@ final class ViewController: UIViewController {
         return button
     }()
     
+    private lazy var changeTimeSystem: UIBarButtonItem = {
+        let button = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(changeTime))
+        return button
+    }()
+    
     private var style: Style = {
         var style = Style()
         if UIDevice.current.userInterfaceIdiom == .phone {
@@ -45,6 +50,7 @@ final class ViewController: UIViewController {
         style.timeline.offsetTimeY = 25
         style.startWeekDay = .sunday
         style.timeSystem = TimeHourSystem.current ?? .twelve
+        style.systemCalendars = ["Calendar"]
         if #available(iOS 13.0, *) {
             style.event.iconFile = UIImage(systemName: "paperclip")
         }
@@ -82,7 +88,7 @@ final class ViewController: UIViewController {
         }
         view.addSubview(calendarView)
         navigationItem.titleView = segmentedControl
-        navigationItem.rightBarButtonItem = todayButton
+        navigationItem.rightBarButtonItems = [todayButton, changeTimeSystem]
                 
         loadEvents { (events) in
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
@@ -97,6 +103,12 @@ final class ViewController: UIViewController {
         var frame = view.frame
         frame.origin.y = 0
         calendarView.reloadFrame(frame)
+    }
+    
+    @objc private func changeTime() {
+        style.timeSystem = style.timeSystem == .twentyFour ? .twelve : .twentyFour
+        calendarView.updateStyle(style)
+        calendarView.reloadData()
     }
     
     @objc private func today() {

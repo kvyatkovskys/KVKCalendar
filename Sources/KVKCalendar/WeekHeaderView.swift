@@ -30,7 +30,7 @@ final class WeekHeaderView: UIView {
         self.style = style
         self.isFromYear = fromYear
         super.init(frame: frame)
-        addViews(frame: frame, isFromYear: fromYear)
+        setUI()
     }
     
     required init?(coder: NSCoder) {
@@ -106,6 +106,12 @@ final class WeekHeaderView: UIView {
 }
 
 extension WeekHeaderView: CalendarSettingProtocol {
+    func setUI() {
+        subviews.forEach({ $0.removeFromSuperview() })
+        
+        addViews(frame: frame, isFromYear: isFromYear)
+    }
+    
     func reloadFrame(_ frame: CGRect) {
         self.frame.size.width = frame.width
         
@@ -118,5 +124,6 @@ extension WeekHeaderView: CalendarSettingProtocol {
     
     func updateStyle(_ style: Style) {
         self.style = style
+        setUI()
     }
 }

@@ -256,7 +256,7 @@ extension TimelineView {
     
     func createTimesLabel(start: Int) -> [TimelineLabel] {
         var times = [TimelineLabel]()
-        for (idx, hour) in hours.enumerated() where idx >= start {
+        for (idx, hour) in availabilityHours.enumerated() where idx >= start {
             let yTime = (style.timeline.offsetTimeY + style.timeline.heightTime) * CGFloat(idx - start)
             
             let time = TimelineLabel(frame: CGRect(x: style.timeline.offsetTimeX,
@@ -267,10 +267,8 @@ extension TimelineView {
             time.textAlignment = .center
             time.textColor = style.timeline.timeColor
             time.text = hour
-            let formatter = DateFormatter()
-            formatter.dateFormat = "HH:mm"
             let hourTmp = TimeHourSystem.twentyFour.hours[idx]
-            time.valueHash = formatter.date(from: hourTmp)?.hour.hashValue
+            time.valueHash = timeLabelFormatter.date(from: hourTmp)?.hour.hashValue
             time.tag = idx - start
             times.append(time)
         }
@@ -685,6 +683,17 @@ extension TimelineView: EventDelegate {
 }
 
 extension TimelineView: CalendarSettingProtocol {
+    func setUI() {
+        gestureRecognizers?.forEach({ $0.removeTarget(self, action: #selector(addNewEvent)) })
+        
+        if style.timeline.isEnabledCreateNewEvent {
+            // long tap to create a new event preview
+            let longTap = UILongPressGestureRecognizer(target: self, action: #selector(addNewEvent))
+            longTap.minimumPressDuration = style.timeline.minimumPressDuration
+            addGestureRecognizer(longTap)
+        }
+    }
+    
     func reloadFrame(_ frame: CGRect) {
         self.frame.size = frame.size
         scrollView.frame.size = frame.size
@@ -693,6 +702,8 @@ extension TimelineView: CalendarSettingProtocol {
     
     func updateStyle(_ style: Style) {
         self.style = style
+        setUI()
+        reloadData()
     }
 }
 

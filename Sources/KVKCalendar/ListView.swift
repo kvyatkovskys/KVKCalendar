@@ -10,13 +10,13 @@ import UIKit
 final class ListView: UIView, CalendarSettingProtocol {
     
     struct Parameters {
-        let style: Style
+        var style: Style
         let data: ListViewData
         weak var dataSource: DisplayDataSource?
         weak var delegate: DisplayDelegate?
     }
     
-    private let params: Parameters
+    private var params: Parameters
     
     private lazy var tableView: UITableView = {
         let table = UITableView()
@@ -40,7 +40,14 @@ final class ListView: UIView, CalendarSettingProtocol {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func updateStyle(_ style: Style) {
+        params.style = style
+        setUI()
+    }
+    
     func setUI() {
+        subviews.forEach({ $0.removeFromSuperview() })
+        
         backgroundColor = style.backgroundColor
         tableView.backgroundColor = style.backgroundColor
         tableView.frame = CGRect(origin: .zero, size: frame.size)

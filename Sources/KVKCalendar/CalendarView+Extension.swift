@@ -243,11 +243,15 @@ extension CalendarView: CalendarSettingProtocol {
     }
     
     // MARK: in progress
-    func updateStyle(_ style: Style) {
+    public func updateStyle(_ style: Style) {
         self.style = style
         
         if let currentView = currentViewCache as? CalendarSettingProtocol {
             currentView.updateStyle(style)
         }
+    }
+    
+    func setUI() {
+        
     }
 }
