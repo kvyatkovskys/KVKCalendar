@@ -325,7 +325,6 @@ extension DayView: CalendarSettingProtocol {
         scrollHeaderDay.updateStyle(style)
         timelinePages.timelineView?.updateStyle(style)
         setUI()
-        setDate(parameters.data.date)
     }
     
     func setUI() {
