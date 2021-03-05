@@ -62,6 +62,18 @@ final class TimelinePageView: UIView {
         mainPageView.delegate = self
     }
     
+    func updateStyle(_ style: Style) {
+        pages.forEach({ $0.value.updateStyle(style) })
+    }
+    
+    func reloadPages() {
+        pages.forEach({ $0.value.reloadData() })
+    }
+    
+    func removeAll() {
+        pages.removeAll()
+    }
+    
     func reloadCacheControllers() {
         pages = pages.reduce([:], { (acc, item) -> [Int: TimelineView] in
             var accTemp = acc

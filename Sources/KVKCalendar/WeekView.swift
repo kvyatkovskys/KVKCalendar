@@ -214,9 +214,10 @@ extension WeekView: CalendarSettingProtocol {
     func updateStyle(_ style: Style) {
         self.style = style
         scrollHeaderDay.updateStyle(style)
-        timelinePages.timelineView?.updateStyle(style)
+        timelinePages.updateStyle(style)
+        timelinePages.reloadPages()
         setUI()
-        setDate(data.date)
+        reloadFrame(frame)
     }
     
     func setUI() {
