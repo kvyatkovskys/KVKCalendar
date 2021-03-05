@@ -135,7 +135,7 @@ extension YearView: CalendarSettingProtocol {
     func updateStyle(_ style: Style) {
         self.data.style = style
         setUI()
-        setDate(data.date)
+        scrollToDate(date: data.date, animated: false)
     }
     
     func setUI() {

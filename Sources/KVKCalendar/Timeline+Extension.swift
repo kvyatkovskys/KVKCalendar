@@ -703,7 +703,6 @@ extension TimelineView: CalendarSettingProtocol {
     func updateStyle(_ style: Style) {
         self.style = style
         setUI()
-        reloadData()
     }
 }
 

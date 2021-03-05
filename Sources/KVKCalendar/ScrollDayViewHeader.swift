@@ -293,6 +293,7 @@ extension ScrollDayHeaderView: CalendarSettingProtocol {
     func updateStyle(_ style: Style) {
         self.style = style
         setUI()
+        scrollToDate(date, isAnimate: false)
     }
     
     private func getScrollDate(_ date: Date) -> Date? {

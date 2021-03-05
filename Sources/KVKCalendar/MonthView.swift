@@ -184,7 +184,7 @@ extension MonthView: CalendarSettingProtocol {
         self.style = style
         headerView.updateStyle(style)
         setUI()
-        setDate(monthData.date)
+        scrollToDate(monthData.date, animated: false)
     }
     
     func setUI() {
