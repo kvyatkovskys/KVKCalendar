@@ -244,7 +244,11 @@ public struct MonthStyle {
     public var isAnimateSelection: Bool = true
     public var isPagingEnabled: Bool = true
     public var isScrollEnabled: Bool = true
+    
+    @available(swift, deprecated: 0.4.7, obsoleted: 0.4.8, renamed: "autoSelectionDateWhenScrolling")
     public var isAutoSelectDateScrolling: Bool = false
+    public var autoSelectionDateWhenScrolling: Bool = false
+    
     public var eventCorners: UIRectCorner = .allCorners
     public var eventCornersRadius: CGSize = CGSize(width: 5, height: 5)
     public var isHiddenDotInTitle: Bool = false
