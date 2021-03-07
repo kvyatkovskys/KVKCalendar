@@ -22,11 +22,11 @@ final class WeekView: UIView {
         } else {
             heightView = style.headerScroll.heightHeaderWeek + style.headerScroll.heightSubviewHeader
         }
-        let view = ScrollDayHeaderView(frame: CGRect(x: 0, y: 0, width: frame.width, height: heightView),
-                                       days: data.days,
-                                       date: data.date,
-                                       type: .week,
-                                       style: style)
+        let view = ScrollDayHeaderView(parameters: .init(frame: CGRect(x: 0, y: 0, width: frame.width, height: heightView),
+                                                         days: data.days,
+                                                         date: data.date,
+                                                         type: .week,
+                                                         style: style))
         view.didSelectDate = { [weak self] (date, type) in
             self?.didSelectDateScrollHeader(date, type: type)
         }
