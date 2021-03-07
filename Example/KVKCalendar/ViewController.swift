@@ -25,8 +25,9 @@ final class ViewController: UIViewController {
         return button
     }()
     
-    private lazy var changeTimeSystem: UIBarButtonItem = {
-        let button = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(changeTime))
+    private lazy var reloadStyle: UIBarButtonItem = {
+        let button = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(reloadCalendarStyle))
+        button.tintColor = .systemRed
         return button
     }()
     
@@ -88,7 +89,7 @@ final class ViewController: UIViewController {
         }
         view.addSubview(calendarView)
         navigationItem.titleView = segmentedControl
-        navigationItem.rightBarButtonItems = [todayButton, changeTimeSystem]
+        navigationItem.rightBarButtonItems = [todayButton, reloadStyle]
                 
         loadEvents { (events) in
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
@@ -105,7 +106,7 @@ final class ViewController: UIViewController {
         calendarView.reloadFrame(frame)
     }
     
-    @objc private func changeTime() {
+    @objc private func reloadCalendarStyle() {
         style.timeSystem = style.timeSystem == .twentyFour ? .twelve : .twentyFour
         calendarView.updateStyle(style)
         calendarView.reloadData()
