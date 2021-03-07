@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name             = 'KVKCalendar'
-  s.version          = '0.4.7'
-  s.summary          = 'A most fully customization calendar library for iOS.'
+  s.version          = '0.4.8'
+  s.summary          = 'A most fully customization calendar and timeline library for iOS.'
   
   s.description      = <<-DESC
   KVKCalendar is a most fully customization calendar and timeline library.
