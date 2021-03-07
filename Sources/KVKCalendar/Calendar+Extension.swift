@@ -130,10 +130,21 @@ extension UIView {
     }
     
     func setRoundCorners(_ corners: UIRectCorner = .allCorners, radius: CGSize) {
-        let path = UIBezierPath(roundedRect: bounds, byRoundingCorners: corners, cornerRadii: radius)
-        let mask = CAShapeLayer()
-        mask.path = path.cgPath
-        layer.mask = mask
+        if #available(iOS 11.0, *) {
+            setRoundCorners(corners.convertedCorners, radius: max(radius.width, radius.height))
+        } else {
+            let path = UIBezierPath(roundedRect: bounds, byRoundingCorners: corners, cornerRadii: radius)
+            let mask = CAShapeLayer()
+            mask.path = path.cgPath
+            layer.mask = mask
+        }
+    }
+    
+    @available(iOS 11.0, *)
+    func setRoundCorners(_ corners: CACornerMask = [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMaxYCorner], radius: CGFloat) {
+        layer.masksToBounds = true
+        layer.cornerRadius = radius
+        layer.maskedCorners = corners
     }
     
     func snapshot(size: CGSize) -> UIImage {
@@ -158,6 +169,25 @@ extension UIView {
             UIView.animate(withDuration: 0.2, animations: action)
         } else {
             action()
+        }
+    }
+}
+
+extension UIRectCorner {
+    var convertedCorners: CACornerMask {
+        switch self {
+        case .allCorners:
+            return [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+        case .bottomLeft:
+            return .layerMinXMaxYCorner
+        case .bottomRight:
+            return .layerMaxXMaxYCorner
+        case .topLeft:
+            return .layerMinXMinYCorner
+        case .topRight:
+            return .layerMaxXMinYCorner
+        default:
+            return []
         }
     }
 }
