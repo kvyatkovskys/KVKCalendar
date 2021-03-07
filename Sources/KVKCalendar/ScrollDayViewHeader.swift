@@ -13,16 +13,47 @@ final class ScrollDayHeaderView: UIView {
     var didSelectDate: ((Date?, CalendarType) -> Void)?
     var didChangeDay: ((TimelinePageView.SwitchPageType) -> Void)?
     
-    private let days: [Day]
-    var date: Date
-    private var style: Style
+    struct Parameters {
+        let frame: CGRect
+        let days: [Day]
+        var date: Date
+        let type: CalendarType
+        var style: Style
+    }
+    
+    private var params: Parameters
     private var collectionView: UICollectionView!
     private var isAnimate: Bool = false
-    private let type: CalendarType
-    private let calendar: Calendar
     private var lastContentOffset: CGFloat = 0
     private var trackingTranslation: CGFloat?
     private var subviewCustomHeader: UIView?
+    
+    private var style: Style {
+        get {
+            return params.style
+        }
+        set {
+            params.style = newValue
+        }
+    }
+    private var days: [Day] {
+        return params.days
+    }
+    private var calendar: Calendar {
+        return params.style.calendar
+    }
+    private var type: CalendarType {
+        return params.type
+    }
+    
+    var date: Date {
+        get {
+            return params.date
+        }
+        set {
+            params.date = newValue
+        }
+    }
     
     weak var dataSource: DisplayDataSource?
     
@@ -51,14 +82,9 @@ final class ScrollDayHeaderView: UIView {
         }
     }
     
-    init(frame: CGRect, days: [Day], date: Date, type: CalendarType, style: Style) {
-        self.days = days
-        self.date = date
-        self.type = type
-        self.style = style
-        self.calendar = style.calendar
-        super.init(frame: frame)
-        
+    init(parameters: Parameters) {
+        self.params = parameters
+        super.init(frame: parameters.frame)
         setUI()
     }
     

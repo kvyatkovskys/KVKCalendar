@@ -71,6 +71,11 @@ class ViewController: UIViewController {
             self.calendarView.reloadData()
         }
     }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        calendarView.reloadFrame(view.frame)
+    }
 }
 
 extension ViewController {
@@ -138,7 +143,7 @@ To use a custom date cell, just subscribe on this optional method from `Calendar
 func dequeueCell<T>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol? where T: UIScrollView { 
     switch type {
     case .year:
-        let cell = (view as? UICollectionView)?.dequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
+        let cell = (view as? UICollectionView)?.dequeueCell(indexPath: indexPath) { (cell: CustomYearCell) in
             // configure the cell
         }
         return cell
@@ -148,7 +153,7 @@ func dequeueCell<T>(date: Date?, type: CalendarType, view: T, indexPath: IndexPa
         }
         return cell
     case .list:    
-        let cell = (view as? UITableView)?.dequeueCell { (cell) in
+        let cell = (view as? UITableView)?.dequeueCell { (cell: CustomLstCell) in
             // configure the cell
         }
         return cell

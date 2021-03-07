@@ -27,11 +27,11 @@ final class DayView: UIView {
         } else {
             heightView = parameters.style.headerScroll.heightHeaderWeek + parameters.style.headerScroll.heightSubviewHeader
         }
-        let view = ScrollDayHeaderView(frame: CGRect(x: 0, y: 0, width: frame.width, height: heightView),
-                                       days: parameters.data.days,
-                                       date: parameters.data.date,
-                                       type: .day,
-                                       style: parameters.style)
+        let view = ScrollDayHeaderView(parameters: .init(frame: CGRect(x: 0, y: 0, width: frame.width, height: heightView),
+                                                         days: parameters.data.days,
+                                                         date: parameters.data.date,
+                                                         type: .day,
+                                                         style: parameters.style))
         view.didSelectDate = { [weak self] (date, type) in
             self?.didSelectDateScrollHeader(date, type: type)
         }
@@ -327,6 +327,7 @@ extension DayView: CalendarSettingProtocol {
         timelinePages.reloadPages()
         setUI()
         reloadFrame(frame)
+        reloadEventViewer()
     }
     
     func setUI() {
