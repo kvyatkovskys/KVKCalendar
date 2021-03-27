@@ -110,6 +110,11 @@ final class YearView: UIView {
 }
 
 extension YearView: CalendarSettingProtocol {
+    
+    var currentStyle: Style {
+        data.style
+    }
+    
     func reloadFrame(_ frame: CGRect) {
         self.frame = frame
         

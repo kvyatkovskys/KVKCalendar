@@ -244,16 +244,22 @@ public protocol EventProtocol {
 // MARK: - Settings protocol
 
 protocol CalendarSettingProtocol: AnyObject {
+    
+    var currentStyle: Style { get }
+    
     func reloadFrame(_ frame: CGRect)
     func updateStyle(_ style: Style)
     func reloadData(_ events: [Event])
     func setDate(_ date: Date)
     func setUI()
+    
 }
 
 extension CalendarSettingProtocol {
+    
     func reloadData(_ events: [Event]) {}
     func setDate(_ date: Date) {}
+    
 }
 
 // MARK: - Data source protocol

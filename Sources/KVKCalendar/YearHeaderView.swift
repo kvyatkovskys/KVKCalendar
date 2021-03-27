@@ -48,6 +48,11 @@ final class YearHeaderView: UICollectionReusableView {
 }
 
 extension YearHeaderView: CalendarSettingProtocol {
+    
+    var currentStyle: Style {
+        style
+    }
+    
     func setUI() {
         titleLabel.frame = CGRect(x: 20, y: 0, width: frame.width - 10, height: frame.height)
         addSubview(titleLabel)

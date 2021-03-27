@@ -215,6 +215,11 @@ final class ScrollDayHeaderView: UIView {
 }
 
 extension ScrollDayHeaderView: CalendarSettingProtocol {
+    
+    var currentStyle: Style {
+        style
+    }
+    
     func setUI() {
         subviews.forEach({ $0.removeFromSuperview() })
         var newFrame = frame

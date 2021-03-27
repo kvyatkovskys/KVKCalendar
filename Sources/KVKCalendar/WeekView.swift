@@ -192,6 +192,11 @@ extension WeekView {
 }
 
 extension WeekView: CalendarSettingProtocol {
+    
+    var currentStyle: Style {
+        style
+    }
+    
     func reloadFrame(_ frame: CGRect) {
         self.frame = frame
         var timelineFrame = timelinePages.frame

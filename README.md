@@ -172,7 +172,8 @@ import SwiftUI
 import KVKCalendar
 
 struct CalendarDisplayView: UIViewRepresentable {
-    
+    @Binding var events: [Event]
+
     private var calendar: CalendarView = {
         return CalendarView(frame: frame, style: style)
     }()
@@ -185,16 +186,26 @@ struct CalendarDisplayView: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: CalendarView, context: UIViewRepresentableContext<CalendarDisplayView>) {
-        
+        context.coordinator.events = events
     }
     
     func makeCoordinator() -> CalendarDisplayView.Coordinator {
         Coordinator(self)
     }
     
+    public init(events: Binding<[Event]>) {
+        self._events = events
+    }
+    
     // MARK: Calendar DataSource and Delegate
     class Coordinator: NSObject, CalendarDataSource, CalendarDelegate {
         private let view: CalendarDisplayView
+        
+        var events: [Event] = [] {
+            didSet {
+                view.calendar.reloadData()
+            }
+        }
         
         init(_ view: CalendarDisplayView) {
             self.view = view
@@ -206,12 +217,6 @@ struct CalendarDisplayView: UIViewRepresentable {
         }
     }
 }
-
-struct CalendarDisplayView_Previews: PreviewProvider {
-    static var previews: some View {
-        CalendarDisplayView()
-    }
-}
 ```
 
 Create a new `SwiftUI` file and add `CalendarDisplayView` to `body`.
@@ -219,17 +224,13 @@ Create a new `SwiftUI` file and add `CalendarDisplayView` to `body`.
 ```swift
 import SwiftUI
 
-struct CalendarContentView: View {    
+struct CalendarContentView: View {
+    @State var events: [Event] = []
+
     var body: some View {
         NavigationView {
-            CalendarDisplayView()
+            CalendarDisplayView(events: $events)
         }
-    }
-}
-
-struct CalendarContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        CalendarContentView()
     }
 }
 ```

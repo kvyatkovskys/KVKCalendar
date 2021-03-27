@@ -138,7 +138,7 @@ public struct TimelineStyle {
     public var isEnabledCreateNewEvent: Bool = true
     public var maxLimitChachedPages: UInt = 10
     
-    public enum CurrentLineHourShowMode {
+    public enum CurrentLineHourShowMode: Equatable {
         case always, today, forDate(Date)
         
         func showForDates(_ dates: [Date?]) -> Bool {
@@ -155,7 +155,7 @@ public struct TimelineStyle {
 
     }
     
-    public enum CurrentLineHourScrollMode {
+    public enum CurrentLineHourScrollMode: Equatable {
         case always, today, forDate(Date)
         
         func scrollForDates(_ dates: [Date?]) -> Bool {
@@ -468,4 +468,100 @@ extension Style {
         }
         return newStyle
     }
+}
+
+extension Style: Equatable {
+    
+    public static func == (lhs: Style, rhs: Style) -> Bool {
+        func compare<E: Equatable>(_ kp: KeyPath<Style, E>) -> Bool {
+            return lhs[keyPath: kp] == rhs[keyPath: kp]
+        }
+        
+        return compare(\.event)
+            && compare(\.timeline)
+//            && compare(\.allDay)
+//            && compare(\.week)
+//            && compare(\.headerScroll)
+//            && compare(\.month)
+//            && compare(\.year)
+//            && compare(\.list)
+            && compare(\.locale)
+            && compare(\.timezone)
+            && compare(\.defaultType)
+            && compare(\.timeSystem)
+            && compare(\.startWeekDay)
+            && compare(\.followInSystemTheme)
+            && compare(\.systemCalendars)
+    }
+    
+}
+
+extension TimelineStyle: Equatable {
+    
+    public static func == (lhs: TimelineStyle, rhs: TimelineStyle) -> Bool {
+        func compare<E: Equatable>(_ kp: KeyPath<TimelineStyle, E>) -> Bool {
+            return lhs[keyPath: kp] == rhs[keyPath: kp]
+        }
+        
+        return compare(\.minimumPressDuration)
+            && compare(\.startFromFirstEvent)
+            && compare(\.eventFont)
+            && compare(\.offsetEvent)
+            && compare(\.startHour)
+            && compare(\.heightLine)
+            && compare(\.widthLine)
+            && compare(\.offsetLineLeft)
+            && compare(\.offsetLineRight)
+            && compare(\.backgroundColor)
+            && compare(\.widthTime)
+            && compare(\.heightTime)
+            && compare(\.offsetTimeX)
+            && compare(\.offsetTimeY)
+            && compare(\.timeColor)
+            && compare(\.timeFont)
+            && compare(\.widthEventViewer)
+            && compare(\.showLineHourMode)
+            && compare(\.scrollLineHourMode)
+            && compare(\.currentLineHourFont)
+            && compare(\.currentLineHourColor)
+            && compare(\.currentLineHourDotSize)
+            && compare(\.currentLineHourDotCornersRadius)
+            && compare(\.currentLineHourWidth)
+            && compare(\.currentLineHourHeight)
+            && compare(\.separatorLineColor)
+            && compare(\.movingMinutesColor)
+            && compare(\.shadowColumnColor)
+            && compare(\.shadowColumnAlpha)
+            && compare(\.minimumPressDuration)
+            && compare(\.isHiddenStubEvent)
+            && compare(\.isEnabledCreateNewEvent)
+            && compare(\.maxLimitChachedPages)
+    }
+    
+}
+
+extension EventStyle: Equatable {
+    
+    public static func == (lhs: EventStyle, rhs: EventStyle) -> Bool {
+        func compare<E: Equatable>(_ kp: KeyPath<EventStyle, E>) -> Bool {
+            return lhs[keyPath: kp] == rhs[keyPath: kp]
+        }
+        
+        return compare(\.minimumPressDuration)
+            && compare(\.alphaWhileMoving)
+            && compare(\.textForNewEvent)
+            && compare(\.iconFile)
+            && compare(\.colorIconFile)
+            && compare(\.isEnableVisualSelect)
+            && compare(\.colorStubView)
+            && compare(\.heightStubView)
+            && compare(\.alignmentStubView)
+            && compare(\.spacingStubView)
+            && compare(\.eventCorners)
+            && compare(\.eventCornersRadius)
+            && compare(\.delayForStartMove)
+            && compare(\.states)
+            && compare(\.defaultHeight)
+    }
+    
 }
