@@ -158,6 +158,10 @@ extension CalendarView {
             currentViewCache = listView
             reloadData()
         }
+        
+        if let cacheView = currentViewCache as? CalendarSettingProtocol, cacheView.currentStyle != style {
+            cacheView.updateStyle(style)
+        }
     }
 }
 
@@ -234,6 +238,10 @@ extension CalendarView: DisplayDelegate {
 }
 
 extension CalendarView: CalendarSettingProtocol {
+    var currentStyle: Style {
+        return style
+    }
+    
     public func reloadFrame(_ frame: CGRect) {
         self.frame = frame
         
@@ -242,7 +250,6 @@ extension CalendarView: CalendarSettingProtocol {
         }
     }
     
-    // MARK: in progress
     public func updateStyle(_ style: Style) {
         self.style = style
         

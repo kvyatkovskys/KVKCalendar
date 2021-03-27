@@ -152,6 +152,11 @@ final class MonthView: UIView {
 }
 
 extension MonthView: CalendarSettingProtocol {
+    
+    var currentStyle: Style {
+        style
+    }
+    
     func reloadFrame(_ frame: CGRect) {
         self.frame = frame
         

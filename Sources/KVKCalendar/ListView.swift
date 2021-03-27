@@ -16,6 +16,10 @@ final class ListView: UIView, CalendarSettingProtocol {
         weak var delegate: DisplayDelegate?
     }
     
+    var currentStyle: Style {
+        params.style
+    }
+    
     private var params: Parameters
     
     private lazy var tableView: UITableView = {

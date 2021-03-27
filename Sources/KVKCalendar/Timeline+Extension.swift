@@ -683,6 +683,11 @@ extension TimelineView: EventDelegate {
 }
 
 extension TimelineView: CalendarSettingProtocol {
+    
+    var currentStyle: Style {
+        style
+    }
+    
     func setUI() {
         gestureRecognizers?.forEach({ $0.removeTarget(self, action: #selector(addNewEvent)) })
         

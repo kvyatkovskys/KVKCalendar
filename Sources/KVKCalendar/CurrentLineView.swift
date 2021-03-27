@@ -64,6 +64,11 @@ final class CurrentLineView: UIView {
 }
 
 extension CurrentLineView: CalendarSettingProtocol {
+    
+    var currentStyle: Style {
+        style
+    }
+    
     func setUI() {
         subviews.forEach({ $0.removeFromSuperview() })
         

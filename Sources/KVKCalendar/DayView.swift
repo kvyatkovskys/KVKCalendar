@@ -273,6 +273,11 @@ extension DayView: TimelineDelegate {
 }
 
 extension DayView: CalendarSettingProtocol {
+    
+    var currentStyle: Style {
+        parameters.style
+    }
+    
     func reloadFrame(_ frame: CGRect) {
         self.frame = frame
         var timelineFrame = timelinePages.frame
