@@ -479,12 +479,12 @@ extension Style: Equatable {
         
         return compare(\.event)
             && compare(\.timeline)
-//            && compare(\.allDay)
-//            && compare(\.week)
-//            && compare(\.headerScroll)
+            && compare(\.allDay)
+            && compare(\.week)
+            && compare(\.headerScroll)
 //            && compare(\.month)
 //            && compare(\.year)
-//            && compare(\.list)
+            && compare(\.list)
             && compare(\.locale)
             && compare(\.timezone)
             && compare(\.defaultType)
@@ -492,6 +492,112 @@ extension Style: Equatable {
             && compare(\.startWeekDay)
             && compare(\.followInSystemTheme)
             && compare(\.systemCalendars)
+    }
+    
+}
+
+extension ListViewStyle: Equatable {
+    
+    public static func == (lhs: ListViewStyle, rhs: ListViewStyle) -> Bool {
+        func compare<E: Equatable>(_ kp: KeyPath<ListViewStyle, E>) -> Bool {
+            return lhs[keyPath: kp] == rhs[keyPath: kp]
+        }
+        
+        return compare(\.fontBullet)
+            && compare(\.fontTitle)
+            && compare(\.heightHeaderView)
+            && compare(\.backgroundColor)
+    }
+    
+}
+
+extension HeaderScrollStyle: Equatable {
+    
+    public static func == (lhs: HeaderScrollStyle, rhs: HeaderScrollStyle) -> Bool {
+        func compare<E: Equatable>(_ kp: KeyPath<HeaderScrollStyle, E>) -> Bool {
+            return lhs[keyPath: kp] == rhs[keyPath: kp]
+        }
+        
+        return compare(\.titleDays)
+            && compare(\.heightHeaderWeek)
+            && compare(\.heightSubviewHeader)
+            && compare(\.colorBackground)
+            && compare(\.isHidden)
+            && compare(\.isHiddenSubview)
+            && compare(\.titleFormatter)
+            && compare(\.weekdayFormatter)
+            && compare(\.colorTitleDate)
+            && compare(\.colorTitleCornerDate)
+            && compare(\.colorDate)
+            && compare(\.fontDate)
+            && compare(\.colorNameDay)
+            && compare(\.fontNameDay)
+            && compare(\.colorCurrentDate)
+            && compare(\.colorBackgroundCurrentDate)
+            && compare(\.colorBackgroundSelectDate)
+            && compare(\.colorSelectDate)
+            && compare(\.colorCurrentSelectDateForDarkStyle)
+            && compare(\.colorWeekendDate)
+            && compare(\.isScrollEnabled)
+            && compare(\.colorWeekdayBackground)
+            && compare(\.colorWeekendBackground)
+            && compare(\.isHidden)
+            && compare(\.dotCorners)
+            && compare(\.dotCornersRadius)
+            && compare(\.titleDateAlignment)
+            && compare(\.titleDateFont)
+            && compare(\.isAnimateTitleDate)
+            && compare(\.colorNameEmptyDay)
+            && compare(\.showDatesForOtherMonths)
+            && compare(\.isAnimateSelection)
+    }
+    
+}
+
+extension WeekStyle: Equatable {
+    
+    public static func == (lhs: WeekStyle, rhs: WeekStyle) -> Bool {
+        func compare<E: Equatable>(_ kp: KeyPath<WeekStyle, E>) -> Bool {
+            return lhs[keyPath: kp] == rhs[keyPath: kp]
+        }
+        
+        return compare(\.colorBackground)
+            && compare(\.colorDate)
+            && compare(\.colorNameDay)
+            && compare(\.colorCurrentDate)
+            && compare(\.colorBackgroundCurrentDate)
+            && compare(\.colorBackgroundSelectDate)
+            && compare(\.colorSelectDate)
+            && compare(\.colorWeekendDate)
+            && compare(\.colorWeekendBackground)
+            && compare(\.colorWeekdayBackground)
+            && compare(\.selectCalendarType)
+            && compare(\.showVerticalDayDivider)
+    }
+    
+}
+
+extension AllDayStyle: Equatable {
+    
+    public static func == (lhs: AllDayStyle, rhs: AllDayStyle) -> Bool {
+        func compare<E: Equatable>(_ kp: KeyPath<AllDayStyle, E>) -> Bool {
+            return lhs[keyPath: kp] == rhs[keyPath: kp]
+        }
+        
+        return compare(\.backgroundColor)
+            && compare(\.titleText)
+            && compare(\.titleColor)
+            && compare(\.textColor)
+            && compare(\.backgroundColorEvent)
+            && compare(\.font)
+            && compare(\.offsetWidth)
+            && compare(\.offsetHeight)
+            && compare(\.height)
+            && compare(\.fontTitle)
+            && compare(\.isPinned)
+            && compare(\.eventCorners)
+            && compare(\.eventCornersRadius)
+            && compare(\.axis)
     }
     
 }
