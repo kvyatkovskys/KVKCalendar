@@ -158,7 +158,10 @@ final class WeekView: UIView {
                 && $0.date?.month == scrollDate.month
                 && $0.date?.day == scrollDate.day }) else { return [] }
         
-        let endIdx = idx + 7
+        var endIdx = idx + 7
+        if endIdx > data.days.count {
+            endIdx = data.days.count
+        }
         let newVisibleDates = data.days[idx..<endIdx].map({ $0.date })
         return newVisibleDates
     }
