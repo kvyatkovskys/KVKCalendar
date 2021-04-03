@@ -117,9 +117,9 @@ struct CalendarData {
             let maxIdx: Int
             switch startDay {
             case .sunday:
-                maxIdx = 6 - 1
+                maxIdx = 6
             case .monday:
-                maxIdx = 7 - 1
+                maxIdx = 7
             }
             let lastIdx = (lastDay.date?.weekday ?? 1) - 1
             
