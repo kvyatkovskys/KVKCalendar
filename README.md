@@ -12,6 +12,7 @@
 **KVKCalendar** is a most fully customization calendar and timeline library. Library consists of four modules for displaying various types of calendar (*day*, *week*, *month*, *year*). You can choose any module or use all. It is designed based on a standard iOS calendar, but with additional features. Timeline displays the schedule for the day and week.
 
 ## Need Help?
+
 If you have a **question** about how to use KVKCalendar in your application, ask it on StackOverflow using the [KVKCalendar](https://stackoverflow.com/questions/tagged/kvkcalendar) tag.
 
 Please, use [Issues](https://github.com/kvyatkovskys/KVKCalendar/issues) only for reporting **bugs** or requesting a new **features** in the library.
@@ -50,8 +51,9 @@ github "kvyatkovskys/KVKCalendar"
 [Adding Package Dependencies to Your App](https://developer.apple.com/documentation/swift_packages/adding_package_dependencies_to_your_app)
 
 ## Usage for UIKit
+
 Import `KVKCalendar`.
-Create a subclass view `CalendarView` and implement `CalendarDataSource` protocol. Create an array of class `[Event]` and return this array in the function.
+Create a subclass view `CalendarView` and implement `CalendarDataSource` protocol. Create an array of class `[Event]` and return the array.
 
 ```swift
 import KVKCalendar
@@ -153,7 +155,7 @@ func dequeueCell<T>(date: Date?, type: CalendarType, view: T, indexPath: IndexPa
         }
         return cell
     case .list:    
-        let cell = (view as? UITableView)?.dequeueCell { (cell: CustomLstCell) in
+        let cell = (view as? UITableView)?.dequeueCell { (cell: CustomListCell) in
             // configure the cell
         }
         return cell
@@ -164,6 +166,7 @@ func dequeueCell<T>(date: Date?, type: CalendarType, view: T, indexPath: IndexPa
 <img src="Screenshots/custom_day_cell.png" width="300">
 
 ## Usage for SwiftUI
+
 Add a new `SwiftUI` file and import `KVKCalendar`.
 Create a struct `CalendarDisplayView` and declare the protocol `UIViewRepresentable` for connection `UIKit` with `SwiftUI`.
 
@@ -236,6 +239,7 @@ struct CalendarContentView: View {
 ```
 
 ## Styles
+
 To customize calendar create an object `Style` and add to `init` class `CalendarView`.
 
 ```swift
