@@ -275,17 +275,18 @@ public struct YearStyle {
         format.dateFormat = "yyyy"
         return format
     }()
-    
     public var titleFormatter: DateFormatter = {
         let format = DateFormatter()
         format.dateFormat = "yyyy"
         return format
     }()
+    
     public var weekdayFormatter: DateFormatter = {
         let format = DateFormatter()
         format.dateFormat = "EE"
         return format
     }()
+    
     public var colorCurrentDate: UIColor = .white
     public var colorBackgroundCurrentDate: UIColor = .systemRed
     public var colorBackgroundSelectDate: UIColor = .black
@@ -482,8 +483,8 @@ extension Style: Equatable {
             && compare(\.allDay)
             && compare(\.week)
             && compare(\.headerScroll)
-//            && compare(\.month)
-//            && compare(\.year)
+            && compare(\.month)
+            && compare(\.year)
             && compare(\.list)
             && compare(\.locale)
             && compare(\.timezone)
@@ -492,6 +493,104 @@ extension Style: Equatable {
             && compare(\.startWeekDay)
             && compare(\.followInSystemTheme)
             && compare(\.systemCalendars)
+    }
+    
+}
+
+extension YearStyle: Equatable {
+    
+    public static func == (lhs: YearStyle, rhs: YearStyle) -> Bool {
+        func compare<E: Equatable>(_ kp: KeyPath<YearStyle, E>) -> Bool {
+            return lhs[keyPath: kp] == rhs[keyPath: kp]
+        }
+        
+        return compare(\.titleFormatter)
+            && compare(\.weekdayFormatter)
+            && compare(\.colorCurrentDate)
+            && compare(\.colorBackgroundCurrentDate)
+            && compare(\.colorBackgroundSelectDate)
+            && compare(\.colorSelectDate)
+            && compare(\.colorWeekendDate)
+            && compare(\.weekFont)
+            && compare(\.colorBackgroundWeekendDate)
+            && compare(\.scrollDirection)
+            && compare(\.isAnimateSelection)
+            && compare(\.isPagingEnabled)
+            && compare(\.weekDayAlignment)
+            && compare(\.titleDateAlignment)
+            && compare(\.colorBackground)
+            && compare(\.weekFontPad)
+            && compare(\.weekFontPhone)
+            && compare(\.fontTitle)
+            && compare(\.colorTitle)
+            && compare(\.colorBackgroundHeader)
+            && compare(\.fontTitleHeader)
+            && compare(\.colorTitleHeader)
+            && compare(\.heightTitleHeader)
+            && compare(\.alignmentTitleHeader)
+            && compare(\.fontDayTitlePad)
+            && compare(\.fontDayTitlePhone)
+            && compare(\.fontDayTitle)
+            && compare(\.colorDayTitle)
+            && compare(\.selectCalendarType)
+            && compare(\.isAutoSelectDateScrolling)
+            && compare(\.weekDayAlignment)
+            && compare(\.titleDateAlignment)
+    }
+    
+}
+
+extension MonthStyle: Equatable {
+    
+    public static func == (lhs: MonthStyle, rhs: MonthStyle) -> Bool {
+        func compare<E: Equatable>(_ kp: KeyPath<MonthStyle, E>) -> Bool {
+            return lhs[keyPath: kp] == rhs[keyPath: kp]
+        }
+        
+        return compare(\.titleFormatter)
+            && compare(\.weekdayFormatter)
+            && compare(\.shortInDayMonthFormatter)
+            && compare(\.heightHeaderWeek)
+            && compare(\.heightTitleDate)
+            && compare(\.isHiddenTitleDate)
+            && compare(\.colorDate)
+            && compare(\.colorNameEmptyDay)
+            && compare(\.fontNameDate)
+            && compare(\.colorCurrentDate)
+            && compare(\.colorBackgroundCurrentDate)
+            && compare(\.colorBackgroundSelectDate)
+            && compare(\.colorSelectDate)
+            && compare(\.colorWeekendDate)
+            && compare(\.moreTitle)
+            && compare(\.isHiddenMoreTitle)
+            && compare(\.colorMoreTitle)
+            && compare(\.colorEventTitle)
+            && compare(\.weekFont)
+            && compare(\.fontEventTitle)
+            && compare(\.fontEventTime)
+            && compare(\.fontEventBullet)
+            && compare(\.isHiddenSeparator)
+            && compare(\.isHiddenSeparatorOnEmptyDate)
+            && compare(\.widthSeparator)
+            && compare(\.colorSeparator)
+            && compare(\.colorBackgroundWeekendDate)
+            && compare(\.colorBackgroundDate)
+            && compare(\.scrollDirection)
+            && compare(\.isAnimateSelection)
+            && compare(\.isPagingEnabled)
+            && compare(\.isScrollEnabled)
+            && compare(\.autoSelectionDateWhenScrolling)
+            && compare(\.eventCorners)
+            && compare(\.eventCornersRadius)
+            && compare(\.isHiddenDotInTitle)
+            && compare(\.isHiddenTitle)
+            && compare(\.weekDayAlignment)
+            && compare(\.titleDateAlignment)
+            && compare(\.fontTitleDate)
+            && compare(\.colorTitleDate)
+            && compare(\.showDatesForOtherMonths)
+            && compare(\.colorBackground)
+            && compare(\.selectionMode)
     }
     
 }
