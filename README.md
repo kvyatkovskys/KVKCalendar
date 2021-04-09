@@ -108,7 +108,7 @@ extension ViewController {
 extension ViewController: CalendarDataSource {
     func eventsForCalendar(systemEvents: [EKEvent]) -> [Event] {
         // if you want to get events from iOS calendars
-        // set calendars name to style.systemCalendars = ["Test"]
+        // set calendar names to style.systemCalendars = ["Test"]
         let mappedEvents = systemEvents.compactMap({ $0.transform() })
         return events + mappedEvents
     }
