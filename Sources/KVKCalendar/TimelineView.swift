@@ -67,8 +67,7 @@ final class TimelineView: UIView, EventDateProtocol {
     
     private(set) lazy var currentLineView: CurrentLineView = {
         let view = CurrentLineView(style: style,
-                                   frame: CGRect(x: 0, y: 0, width: scrollView.frame.width, height: 15),
-                                   timeHourSystem: timeSystem)
+                                   frame: CGRect(x: 0, y: 0, width: scrollView.frame.width, height: 15))
         view.tag = tagCurrentHourLine
         return view
     }()
@@ -196,12 +195,10 @@ final class TimelineView: UIView, EventDateProtocol {
             return
         }
         
-        var pointY = time.frame.origin.y
+        var pointY = calculatePointYByMinute(date.minute, time: time)
         if !subviews.filter({ $0 is AllDayTitleView }).isEmpty, style.allDay.isPinned {
             pointY -= style.allDay.height
         }
-        
-        pointY = calculatePointYByMinute(date.minute, time: time)
         currentLineView.frame.origin.y = pointY - (currentLineView.frame.height * 0.5)
         scrollView.addSubview(currentLineView)
         movingCurrentLineHour()
