@@ -9,8 +9,12 @@ import UIKit
 
 final class CurrentLineView: UIView {
     
-    private var style: Style
-    private let timeHourSystem: TimeHourSystem
+    private var style: Style {
+        didSet {
+            formatter.dateFormat = style.timeSystem.format
+            formatter.timeZone = style.timezone
+        }
+    }
 
     private lazy var timeLabel: TimelineLabel = {
         let label = TimelineLabel()
@@ -19,13 +23,14 @@ final class CurrentLineView: UIView {
         label.font = style.timeline.currentLineHourFont
         label.adjustsFontSizeToFitWidth = true
         label.minimumScaleFactor = 0.6
-        
-        let formatter = DateFormatter()
-        formatter.dateFormat = timeHourSystem.format
-        formatter.timeZone = style.timezone
         label.text = formatter.string(from: Date())
         label.valueHash = Date().minute.hashValue
         return label
+    }()
+    
+    private let formatter: DateFormatter = {
+        let formatter = DateFormatter()
+        return formatter
     }()
     
     private lazy var lineView: UIView = {
@@ -50,12 +55,11 @@ final class CurrentLineView: UIView {
     
     var date: Date?
     
-    init(style: Style, frame: CGRect, timeHourSystem: TimeHourSystem) {
+    init(style: Style, frame: CGRect) {
         self.style = style
-        self.timeHourSystem = timeHourSystem
         super.init(frame: frame)
         
-        
+        setUI()
     }
     
     required init?(coder: NSCoder) {
@@ -71,6 +75,11 @@ extension CurrentLineView: CalendarSettingProtocol {
     
     func setUI() {
         subviews.forEach({ $0.removeFromSuperview() })
+        
+        formatter.dateFormat = style.timeSystem.format
+        formatter.timeZone = style.timezone
+        timeLabel.text = formatter.string(from: Date())
+        timeLabel.valueHash = Date().minute.hashValue
         
         timeLabel.frame = CGRect(x: 2, y: 0, width: style.timeline.currentLineHourWidth - 5, height: frame.height)
         dotView.frame = CGRect(origin: CGPoint(x: style.timeline.currentLineHourWidth - (style.timeline.currentLineHourDotSize.width * 0.5), y: (frame.height * 0.5) - 2), size: style.timeline.currentLineHourDotSize)

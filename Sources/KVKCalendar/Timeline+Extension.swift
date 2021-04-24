@@ -707,6 +707,7 @@ extension TimelineView: CalendarSettingProtocol {
     
     func updateStyle(_ style: Style) {
         self.style = style
+        currentLineView.updateStyle(style)
         setUI()
     }
 }
