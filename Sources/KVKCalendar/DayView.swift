@@ -326,7 +326,7 @@ extension DayView: CalendarSettingProtocol {
     }
     
     func updateStyle(_ style: Style) {
-        self.parameters.style = style
+        parameters.style = style
         scrollHeaderDay.updateStyle(style)
         timelinePages.updateStyle(style)
         timelinePages.reloadPages()
@@ -343,5 +343,6 @@ extension DayView: CalendarSettingProtocol {
             topBackgroundView.addSubview(scrollHeaderDay)
         }
         addSubview(timelinePages)
+        timelinePages.isPagingEnabled = parameters.style.timeline.scrollDirections.contains(.horizontal)
     }
 }

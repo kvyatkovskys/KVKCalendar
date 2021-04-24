@@ -137,6 +137,11 @@ public struct TimelineStyle {
     public var isHiddenStubEvent: Bool = false
     public var isEnabledCreateNewEvent: Bool = true
     public var maxLimitChachedPages: UInt = 10
+    public var scrollDirections: Set<ScrollDirectionType> = Set(ScrollDirectionType.allCases)
+    
+    public enum ScrollDirectionType: Int, CaseIterable {
+        case vertical, horizontal
+    }
     
     public enum CurrentLineHourShowMode: Equatable {
         case always, today, forDate(Date)
@@ -741,6 +746,7 @@ extension TimelineStyle: Equatable {
             && compare(\.isHiddenStubEvent)
             && compare(\.isEnabledCreateNewEvent)
             && compare(\.maxLimitChachedPages)
+            && compare(\.scrollDirections)
     }
     
 }
