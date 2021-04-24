@@ -37,6 +37,8 @@ final class TimelinePageView: UIView {
         return pages[currentIndex]
     }
     
+    var isPagingEnabled = true
+    
     private let mainPageView: UIPageViewController = {
         let pageView = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: [:])
         return pageView
@@ -132,7 +134,7 @@ extension TimelinePageView: UIPageViewControllerDataSource, UIPageViewController
     }
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
-        guard var newIndex = (viewController as? TimelineContainerVC)?.index else { return nil }
+        guard var newIndex = (viewController as? TimelineContainerVC)?.index, isPagingEnabled else { return nil }
         
         newIndex -= 1
         guard let newTimelineView = pages[newIndex] else { return nil }
@@ -143,7 +145,7 @@ extension TimelinePageView: UIPageViewControllerDataSource, UIPageViewController
     }
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
-        guard var newIndex = (viewController as? TimelineContainerVC)?.index else { return nil }
+        guard var newIndex = (viewController as? TimelineContainerVC)?.index, isPagingEnabled else { return nil }
         
         newIndex += 1
         guard let newTimelineView = pages[newIndex] else { return nil }

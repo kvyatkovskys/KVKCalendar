@@ -234,6 +234,7 @@ extension WeekView: CalendarSettingProtocol {
         addSubview(topBackgroundView)
         topBackgroundView.addSubview(scrollHeaderDay)
         addSubview(timelinePages)
+        timelinePages.isPagingEnabled = style.timeline.scrollDirections.contains(.horizontal)
     }
 }
 

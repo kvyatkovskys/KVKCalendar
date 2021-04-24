@@ -75,7 +75,6 @@ final class TimelineView: UIView, EventDateProtocol {
     private(set) lazy var scrollView: UIScrollView = {
         let scroll = UIScrollView()
         scroll.delegate = self
-        scroll.backgroundColor = style.timeline.backgroundColor
         return scroll
     }()
     
@@ -132,10 +131,15 @@ final class TimelineView: UIView, EventDateProtocol {
         return crossEvents
     }
     
-    private func setOffsetScrollView() {
+    private func setOffsetScrollView(allDayEventsCount: Int) {
         var offsetY: CGFloat = 0
         if !subviews.filter({ $0 is AllDayTitleView }).isEmpty || !scrollView.subviews.filter({ $0 is AllDayTitleView }).isEmpty {
-            offsetY = style.allDay.height
+            switch style.allDay.axis {
+            case .horizontal:
+                offsetY = style.allDay.height
+            case .vertical:
+                offsetY = style.allDay.height * CGFloat(allDayEventsCount)
+            }
         }
         scrollView.contentInset = UIEdgeInsets(top: offsetY, left: 0, bottom: 0, right: 0)
     }
@@ -291,6 +295,7 @@ final class TimelineView: UIView, EventDateProtocol {
         let widthPage = (frame.width - leftOffset) / CGFloat(dates.count)
         let heightPage = scrollView.contentSize.height
         let midnight = 24
+        var allDayEventsCount = 0
         
         // horror
         for (idx, date) in dates.enumerated() {
@@ -329,6 +334,7 @@ final class TimelineView: UIView, EventDateProtocol {
             let sortedEventsByDate = (eventsByDate + filteredRecurringEvents).sorted(by: { $0.start < $1.start })
             
             // create an all day events
+            allDayEventsCount = (allDayEvents + filteredAllDayRecurringEvents).count
             createAllDayEvents(events: allDayEvents + filteredAllDayRecurringEvents, date: date, width: widthPage, originX: pointX)
             
             // count event cross in one hour
@@ -413,7 +419,7 @@ final class TimelineView: UIView, EventDateProtocol {
                 addSubview(createStackView(day: day, type: .bottom, frame: bottomStackFrame))
             }
         }
-        setOffsetScrollView()
+        setOffsetScrollView(allDayEventsCount: allDayEventsCount)
         scrollToCurrentTime(startHour)
         showCurrentLineHour()
         addStubInvisibleEvents()
