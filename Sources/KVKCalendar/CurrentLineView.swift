@@ -9,12 +9,7 @@ import UIKit
 
 final class CurrentLineView: UIView {
     
-    private var style: Style {
-        didSet {
-            formatter.dateFormat = style.timeSystem.format
-            formatter.timeZone = style.timezone
-        }
-    }
+    private var style: Style
 
     private lazy var timeLabel: TimelineLabel = {
         let label = TimelineLabel()
