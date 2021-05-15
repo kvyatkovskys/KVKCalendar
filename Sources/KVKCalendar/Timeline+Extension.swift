@@ -214,7 +214,7 @@ extension TimelineView {
     func createAllDayEvents(events: [Event], date: Date?, width: CGFloat, originX: CGFloat) {
         guard !events.isEmpty else { return }
         
-        let pointY = style.allDay.isPinned ? 0 : -style.allDay.height
+        let pointY: CGFloat = style.allDay.isPinned ? 0 : (-style.allDay.height * CGFloat(events.count))
         let allDayHeight: CGFloat
         switch style.allDay.axis {
         case .horizontal:
