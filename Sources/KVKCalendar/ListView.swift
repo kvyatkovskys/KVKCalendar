@@ -7,13 +7,20 @@
 
 import UIKit
 
-final class ListView: UIView, CalendarSettingProtocol {
+public final class ListView: UIView, CalendarSettingProtocol {
     
-    struct Parameters {
+    public struct Parameters {
         var style: Style
         let data: ListViewData
-        weak var dataSource: DisplayDataSource?
-        weak var delegate: DisplayDelegate?
+        weak var dataSource: CalendarDataSource?
+        weak var delegate: CalendarDelegate?
+        
+        public init(style: Style, data: ListViewData, dataSource: CalendarDataSource?, delegate: CalendarDelegate?) {
+            self.style = style
+            self.data = data
+            self.dataSource = dataSource
+            self.delegate = delegate
+        }
     }
     
     var currentStyle: Style {
@@ -34,7 +41,7 @@ final class ListView: UIView, CalendarSettingProtocol {
         return params.style.list
     }
     
-    init(parameters: Parameters, frame: CGRect) {
+    public init(parameters: Parameters, frame: CGRect) {
         self.params = parameters
         super.init(frame: frame)
         setUI()
@@ -84,15 +91,15 @@ final class ListView: UIView, CalendarSettingProtocol {
 }
 
 extension ListView: UITableViewDataSource, UITableViewDelegate {
-    func numberOfSections(in tableView: UITableView) -> Int {
+    public func numberOfSections(in tableView: UITableView) -> Int {
         return params.data.numberOfSection()
     }
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return params.data.numberOfItemsInSection(section)
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let event = params.data.event(indexPath: indexPath)
         if let cell = params.dataSource?.dequeueCell(dateParameter: .init(date: event.start), type: .list, view: tableView, indexPath: indexPath) as? UITableViewCell {
             return cell
@@ -104,7 +111,7 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
         }
     }
     
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let date = params.data.sections[section].date
         if let headerView = params.dataSource?.dequeueHeader(date: date, type: .list, view: tableView, indexPath: IndexPath(row: 0, section: section)) as? UIView {
             return headerView
@@ -115,7 +122,7 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
         }
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         let event = params.data.event(indexPath: indexPath)
         if let height = params.delegate?.sizeForCell(event.start, type: .list)?.height {
             return height
@@ -124,7 +131,7 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
         }
     }
     
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         let date = params.data.sections[section].date
         if let height = params.delegate?.sizeForHeader(date, type: .list)?.height {
             return height
@@ -133,7 +140,7 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
         }
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
         let event = params.data.event(indexPath: indexPath)
