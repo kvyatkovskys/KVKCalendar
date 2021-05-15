@@ -77,27 +77,27 @@ extension Collection {
 
 extension UICollectionView {
     func register<T: UICollectionViewCell>(_ cell: T.Type) {
-        register(T.self, forCellWithReuseIdentifier: cell.identifier)
+        register(T.self, forCellWithReuseIdentifier: cell.kvkIdentifier)
     }
     
     func registerView<T: UICollectionReusableView>(_ view: T.Type, kind: String = UICollectionView.elementKindSectionHeader) {
-        register(T.self, forSupplementaryViewOfKind: kind, withReuseIdentifier: view.identifier)
+        register(T.self, forSupplementaryViewOfKind: kind, withReuseIdentifier: view.kvkIdentifier)
     }
 }
 
 public extension UIView {
-    static var identifier: String {
+    static var kvkIdentifier: String {
         return String(describing: self)
     }
 }
 
 extension UITableView {
     func register<T: UITableViewCell>(_ cell: T.Type) {
-        register(T.self, forCellReuseIdentifier: cell.identifier)
+        register(T.self, forCellReuseIdentifier: cell.kvkIdentifier)
     }
     
     func register<T: UIView>(_ view: T.Type) {
-        register(T.self, forHeaderFooterViewReuseIdentifier: view.identifier)
+        register(T.self, forHeaderFooterViewReuseIdentifier: view.kvkIdentifier)
     }
 }
 
@@ -193,7 +193,7 @@ extension UIRectCorner {
 }
 
 public extension UITableView {
-    func dequeueCell<T: UITableViewCell>(id: String = T.identifier, indexPath: IndexPath? = nil, configure: (T) -> Void) -> T {
+    func dequeueCell<T: UITableViewCell>(id: String = T.kvkIdentifier, indexPath: IndexPath? = nil, configure: (T) -> Void) -> T {
         register(T.self)
         
         let cell: T
@@ -209,7 +209,7 @@ public extension UITableView {
         return cell
     }
     
-    func dequeueView<T: UIView>(id: String = T.identifier, configure: (T) -> Void) -> T {
+    func dequeueView<T: UIView>(id: String = T.kvkIdentifier, configure: (T) -> Void) -> T {
         register(T.self)
         
         let view: T
@@ -225,7 +225,7 @@ public extension UITableView {
 }
 
 public extension UICollectionView {
-    func dequeueCell<T: UICollectionViewCell>(id: String = T.identifier, indexPath: IndexPath, configure: (T) -> Void) -> T {
+    func dequeueCell<T: UICollectionViewCell>(id: String = T.kvkIdentifier, indexPath: IndexPath, configure: (T) -> Void) -> T {
         register(T.self)
         
         let cell: T
@@ -239,7 +239,7 @@ public extension UICollectionView {
         return cell
     }
     
-    func dequeueView<T: UICollectionReusableView>(id: String = T.identifier, kind: String = UICollectionView.elementKindSectionHeader, indexPath: IndexPath, configure: (T) -> Void) -> T {
+    func dequeueView<T: UICollectionReusableView>(id: String = T.kvkIdentifier, kind: String = UICollectionView.elementKindSectionHeader, indexPath: IndexPath, configure: (T) -> Void) -> T {
         registerView(T.self, kind: kind)
         
         let view: T
