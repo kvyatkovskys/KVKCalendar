@@ -251,10 +251,10 @@ extension CalendarView: CalendarSettingProtocol {
     }
     
     public func updateStyle(_ style: Style) {
-        self.style = style
+        self.style = style.checkStyle
         
         if let currentView = currentViewCache as? CalendarSettingProtocol {
-            currentView.updateStyle(style)
+            currentView.updateStyle(self.style)
         }
     }
     
