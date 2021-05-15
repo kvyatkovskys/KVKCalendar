@@ -7,11 +7,16 @@
 
 import Foundation
 
-final class ListViewData {
+public final class ListViewData {
     
-    struct SectionListView {
+    public struct SectionListView {
         let date: Date
         var events: [Event]
+        
+        public init(date: Date, events: [Event]) {
+            self.date = date
+            self.events = events
+        }
     }
     
     var sections: [SectionListView]
@@ -26,6 +31,11 @@ final class ListViewData {
     init(data: CalendarData) {
         self.date = data.date
         self.sections = []
+    }
+    
+    public init(date: Date, sections: [SectionListView]) {
+        self.date = date
+        self.sections = sections
     }
     
     func titleOfHeader(section: Int) -> String {
