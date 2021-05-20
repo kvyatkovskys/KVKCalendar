@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 VALUE=${1?Error: no number given}
-carthage.sh build --no-skip-current
+carthage build --no-skip-current --use-xcframeworks
 echo "Created build for Carthage!"
 
 git add .
