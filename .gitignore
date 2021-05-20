@@ -15,8 +15,6 @@ xcuserdata
 *.xccheckout
 *.moved-aside
 DerivedData
-*.hmap
-*.ipa
 *.xcuserstate
 /.idea/*
 *.mobileprovision
@@ -28,3 +26,13 @@ Example/build/*
 
 # CocoaPods
 #Pods
+
+# Swift Package Manager
+.build/
+
+# Carthage
+Carthage/Build
+
+## Obj-C/Swift specific
+*.hmap
+*.ipa
