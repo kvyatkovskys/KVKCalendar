@@ -175,7 +175,7 @@ final class TimelineView: UIView, EventDateProtocol {
             guard self.currentLineView.valueHash != nextDate.minute.hashValue, let time = self.getTimelineLabel(hour: nextDate.hour) else { return }
             
             var pointY = time.frame.origin.y
-            if !self.subviews.filter({ $0 is AllDayTitleView }).isEmpty, self.style.allDay.isPinned {
+            if !self.subviews.filter({ $0.tag == self.tagAllDayEvent }).isEmpty, self.style.allDay.isPinned {
                 pointY -= self.style.allDay.height
             }
             
@@ -208,7 +208,7 @@ final class TimelineView: UIView, EventDateProtocol {
         }
         
         var pointY = calculatePointYByMinute(date.minute, time: time)
-        if !subviews.filter({ $0 is AllDayTitleView }).isEmpty, style.allDay.isPinned {
+        if !subviews.filter({ $0.tag == tagAllDayEvent }).isEmpty, style.allDay.isPinned {
             pointY -= style.allDay.height
         }
         currentLineView.frame.origin.y = pointY - (currentLineView.frame.height * 0.5)
@@ -261,7 +261,7 @@ final class TimelineView: UIView, EventDateProtocol {
         self.selectedDate = selectedDate
         
         if style.allDay.isPinned {
-            subviews.filter({ $0.tag == tagAllDayEvent || $0.tag == tagAllDayPlaceholder }).forEach({ $0.removeFromSuperview() })
+            subviews.filter({ $0.tag == tagAllDayEvent }).forEach({ $0.removeFromSuperview() })
         }
         subviews.filter({ $0.tag == tagStubEvent }).forEach({ $0.removeFromSuperview() })
         scrollView.subviews.filter({ $0.tag != tagCurrentHourLine }).forEach({ $0.removeFromSuperview() })

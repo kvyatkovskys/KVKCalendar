@@ -76,12 +76,12 @@ extension Collection {
 }
 
 extension UICollectionView {
-    func register<T: UICollectionViewCell>(_ cell: T.Type) {
-        register(T.self, forCellWithReuseIdentifier: cell.kvkIdentifier)
+    func register<T: UICollectionViewCell>(_ cell: T.Type, id: String? = nil) {
+        register(T.self, forCellWithReuseIdentifier: id ?? cell.kvkIdentifier)
     }
     
-    func registerView<T: UICollectionReusableView>(_ view: T.Type, kind: String = UICollectionView.elementKindSectionHeader) {
-        register(T.self, forSupplementaryViewOfKind: kind, withReuseIdentifier: view.kvkIdentifier)
+    func registerView<T: UICollectionReusableView>(_ view: T.Type, id: String? = nil, kind: String = UICollectionView.elementKindSectionHeader) {
+        register(T.self, forSupplementaryViewOfKind: kind, withReuseIdentifier: id ?? view.kvkIdentifier)
     }
 }
 
@@ -226,7 +226,7 @@ public extension UITableView {
 
 public extension UICollectionView {
     func dequeueCell<T: UICollectionViewCell>(id: String = T.kvkIdentifier, indexPath: IndexPath, configure: (T) -> Void) -> T {
-        register(T.self)
+        register(T.self, id: id)
         
         let cell: T
         if let dequeued = dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as? T {
@@ -240,7 +240,7 @@ public extension UICollectionView {
     }
     
     func dequeueView<T: UICollectionReusableView>(id: String = T.kvkIdentifier, kind: String = UICollectionView.elementKindSectionHeader, indexPath: IndexPath, configure: (T) -> Void) -> T {
-        registerView(T.self, kind: kind)
+        registerView(T.self, id: id, kind: kind)
         
         let view: T
         if let dequeued = dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: id, for: indexPath) as? T {

@@ -351,7 +351,7 @@ public struct AllDayStyle {
     public var offsetHeight: CGFloat = 4
     public var offsetX: CGFloat = 10
     public var height: CGFloat = 25
-    public var maxHeight: CGFloat = 75
+    public var maxHeight: CGFloat = 70
     public var width: CGFloat = {
         let timeLineStyle = TimelineStyle()
         return timeLineStyle.widthTime + timeLineStyle.offsetTimeX + timeLineStyle.offsetLineLeft

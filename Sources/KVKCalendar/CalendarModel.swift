@@ -139,12 +139,12 @@ public struct Event {
         }
     }
     
-    func prepareColor(_ color: Event.Color) -> (background: UIColor, text: UIColor) {
+    func prepareColor(_ color: Event.Color, brightnessOffset: CGFloat = 0.4) -> (background: UIColor, text: UIColor) {
         let bgColor = color.value.withAlphaComponent(color.alpha)
         var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 0
         color.value.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
         let txtColor = UIColor(hue: hue, saturation: saturation,
-                               brightness: UIScreen.isDarkMode ? brightness : brightness * 0.4,
+                               brightness: UIScreen.isDarkMode ? brightness : brightness * brightnessOffset,
                                alpha: alpha)
         
         return (bgColor, txtColor)

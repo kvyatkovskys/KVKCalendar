@@ -17,7 +17,11 @@ final class AllDayView: UIView {
         weak var delegate: CalendarDelegate?
     }
     
-    private let titleLabel = UILabel()
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.numberOfLines = 0
+        return label
+    }()
     
     private let layout: UICollectionViewFlowLayout = {
         let layout = UICollectionViewFlowLayout()
@@ -27,9 +31,9 @@ final class AllDayView: UIView {
     }()
     
     private var collectionView: UICollectionView?
-    
     private var params: Parameters
-    private let events: [AllDayEvent]
+    
+    let items: [AllDayEvent]
     
     init(parameters: Parameters, frame: CGRect) {
         self.params = parameters
@@ -37,14 +41,13 @@ final class AllDayView: UIView {
         let startEvents = parameters.events.map({ AllDayEvent(event: $0, date: $0.start) })
         let endEvents = parameters.events.map({ AllDayEvent(event: $0, date: $0.end) })
         let result = startEvents + endEvents
-        let distinct = result.reduce([]) { (acc, event) -> [AllDayEvent] in
-            guard acc.contains(where: { $0.date.day == event.date.day && $0.id.hashValue == event.id.hashValue }) else {
-                return acc + [event]
+        let distinct = result.reduce([]) { (acc, item) -> [AllDayEvent] in
+            guard acc.contains(where: { $0.date.day == item.date.day && $0.event.hash == item.event.hash }) else {
+                return acc + [item]
             }
             return acc
         }
-        let filtered = distinct.filter({ $0.date.day == parameters.date?.day })
-        self.events = filtered
+        self.items = distinct.filter({ $0.date.day == parameters.date?.day })
         
         super.init(frame: frame)
         setUI()
@@ -56,12 +59,12 @@ final class AllDayView: UIView {
     
     private func calculateSize(index: IndexPath, view: UIView) -> CGSize {
         var newSize: CGSize
-        if events.count == 1 {
+        if items.count == 1 {
             newSize = CGSize(width: view.bounds.width, height: params.style.allDay.height)
-        } else if events.count % 2 == 0 {
+        } else if items.count % 2 == 0 {
             newSize = CGSize(width: view.bounds.width * 0.5, height: params.style.allDay.height)
         } else {
-            if events.count == (index.row + 1) {
+            if items.count == (index.row + 1) {
                 newSize = CGSize(width: view.bounds.width, height: params.style.allDay.height)
             } else {
                 newSize = CGSize(width: view.bounds.width * 0.5, height: params.style.allDay.height)
@@ -114,12 +117,13 @@ extension AllDayView: UICollectionViewDataSource, UICollectionViewDelegate, UICo
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return events.count
+        return items.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        return collectionView.dequeueCell(indexPath: indexPath) { (cell: UICollectionViewCell) in
-            cell.backgroundColor = .systemRed
+        let item = items[indexPath.row]
+        return collectionView.dequeueCell(indexPath: indexPath) { (cell: AllDayEventCell) in
+            cell.value = (params.style.allDay, item.event)
             cell.setRoundCorners(params.style.allDay.eventCorners, radius: params.style.allDay.eventCornersRadius)
         }
     }
