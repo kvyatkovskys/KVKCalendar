@@ -32,7 +32,7 @@ final class MonthView: UIView {
         return view
     }()
     
-    private lazy var layout: UICollectionViewLayout = {
+    private lazy var layout: UICollectionViewFlowLayout = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 0
