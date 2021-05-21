@@ -282,15 +282,18 @@ public protocol CalendarDataSource: AnyObject {
     
     func willDisplayEventViewer(date: Date, frame: CGRect) -> UIView?
     
-    /// **DEPRECATED**
+    /// The method is **DEPRECATED**
+    /// Use a new **dequeueCell**
     @available(*, deprecated, renamed: "dequeueCell")
     func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell?
     
-    /// **DEPRECATED**
+    /// The method is **DEPRECATED**
+    /// Use a new **dequeueHeader**
     @available(*, deprecated, renamed: "dequeueHeader")
     func dequeueHeaderView(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionReusableView?
     
-    /// **DEPRECATED**
+    /// The method is **DEPRECATED**
+    /// Use a new **dequeueCell**
     @available(*, deprecated, renamed: "dequeueCell")
     func dequeueListCell(date: Date?, tableView: UITableView, indexPath: IndexPath) -> UITableViewCell?
     
@@ -311,17 +314,11 @@ public extension CalendarDataSource {
     func willDisplayHeaderSubview(date: Date?, frame: CGRect, type: CalendarType) -> UIView? { return nil }
     
     func willDisplayCollectionView(frame: CGRect, type: CalendarType) -> UICollectionView? { return nil }
-    
-    /// **DEPRECATED**
-    @available(*, deprecated, renamed: "dequeueCell")
+
     func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? { return nil }
     
-    /// **DEPRECATED**
-    @available(*, deprecated, renamed: "dequeueHeader")
     func dequeueHeaderView(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionReusableView? { return nil }
-        
-    /// **DEPRECATED**
-    @available(*, deprecated, renamed: "dequeueCell")
+
     func dequeueListCell(date: Date?, tableView: UITableView, indexPath: IndexPath) -> UITableViewCell? { return nil }
     
     func dequeueCell<T: UIScrollView>(dateParameter: DateParameter, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol? { return nil }
@@ -337,20 +334,22 @@ public protocol CalendarDelegate: AnyObject {
     /// size cell for (month, year, list) view
     func sizeForCell(_ date: Date?, type: CalendarType) -> CGSize?
     
-    /// get a selecting date
+    /// The method is **DEPRECATED**
+    /// Use a new **didSelectDates**
     @available(*, deprecated, renamed: "didSelectDates")
     func didSelectDate(_ date: Date?, type: CalendarType, frame: CGRect?)
     
     /// get selected dates
     func didSelectDates(_ dates: [Date], type: CalendarType, frame: CGRect?)
     
-    /// get a selecting event
+    /// get a selected event
     func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?)
     
     /// tap on more fro month view
     func didSelectMore(_ date: Date, frame: CGRect?)
     
-    /// **DEPRECATED**
+    /// The method is **DEPRECATED**
+    /// Use a new **didChangeViewerFrame**
     @available(*, deprecated, renamed: "didChangeViewerFrame")
     func eventViewerFrame(_ frame: CGRect)
     
@@ -369,7 +368,8 @@ public protocol CalendarDelegate: AnyObject {
     /// get next date when the calendar scrolls (works for month view)
     func willSelectDate(_ date: Date, type: CalendarType)
     
-    /// **DEPRECATED**
+    /// The method is **DEPRECATED**
+    /// Use a new ** func didDeselectEvent**
     @available(*, deprecated, renamed: "didDeselectEvent")
     func deselectEvent(_ event: Event, animated: Bool)
     
@@ -382,7 +382,6 @@ public extension CalendarDelegate {
     
     func sizeForCell(_ date: Date?, type: CalendarType) -> CGSize? { return nil }
     
-    @available(*, deprecated, renamed: "didSelectDates")
     func didSelectDate(_ date: Date?, type: CalendarType, frame: CGRect?) {}
     
     func didSelectDates(_ dates: [Date], type: CalendarType, frame: CGRect?)  {}
@@ -391,7 +390,6 @@ public extension CalendarDelegate {
     
     func didSelectMore(_ date: Date, frame: CGRect?) {}
     
-    @available(*, deprecated, renamed: "didChangeViewerFrame")
     func eventViewerFrame(_ frame: CGRect) {}
     
     func didChangeEvent(_ event: Event, start: Date?, end: Date?) {}
@@ -402,7 +400,6 @@ public extension CalendarDelegate {
     
     func willSelectDate(_ date: Date, type: CalendarType) {}
     
-    @available(*, deprecated, renamed: "didDeselectEvent")
     func deselectEvent(_ event: Event, animated: Bool) {}
     
     func didDeselectEvent(_ event: Event, animated: Bool) {}

@@ -16,8 +16,8 @@ final class AllDayEventView: UIView {
         super.init(frame: frame)
         backgroundColor = style.backgroundColor
         
-        let startEvents = events.map({ AllDayEvent(id: $0.ID, text: $0.text, date: $0.start, color: Event.Color($0.color?.value ?? $0.backgroundColor).value) })
-        let endEvents = events.map({ AllDayEvent(id: $0.ID, text: $0.text, date: $0.end, color: Event.Color($0.color?.value ?? $0.backgroundColor).value) })
+        let startEvents = events.map({ AllDayEvent(event: $0, date: $0.start) })
+        let endEvents = events.map({ AllDayEvent(event: $0, date: $0.end) })
         let result = startEvents + endEvents
         let distinct = result.reduce([]) { (acc, event) -> [AllDayEvent] in
             guard acc.contains(where: { $0.date.day == event.date.day && $0.id.hashValue == event.id.hashValue }) else {
@@ -102,11 +102,18 @@ extension AllDayEventView: PointerInteractionProtocol {
     }
 }
 
-private struct AllDayEvent {
+struct AllDayEvent {
     let id: String
     let text: String
     let date: Date
     let color: UIColor
+    
+    init(event: Event, date: Date) {
+        self.id = event.ID
+        self.text = event.text
+        self.date = date
+        self.color = Event.Color(event.color?.value ?? event.backgroundColor).value
+    }
 }
 
 extension AllDayEvent: EventProtocol {

@@ -343,12 +343,19 @@ public struct AllDayStyle {
     public var backgroundColor: UIColor = gainsboro
     public var titleText: String = "all-day"
     public var titleColor: UIColor = .black
+    public var titleAlignment: NSTextAlignment = .left
     public var textColor: UIColor = .black
     public var backgroundColorEvent: UIColor = .clear
     public var font: UIFont = .systemFont(ofSize: 12)
     public var offsetWidth: CGFloat = 2
     public var offsetHeight: CGFloat = 4
+    public var offsetX: CGFloat = 10
     public var height: CGFloat = 25
+    public var maxHeight: CGFloat = 75
+    public var width: CGFloat = {
+        let timeLineStyle = TimelineStyle()
+        return timeLineStyle.widthTime + timeLineStyle.offsetTimeX + timeLineStyle.offsetLineLeft
+    }()
     public var fontTitle: UIFont = .systemFont(ofSize: 10)
     public var isPinned: Bool = true
     public var eventCorners: UIRectCorner = .allCorners
