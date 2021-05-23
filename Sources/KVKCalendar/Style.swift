@@ -345,10 +345,15 @@ public struct AllDayStyle {
     public var titleColor: UIColor = .black
     public var titleAlignment: NSTextAlignment = .left
     public var textColor: UIColor = .black
+    
+    @available(swift, deprecated: 0.5.0, obsoleted: 0.5.1)
     public var backgroundColorEvent: UIColor = .clear
+    
+    @available(swift, deprecated: 0.5.0, obsoleted: 0.5.1)
     public var font: UIFont = .systemFont(ofSize: 12)
+    
     public var offsetWidth: CGFloat = 2
-    public var offsetHeight: CGFloat = 4
+    public var offsetHeight: CGFloat = 2    
     public var offsetX: CGFloat = 10
     public var height: CGFloat = 25
     public var maxHeight: CGFloat = 70
@@ -360,8 +365,11 @@ public struct AllDayStyle {
     public var isPinned: Bool = true
     public var eventCorners: UIRectCorner = .allCorners
     public var eventCornersRadius: CGSize = CGSize(width: 5, height: 5)
+    
+    @available(swift, deprecated: 0.5.0, obsoleted: 0.5.1)
     public var axis: AxisMode = .vertical
     
+    @available(swift, deprecated: 0.5.0)
     public enum AxisMode: Int {
         case horizontal, vertical
     }
@@ -699,8 +707,6 @@ extension AllDayStyle: Equatable {
             && compare(\.titleText)
             && compare(\.titleColor)
             && compare(\.textColor)
-            && compare(\.backgroundColorEvent)
-            && compare(\.font)
             && compare(\.offsetWidth)
             && compare(\.offsetHeight)
             && compare(\.height)
@@ -708,7 +714,6 @@ extension AllDayStyle: Equatable {
             && compare(\.isPinned)
             && compare(\.eventCorners)
             && compare(\.eventCornersRadius)
-            && compare(\.axis)
     }
     
 }

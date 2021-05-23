@@ -33,7 +33,7 @@
 		57BF1D35A352DADF2DAF529D7499F7E5 /* DayCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2FEDB8B803BCED77D12A798EF2E282 /* DayCell.swift */; };
 		669A4F907EC931B839E03B9367706EBD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B907F9B2E7D0EE7E7174FFA2429E0E9 /* Foundation.framework */; };
 		675B181B34C4766A6B9FCAEE27E99777 /* ShadowDayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F3F3C241A7A9D06CEE389D078C4101 /* ShadowDayView.swift */; };
-		67FF774F81829D25627A95523D121DCB /* AllDayEventView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 778DFD3FBB832D6E4D23F25335FFBEF0 /* AllDayEventView.swift */; };
+		67FF774F81829D25627A95523D121DCB /* AllDayEventModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 778DFD3FBB832D6E4D23F25335FFBEF0 /* AllDayEventModel.swift */; };
 		681E095B5B26C2C43F3712DE60C0EE04 /* KVKCalendar-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 4156390BBF62FCCDDD0E7939667888E7 /* KVKCalendar-dummy.m */; };
 		6F0D7E0034E08D9E007E126E021CEAFB /* MonthCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96098C6CF6C1BA70E1197BA7471FC51F /* MonthCell.swift */; };
 		71F3B422C4D8488E7E4ADD2E2A52C94D /* CalendarView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95889043D19F567D2F068D3DF793D13 /* CalendarView+Extension.swift */; };
@@ -62,7 +62,7 @@
 		F6719C1224AF8A99C6B0A1AB7BAD7120 /* WeekData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97ACC5DCAE8C90FAB8DC57B176151933 /* WeekData.swift */; };
 		F6A5BCF15DC6BAF6EDCE414F28B21D84 /* YearData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EFE95869F11EF6CB11860ABC3888D57 /* YearData.swift */; };
 		F921AE5E2656EAFD007669C6 /* AllDayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F921AE5D2656EAFD007669C6 /* AllDayView.swift */; };
-		F9230C3E26586394000DD757 /* AllDayEventCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9230C3D26586394000DD757 /* AllDayEventCell.swift */; };
+		F9230C3E26586394000DD757 /* AllDayEventView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9230C3D26586394000DD757 /* AllDayEventView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -118,7 +118,7 @@
 		6B6179D20EE3F4E1B968A8E83351B79D /* DayPadCell.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DayPadCell.swift; path = Sources/KVKCalendar/DayPadCell.swift; sourceTree = "<group>"; };
 		6C2473E1B4D437BDB11755000CFA2D5F /* Pods_KVKCalendar_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KVKCalendar_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7692433655FAF139DE62DFA36F5714C2 /* StubEventView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StubEventView.swift; path = Sources/KVKCalendar/StubEventView.swift; sourceTree = "<group>"; };
-		778DFD3FBB832D6E4D23F25335FFBEF0 /* AllDayEventView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AllDayEventView.swift; path = Sources/KVKCalendar/AllDayEventView.swift; sourceTree = "<group>"; };
+		778DFD3FBB832D6E4D23F25335FFBEF0 /* AllDayEventModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AllDayEventModel.swift; path = Sources/KVKCalendar/AllDayEventModel.swift; sourceTree = "<group>"; };
 		7922F1FF5F9F47C465C052D105EF0E47 /* YearCell.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = YearCell.swift; path = Sources/KVKCalendar/YearCell.swift; sourceTree = "<group>"; };
 		7ED99FB8A745CDF19E67E51BEDB31728 /* CurrentLineView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CurrentLineView.swift; path = Sources/KVKCalendar/CurrentLineView.swift; sourceTree = "<group>"; };
 		835D1E92CB910DC79807F44B49CE9CFC /* WeekHeaderView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WeekHeaderView.swift; path = Sources/KVKCalendar/WeekHeaderView.swift; sourceTree = "<group>"; };
@@ -160,7 +160,7 @@
 		F5DE8C41F2288BC883CEE2330603A683 /* TimelineContainerVC.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TimelineContainerVC.swift; path = Sources/KVKCalendar/TimelineContainerVC.swift; sourceTree = "<group>"; };
 		F68932F57BDD715B5D6BEEF06CC1FCD6 /* DayView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DayView.swift; path = Sources/KVKCalendar/DayView.swift; sourceTree = "<group>"; };
 		F921AE5D2656EAFD007669C6 /* AllDayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AllDayView.swift; path = Sources/KVKCalendar/AllDayView.swift; sourceTree = "<group>"; };
-		F9230C3D26586394000DD757 /* AllDayEventCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AllDayEventCell.swift; path = Sources/KVKCalendar/AllDayEventCell.swift; sourceTree = "<group>"; };
+		F9230C3D26586394000DD757 /* AllDayEventView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AllDayEventView.swift; path = Sources/KVKCalendar/AllDayEventView.swift; sourceTree = "<group>"; };
 		F9A5FE2DD23FBAFCC63D57A554B1036E /* Pods-KVKCalendar_Example-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-KVKCalendar_Example-frameworks.sh"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -274,8 +274,8 @@
 			isa = PBXGroup;
 			children = (
 				F921AE5D2656EAFD007669C6 /* AllDayView.swift */,
-				F9230C3D26586394000DD757 /* AllDayEventCell.swift */,
-				778DFD3FBB832D6E4D23F25335FFBEF0 /* AllDayEventView.swift */,
+				F9230C3D26586394000DD757 /* AllDayEventView.swift */,
+				778DFD3FBB832D6E4D23F25335FFBEF0 /* AllDayEventModel.swift */,
 				DCBFA56F9C790AF87352E834A0D6D95D /* Calendar+Extension.swift */,
 				8A296C8DC2AC32446F7C661A876C043A /* CalendarData.swift */,
 				9DDDFB44C1E4A1CAC17F5959155FCA80 /* CalendarModel.swift */,
@@ -507,7 +507,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				67FF774F81829D25627A95523D121DCB /* AllDayEventView.swift in Sources */,
+				67FF774F81829D25627A95523D121DCB /* AllDayEventModel.swift in Sources */,
 				9ED826389916FA59E1F17001B1AAEC6E /* Calendar+Extension.swift in Sources */,
 				80F2D7EF1FD9A18404BA24798C596B10 /* CalendarData.swift in Sources */,
 				F921AE5E2656EAFD007669C6 /* AllDayView.swift in Sources */,
@@ -538,7 +538,7 @@
 				43A71B0C2D67DDAE6C0D4152B2977C07 /* StubEventView.swift in Sources */,
 				2D982E68A819D66622F6BD0FE6B13C2B /* StubStackView.swift in Sources */,
 				18E5875BD7D392E12CFD936351479DAE /* Style.swift in Sources */,
-				F9230C3E26586394000DD757 /* AllDayEventCell.swift in Sources */,
+				F9230C3E26586394000DD757 /* AllDayEventView.swift in Sources */,
 				1854C4D2AAD2F8BFB7D5D885FC47C049 /* Timeline+Extension.swift in Sources */,
 				3FE8D0253ABE9B61C42F2322700FAFA0 /* TimelineContainerVC.swift in Sources */,
 				50DA4CC293A9226D0714437AACC4D56E /* TimelineLabel.swift in Sources */,
