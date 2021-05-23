@@ -9,12 +9,18 @@ import UIKit
 
 final class AllDayView: UIView {
     
-    struct Parameters {
-        let date: Date?
+    struct PrepareEvents {
         let events: [Event]
+        let date: Date?
+        let xOffset: CGFloat
+        let width: CGFloat
+    }
+    
+    struct Parameters {
+        let prepareEvents: [PrepareEvents]
+        let type: CalendarType
         var style: Style
-        weak var dataSource: CalendarDataSource?
-        weak var delegate: CalendarDelegate?
+        weak var delegate: TimelineDelegate?
     }
     
     private let titleLabel: UILabel = {
@@ -23,31 +29,19 @@ final class AllDayView: UIView {
         return label
     }()
     
-    private let layout: UICollectionViewFlowLayout = {
-        let layout = UICollectionViewFlowLayout()
-        layout.minimumLineSpacing = 2
-        layout.minimumInteritemSpacing = 1
-        return layout
-    }()
-    
-    private var collectionView: UICollectionView?
+    private let scrollView = UIScrollView()
+    private let linePoints: [CGPoint]
     private var params: Parameters
     
-    let items: [AllDayEvent]
+    let items: [[AllDayEvent]]
     
     init(parameters: Parameters, frame: CGRect) {
         self.params = parameters
         
-        let startEvents = parameters.events.map({ AllDayEvent(event: $0, date: $0.start) })
-        let endEvents = parameters.events.map({ AllDayEvent(event: $0, date: $0.end) })
-        let result = startEvents + endEvents
-        let distinct = result.reduce([]) { (acc, item) -> [AllDayEvent] in
-            guard acc.contains(where: { $0.date.day == item.date.day && $0.event.hash == item.event.hash }) else {
-                return acc + [item]
-            }
-            return acc
-        }
-        self.items = distinct.filter({ $0.date.day == parameters.date?.day })
+        self.items = parameters.prepareEvents.compactMap({ item -> [AllDayEvent] in
+            return item.events.compactMap({ AllDayEvent(date: $0.start, event: $0, xOffset: item.xOffset, width: item.width) })
+        })
+        self.linePoints = parameters.prepareEvents.compactMap({ CGPoint(x: $0.xOffset, y: 0) })
         
         super.init(frame: frame)
         setUI()
@@ -57,29 +51,35 @@ final class AllDayView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func calculateSize(index: IndexPath, view: UIView) -> CGSize {
+    private func calculateFrame(index: Int, countEvents: Int, width: CGFloat, height: CGFloat) -> CGRect {
         var newSize: CGSize
-        if items.count == 1 {
-            newSize = CGSize(width: view.bounds.width, height: params.style.allDay.height)
-        } else if items.count % 2 == 0 {
-            newSize = CGSize(width: view.bounds.width * 0.5, height: params.style.allDay.height)
+        var newPoint: CGPoint
+        
+        if countEvents == (index + 1) {
+            newSize = CGSize(width: width, height: height)
+            newPoint = CGPoint(x: 0, y: height * CGFloat(index / 2))
+        } else if index == 0 {
+            newSize = CGSize(width: width * 0.5, height: height)
+            newPoint = CGPoint(x: 0, y: 0)
+        } else if index % 2 == 0 {
+            newSize = CGSize(width: width * 0.5, height: height)
+            newPoint = CGPoint(x: 0, y: height * CGFloat(index / 2))
         } else {
-            if items.count == (index.row + 1) {
-                newSize = CGSize(width: view.bounds.width, height: params.style.allDay.height)
-            } else {
-                newSize = CGSize(width: view.bounds.width * 0.5, height: params.style.allDay.height)
-            }
+            newSize = CGSize(width: width * 0.5, height: height)
+            newPoint = CGPoint(x: width * 0.5, y: height * CGFloat(index / 2))
         }
         
-        newSize.width -= 1
-        return newSize
+        newSize.width -= params.style.allDay.offsetWidth
+        newSize.height -= params.style.allDay.offsetHeight
+        newPoint.y += 1
+        
+        return CGRect(origin: newPoint, size: newSize)
     }
     
     private func setupView() {
         backgroundColor = params.style.allDay.backgroundColor
         titleLabel.removeFromSuperview()
-        collectionView?.removeFromSuperview()
-        collectionView = nil
+        scrollView.removeFromSuperview()
         
         titleLabel.frame = CGRect(x: params.style.allDay.offsetX, y: 0,
                                   width: params.style.allDay.width - params.style.allDay.offsetX,
@@ -90,51 +90,78 @@ final class AllDayView: UIView {
         titleLabel.text = params.style.allDay.titleText
         
         let x = titleLabel.frame.width + titleLabel.frame.origin.x
-        let collectionFrame = CGRect(origin: CGPoint(x: x, y: 0),
-                                     size: CGSize(width: bounds.size.width - x, height: bounds.size.height))
+        let scrollFrame = CGRect(origin: CGPoint(x: x, y: 0),
+                                 size: CGSize(width: bounds.size.width - x, height: bounds.size.height))
         
-        collectionView = UICollectionView(frame: collectionFrame, collectionViewLayout: layout)
-        collectionView?.backgroundColor = .clear
+        let maxItems = CGFloat(items.max(by: { $0.count < $1.count })?.count ?? 0)
+        scrollView.frame = scrollFrame
         
-        if collectionView?.dataSource == nil {
-            collectionView?.dataSource = self
-        }
-        if collectionView?.delegate == nil {
-            collectionView?.delegate = self
+        switch params.type {
+        case .day:
+            scrollView.contentSize = CGSize(width: scrollFrame.width, height: (maxItems / 2).rounded(.up) * params.style.allDay.height)
+        case .week:
+            scrollView.contentSize = CGSize(width: scrollFrame.width, height: maxItems * params.style.allDay.height)
+        default:
+            break
         }
         
         addSubview(titleLabel)
-        if let view = collectionView {
-            addSubview(view)
+        addSubview(scrollView)
+    }
+    
+    private func createEventViews() {
+        switch params.type {
+        case .day:
+            if let item = items.first {
+                item.enumerated().forEach { (event) in
+                    let frameEvent = calculateFrame(index: event.offset,
+                                                    countEvents: item.count,
+                                                    width: scrollView.bounds.width,
+                                                    height: params.style.allDay.height)
+                    let eventView = AllDayEventView(style: params.style.allDay, event: event.element.event, frame: frameEvent)
+                    eventView.delegate = self
+                    scrollView.addSubview(eventView)
+                }
+            }
+        case .week:
+            items.enumerated().forEach { item in
+                item.element.enumerated().forEach { (event) in
+                    let x = item.offset == 0 ? 0 : event.element.xOffset
+                    let frameEvent = CGRect(origin: CGPoint(x: x, y: params.style.allDay.height * CGFloat(event.offset)),
+                                            size: CGSize(width: event.element.width - params.style.allDay.offsetWidth,
+                                                         height: params.style.allDay.height - params.style.allDay.offsetHeight))
+                    let eventView = AllDayEventView(style: params.style.allDay, event: event.element.event, frame: frameEvent)
+                    eventView.delegate = self
+                    scrollView.addSubview(eventView)
+                }
+            }
+            
+            linePoints.enumerated().forEach { (point) in
+                let x = point.offset == 0 ? scrollView.frame.origin.x : (point.element.x + scrollView.frame.origin.x)
+                let line = createVerticalLine(pointX: x)
+                addSubview(line)
+            }
+            
+        default:
+            break
         }
+    }
+    
+    private func createVerticalLine(pointX: CGFloat) -> VerticalLineView {
+        let frame = CGRect(x: pointX, y: 0, width: params.style.timeline.widthLine, height: bounds.height)
+        let line = VerticalLineView(frame: frame)
+        line.backgroundColor = params.style.timeline.separatorLineColor
+        line.isHidden = !params.style.week.showVerticalDayDivider
+        return line
     }
 }
 
-extension AllDayView: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+extension AllDayView: AllDayEventDelegate {
     
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
+    func didSelectAllDayEvent(_ event: Event, frame: CGRect?) {
+        params.delegate?.didSelectEvent(event, frame: frame)
     }
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return items.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let item = items[indexPath.row]
-        return collectionView.dequeueCell(indexPath: indexPath) { (cell: AllDayEventCell) in
-            cell.value = (params.style.allDay, item.event)
-            cell.setRoundCorners(params.style.allDay.eventCorners, radius: params.style.allDay.eventCornersRadius)
-        }
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return calculateSize(index: indexPath, view: collectionView)
-    }
 }
 
 extension AllDayView: CalendarSettingProtocol {
@@ -148,11 +175,13 @@ extension AllDayView: CalendarSettingProtocol {
     }
     
     func updateStyle(_ style: Style) {
-        
+        params.style = style
+        setUI()
     }
     
     func setUI() {
         setupView()
+        createEventViews()
     }
     
 }

@@ -134,11 +134,12 @@ final class TimelineView: UIView, EventDateProtocol {
     private func setOffsetScrollView(allDayEventsCount: Int) {
         var offsetY: CGFloat = 0
         if allDayEventsCount > 0 {
-            switch style.allDay.axis {
-            case .horizontal:
+            if 3...4 ~= allDayEventsCount {
+                offsetY = style.allDay.height * 2
+            } else if allDayEventsCount > 4 {
+                offsetY = style.allDay.maxHeight
+            } else {
                 offsetY = style.allDay.height
-            case .vertical:
-                offsetY = style.allDay.height * CGFloat(allDayEventsCount)
             }
         }
         
@@ -303,7 +304,7 @@ final class TimelineView: UIView, EventDateProtocol {
         let widthPage = (frame.width - leftOffset) / CGFloat(dates.count)
         let heightPage = scrollView.contentSize.height
         let midnight = 24
-        var allDayEventsCount = 0
+        var allDayEvents = [AllDayView.PrepareEvents]()
         
         // horror
         for (idx, date) in dates.enumerated() {
@@ -315,10 +316,16 @@ final class TimelineView: UIView, EventDateProtocol {
             }
             
             let verticalLine = createVerticalLine(pointX: pointX, date: date)
-            scrollView.addSubview(verticalLine)
+            addSubview(verticalLine)
+            bringSubviewToFront(verticalLine)
             
             let eventsByDate = filteredEvents.filter({ compareStartDate(date, with: $0) || compareEndDate(date, with: $0) || checkMultipleDate(date, with: $0) })
-            let allDayEvents = filteredAllDayEvents.filter({ compareStartDate(date, with: $0) || compareEndDate(date, with: $0) })
+            let allDayEventsForDate = filteredAllDayEvents.filter({ compareStartDate(date, with: $0) || compareEndDate(date, with: $0) }).compactMap { (oldEvent) -> Event in
+                var updatedEvent = oldEvent
+                updatedEvent.start = date ?? oldEvent.start
+                updatedEvent.end = date ?? oldEvent.end
+                return updatedEvent
+            }
             
             let recurringEventByDate: [Event]
             if !recurringEvents.isEmpty, let dt = date {
@@ -342,9 +349,10 @@ final class TimelineView: UIView, EventDateProtocol {
             let sortedEventsByDate = (eventsByDate + filteredRecurringEvents).sorted(by: { $0.start < $1.start })
             
             // create an all day events
-            allDayEventsCount = (allDayEvents + filteredAllDayRecurringEvents).count
-            setOffsetScrollView(allDayEventsCount: allDayEventsCount)
-            createAllDayEvents(events: allDayEvents + filteredAllDayRecurringEvents, date: date, width: widthPage, originX: pointX)
+            allDayEvents.append(.init(events: allDayEventsForDate + filteredAllDayRecurringEvents,
+                                      date: date,
+                                      xOffset: pointX - leftOffset,
+                                      width: widthPage))
             
             // count event cross in one hour
             let crossEvents = calculateCrossEvents(sortedEventsByDate)
@@ -418,8 +426,7 @@ final class TimelineView: UIView, EventDateProtocol {
             
             if !style.timeline.isHiddenStubEvent, let day = date?.day {
                 let y = topStabStackOffsetY(allDayEventsIsPinned: style.allDay.isPinned,
-                                            axis: style.allDay.axis,
-                                            eventsCount: (allDayEvents + filteredAllDayRecurringEvents).count,
+                                            eventsCount: (allDayEventsForDate + filteredAllDayRecurringEvents).count,
                                             height: style.allDay.height)
                 let topStackFrame = CGRect(x: pointX, y: y, width: widthPage - style.timeline.offsetEvent, height: style.event.heightStubView)
                 let bottomStackFrame = CGRect(x: pointX, y: frame.height - bottomStabStackOffsetY, width: widthPage - style.timeline.offsetEvent, height: style.event.heightStubView)
@@ -427,6 +434,11 @@ final class TimelineView: UIView, EventDateProtocol {
                 addSubview(createStackView(day: day, type: .top, frame: topStackFrame))
                 addSubview(createStackView(day: day, type: .bottom, frame: bottomStackFrame))
             }
+        }
+        
+        if let maxEvents = allDayEvents.max(by: { $0.events.count < $1.events.count })?.events.count, maxEvents > 0 {
+            setOffsetScrollView(allDayEventsCount: maxEvents)
+            createAllDayEvents(events: allDayEvents, maxEvents: maxEvents)
         }
         scrollToCurrentTime(startHour)
         showCurrentLineHour()

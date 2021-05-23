@@ -32,13 +32,13 @@ extension TimelineView: UIScrollViewDelegate {
         }
         
         var eventsAllDay: [StubEvent] = []
-        if !style.allDay.isPinned {
-            eventsAllDay = scrollView.subviews.compactMap { (view) -> [StubEvent]? in
-                guard let item = view as? AllDayView else { return nil }
-                
-                return item.items.compactMap({ StubEvent(event: $0.event, frame: item.frame) })
-            }.flatMap({ $0 })
-        }
+//        if !style.allDay.isPinned {
+//            eventsAllDay = scrollView.subviews.compactMap { (view) -> [StubEvent]? in
+//                guard let item = view as? AllDayView else { return nil }
+//                
+//               // return item.items.compactMap({ StubEvent(event: $0.event, frame: item.frame) })
+//            }.flatMap({ $0 })
+//        }
         
         let stubEvents = events + eventsAllDay
         stubEvents.forEach { (eventView) in
@@ -129,13 +129,8 @@ extension TimelineView {
         return UIApplication.shared.isAvailableBottomHomeIndicator ? 30 : 5
     }
     
-    func topStabStackOffsetY(allDayEventsIsPinned: Bool, axis: AllDayStyle.AxisMode, eventsCount: Int, height: CGFloat) -> CGFloat {
-        switch axis {
-        case .horizontal:
-            return allDayEventsIsPinned ? 30 : 5
-        case .vertical:
-            return allDayEventsIsPinned ? (CGFloat(eventsCount) * height) + 5 : 5
-        }
+    func topStabStackOffsetY(allDayEventsIsPinned: Bool, eventsCount: Int, height: CGFloat) -> CGFloat {
+        return allDayEventsIsPinned ? (CGFloat(eventsCount) * height) + 5 : 5
     }
     
     var scrollableEventViews: [UIView] {
@@ -211,18 +206,24 @@ extension TimelineView {
         eventView.deselectEvent()
     }
     
-    func createAllDayEvents(events: [Event], date: Date?, width: CGFloat, originX: CGFloat) {
+    func createAllDayEvents(events: [AllDayView.PrepareEvents], maxEvents: Int) {
         guard !events.isEmpty else { return }
         
         var allDayHeight = style.allDay.height
-        if 3...4 ~= events.count {
+        if 3...4 ~= maxEvents {
             allDayHeight *= 2
-        } else if events.count > 4 {
+        } else if maxEvents > 4 {
             allDayHeight = style.allDay.maxHeight
         }
+        let y: CGFloat
+        if style.allDay.isPinned {
+            y = 0
+        } else {
+            y = -allDayHeight
+        }
         
-        let newAllDayView = AllDayView(parameters: .init(date: date, events: events, style: style),
-                                       frame: CGRect(x: 0, y: 0, width: bounds.width, height: allDayHeight))
+        let newAllDayView = AllDayView(parameters: .init(prepareEvents: events, type: type, style: style, delegate: delegate),
+                                       frame: CGRect(x: 0, y: y, width: bounds.width, height: allDayHeight))
         newAllDayView.tag = tagAllDayEvent
         if style.allDay.isPinned {
             addSubview(newAllDayView)
@@ -272,7 +273,7 @@ extension TimelineView {
         let frame = CGRect(x: pointX, y: 0, width: style.timeline.widthLine, height: scrollView.contentSize.height)
         let line = VerticalLineView(frame: frame)
         line.tag = tagVerticalLine
-        line.backgroundColor = .systemGray
+        line.backgroundColor = style.timeline.separatorLineColor
         line.isHidden = !style.week.showVerticalDayDivider
         line.date = date
         return line

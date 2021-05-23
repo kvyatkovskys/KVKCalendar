@@ -2,44 +2,52 @@
 //  AllDayEventView.swift
 //  KVKCalendar
 //
-//  Created by Sergei Kviatkovskii on 02/01/2019.
+//  Created by Sergei Kviatkovskii on 22.05.2021.
 //
 
 import UIKit
 
-//@available(iOS 13.4, *)
-//extension AllDayEventView: PointerInteractionProtocol {
-//    func pointerInteraction(_ interaction: UIPointerInteraction, styleFor region: UIPointerRegion) -> UIPointerStyle? {
-//        var pointerStyle: UIPointerStyle?
-//
-//        if let interactionView = interaction.view {
-//            let targetedPreview = UITargetedPreview(view: interactionView)
-//            pointerStyle = UIPointerStyle(effect: .hover(targetedPreview))
-//        }
-//        return pointerStyle
-//    }
-//}
-
-struct AllDayEvent {
-    let date: Date
-    let event: Event
+final class AllDayEventView: UIView {
     
-    init(event: Event, date: Date) {
+    weak var delegate: AllDayEventDelegate?
+    
+    private let textLabel: UILabel = {
+        let label = UILabel()
+        label.lineBreakMode = .byTruncatingTail
+        return label
+    }()
+    
+    private let event: Event
+    
+    init(style: AllDayStyle, event: Event, frame: CGRect) {
         self.event = event
-        self.date = date
+        super.init(frame: frame)
+        
+        let bgView = UIView(frame: CGRect(origin: .zero, size: CGSize(width: frame.width, height: frame.height - 2)))
+        bgView.backgroundColor = UIScreen.isDarkMode ? style.backgroundColor : UIColor.white
+        bgView.setRoundCorners(style.eventCorners, radius: style.eventCornersRadius)
+        addSubview(bgView)
+        
+        textLabel.frame = CGRect(origin: .zero, size: frame.size)
+        textLabel.setRoundCorners(style.eventCorners, radius: style.eventCornersRadius)
+        bgView.addSubview(textLabel)
+        
+        textLabel.backgroundColor = event.backgroundColor
+        textLabel.text = event.text
+        textLabel.textColor = event.textColor
+        textLabel.font = style.fontTitle
+        
+        tag = event.hash
+        let tap = UITapGestureRecognizer(target: self, action: #selector(tapOnEvent))
+        addGestureRecognizer(tap)
     }
-}
-
-extension AllDayEvent: EventProtocol {
     
-    func compare(_ event: Event) -> Bool {
-        return self.event.hash == event.hash
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
-}
-
-protocol AllDayEventDelegate: AnyObject {
-    
-    func didSelectAllDayEvent(_ event: Event, frame: CGRect?)
+    @objc private func tapOnEvent(gesture: UITapGestureRecognizer) {
+        delegate?.didSelectAllDayEvent(event, frame: gesture.view?.frame)
+    }
     
 }
