@@ -357,10 +357,6 @@ public struct AllDayStyle {
     public var offsetX: CGFloat = 10
     public var height: CGFloat = 25
     public var maxHeight: CGFloat = 70
-    public var width: CGFloat = {
-        let timeLineStyle = TimelineStyle()
-        return timeLineStyle.widthTime + timeLineStyle.offsetTimeX + timeLineStyle.offsetLineLeft
-    }()
     public var fontTitle: UIFont = .systemFont(ofSize: 10)
     public var isPinned: Bool = true
     public var eventCorners: UIRectCorner = .allCorners
