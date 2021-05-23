@@ -81,8 +81,9 @@ final class AllDayView: UIView {
         titleLabel.removeFromSuperview()
         scrollView.removeFromSuperview()
         
+        let widthTitle = params.style.timeline.widthTime + params.style.timeline.offsetTimeX + params.style.timeline.offsetLineLeft
         titleLabel.frame = CGRect(x: params.style.allDay.offsetX, y: 0,
-                                  width: params.style.allDay.width - params.style.allDay.offsetX,
+                                  width: widthTitle - params.style.allDay.offsetX,
                                   height: params.style.allDay.height)
         titleLabel.font = params.style.allDay.fontTitle
         titleLabel.textColor = params.style.allDay.titleColor
