@@ -36,8 +36,7 @@ final class TimelineView: UIView, EventDateProtocol {
     private(set) var tagVerticalLine = -30
     private let tagShadowView = -40
     private let tagBackgroundView = -50
-    private(set) var tagAllDayPlaceholder = -60
-    private(set) var tagAllDayEvent = -70
+    private(set) var tagAllDayEventView = -70
     private(set) var tagStubEvent = -80
     private(set) var timeLabels = [TimelineLabel]()
     private(set) var availabilityHours: [String]
@@ -176,7 +175,7 @@ final class TimelineView: UIView, EventDateProtocol {
             guard self.currentLineView.valueHash != nextDate.minute.hashValue, let time = self.getTimelineLabel(hour: nextDate.hour) else { return }
             
             var pointY = time.frame.origin.y
-            if !self.subviews.filter({ $0.tag == self.tagAllDayEvent }).isEmpty, self.style.allDay.isPinned {
+            if !self.subviews.filter({ $0.tag == self.tagAllDayEventView }).isEmpty, self.style.allDay.isPinned {
                 pointY -= self.style.allDay.height
             }
             
@@ -209,7 +208,7 @@ final class TimelineView: UIView, EventDateProtocol {
         }
         
         var pointY = calculatePointYByMinute(date.minute, time: time)
-        if !subviews.filter({ $0.tag == tagAllDayEvent }).isEmpty, style.allDay.isPinned {
+        if !subviews.filter({ $0.tag == tagAllDayEventView }).isEmpty, style.allDay.isPinned {
             pointY -= style.allDay.height
         }
         currentLineView.frame.origin.y = pointY - (currentLineView.frame.height * 0.5)
@@ -262,9 +261,9 @@ final class TimelineView: UIView, EventDateProtocol {
         self.selectedDate = selectedDate
         
         if style.allDay.isPinned {
-            subviews.filter({ $0.tag == tagAllDayEvent }).forEach({ $0.removeFromSuperview() })
+            subviews.filter({ $0.tag == tagAllDayEventView }).forEach({ $0.removeFromSuperview() })
         }
-        subviews.filter({ $0.tag == tagStubEvent }).forEach({ $0.removeFromSuperview() })
+        subviews.filter({ $0.tag == tagStubEvent || $0.tag == tagVerticalLine }).forEach({ $0.removeFromSuperview() })
         scrollView.subviews.filter({ $0.tag != tagCurrentHourLine }).forEach({ $0.removeFromSuperview() })
         
         // filter events

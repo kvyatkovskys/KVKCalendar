@@ -32,13 +32,13 @@ extension TimelineView: UIScrollViewDelegate {
         }
         
         var eventsAllDay: [StubEvent] = []
-//        if !style.allDay.isPinned {
-//            eventsAllDay = scrollView.subviews.compactMap { (view) -> [StubEvent]? in
-//                guard let item = view as? AllDayView else { return nil }
-//                
-//               // return item.items.compactMap({ StubEvent(event: $0.event, frame: item.frame) })
-//            }.flatMap({ $0 })
-//        }
+        if !style.allDay.isPinned && !style.allDay.isHiddenStubEvent {
+            eventsAllDay = scrollView.subviews.compactMap { (view) -> [StubEvent]? in
+                guard let item = view as? AllDayView else { return nil }
+                
+                return item.items.flatMap({ $0.compactMap({ item in StubEvent(event: item.event, frame: view.frame)}) })
+            }.flatMap({ $0 })
+        }
         
         let stubEvents = events + eventsAllDay
         stubEvents.forEach { (eventView) in
@@ -170,9 +170,9 @@ extension TimelineView {
     
     private func enableAllEvents(enable: Bool) {
         if style.allDay.isPinned {
-            subviews.filter({ $0.tag == tagAllDayEvent }).forEach({ $0.isUserInteractionEnabled = enable })
+            subviews.filter({ $0.tag == tagAllDayEventView }).forEach({ $0.isUserInteractionEnabled = enable })
         } else {
-            scrollView.subviews.filter({ $0.tag == tagAllDayEvent }).forEach({ $0.isUserInteractionEnabled = enable })
+            scrollView.subviews.filter({ $0.tag == tagAllDayEventView }).forEach({ $0.isUserInteractionEnabled = enable })
         }
         
         scrollView.subviews.filter({ $0 is EventViewGeneral }).forEach({ $0.isUserInteractionEnabled = enable })
@@ -224,7 +224,7 @@ extension TimelineView {
         
         let newAllDayView = AllDayView(parameters: .init(prepareEvents: events, type: type, style: style, delegate: delegate),
                                        frame: CGRect(x: 0, y: y, width: bounds.width, height: allDayHeight))
-        newAllDayView.tag = tagAllDayEvent
+        newAllDayView.tag = tagAllDayEventView
         if style.allDay.isPinned {
             addSubview(newAllDayView)
         } else {
@@ -340,9 +340,9 @@ extension TimelineView {
         
         let eventsAllDay: [UIView]
         if style.allDay.isPinned {
-            eventsAllDay = subviews.filter({ $0.tag == tagAllDayEvent })
+            eventsAllDay = subviews.filter({ $0.tag == tagAllDayEventView })
         } else {
-            eventsAllDay = scrollView.subviews.filter({ $0.tag == tagAllDayEvent })
+            eventsAllDay = scrollView.subviews.filter({ $0.tag == tagAllDayEventView })
         }
         
         let stackViews = subviews.filter({ $0 is StubStackView })
