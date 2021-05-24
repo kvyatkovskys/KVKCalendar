@@ -54,19 +54,18 @@ final class AllDayView: UIView {
     private func calculateFrame(index: Int, countEvents: Int, width: CGFloat, height: CGFloat) -> CGRect {
         var newSize: CGSize
         var newPoint: CGPoint
+        let newY = height * CGFloat(index / 2)
+        let newWidth = width * 0.5
         
         if countEvents == (index + 1) {
-            newSize = CGSize(width: width, height: height)
-            newPoint = CGPoint(x: 0, y: height * CGFloat(index / 2))
-        } else if index == 0 {
-            newSize = CGSize(width: width * 0.5, height: height)
-            newPoint = CGPoint(x: 0, y: 0)
+            newSize = CGSize(width: index % 2 == 0 ? width : newWidth, height: height)
+            newPoint = CGPoint(x: index % 2 == 0 ? 0 : newWidth, y: newY)
         } else if index % 2 == 0 {
-            newSize = CGSize(width: width * 0.5, height: height)
-            newPoint = CGPoint(x: 0, y: height * CGFloat(index / 2))
+            newSize = CGSize(width: newWidth, height: height)
+            newPoint = CGPoint(x: 0, y: newY)
         } else {
-            newSize = CGSize(width: width * 0.5, height: height)
-            newPoint = CGPoint(x: width * 0.5, y: height * CGFloat(index / 2))
+            newSize = CGSize(width: newWidth, height: height)
+            newPoint = CGPoint(x: newWidth, y: newY)
         }
         
         newSize.width -= params.style.allDay.offsetWidth
