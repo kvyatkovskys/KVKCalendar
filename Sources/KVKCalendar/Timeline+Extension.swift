@@ -351,57 +351,6 @@ extension TimelineView {
         return eventViews
     }
     
-    @available(swift, deprecated: 0.4.3)
-    @objc func swipeEvent(gesture: UIPanGestureRecognizer) {
-        guard !isResizeEnableMode else { return }
-        
-        let translation = gesture.translation(in: self)
-        let velocity = gesture.velocity(in: self)
-        let endGesture = abs(translation.x) > (frame.width / 3.5)
-        
-        switch gesture.state {
-        case .began, .changed:
-            guard abs(velocity.y) < abs(velocity.x) else { break }
-            guard endGesture else {
-                delegate?.swipeX(transform: CGAffineTransform(translationX: translation.x, y: 0), stop: false)
-                
-                scrollableEventViews.forEach { (view) in
-                    view.transform = CGAffineTransform(translationX: translation.x, y: 0)
-                }
-                break
-            }
-    
-            gesture.state = .ended
-        case .failed:
-            delegate?.swipeX(transform: .identity, stop: false)
-            identityViews(scrollableEventViews)
-        case .cancelled, .ended:
-            guard endGesture else {
-                delegate?.swipeX(transform: .identity, stop: false)
-                identityViews(scrollableEventViews)
-                break
-            }
-            
-            let previousDay = translation.x > 0
-            delegate?.swipeX(transform: CGAffineTransform(translationX: 0, y: 0), stop: true)
-            
-            UIView.animate(withDuration: 0.3, animations: {
-                self.moveEvents(offset: translation.x * 10)
-            }) { [weak delegate = self.delegate] (_) in
-                guard previousDay else {
-                    delegate?.nextDate()
-                    return
-                }
-                
-                delegate?.previousDate()
-            }
-        case .possible:
-            break
-        @unknown default:
-            fatalError()
-        }
-    }
-    
     func identityViews(duration: TimeInterval = 0.3, delay: TimeInterval = 0.1, _ views: [UIView], action: @escaping (() -> Void) = {}) {
         UIView.animate(withDuration: duration, delay: delay, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.8, options: .curveLinear, animations: {
             views.forEach { (view) in
@@ -649,7 +598,7 @@ extension TimelineView: EventDelegate {
     private func moveShadowView(pointX: CGFloat) -> (frame: CGRect, date: Date?)? {
         guard type == .week else { return nil }
         
-        let lines = scrollView.subviews.filter({ $0.tag == tagVerticalLine })
+        let lines = subviews.filter({ $0.tag == tagVerticalLine })
         var width: CGFloat = 200
         if let firstLine = lines[safe: 0], let secondLine = lines[safe: 1] {
             width = secondLine.frame.origin.x - firstLine.frame.origin.x
