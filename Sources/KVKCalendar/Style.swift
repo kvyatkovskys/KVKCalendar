@@ -343,7 +343,7 @@ public struct AllDayStyle {
     public var backgroundColor: UIColor = gainsboro
     public var titleText: String = "all-day"
     public var titleColor: UIColor = .black
-    public var titleAlignment: NSTextAlignment = .left
+    public var titleAlignment: NSTextAlignment = .center
     public var textColor: UIColor = .black
     
     @available(swift, deprecated: 0.5.0, obsoleted: 0.5.1)
@@ -354,13 +354,14 @@ public struct AllDayStyle {
     
     public var offsetWidth: CGFloat = 2
     public var offsetHeight: CGFloat = 2    
-    public var offsetX: CGFloat = 10
+    public var offsetX: CGFloat = 0
     public var height: CGFloat = 25
     public var maxHeight: CGFloat = 70
     public var fontTitle: UIFont = .systemFont(ofSize: 10)
     public var isPinned: Bool = true
     public var eventCorners: UIRectCorner = .allCorners
     public var eventCornersRadius: CGSize = CGSize(width: 5, height: 5)
+    public var isHiddenStubEvent: Bool = true
     
     @available(swift, deprecated: 0.5.0, obsoleted: 0.5.1)
     public var axis: AxisMode = .vertical

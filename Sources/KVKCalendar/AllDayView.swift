@@ -137,12 +137,13 @@ final class AllDayView: UIView {
                 }
             }
             
-            linePoints.enumerated().forEach { (point) in
-                let x = point.offset == 0 ? scrollView.frame.origin.x : (point.element.x + scrollView.frame.origin.x)
-                let line = createVerticalLine(pointX: x)
-                addSubview(line)
+            if params.style.allDay.isPinned {
+                linePoints.enumerated().forEach { (point) in
+                    let x = point.offset == 0 ? scrollView.frame.origin.x : (point.element.x + scrollView.frame.origin.x)
+                    let line = createVerticalLine(pointX: x)
+                    addSubview(line)
+                }
             }
-            
         default:
             break
         }
