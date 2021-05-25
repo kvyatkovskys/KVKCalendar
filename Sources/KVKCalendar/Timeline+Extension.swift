@@ -642,7 +642,9 @@ extension TimelineView: CalendarSettingProtocol {
 }
 
 extension TimelineView: AllDayEventDelegate {
+    
     func didSelectAllDayEvent(_ event: Event, frame: CGRect?) {
         delegate?.didSelectEvent(event, frame: frame)
     }
+    
 }
