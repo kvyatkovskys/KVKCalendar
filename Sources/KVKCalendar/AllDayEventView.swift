@@ -18,6 +18,7 @@ final class AllDayEventView: UIView {
     }()
     
     private let event: Event
+    private var isSelected = false
     
     init(style: AllDayStyle, event: Event, frame: CGRect) {
         self.event = event
@@ -50,4 +51,15 @@ final class AllDayEventView: UIView {
         delegate?.didSelectAllDayEvent(event, frame: gesture.view?.frame)
     }
     
+    func selectEvent() {
+        textLabel.backgroundColor = event.color?.value ?? event.backgroundColor
+        isSelected = true
+        textLabel.textColor = UIColor.white
+    }
+    
+    func deselectEvent() {
+        textLabel.backgroundColor = event.backgroundColor
+        isSelected = false
+        textLabel.textColor = event.textColor
+    }
 }

@@ -363,7 +363,7 @@ extension UIColor {
         }
         
         if cString.count != 6 {
-            return .gray
+            return .systemGray
         }
         var rgbValue: UInt32 = 0
         Scanner(string: cString).scanHexInt32(&rgbValue)
