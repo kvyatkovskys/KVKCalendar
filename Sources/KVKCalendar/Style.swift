@@ -703,14 +703,18 @@ extension AllDayStyle: Equatable {
         return compare(\.backgroundColor)
             && compare(\.titleText)
             && compare(\.titleColor)
+            && compare(\.titleAlignment)
             && compare(\.textColor)
             && compare(\.offsetWidth)
             && compare(\.offsetHeight)
             && compare(\.height)
+            && compare(\.maxHeight)
+            && compare(\.offsetX)
             && compare(\.fontTitle)
             && compare(\.isPinned)
             && compare(\.eventCorners)
             && compare(\.eventCornersRadius)
+            && compare(\.isHiddenStubEvent)
     }
     
 }
