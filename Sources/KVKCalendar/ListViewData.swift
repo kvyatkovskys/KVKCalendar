@@ -38,8 +38,9 @@ public final class ListViewData {
         self.sections = sections
     }
     
-    func titleOfHeader(section: Int) -> String {
+    func titleOfHeader(section: Int, locale: Locale) -> String {
         let dateSection = sections[section].date
+        dateFormatter.locale = locale
         return dateFormatter.string(from: dateSection)
     }
     

@@ -117,7 +117,7 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
             return headerView
         } else {
             return tableView.dequeueView { (view: ListViewHeader) in
-                view.title = params.data.titleOfHeader(section: section)
+                view.title = params.data.titleOfHeader(section: section, locale: params.style.locale)
             }
         }
     }
