@@ -11,14 +11,11 @@ final class CurrentLineView: UIView {
     
     private var style: Style
 
-    private lazy var timeLabel: TimelineLabel = {
+    private let timeLabel: TimelineLabel = {
         let label = TimelineLabel()
-        label.textColor = style.timeline.currentLineHourColor
         label.textAlignment = .center
-        label.font = style.timeline.currentLineHourFont
         label.adjustsFontSizeToFitWidth = true
         label.minimumScaleFactor = 0.6
-        label.text = formatter.string(from: Date())
         label.valueHash = Date().minute.hashValue
         return label
     }()
@@ -28,17 +25,8 @@ final class CurrentLineView: UIView {
         return formatter
     }()
     
-    private lazy var lineView: UIView = {
-        let view = UIView()
-        view.backgroundColor = style.timeline.currentLineHourColor
-        return view
-    }()
-    
-    private lazy var dotView: UIView = {
-        let view = UIView()
-        view.backgroundColor = style.timeline.currentLineHourColor
-        return view
-    }()
+    private let lineView = UIView()
+    private let dotView = UIView()
     
     var valueHash: Int?
     
@@ -71,8 +59,15 @@ extension CurrentLineView: CalendarSettingProtocol {
     func setUI() {
         subviews.forEach({ $0.removeFromSuperview() })
         
+        lineView.backgroundColor = style.timeline.currentLineHourColor
+        dotView.backgroundColor = style.timeline.currentLineHourColor
+        
         formatter.dateFormat = style.timeSystem.format
         formatter.timeZone = style.timezone
+        formatter.locale = style.locale
+        
+        timeLabel.textColor = style.timeline.currentLineHourColor
+        timeLabel.font = style.timeline.currentLineHourFont
         timeLabel.text = formatter.string(from: Date())
         timeLabel.valueHash = Date().minute.hashValue
         

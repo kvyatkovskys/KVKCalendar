@@ -47,6 +47,8 @@ final class TimelineView: UIView, EventDateProtocol {
     private(set) var selectedDate: Date?
     private(set) var type: CalendarType
     
+    private(set) var currentTimeFormatter = DateFormatter()
+    
     private(set) lazy var shadowView: ShadowDayView = {
         let view = ShadowDayView()
         view.backgroundColor = style.timeline.shadowColumnColor
@@ -183,10 +185,7 @@ final class TimelineView: UIView, EventDateProtocol {
             
             self.currentLineView.frame.origin.y = pointY - (self.currentLineView.frame.height * 0.5)
             self.currentLineView.valueHash = nextDate.minute.hashValue
-            
-            let formatter = DateFormatter()
-            formatter.dateFormat = self.timeSystem.format
-            self.currentLineView.time = formatter.string(from: nextDate)
+            self.currentLineView.time = self.currentTimeFormatter.string(from: nextDate)
             self.currentLineView.date = nextDate
             
             if let timeNext = self.getTimelineLabel(hour: nextDate.hour + 1) {

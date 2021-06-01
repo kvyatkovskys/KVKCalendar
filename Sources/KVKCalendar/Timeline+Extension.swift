@@ -616,6 +616,9 @@ extension TimelineView: CalendarSettingProtocol {
     }
     
     func setUI() {
+        currentTimeFormatter.dateFormat = style.timeSystem.format
+        currentTimeFormatter.locale = style.locale
+        
         scrollView.backgroundColor = style.timeline.backgroundColor
         scrollView.isScrollEnabled = style.timeline.scrollDirections.contains(.vertical)
         gestureRecognizers?.forEach({ $0.removeTarget(self, action: #selector(addNewEvent)) })
