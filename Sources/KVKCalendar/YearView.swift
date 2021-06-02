@@ -78,7 +78,6 @@ final class YearView: UIView {
     }
     
     private func scrollToDate(date: Date, animated: Bool) {
-        delegate?.didSelectDates([date], type: .year, frame: nil)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             if let idx = self.data.sections.firstIndex(where: { $0.date.year == date.year }) {
                 self.collectionView?.scrollToItem(at: IndexPath(row: 0, section: idx),

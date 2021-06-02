@@ -22,6 +22,8 @@ final class CurrentLineView: UIView {
     
     private let formatter: DateFormatter = {
         let formatter = DateFormatter()
+        formatter.amSymbol = "AM"
+        formatter.pmSymbol = "PM"
         return formatter
     }()
     
@@ -29,14 +31,16 @@ final class CurrentLineView: UIView {
     private let dotView = UIView()
     
     var valueHash: Int?
-    
-    var time: String? {
+        
+    var date: Date = Date() {
         didSet {
-            timeLabel.text = time
+            if isHidden {
+                isHidden = false
+            }
+            timeLabel.text = formatter.string(from: date)
+            timeLabel.valueHash = date.minute.hashValue
         }
     }
-    
-    var date: Date?
     
     init(style: Style, frame: CGRect) {
         self.style = style
@@ -68,14 +72,18 @@ extension CurrentLineView: CalendarSettingProtocol {
         
         timeLabel.textColor = style.timeline.currentLineHourColor
         timeLabel.font = style.timeline.currentLineHourFont
-        timeLabel.text = formatter.string(from: Date())
-        timeLabel.valueHash = Date().minute.hashValue
-        
+                
         timeLabel.frame = CGRect(x: 2, y: 0, width: style.timeline.currentLineHourWidth - 5, height: frame.height)
-        dotView.frame = CGRect(origin: CGPoint(x: style.timeline.currentLineHourWidth - (style.timeline.currentLineHourDotSize.width * 0.5), y: (frame.height * 0.5) - 2), size: style.timeline.currentLineHourDotSize)
-        lineView.frame = CGRect(x: style.timeline.currentLineHourWidth, y: frame.height * 0.5, width: frame.width - style.timeline.currentLineHourWidth, height: style.timeline.currentLineHourHeight)
+        dotView.frame = CGRect(origin: CGPoint(x: style.timeline.currentLineHourWidth - (style.timeline.currentLineHourDotSize.width * 0.5),
+                                               y: (frame.height * 0.5) - 2),
+                               size: style.timeline.currentLineHourDotSize)
+        lineView.frame = CGRect(x: style.timeline.currentLineHourWidth,
+                                y: frame.height * 0.5,
+                                width: frame.width - style.timeline.currentLineHourWidth,
+                                height: style.timeline.currentLineHourHeight)
         [timeLabel, lineView, dotView].forEach({ addSubview($0) })
         dotView.setRoundCorners(radius: style.timeline.currentLineHourDotCornersRadius)
+        isHidden = true
     }
     
     func updateStyle(_ style: Style) {
