@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class TimelineView: UIView, EventDateProtocol {
+final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     
     weak var delegate: TimelineDelegate?
     weak var dataSource: DisplayDataSource?
@@ -41,13 +41,11 @@ final class TimelineView: UIView, EventDateProtocol {
     private(set) var timeLabels = [TimelineLabel]()
     private(set) var availabilityHours: [String]
     private var timeSystem: TimeHourSystem
-    private var timer: Timer?
+    private let timerKey = "CurrentHourTimerKey"
     private(set) var events = [Event]()
     private(set) var dates = [Date?]()
     private(set) var selectedDate: Date?
     private(set) var type: CalendarType
-    
-    private(set) var currentTimeFormatter = DateFormatter()
     
     private(set) lazy var shadowView: ShadowDayView = {
         let view = ShadowDayView()
@@ -101,7 +99,7 @@ final class TimelineView: UIView, EventDateProtocol {
     }
     
     deinit {
-        stopTimer()
+        stopTimer(timerKey)
     }
     
     private func calculateCrossEvents(_ events: [Event]) -> [TimeInterval: CrossEvent] {
@@ -160,17 +158,10 @@ final class TimelineView: UIView, EventDateProtocol {
             return time.valueHash == hour.hashValue }).first as? TimelineLabel
     }
     
-    private func stopTimer() {
-        if timer?.isValid ?? true {
-            timer?.invalidate()
-            timer = nil
-        }
-    }
-    
     private func movingCurrentLineHour() {
-        guard !(timer?.isValid ?? false) else { return }
-        
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] (_) in
+        guard !isValidTimer(timerKey) else { return }
+                
+        let action = { [weak self] in
             guard let self = self else { return }
             
             let nextDate = Date().convertTimeZone(TimeZone.current, to: self.style.timezone)
@@ -185,7 +176,6 @@ final class TimelineView: UIView, EventDateProtocol {
             
             self.currentLineView.frame.origin.y = pointY - (self.currentLineView.frame.height * 0.5)
             self.currentLineView.valueHash = nextDate.minute.hashValue
-            self.currentLineView.time = self.currentTimeFormatter.string(from: nextDate)
             self.currentLineView.date = nextDate
             
             if let timeNext = self.getTimelineLabel(hour: nextDate.hour + 1) {
@@ -194,15 +184,14 @@ final class TimelineView: UIView, EventDateProtocol {
             time.isHidden = time.frame.intersects(self.currentLineView.frame)
         }
         
-        guard let timer = timer else { return }
-        RunLoop.current.add(timer, forMode: .default)
+        startTimer(timerKey, repeats: true, addToRunLoop: true, action: action)
     }
     
     private func showCurrentLineHour() {
-        let date = Date().convertTimeZone(TimeZone.current, to: self.style.timezone)
+        let date = Date().convertTimeZone(TimeZone.current, to: style.timezone)
         guard style.timeline.showLineHourMode.showForDates(dates), let time = getTimelineLabel(hour: date.hour) else {
             currentLineView.removeFromSuperview()
-            timer?.invalidate()
+            stopTimer(timerKey)
             return
         }
         

@@ -26,10 +26,20 @@ extension CalendarTimer {
         timers[key] = nil
     }
     
-    func startTimer(_ key: String = "Timer", interval: TimeInterval = 1, action: @escaping () -> Void) {
-        timers[key] = Timer.scheduledTimer(withTimeInterval: interval, repeats: false, block: { _ in
+    func isValidTimer(_ key: String = "Timer") -> Bool {
+        return timers[key]?.isValid == true
+    }
+    
+    func startTimer(_ key: String = "Timer", interval: TimeInterval = 1, repeats: Bool = false, addToRunLoop: Bool = false, action: @escaping () -> Void) {
+        let timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: repeats, block: { _ in
             action()
         })
+        
+        timers[key] = timer
+        
+        if addToRunLoop {
+            RunLoop.current.add(timer, forMode: .default)
+        }
     }
     
 }
