@@ -76,7 +76,6 @@ public final class ListView: UIView, CalendarSettingProtocol {
     }
     
     func setDate(_ date: Date) {
-        params.delegate?.didSelectDates([date], type: .list, frame: nil)
         params.data.date = date
         
         if let idx = params.data.sections.firstIndex(where: { $0.date.year == date.year && $0.date.month == date.month && $0.date.day == date.day }) {
@@ -118,6 +117,9 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
         } else {
             return tableView.dequeueView { (view: ListViewHeader) in
                 view.title = params.data.titleOfHeader(section: section, locale: params.style.locale)
+                view.didTap = { [weak self] in
+                    self?.params.delegate?.didSelectDates([date], type: .list, frame: view.frame)
+                }
             }
         }
     }

@@ -16,15 +16,23 @@ final class ListViewHeader: UITableViewHeaderFooterView {
         return label
     }()
     
+    var didTap: (() -> Void)?
+    
     var title: String? {
         didSet {
             titleLabel.text = title
         }
     }
     
+    private lazy var tapGesture: UITapGestureRecognizer = {
+        let tap = UITapGestureRecognizer(target: self, action: #selector(tapOnView))
+        return tap
+    }()
+    
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
         addSubview(titleLabel)
+        addGestureRecognizer(tapGesture)
         
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         let top = titleLabel.topAnchor.constraint(equalTo: topAnchor)
@@ -40,6 +48,10 @@ final class ListViewHeader: UITableViewHeaderFooterView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    @objc private func tapOnView() {
+        didTap?()
     }
     
 }
