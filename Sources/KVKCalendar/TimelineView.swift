@@ -188,17 +188,15 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     }
     
     private func showCurrentLineHour() {
+        currentLineView.removeFromSuperview()
+        
         let date = Date().convertTimeZone(TimeZone.current, to: style.timezone)
         guard style.timeline.showLineHourMode.showForDates(dates), let time = getTimelineLabel(hour: date.hour) else {
-            currentLineView.removeFromSuperview()
             stopTimer(timerKey)
             return
         }
         
-        var pointY = calculatePointYByMinute(date.minute, time: time)
-        if !subviews.filter({ $0.tag == tagAllDayEventView }).isEmpty, style.allDay.isPinned {
-            pointY -= style.allDay.height
-        }
+        let pointY = calculatePointYByMinute(date.minute, time: time)
         currentLineView.frame.origin.y = pointY - (currentLineView.frame.height * 0.5)
         scrollView.addSubview(currentLineView)
         movingCurrentLineHour()
@@ -252,7 +250,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             subviews.filter({ $0.tag == tagAllDayEventView }).forEach({ $0.removeFromSuperview() })
         }
         subviews.filter({ $0.tag == tagStubEvent || $0.tag == tagVerticalLine }).forEach({ $0.removeFromSuperview() })
-        scrollView.subviews.filter({ $0.tag != tagCurrentHourLine }).forEach({ $0.removeFromSuperview() })
+        scrollView.subviews.forEach({ $0.removeFromSuperview() })
         
         // filter events
         let recurringEvents = events.filter({ $0.recurringType != .none })

@@ -89,6 +89,7 @@ extension CurrentLineView: CalendarSettingProtocol {
     func updateStyle(_ style: Style) {
         self.style = style
         setUI()
+        date = Date()
     }
     
     func reloadFrame(_ frame: CGRect) {
