@@ -116,7 +116,9 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
             return headerView
         } else {
             return tableView.dequeueView { (view: ListViewHeader) in
-                view.title = params.data.titleOfHeader(section: section, locale: params.style.locale)
+                view.title = params.data.titleOfHeader(section: section,
+                                                       formatter: params.style.list.headerDateFormatter,
+                                                       locale: params.style.locale)
                 view.didTap = { [weak self] in
                     self?.params.delegate?.didSelectDates([date], type: .list, frame: view.frame)
                 }

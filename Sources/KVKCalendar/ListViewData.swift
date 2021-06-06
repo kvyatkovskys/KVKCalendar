@@ -22,12 +22,6 @@ public final class ListViewData {
     var sections: [SectionListView]
     var date: Date
     
-    private var dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .full
-        return formatter
-    }()
-    
     init(data: CalendarData) {
         self.date = data.date
         self.sections = []
@@ -38,10 +32,10 @@ public final class ListViewData {
         self.sections = sections
     }
     
-    func titleOfHeader(section: Int, locale: Locale) -> String {
+    func titleOfHeader(section: Int, formatter: DateFormatter, locale: Locale) -> String {
         let dateSection = sections[section].date
-        dateFormatter.locale = locale
-        return dateFormatter.string(from: dateSection)
+        formatter.locale = locale
+        return formatter.string(from: dateSection)
     }
     
     func reloadEvents(_ events: [Event]) {
