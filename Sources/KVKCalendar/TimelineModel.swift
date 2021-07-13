@@ -7,35 +7,9 @@
 
 import UIKit
 
-struct CrossEvent: Hashable {
-    let eventTime: EventTime
-    var count: Int
-    
-    init(eventTime: EventTime, count: Int = 1) {
-        self.eventTime = eventTime
-        self.count = count
-    }
-    
-    static func == (lhs: CrossEvent, rhs: CrossEvent) -> Bool {
-        return lhs.eventTime == rhs.eventTime
-            && lhs.count == rhs.count
-    }
-}
-
-extension CrossEvent {
-    var displayValue: String {
-        return "\(Date(timeIntervalSince1970: eventTime.start).toLocalTime()) - \(Date(timeIntervalSince1970: eventTime.end).toLocalTime()) = \(count)"
-    }
-}
-
 struct TimeContainer {
     var minute: Int
     var hour: Int
-}
-
-struct EventTime: Equatable, Hashable {
-    let start: TimeInterval
-    let end: TimeInterval
 }
 
 typealias ResizeTime = (hour: Int, minute: Int)
