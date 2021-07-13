@@ -46,8 +46,8 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     private(set) var dates = [Date?]()
     private(set) var selectedDate: Date?
     private(set) var type: CalendarType
-	private(set) var eventLayout: TimelineEventLayout
-    
+    private(set) var eventLayout: TimelineEventLayout
+
     private(set) lazy var shadowView: ShadowDayView = {
         let view = ShadowDayView()
         view.backgroundColor = style.timeline.shadowColumnColor
@@ -83,7 +83,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         self.timeSystem = style.timeSystem
         self.availabilityHours = timeSystem.hours
         self.style = style
-		self.eventLayout = style.timeline.eventLayout
+        self.eventLayout = style.timeline.eventLayout
         super.init(frame: frame)
         
         var scrollFrame = frame
@@ -312,33 +312,33 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                                       xOffset: pointX - leftOffset,
                                       width: widthPage))
 
-			do {
-				let context = TimelineEventLayoutContext(
-					style: style,
-					pageFrame: .init(x: pointX, y: 0, width: widthPage, height: heightPage),
-					startHour: startHour,
-					timeLabels: timeLabels,
-					calculatePointYByMinute: calculatePointYByMinute(_:time:),
-					getTimelineLabel: getTimelineLabel(hour:)
-				)
-				let rects = eventLayout.getEventRects(
-					forEvents: sortedEventsByDate,
-					date: date,
-					context: context
-				)
-				for (event, rect) in zip(sortedEventsByDate, rects) {
-					let view: EventViewGeneral = {
-						if let view = dataSource?.willDisplayEventView(event, frame: rect, date: date) {
-							return view
-						} else {
-							return EventView(event: event, style: style, frame: rect)
-						}
-					}()
+            do {
+                let context = TimelineEventLayoutContext(
+                    style: style,
+                    pageFrame: .init(x: pointX, y: 0, width: widthPage, height: heightPage),
+                    startHour: startHour,
+                    timeLabels: timeLabels,
+                    calculatePointYByMinute: calculatePointYByMinute(_:time:),
+                    getTimelineLabel: getTimelineLabel(hour:)
+                )
+                let rects = eventLayout.getEventRects(
+                    forEvents: sortedEventsByDate,
+                    date: date,
+                    context: context
+                )
+                for (event, rect) in zip(sortedEventsByDate, rects) {
+                    let view: EventViewGeneral = {
+                        if let view = dataSource?.willDisplayEventView(event, frame: rect, date: date) {
+                            return view
+                        } else {
+                            return EventView(event: event, style: style, frame: rect)
+                        }
+                    }()
 
-					view.delegate = self
-					view.dataSource = self
-					scrollView.addSubview(view)
-				}
+                    view.delegate = self
+                    view.dataSource = self
+                    scrollView.addSubview(view)
+                }
             }
             
             if !style.timeline.isHiddenStubEvent, let day = date?.day {
