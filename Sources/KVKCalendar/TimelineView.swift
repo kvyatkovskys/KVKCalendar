@@ -46,6 +46,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     private(set) var dates = [Date?]()
     private(set) var selectedDate: Date?
     private(set) var type: CalendarType
+	private(set) var eventLayout: TimelineEventLayout
     
     private(set) lazy var shadowView: ShadowDayView = {
         let view = ShadowDayView()
@@ -82,6 +83,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         self.timeSystem = style.timeSystem
         self.availabilityHours = timeSystem.hours
         self.style = style
+		self.eventLayout = style.timeline.eventLayout
         super.init(frame: frame)
         
         var scrollFrame = frame
@@ -100,34 +102,6 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     
     deinit {
         stopTimer(timerKey)
-    }
-    
-    private func calculateCrossEvents(_ events: [Event]) -> [TimeInterval: CrossEvent] {
-        var eventsTemp = events
-        var crossEvents = [TimeInterval: CrossEvent]()
-        
-        while let event = eventsTemp.first {
-            let start = event.start.timeIntervalSince1970
-            let end = event.end.timeIntervalSince1970
-            var crossEventNew = CrossEvent(eventTime: EventTime(start: start, end: end))
-            
-            let endCalculated: TimeInterval = crossEventNew.eventTime.end - TimeInterval(style.timeline.offsetEvent)
-            let eventsFiltered = events.filter({ (item) in
-                let itemEnd = item.end.timeIntervalSince1970 - TimeInterval(style.timeline.offsetEvent)
-                let itemStart = item.start.timeIntervalSince1970
-                guard itemEnd > itemStart else { return false }
-                
-                return (itemStart...itemEnd).contains(start) || (itemStart...itemEnd).contains(endCalculated) || (start...endCalculated).contains(itemStart) || (start...endCalculated).contains(itemEnd)
-            })
-            if !eventsFiltered.isEmpty {
-                crossEventNew.count = eventsFiltered.count
-            }
-
-            crossEvents[crossEventNew.eventTime.start] = crossEventNew
-            eventsTemp.removeFirst()
-        }
-        
-        return crossEvents
     }
     
     private func setOffsetScrollView(allDayEventsCount: Int) {
@@ -288,7 +262,6 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
         let widthPage = (frame.width - leftOffset) / CGFloat(dates.count)
         let heightPage = scrollView.contentSize.height
-        let midnight = 24
         var allDayEvents = [AllDayView.PrepareEvents]()
         
         // horror
@@ -338,75 +311,34 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                                       date: date,
                                       xOffset: pointX - leftOffset,
                                       width: widthPage))
-            
-            // count event cross in one hour
-            let crossEvents = calculateCrossEvents(sortedEventsByDate)
-            var pagesCached = [EventViewGeneral]()
-            
-            if !sortedEventsByDate.isEmpty {
-                // create event
-                var newFrame = CGRect(x: 0, y: 0, width: 0, height: heightPage)
-                sortedEventsByDate.forEach { (event) in
-                    timeLabels.forEach({ (time) in
-                        // calculate position 'y'
-                        if event.start.hour.hashValue == time.valueHash, event.start.day == date?.day {
-                            if time.tag == midnight, let newTime = timeLabels.first(where: { $0.tag == 0 }) {
-                                newFrame.origin.y = calculatePointYByMinute(event.start.minute, time: newTime)
-                            } else {
-                                newFrame.origin.y = calculatePointYByMinute(event.start.minute, time: time)
-                            }
-                        } else if let firstTimeLabel = getTimelineLabel(hour: startHour), event.start.day != date?.day {
-                            newFrame.origin.y = calculatePointYByMinute(startHour, time: firstTimeLabel)
-                        }
-                        
-                        // calculate 'height' event
-                        if let defaultHeight = event.style?.defaultHeight {
-                            newFrame.size.height = defaultHeight
-                        } else if let globalDefaultHeight = style.event.defaultHeight {
-                            newFrame.size.height = globalDefaultHeight
-                        } else if event.end.hour.hashValue == time.valueHash, event.end.day == date?.day {
-                            var timeTemp = time
-                            if time.tag == midnight, let newTime = timeLabels.first(where: { $0.tag == 0 }) {
-                                timeTemp = newTime
-                            }
-                            let summHeight = (CGFloat(timeTemp.tag) * (style.timeline.offsetTimeY + timeTemp.frame.height)) - newFrame.origin.y + (timeTemp.frame.height / 2)
-                            if 0...59 ~= event.end.minute {
-                                let minutePercent = 59.0 / CGFloat(event.end.minute)
-                                let newY = (style.timeline.offsetTimeY + timeTemp.frame.height) / minutePercent
-                                newFrame.size.height = summHeight + newY - style.timeline.offsetEvent
-                            } else {
-                                newFrame.size.height = summHeight - style.timeline.offsetEvent
-                            }
-                        } else if event.end.day != date?.day {
-                            newFrame.size.height = (CGFloat(time.tag) * (style.timeline.offsetTimeY + time.frame.height)) - newFrame.origin.y + (time.frame.height / 2)
-                        }
-                    })
-                    
-                    // calculate 'width' and position 'x'
-                    var newWidth = widthPage
-                    var newPointX = pointX
-                    if let crossEvent = crossEvents[event.start.timeIntervalSince1970] {
-                        newWidth /= CGFloat(crossEvent.count)
-                        newWidth -= style.timeline.offsetEvent
-                        newFrame.size.width = newWidth
-                        
-                        if crossEvent.count > 1, !pagesCached.isEmpty {
-                            for page in pagesCached {
-                                while page.frame.intersects(CGRect(x: newPointX, y: newFrame.origin.y, width: newFrame.width, height: newFrame.height)) {
-                                    newPointX += (page.frame.width + style.timeline.offsetEvent).rounded()
-                                }
-                            }
-                        }
-                    }
-                    
-                    newFrame.origin.x = newPointX
-                    
-                    let page = getEventView(style: style, event: event, frame: newFrame, date: date)
-                    page.delegate = self
-                    page.dataSource = self
-                    scrollView.addSubview(page)
-                    pagesCached.append(page)
-                }
+
+			do {
+				let context = TimelineEventLayoutContext(
+					style: style,
+					pageFrame: .init(x: pointX, y: 0, width: widthPage, height: heightPage),
+					startHour: startHour,
+					timeLabels: timeLabels,
+					calculatePointYByMinute: calculatePointYByMinute(_:time:),
+					getTimelineLabel: getTimelineLabel(hour:)
+				)
+				let rects = eventLayout.getEventRects(
+					forEvents: sortedEventsByDate,
+					date: date,
+					context: context
+				)
+				for (event, rect) in zip(sortedEventsByDate, rects) {
+					let view: EventViewGeneral = {
+						if let view = dataSource?.willDisplayEventView(event, frame: rect, date: date) {
+							return view
+						} else {
+							return EventView(event: event, style: style, frame: rect)
+						}
+					}()
+
+					view.delegate = self
+					view.dataSource = self
+					scrollView.addSubview(view)
+				}
             }
             
             if !style.timeline.isHiddenStubEvent, let day = date?.day {

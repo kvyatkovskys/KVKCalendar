@@ -138,6 +138,8 @@ public struct TimelineStyle {
     public var isEnabledCreateNewEvent: Bool = true
     public var maxLimitChachedPages: UInt = 10
     public var scrollDirections: Set<ScrollDirectionType> = Set(ScrollDirectionType.allCases)
+
+	public var eventLayout: TimelineEventLayout = DefaultTimelineEventLayout()
     
     public enum ScrollDirectionType: Int, CaseIterable {
         case vertical, horizontal
