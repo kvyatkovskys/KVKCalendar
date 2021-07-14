@@ -56,6 +56,7 @@ final class ViewController: UIViewController {
         if #available(iOS 13.0, *) {
             style.event.iconFile = UIImage(systemName: "paperclip")
         }
+        style.locale = Locale(identifier: "ru_RU")
         return style
     }()
     
@@ -203,6 +204,16 @@ extension ViewController: CalendarDelegate {
 // MARK: - Calendar datasource
 
 extension ViewController: CalendarDataSource {
+    @available(iOS 14.0, *)
+    func willDisplayEventOptionMenu(_ event: Event) -> (menu: UIMenu, customButton: UIButton?)? {
+        print(event)
+        let action = UIAction(title: "Test", attributes: .destructive) { _ in
+            print("test tap")
+        }
+        
+        return (UIMenu(title: "Test menu", children: [action]), nil)
+    }
+    
     func eventsForCalendar(systemEvents: [EKEvent]) -> [Event] {
         // if you want to get a system events, you need to set style.systemCalendars = ["test"]
         let mappedEvents = systemEvents.compactMap { (event) -> Event in

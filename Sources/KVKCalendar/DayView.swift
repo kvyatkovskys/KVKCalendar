@@ -187,21 +187,30 @@ final class DayView: UIView {
 }
 
 extension DayView: DisplayDataSource {
+    
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? {
         return dataSource?.willDisplayEventView(event, frame: frame, date: date)
+    }
+    
+    @available(iOS 14.0, *)
+    func willDisplayEventOptionMenu(_ event: Event) -> (menu: UIMenu, customButton: UIButton?)? {
+        return dataSource?.willDisplayEventOptionMenu(event)
     }
 }
 
 extension DayView {
+    
     func didSelectDateScrollHeader(_ date: Date?, type: CalendarType) {
         guard let selectDate = date else { return }
         
         parameters.data.date = selectDate
         delegate?.didSelectDates([selectDate], type: type, frame: nil)
     }
+    
 }
 
 extension DayView: TimelineDelegate {
+    
     func didDisplayEvents(_ events: [Event], dates: [Date?]) {
         delegate?.didDisplayEvents(events, dates: dates, type: .day)
     }
@@ -270,6 +279,7 @@ extension DayView: TimelineDelegate {
                 
         delegate?.didChangeEvent(event, start: startDate, end: endDate)
     }
+    
 }
 
 extension DayView: CalendarSettingProtocol {
