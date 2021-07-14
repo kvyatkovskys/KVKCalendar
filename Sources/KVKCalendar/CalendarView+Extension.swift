@@ -189,6 +189,11 @@ extension CalendarView: DisplayDataSource {
     public func willDisplayEventViewer(date: Date, frame: CGRect) -> UIView? {
         return dataSource?.willDisplayEventViewer(date: date, frame: frame)
     }
+    
+    @available(iOS 14.0, *)
+    public func willDisplayEventOptionMenu(_ event: Event) -> (menu: UIMenu, customButton: UIButton?)? {
+        return dataSource?.willDisplayEventOptionMenu(event)
+    }
 }
 
 extension CalendarView: DisplayDelegate {

@@ -61,6 +61,21 @@ final class EventView: EventViewGeneral {
         }
     }
     
+    @available(iOS 14.0, *)
+    func addOptionMenu(_ menu: UIMenu, customButton: UIButton?) {
+        let button: UIButton
+        if let item = customButton {
+            button = item
+        } else {
+            button = optionButton
+            button.frame = CGRect(x: frame.width - 27, y: 2, width: 23, height: 23)
+
+        }
+        
+        button.menu = menu
+        addSubview(button)
+    }
+    
     override func tapOnEvent(gesture: UITapGestureRecognizer) {
         guard !isSelected else {
             delegate?.deselectEvent(event)

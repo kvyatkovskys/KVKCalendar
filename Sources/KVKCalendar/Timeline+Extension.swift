@@ -280,10 +280,14 @@ extension TimelineView {
     }
     
     func getEventView(style: Style, event: Event, frame: CGRect, date: Date? = nil) -> EventViewGeneral {
-        if let pageView = dataSource?.willDisplayEventView(event, frame: frame, date: date) {
-            return pageView
+        if let eventView = dataSource?.willDisplayEventView(event, frame: frame, date: date) {
+            return eventView
         } else {
-            return EventView(event: event, style: style, frame: frame)
+            let eventView = EventView(event: event, style: style, frame: frame)
+            if #available(iOS 14.0, *), let item = dataSource?.willDisplayEventOptionMenu(event) {
+                eventView.addOptionMenu(item.menu, customButton: item.customButton)
+            }
+            return eventView
         }
     }
     
@@ -358,13 +362,6 @@ extension TimelineView {
             }
             action()
         })
-    }
-}
-
-extension TimelineView: EventDataSource {
-    @available(iOS 13, *)
-    func willDisplayContextMenu(_ event: Event, date: Date?) -> UIContextMenuConfiguration? {
-        return nil
     }
 }
 
