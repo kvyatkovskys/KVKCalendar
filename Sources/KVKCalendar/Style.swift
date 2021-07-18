@@ -138,8 +138,25 @@ public struct TimelineStyle {
     public var isEnabledCreateNewEvent: Bool = true
     public var maxLimitChachedPages: UInt = 10
     public var scrollDirections: Set<ScrollDirectionType> = Set(ScrollDirectionType.allCases)
-
+    public var dividerType: DividerType? = nil
     public var eventLayout: TimelineEventLayout = DefaultTimelineEventLayout()
+    
+    public enum DividerType: Int {
+        case mins5 = 12
+        case mins15 = 4
+        case mins30 = 2
+        
+        var minutes: Int {
+            switch self {
+            case .mins5:
+                return 5
+            case .mins15:
+                return 15
+            case .mins30:
+                return 30
+            }
+        }
+    }
     
     public enum ScrollDirectionType: Int, CaseIterable {
         case vertical, horizontal

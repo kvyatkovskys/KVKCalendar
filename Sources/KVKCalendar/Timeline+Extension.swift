@@ -254,8 +254,10 @@ extension TimelineView {
     }
     
     func createLines(times: [TimelineLabel]) -> [UIView] {
-        var lines = [UIView]()
-        for (idx, time) in times.enumerated() {
+        return times.enumerated().reduce([]) { acc, item -> [UIView] in
+            let time = item.element
+            let idx = item.offset
+            
             let xLine = time.frame.width + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
             let lineFrame = CGRect(x: xLine,
                                    y: time.center.y,
@@ -264,9 +266,25 @@ extension TimelineView {
             let line = UIView(frame: lineFrame)
             line.backgroundColor = style.timeline.separatorLineColor
             line.tag = idx
-            lines.append(line)
+            
+            var lines = [line]
+            if let dividerType = style.timeline.dividerType {
+                let heightBlock = style.timeline.offsetTimeY + style.timeline.heightTime
+                lines += (1..<dividerType.rawValue).compactMap({ idxDivider in
+                    let yOffset = heightBlock / CGFloat(dividerType.rawValue) * CGFloat(idxDivider)
+                    let divider = DividerView(style: style,
+                                              frame: CGRect(x: 0,
+                                                            y: line.frame.origin.y + yOffset - (style.timeline.heightTime / 2),
+                                                            width: scrollView.bounds.width,
+                                                            height: style.timeline.heightTime))
+                    divider.txt = ":\(dividerType.minutes * idxDivider)"
+                    return divider
+                    
+                })
+            }
+            
+            return acc + lines
         }
-        return lines
     }
     
     func createVerticalLine(pointX: CGFloat, date: Date?) -> VerticalLineView {
