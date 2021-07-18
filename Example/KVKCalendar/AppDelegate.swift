@@ -17,7 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow(frame: UIScreen.main.bounds)
         let navVC = UINavigationController(rootViewController: ViewController())
         navVC.isNavigationBarHidden = false
-        navVC.navigationBar.isTranslucent = true
+        navVC.navigationBar.isTranslucent = false
         
         if #available(iOS 15.0, *) {
             let appearance = UINavigationBarAppearance()

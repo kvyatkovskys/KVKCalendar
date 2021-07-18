@@ -69,9 +69,11 @@ final class EventView: EventViewGeneral {
         } else {
             button = optionButton
             button.frame = CGRect(x: frame.width - 27, y: 2, width: 23, height: 23)
-
         }
         
+        guard bounds.height > button.bounds.height else { return }
+        
+        textView.frame.size.width -= button.bounds.width + 5
         button.menu = menu
         addSubview(button)
     }

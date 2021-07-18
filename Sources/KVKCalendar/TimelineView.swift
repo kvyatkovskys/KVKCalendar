@@ -331,12 +331,15 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                         if let view = dataSource?.willDisplayEventView(event, frame: rect, date: date) {
                             return view
                         } else {
-                            return EventView(event: event, style: style, frame: rect)
+                            let eventView = EventView(event: event, style: style, frame: rect)
+                            if #available(iOS 14.0, *), let item = dataSource?.willDisplayEventOptionMenu(event) {
+                                eventView.addOptionMenu(item.menu, customButton: item.customButton)
+                            }
+                            return eventView
                         }
                     }()
 
                     view.delegate = self
-                    view.dataSource = self
                     scrollView.addSubview(view)
                 }
             }

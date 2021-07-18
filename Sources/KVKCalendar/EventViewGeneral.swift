@@ -31,7 +31,7 @@ open class EventViewGeneral: UIView, CalendarTimer {
     }()
     
     public let optionButton: UIButton = {
-        let button = UIButton(type: .infoDark)
+        let button = UIButton(type: .infoLight)
         if #available(iOS 14.0, *) {
             button.showsMenuAsPrimaryAction = true
         }
