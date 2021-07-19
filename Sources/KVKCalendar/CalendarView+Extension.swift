@@ -191,8 +191,8 @@ extension CalendarView: DisplayDataSource {
     }
     
     @available(iOS 14.0, *)
-    public func willDisplayEventOptionMenu(_ event: Event) -> (menu: UIMenu, customButton: UIButton?)? {
-        return dataSource?.willDisplayEventOptionMenu(event)
+    public func willDisplayEventOptionMenu(_ event: Event, type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)? {
+        return dataSource?.willDisplayEventOptionMenu(event, type: type)
     }
 }
 

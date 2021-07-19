@@ -205,8 +205,9 @@ extension ViewController: CalendarDelegate {
 
 extension ViewController: CalendarDataSource {
     @available(iOS 14.0, *)
-    func willDisplayEventOptionMenu(_ event: Event) -> (menu: UIMenu, customButton: UIButton?)? {
-        print(event)
+    func willDisplayEventOptionMenu(_ event: Event, type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)? {
+        guard type == .day else { return nil }
+        
         let action = UIAction(title: "Test", attributes: .destructive) { _ in
             print("test tap")
         }

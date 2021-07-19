@@ -182,8 +182,8 @@ extension WeekView: DisplayDataSource {
     }
     
     @available(iOS 14.0, *)
-    func willDisplayEventOptionMenu(_ event: Event) -> (menu: UIMenu, customButton: UIButton?)? {
-        return dataSource?.willDisplayEventOptionMenu(event)
+    func willDisplayEventOptionMenu(_ event: Event, type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)? {
+        return dataSource?.willDisplayEventOptionMenu(event, type: type)
     }
     
 }
