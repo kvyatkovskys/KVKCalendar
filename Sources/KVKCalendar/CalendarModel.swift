@@ -304,7 +304,7 @@ public protocol CalendarDataSource: AnyObject {
     func dequeueHeader<T: UIScrollView>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarHeaderProtocol?
     
     @available(iOS 14.0, *)
-    func willDisplayEventOptionMenu(_ event: Event) -> (menu: UIMenu, customButton: UIButton?)?
+    func willDisplayEventOptionMenu(_ event: Event, type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)?
 }
 
 public extension CalendarDataSource {
@@ -329,7 +329,7 @@ public extension CalendarDataSource {
     func dequeueHeader<T: UIScrollView>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarHeaderProtocol? { return nil }
     
     @available(iOS 14.0, *)
-    func willDisplayEventOptionMenu(_ event: Event) -> (menu: UIMenu, customButton: UIButton?)? {
+    func willDisplayEventOptionMenu(_ event: Event, type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)? {
         return nil
     }
 }

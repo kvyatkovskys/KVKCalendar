@@ -302,7 +302,7 @@ extension TimelineView {
             return eventView
         } else {
             let eventView = EventView(event: event, style: style, frame: frame)
-            if #available(iOS 14.0, *), let item = dataSource?.willDisplayEventOptionMenu(event) {
+            if #available(iOS 14.0, *), let item = dataSource?.willDisplayEventOptionMenu(event, type: type) {
                 eventView.addOptionMenu(item.menu, customButton: item.customButton)
             }
             return eventView
