@@ -71,7 +71,7 @@ final class EventView: EventViewGeneral {
             button.frame = CGRect(x: frame.width - 27, y: 2, width: 23, height: 23)
         }
         
-        guard bounds.height > button.bounds.height else { return }
+        guard bounds.height > button.bounds.height && bounds.width > button.bounds.width else { return }
         
         textView.frame.size.width -= button.bounds.width + 5
         button.menu = menu
@@ -109,10 +109,12 @@ final class EventView: EventViewGeneral {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
 }
 
 @available(iOS 13.4, *)
 extension EventView: PointerInteractionProtocol {
+    
     func pointerInteraction(_ interaction: UIPointerInteraction, styleFor region: UIPointerRegion) -> UIPointerStyle? {
         var pointerStyle: UIPointerStyle?
         
@@ -122,4 +124,5 @@ extension EventView: PointerInteractionProtocol {
         }
         return pointerStyle
     }
+    
 }
