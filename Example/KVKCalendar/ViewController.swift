@@ -57,7 +57,6 @@ final class ViewController: UIViewController {
             style.event.iconFile = UIImage(systemName: "paperclip")
         }
         style.timeline.dividerType = .mins30
-        style.locale = Locale(identifier: "ru_RU")
         return style
     }()
     

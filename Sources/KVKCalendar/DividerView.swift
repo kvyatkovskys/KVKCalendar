@@ -13,15 +13,15 @@ final class DividerView: UIView {
     
     private lazy var timeLabel: UILabel = {
         let label = UILabel()
-        label.textColor = style.timeline.timeColor.withAlphaComponent(0.7)
-        label.font = style.timeline.timeFont
+        label.textColor = style.timeline.timeDividerColor
+        label.font = style.timeline.timeDividerFont
         label.textAlignment = .right
         return label
     }()
     
     private lazy var lineView: UIView = {
         let view = UIView()
-        view.backgroundColor = style.timeline.separatorLineColor.withAlphaComponent(0.7)
+        view.backgroundColor = style.timeline.timeDividerColor
         return view
     }()
     
