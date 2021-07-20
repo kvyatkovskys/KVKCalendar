@@ -56,7 +56,6 @@ final class ViewController: UIViewController {
         if #available(iOS 13.0, *) {
             style.event.iconFile = UIImage(systemName: "paperclip")
         }
-        style.timeline.dividerType = .mins30
         return style
     }()
     
