@@ -136,10 +136,33 @@ public struct TimelineStyle {
     public var minimumPressDuration: TimeInterval = 0.5
     public var isHiddenStubEvent: Bool = false
     public var isEnabledCreateNewEvent: Bool = true
+    
+    @available(swift, deprecated: 0.5.1, obsoleted: 0.5.2, renamed: "maxLimitCachedPages")
     public var maxLimitChachedPages: UInt = 10
+    public var maxLimitCachedPages: UInt = 10
+    
     public var scrollDirections: Set<ScrollDirectionType> = Set(ScrollDirectionType.allCases)
-
+    public var dividerType: DividerType? = nil
     public var eventLayout: TimelineEventLayout = DefaultTimelineEventLayout()
+    public var timeDividerColor: UIColor = .lightGray
+    public var timeDividerFont: UIFont = .systemFont(ofSize: 10)
+    
+    public enum DividerType: Int {
+        case mins5 = 12
+        case mins15 = 4
+        case mins30 = 2
+        
+        var minutes: Int {
+            switch self {
+            case .mins5:
+                return 5
+            case .mins15:
+                return 15
+            case .mins30:
+                return 30
+            }
+        }
+    }
     
     public enum ScrollDirectionType: Int, CaseIterable {
         case vertical, horizontal
@@ -766,7 +789,7 @@ extension TimelineStyle: Equatable {
             && compare(\.minimumPressDuration)
             && compare(\.isHiddenStubEvent)
             && compare(\.isEnabledCreateNewEvent)
-            && compare(\.maxLimitChachedPages)
+            && compare(\.maxLimitCachedPages)
             && compare(\.scrollDirections)
     }
     

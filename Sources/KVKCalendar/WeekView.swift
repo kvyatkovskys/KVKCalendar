@@ -70,10 +70,10 @@ final class WeekView: UIView {
             timelineFrame.size.height -= scrollHeaderDay.frame.height
         }
         
-        let timelineViews = Array(0..<style.timeline.maxLimitChachedPages).reduce([]) { (acc, _) -> [TimelineView] in
+        let timelineViews = Array(0..<style.timeline.maxLimitCachedPages).reduce([]) { (acc, _) -> [TimelineView] in
             return acc + [createTimelineView(frame: timelineFrame)]
         }
-        let page = TimelinePageView(maxLimit: style.timeline.maxLimitChachedPages,
+        let page = TimelinePageView(maxLimit: style.timeline.maxLimitCachedPages,
                                     pages: timelineViews,
                                     frame: timelineFrame)
         return page
@@ -176,12 +176,20 @@ final class WeekView: UIView {
 }
 
 extension WeekView: DisplayDataSource {
+    
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? {
         return dataSource?.willDisplayEventView(event, frame: frame, date: date)
     }
+    
+    @available(iOS 14.0, *)
+    func willDisplayEventOptionMenu(_ event: Event, type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)? {
+        return dataSource?.willDisplayEventOptionMenu(event, type: type)
+    }
+    
 }
 
 extension WeekView {
+    
     func didSelectDateScrollHeader(_ date: Date?, type: CalendarType) {
         guard let selectDate = date else { return }
         
@@ -192,6 +200,7 @@ extension WeekView {
         }
         delegate?.didSelectDates([selectDate], type: type, frame: nil)
     }
+    
 }
 
 extension WeekView: CalendarSettingProtocol {
@@ -236,9 +245,11 @@ extension WeekView: CalendarSettingProtocol {
         addSubview(timelinePages)
         timelinePages.isPagingEnabled = style.timeline.scrollDirections.contains(.horizontal)
     }
+    
 }
 
 extension WeekView: TimelineDelegate {
+    
     func didDisplayEvents(_ events: [Event], dates: [Date?]) {
         delegate?.didDisplayEvents(events, dates: dates, type: .week)
     }
@@ -325,4 +336,5 @@ extension WeekView: TimelineDelegate {
         
         delegate?.didChangeEvent(event, start: startDate, end: endDate)
     }
+    
 }

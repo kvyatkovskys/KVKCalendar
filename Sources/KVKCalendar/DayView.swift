@@ -83,10 +83,10 @@ final class DayView: UIView {
             }
         }
         
-        let timelineViews = Array(0..<parameters.style.timeline.maxLimitChachedPages).reduce([]) { (acc, _) -> [TimelineView] in
+        let timelineViews = Array(0..<parameters.style.timeline.maxLimitCachedPages).reduce([]) { (acc, _) -> [TimelineView] in
             return acc + [createTimelineView(frame: timelineFrame)]
         }
-        let page = TimelinePageView(maxLimit: parameters.style.timeline.maxLimitChachedPages,
+        let page = TimelinePageView(maxLimit: parameters.style.timeline.maxLimitCachedPages,
                                     pages: timelineViews,
                                     frame: timelineFrame)
         return page
@@ -187,21 +187,30 @@ final class DayView: UIView {
 }
 
 extension DayView: DisplayDataSource {
+    
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? {
         return dataSource?.willDisplayEventView(event, frame: frame, date: date)
+    }
+    
+    @available(iOS 14.0, *)
+    func willDisplayEventOptionMenu(_ event: Event, type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)? {
+        return dataSource?.willDisplayEventOptionMenu(event, type: type)
     }
 }
 
 extension DayView {
+    
     func didSelectDateScrollHeader(_ date: Date?, type: CalendarType) {
         guard let selectDate = date else { return }
         
         parameters.data.date = selectDate
         delegate?.didSelectDates([selectDate], type: type, frame: nil)
     }
+    
 }
 
 extension DayView: TimelineDelegate {
+    
     func didDisplayEvents(_ events: [Event], dates: [Date?]) {
         delegate?.didDisplayEvents(events, dates: dates, type: .day)
     }
@@ -270,6 +279,7 @@ extension DayView: TimelineDelegate {
                 
         delegate?.didChangeEvent(event, start: startDate, end: endDate)
     }
+    
 }
 
 extension DayView: CalendarSettingProtocol {
