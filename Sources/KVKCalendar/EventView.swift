@@ -74,6 +74,16 @@ final class EventView: EventViewGeneral {
         guard bounds.height > button.bounds.height && bounds.width > button.bounds.width else { return }
         
         textView.frame.size.width -= button.bounds.width + 5
+    
+        if iconFileImageView.superview != nil {
+            if bounds.height > (button.bounds.height + iconFileImageView.bounds.height + 5) {
+                iconFileImageView.frame.origin.y += button.bounds.height + 5
+                iconFileImageView.isHidden = false
+            } else {
+                iconFileImageView.isHidden = true
+            }
+        }
+        
         button.menu = menu
         addSubview(button)
     }
