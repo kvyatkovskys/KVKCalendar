@@ -9,7 +9,17 @@
 
 # KVKCalendar
 
-**KVKCalendar** is a most fully customization calendar and timeline library. Library consists of four modules for displaying various types of calendar (*day*, *week*, *month*, *year*). You can choose any module or use all. It is designed based on a standard iOS calendar, but with additional features. Timeline displays the schedule for the day and week.
+**KVKCalendar** is a most fully customization calendar and timeline library. Library consists of five modules for displaying various types of calendar (*day*, *week*, *month*, *year*, *list of events*). You can choose any module or use all. It is designed based on a standard iOS calendar, but with additional features. Timeline displays the schedule for the day and week.
+
+**Additional features:**
+- [x] Dark mode
+- [ ] Skeleton loading
+- [x] Custom event view
+- [x] Custom date cell
+- [x] Custom header view and collection view
+- [x] Custom calendar localization
+- [x] Ability to set a divider line
+- [x] UIMenu support in event view (iOS 14.0 and above)
 
 ## Need Help?
 
