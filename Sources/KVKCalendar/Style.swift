@@ -287,6 +287,7 @@ public struct MonthStyle {
     public var titleDateAlignment: NSTextAlignment = .left
     public var fontTitleDate: UIFont = .boldSystemFont(ofSize: 30)
     public var colorTitleDate: UIColor = .black
+    public var colorTitleCurrentDate: UIColor = .systemRed
     public var showDatesForOtherMonths: Bool = false
     public var colorBackground: UIColor = .white
     public var selectionMode: SelectionMode = .multiple
@@ -492,6 +493,7 @@ extension Style {
             newStyle.month.colorBackgroundDate = UIColor.useForStyle(dark: .black, white: newStyle.month.colorBackgroundDate)
             newStyle.month.colorTitleDate = UIColor.useForStyle(dark: .white, white: newStyle.month.colorTitleDate)
             newStyle.month.colorBackground = UIColor.useForStyle(dark: .black, white: newStyle.month.colorBackground)
+            newStyle.month.colorTitleCurrentDate = .useForStyle(dark: .systemRed, white: newStyle.month.colorTitleCurrentDate)
             
             // year
             newStyle.year.colorCurrentDate = UIColor.useForStyle(dark: .white, white: newStyle.year.colorCurrentDate)
@@ -638,6 +640,7 @@ extension MonthStyle: Equatable {
             && compare(\.showDatesForOtherMonths)
             && compare(\.colorBackground)
             && compare(\.selectionMode)
+            && compare(\.colorTitleCurrentDate)
     }
     
 }
