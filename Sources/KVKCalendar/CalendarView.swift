@@ -29,13 +29,25 @@ public final class CalendarView: UIView {
     private var dayData: DayData
     private let listData: ListViewData
     
-    var systemEvents: [EKEvent] {
-        guard !style.systemCalendars.isEmpty else { return [] }
+    func getSystemEvents(store: EKEventStore, calendars: Set<String>, completion: @escaping ([EKEvent]) -> Void) {
+        guard !calendars.isEmpty else {
+            completion([])
+            return
+        }
 
-        let systemCalendars = eventStore.calendars(for: .event).filter({ style.systemCalendars.contains($0.title) })
-        guard !systemCalendars.isEmpty else { return [] }
+        let systemCalendars = store.calendars(for: .event).filter({ calendars.contains($0.title) })
+        guard !systemCalendars.isEmpty else {
+            completion([])
+            return
+        }
         
-        return getSystemEvents(eventStore: eventStore, calendars: systemCalendars)
+        DispatchQueue.global().async { [weak self] in
+            self?.getSystemEvents(eventStore: store, calendars: systemCalendars) { (items) in
+                DispatchQueue.main.async {
+                    completion(items)
+                }
+            }
+        }
     }
     
     /// references the current visible View (to allow lazy loading of views)

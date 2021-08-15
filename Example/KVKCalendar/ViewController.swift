@@ -52,7 +52,7 @@ final class ViewController: UIViewController {
         style.timeline.offsetTimeY = 25
         style.startWeekDay = .sunday
         style.timeSystem = .current ?? .twelve
-        style.systemCalendars = ["Calendar"]
+        style.systemCalendars = ["Calendar1", "Calendar2", "Calendar3"]
         if #available(iOS 13.0, *) {
             style.event.iconFile = UIImage(systemName: "paperclip")
         }

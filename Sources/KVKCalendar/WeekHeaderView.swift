@@ -97,7 +97,7 @@ final class WeekHeaderView: UIView {
             titleLabel.text = date.titleForLocale(style.locale, formatter: style.month.titleFormatter)
             
             if Date().year == date.year && Date().month == date.month {
-                titleLabel.textColor = .systemRed
+                titleLabel.textColor = style.month.colorTitleCurrentDate
             } else {
                 titleLabel.textColor = style.month.colorTitleDate
             }

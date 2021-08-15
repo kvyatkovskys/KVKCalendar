@@ -31,19 +31,21 @@ extension CalendarView {
             authForSystemCalendars()
         }
         
-        let events = dataSource?.eventsForCalendar(systemEvents: systemEvents) ?? []
-        
-        switch type {
-        case .day:
-            dayView.reloadData(events)
-        case .week:
-            weekView.reloadData(events)
-        case .month:
-            monthView.reloadData(events)
-        case .list:
-            listView.reloadData(events)
-        default:
-            break
+        getSystemEvents(store: eventStore, calendars: style.systemCalendars) { [weak self] (systemEvents) in
+            let events = self?.dataSource?.eventsForCalendar(systemEvents: systemEvents) ?? []
+            
+            switch self?.type {
+            case .day:
+                self?.dayView.reloadData(events)
+            case .week:
+                self?.weekView.reloadData(events)
+            case .month:
+                self?.monthView.reloadData(events)
+            case .list:
+                self?.listView.reloadData(events)
+            default:
+                break
+            }
         }
     }
     
@@ -95,7 +97,7 @@ extension CalendarView {
     
     // MARK: Private methods
     
-    func getSystemEvents(eventStore: EKEventStore, calendars: [EKCalendar]) -> [EKEvent] {
+    func getSystemEvents(eventStore: EKEventStore, calendars: [EKCalendar], completion: @escaping ([EKEvent]) -> Void) {
         var startOffset = 0
         if calendarData.yearsCount.count > 1 {
             startOffset = calendarData.yearsCount.first ?? 0
@@ -107,11 +109,13 @@ extension CalendarView {
         
         guard let startDate = style.calendar.date(byAdding: .year, value: startOffset, to: calendarData.date),
               let endDate = style.calendar.date(byAdding: .year, value: endOffset, to: calendarData.date) else {
-            return []
+                  completion([])
+            return
         }
         
         let predicate = eventStore.predicateForEvents(withStart: startDate, end: endDate, calendars: calendars)
-        return eventStore.events(matching: predicate)
+        let items = eventStore.events(matching: predicate)
+        completion(items)
     }
     
     private func authForSystemCalendars() {
