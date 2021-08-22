@@ -75,7 +75,7 @@ final class ViewController: UIViewController {
         return control
     }()
     
-    private lazy var eventViewer: EventViewer = {
+    private var eventViewer: EventViewer = {
         let view = EventViewer()
         return view
     }()
