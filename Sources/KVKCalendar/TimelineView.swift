@@ -237,7 +237,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         // calculate a start hour
         let startHour: Int
         if !style.timeline.startFromFirstEvent {
-            startHour = 0
+            startHour = style.timeline.startHour
         } else {
             if dates.count > 1 {
                 startHour = filteredEvents.sorted(by: { $0.start.hour < $1.start.hour }).first?.start.hour ?? style.timeline.startHour
