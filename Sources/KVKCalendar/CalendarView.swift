@@ -29,27 +29,6 @@ public final class CalendarView: UIView {
     private var dayData: DayData
     private let listData: ListViewData
     
-    func getSystemEvents(store: EKEventStore, calendars: Set<String>, completion: @escaping ([EKEvent]) -> Void) {
-        guard !calendars.isEmpty else {
-            completion([])
-            return
-        }
-
-        let systemCalendars = store.calendars(for: .event).filter({ calendars.contains($0.title) })
-        guard !systemCalendars.isEmpty else {
-            completion([])
-            return
-        }
-        
-        DispatchQueue.global().async { [weak self] in
-            self?.getSystemEvents(eventStore: store, calendars: systemCalendars) { (items) in
-                DispatchQueue.main.async {
-                    completion(items)
-                }
-            }
-        }
-    }
-    
     /// references the current visible View (to allow lazy loading of views)
     // cannot be private unfortunately, because private only allows access to extensions that are in the same file...
     internal lazy var currentViewCache: UIView? = nil

@@ -27,25 +27,45 @@ extension CalendarView {
     }
     
     public func reloadData() {
-        if !style.systemCalendars.isEmpty {
-            authForSystemCalendars()
-        }
         
-        getSystemEvents(store: eventStore, calendars: style.systemCalendars) { [weak self] (systemEvents) in
-            let events = self?.dataSource?.eventsForCalendar(systemEvents: systemEvents) ?? []
+        func reload(systemEvents: [EKEvent] = []) {
+            let events = dataSource?.eventsForCalendar(systemEvents: systemEvents) ?? []
             
-            switch self?.type {
+            switch type {
             case .day:
-                self?.dayView.reloadData(events)
+                dayView.reloadData(events)
             case .week:
-                self?.weekView.reloadData(events)
+                weekView.reloadData(events)
             case .month:
-                self?.monthView.reloadData(events)
+                monthView.reloadData(events)
             case .list:
-                self?.listView.reloadData(events)
+                listView.reloadData(events)
             default:
                 break
             }
+        }
+        
+        if !style.systemCalendars.isEmpty {
+            requestAccessSystemCalendars(style.systemCalendars, store: eventStore) { [weak self] (result) in
+                guard let self = self else {
+                    DispatchQueue.main.async {
+                        reload()
+                    }
+                    return
+                }
+                
+                if result {
+                    self.getSystemEvents(store: self.eventStore, calendars: self.style.systemCalendars) { (systemEvents) in
+                        reload(systemEvents: systemEvents)
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        reload()
+                    }
+                }
+            }
+        } else {
+            reload()
         }
     }
     
@@ -97,45 +117,61 @@ extension CalendarView {
     
     // MARK: Private methods
     
-    func getSystemEvents(eventStore: EKEventStore, calendars: [EKCalendar], completion: @escaping ([EKEvent]) -> Void) {
-        var startOffset = 0
-        if calendarData.yearsCount.count > 1 {
-            startOffset = calendarData.yearsCount.first ?? 0
-        }
-        var endOffset = 1
-        if calendarData.yearsCount.count > 1 {
-            endOffset = calendarData.yearsCount.last ?? 1
-        }
-        
-        guard let startDate = style.calendar.date(byAdding: .year, value: startOffset, to: calendarData.date),
-              let endDate = style.calendar.date(byAdding: .year, value: endOffset, to: calendarData.date) else {
-                  completion([])
+    private func getSystemEvents(store: EKEventStore, calendars: Set<String>, completion: @escaping ([EKEvent]) -> Void) {
+        guard !calendars.isEmpty else {
+            completion([])
             return
         }
         
-        let predicate = eventStore.predicateForEvents(withStart: startDate, end: endDate, calendars: calendars)
-        let items = eventStore.events(matching: predicate)
-        completion(items)
-    }
-    
-    private func authForSystemCalendars() {
-        let status = EKEventStore.authorizationStatus(for: .event)
+        let systemCalendars = store.calendars(for: .event).filter({ calendars.contains($0.title) })
+        guard !systemCalendars.isEmpty else {
+            completion([])
+            return
+        }
         
-        switch (status) {
-        case .notDetermined:
-            requestAccessToSystemCalendar { (_) in
-                DispatchQueue.main.async { [weak self] in
-                    self?.reloadData()
+        DispatchQueue.global().async { [weak self] in
+            guard let self = self else {
+                DispatchQueue.main.async {
+                    completion([])
                 }
+                return
             }
-        default:
-            break
+            
+            var startOffset = 0
+            var endOffset = 1
+            if self.calendarData.yearsCount.count > 1 {
+                startOffset = self.calendarData.yearsCount.first ?? 0
+                endOffset = self.calendarData.yearsCount.last ?? 1
+            }
+            
+            guard let startDate = self.style.calendar.date(byAdding: .year,
+                                                           value: startOffset,
+                                                           to: self.calendarData.date),
+                  let endDate = self.style.calendar.date(byAdding: .year,
+                                                         value: endOffset,
+                                                         to: self.calendarData.date) else {
+                      DispatchQueue.main.async {
+                          completion([])
+                      }
+                      return
+                  }
+            
+            let predicate = store.predicateForEvents(withStart: startDate,
+                                                     end: endDate,
+                                                     calendars: systemCalendars)
+            let items = store.events(matching: predicate)
+            
+            DispatchQueue.main.async {
+                completion(items)
+            }
         }
     }
     
-    private func requestAccessToSystemCalendar(completion: @escaping (Bool) -> Void) {
-        eventStore.requestAccess(to: .event) { [weak self] (access, error) in
-            print("System calendars = \(self?.style.systemCalendars ?? []) - access = \(access), error = \(error?.localizedDescription ?? "nil")")
+    private func requestAccessSystemCalendars(_ calendars: Set<String>, store: EKEventStore, completion: @escaping (Bool) -> Void) {
+        let status = EKEventStore.authorizationStatus(for: .event)
+        
+        store.requestAccess(to: .event) { (access, error) in
+            print("System calendars = \(calendars) - access = \(access), error = \(error?.localizedDescription ?? "nil"), status = \(status.rawValue)")
             completion(access)
         }
     }
