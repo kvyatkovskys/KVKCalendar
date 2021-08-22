@@ -55,9 +55,23 @@ extension UIScrollView {
 extension UIApplication {
     
     var isAvailableBottomHomeIndicator: Bool {
-        if #available(iOS 13.0, *), let keyWindow = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) {
-            return keyWindow.safeAreaInsets.bottom > 0
-        } else if #available(iOS 11.0, *), let keyWindow = UIApplication.shared.keyWindow {
+        if #available(iOS 15.0, *) {
+            if let keyWindow = UIApplication.shared.connectedScenes
+                .filter({$0.activationState == .foregroundActive})
+                .compactMap({ $0 as? UIWindowScene })
+                .first?.windows
+                .filter({ $0.isKeyWindow }).first
+            {
+                return keyWindow.safeAreaInsets.bottom > 0
+            } else if let keyWindow = UIApplication.shared.windows.first(where: { $0.isKeyWindow })
+            {
+                return keyWindow.safeAreaInsets.bottom > 0
+            } else {
+                return false
+            }
+        } else if #available(iOS 11.0, *),
+                  let keyWindow = UIApplication.shared.windows.first(where: { $0.isKeyWindow })
+        {
             return keyWindow.safeAreaInsets.bottom > 0
         } else {
             return false
