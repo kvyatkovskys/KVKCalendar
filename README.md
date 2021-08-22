@@ -19,7 +19,7 @@
 - [x] Custom header view and collection view
 - [x] Custom calendar localization
 - [x] Ability to set a divider line
-- [x] UIMenu support in event view (iOS 14.0 and above)
+- [x] UIMenu supports in event view (iOS 14.0 and above)
 
 ## Need Help?
 
