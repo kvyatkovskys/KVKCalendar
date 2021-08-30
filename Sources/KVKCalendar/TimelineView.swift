@@ -376,6 +376,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             setOffsetScrollView(allDayEventsCount: maxEvents)
             createAllDayEvents(events: allDayEvents, maxEvents: maxEvents)
         }
+        print("start hour is: ", startHour)
         if startHour == 0 {
             scrollToCurrentTime(startHour)
         } else {
