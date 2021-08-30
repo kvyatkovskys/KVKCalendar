@@ -102,6 +102,7 @@ public struct TimelineStyle {
     public var eventFont: UIFont = .boldSystemFont(ofSize: 12)
     public var offsetEvent: CGFloat = 3
     public var startHour: Int = 0
+    public var scrollToHour: Int = 0
     public var heightLine: CGFloat = 0.5
     public var widthLine: CGFloat = 0.5
     public var offsetLineLeft: CGFloat = 10

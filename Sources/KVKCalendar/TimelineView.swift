@@ -212,6 +212,17 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         scrollView.scrollRectToVisible(frame, animated: true)
     }
     
+    private func scrollToHour(_ hour: Int) {
+        guard let time = getTimelineLabel(hour: hour) else {
+            scrollView.setContentOffset(.zero, animated: true)
+            return
+        }
+        
+        var frame = scrollView.frame
+        frame.origin.y = time.frame.origin.y - 10
+        scrollView.scrollRectToVisible(frame, animated: true)
+    }
+    
     func create(dates: [Date?], events: [Event], selectedDate: Date?) {
         isResizeEnableMode = false
         delegate?.didDisplayEvents(events, dates: dates)
@@ -246,6 +257,11 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                     .sorted(by: { $0.start.hour < $1.start.hour })
                     .first?.start.hour ?? style.timeline.startHour
             }
+        }
+        
+        var scrollToHourValue: Int = 0
+        if !style.timeline.startFromFirstEvent {
+            scrollToHourValue = style.timeline.scrollToHour
         }
         
         // add time label to timeline
@@ -361,6 +377,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             createAllDayEvents(events: allDayEvents, maxEvents: maxEvents)
         }
         scrollToCurrentTime(startHour)
+        scrollToHour(scrollToHourValue)
         showCurrentLineHour()
         addStubInvisibleEvents()
     }
