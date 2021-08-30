@@ -376,8 +376,11 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             setOffsetScrollView(allDayEventsCount: maxEvents)
             createAllDayEvents(events: allDayEvents, maxEvents: maxEvents)
         }
-        scrollToCurrentTime(startHour)
-        scrollToHour(scrollToHourValue)
+        if startHour == 0 {
+            scrollToCurrentTime(startHour)
+        } else {
+            scrollToHour(scrollToHourValue)
+        }
         showCurrentLineHour()
         addStubInvisibleEvents()
     }
