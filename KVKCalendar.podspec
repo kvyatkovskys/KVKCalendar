@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.homepage         = 'https://github.com/kvyatkovskys/KVKCalendar'
   s.license          = { :type => 'MIT', :file => 'LICENSE.md' }
   s.author           = { 'Sergei Kviatkovskii' => 'sergejkvyatkovskij@gmail.com' }
-  s.source           = { :git => 'https://github.com/kvyatkovskys/KVKCalendar.git', :tag => s.version.to_s }
+  s.source           = { :git => 'https://github.com/Ru5C55an/KVKCalendar.git', :tag => s.version.to_s }
   s.social_media_url = 'https://github.com/kvyatkovskys'
   s.ios.deployment_target = '10.0'
   s.source_files     = 'Sources/**/*.swift'
