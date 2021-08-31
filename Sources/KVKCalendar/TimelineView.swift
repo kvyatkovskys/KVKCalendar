@@ -261,7 +261,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         
         var scrollToHourValue: Int = 0
         if !style.timeline.startFromFirstEvent {
-            scrollToHourValue = style.timeline.scrollToHour
+            scrollToHourValue = style.timeline.scrollToHour ?? 0
         }
         
         // add time label to timeline
