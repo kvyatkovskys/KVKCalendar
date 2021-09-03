@@ -259,11 +259,6 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             }
         }
         
-        var scrollToHourValue: Int = 0
-        if !style.timeline.startFromFirstEvent {
-            scrollToHourValue = style.timeline.scrollToHour ?? 0
-        }
-        
         // add time label to timeline
         timeLabels = createTimesLabel(start: startHour)
         // add separator line
@@ -376,12 +371,13 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             setOffsetScrollView(allDayEventsCount: maxEvents)
             createAllDayEvents(events: allDayEvents, maxEvents: maxEvents)
         }
-
-        if scrollToHourValue == 0 {
-            scrollToCurrentTime(startHour)
+        
+        if let preferredHour = style.timeline.scrollToHour, !style.timeline.startFromFirstEvent {
+            scrollToHour(preferredHour)
         } else {
-            scrollToHour(scrollToHourValue)
+            scrollToCurrentTime(startHour)
         }
+        
         showCurrentLineHour()
         addStubInvisibleEvents()
     }
