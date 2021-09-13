@@ -292,6 +292,7 @@ public struct MonthStyle {
     public var showDatesForOtherMonths: Bool = false
     public var colorBackground: UIColor = .white
     public var selectionMode: SelectionMode = .multiple
+    public var showMonthNameInFirstDay: Bool = false
     
     public enum SelectionMode: Int {
         case single, multiple

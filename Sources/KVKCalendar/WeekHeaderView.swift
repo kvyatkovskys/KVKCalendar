@@ -57,7 +57,14 @@ final class WeekHeaderView: UIView {
             addSubview(titleLabel)
         }
         
-        let y = isFromYear ? 0 : (style.month.heightTitleDate + 5)
+        let y: CGFloat
+        if isFromYear {
+            y = 0
+        } else if !style.month.isHiddenTitleDate {
+            y = style.month.heightTitleDate + 5
+        } else {
+            y = 0
+        }
         let xOffset: CGFloat = isFromYear ? 0 : 10
         let width = frame.width / CGFloat(days.count)
         for (idx, value) in days.enumerated() {

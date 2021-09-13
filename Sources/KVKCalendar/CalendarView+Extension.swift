@@ -56,7 +56,9 @@ extension CalendarView {
                 
                 if result {
                     self.getSystemEvents(store: self.eventStore, calendars: self.style.systemCalendars) { (systemEvents) in
-                        reload(systemEvents: systemEvents)
+                        DispatchQueue.main.async {
+                            reload(systemEvents: systemEvents)
+                        }
                     }
                 } else {
                     DispatchQueue.main.async {
@@ -131,9 +133,7 @@ extension CalendarView {
         
         DispatchQueue.global().async { [weak self] in
             guard let self = self else {
-                DispatchQueue.main.async {
-                    completion([])
-                }
+                completion([])
                 return
             }
             
@@ -150,9 +150,7 @@ extension CalendarView {
                   let endDate = self.style.calendar.date(byAdding: .year,
                                                          value: endOffset,
                                                          to: self.calendarData.date) else {
-                      DispatchQueue.main.async {
-                          completion([])
-                      }
+                        completion([])
                       return
                   }
             
@@ -160,10 +158,7 @@ extension CalendarView {
                                                      end: endDate,
                                                      calendars: systemCalendars)
             let items = store.events(matching: predicate)
-            
-            DispatchQueue.main.async {
-                completion(items)
-            }
+            completion(items)
         }
     }
     
@@ -233,6 +228,10 @@ extension CalendarView: DisplayDataSource {
     @available(iOS 14.0, *)
     public func willDisplayEventOptionMenu(_ event: Event, type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)? {
         return dataSource?.willDisplayEventOptionMenu(event, type: type)
+    }
+    
+    public func dequeueMonthViewEvents(_ date: Date, frame: CGRect) -> UIView? {
+        return dataSource?.dequeueMonthViewEvents(date, frame: frame)
     }
 }
 
