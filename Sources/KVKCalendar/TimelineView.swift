@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 02/01/2019.
 //
 
+#if os(iOS)
+
 import UIKit
 
 final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
@@ -382,3 +384,5 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         addStubInvisibleEvents()
     }
 }
+
+#endif

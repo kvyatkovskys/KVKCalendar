@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 02/01/2019.
 //
 
+#if os(iOS)
+
 import UIKit
 
 final class YearCell: UICollectionViewCell {
@@ -210,3 +212,5 @@ extension YearCell: PointerInteractionProtocol {
         return pointerStyle
     }
 }
+
+#endif

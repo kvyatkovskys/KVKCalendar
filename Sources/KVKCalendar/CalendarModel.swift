@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 25.02.2020.
 //
 
+#if os(iOS)
+
 import UIKit
 import EventKit
 
@@ -465,3 +467,5 @@ extension UITableViewCell: KVKCalendarCellProtocol {}
 public protocol KVKCalendarHeaderProtocol: AnyObject {}
 
 extension UIView: KVKCalendarHeaderProtocol {}
+
+#endif

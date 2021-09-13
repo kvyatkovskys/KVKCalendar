@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 18.07.2021.
 //
 
+#if os(iOS)
+
 import UIKit
 
 final class DividerView: UIView {
@@ -76,3 +78,5 @@ extension DividerView: CalendarSettingProtocol {
     }
 
 }
+
+#endif

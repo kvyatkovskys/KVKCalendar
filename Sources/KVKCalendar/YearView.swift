@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 02/01/2019.
 //
 
+#if os(iOS)
+
 import UIKit
 
 final class YearView: UIView {
@@ -266,3 +268,5 @@ extension YearView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
         }
     }
 }
+
+#endif

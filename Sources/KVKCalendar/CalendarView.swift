@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 02/01/2019.
 //
 
+#if os(iOS)
+
 import UIKit
 import EventKit
 
@@ -92,3 +94,5 @@ public final class CalendarView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 }
+
+#endif

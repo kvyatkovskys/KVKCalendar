@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 05.12.2020.
 //
 
+#if os(iOS)
+
 import UIKit
 
 final class TimelineContainerVC: UIViewController {
@@ -29,3 +31,5 @@ final class TimelineContainerVC: UIViewController {
     }
 
 }
+
+#endif

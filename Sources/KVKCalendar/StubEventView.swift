@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 04.10.2020.
 //
 
+#if os(iOS)
+
 import UIKit
 
 final class StubEventView: UIView {
@@ -38,3 +40,5 @@ final class StubEventView: UIView {
         context.restoreGState()
     }
 }
+
+#endif

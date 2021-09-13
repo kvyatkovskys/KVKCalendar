@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 02/01/2019.
 //
 
+#if os(iOS)
+
 import UIKit
 
 final class WeekHeaderView: UIView {
@@ -139,3 +141,5 @@ extension WeekHeaderView: CalendarSettingProtocol {
         setUI()
     }
 }
+
+#endif

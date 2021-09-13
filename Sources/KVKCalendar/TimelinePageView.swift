@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 05.12.2020.
 //
 
+#if os(iOS)
+
 import UIKit
 
 final class TimelinePageView: UIView {
@@ -170,3 +172,5 @@ extension TimelinePageView: UIPageViewControllerDataSource, UIPageViewController
         didSwitchTimelineView?(timelineView, type)
     }
 }
+
+#endif

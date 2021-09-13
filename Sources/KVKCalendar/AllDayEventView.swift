@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 22.05.2021.
 //
 
+#if os(iOS)
+
 import UIKit
 
 final class AllDayEventView: UIView {
@@ -63,3 +65,5 @@ final class AllDayEventView: UIView {
         textLabel.textColor = event.textColor
     }
 }
+
+#endif

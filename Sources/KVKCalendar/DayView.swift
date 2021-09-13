@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 02/01/2019.
 //
 
+#if os(iOS)
+
 import UIKit
 
 final class DayView: UIView {
@@ -356,3 +358,5 @@ extension DayView: CalendarSettingProtocol {
         timelinePages.isPagingEnabled = parameters.style.timeline.scrollDirections.contains(.horizontal)
     }
 }
+
+#endif

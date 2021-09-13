@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 02/01/2019.
 //
 
+#if os(iOS)
+
 import UIKit
 
 final class ScrollDayHeaderView: UIView {
@@ -426,3 +428,5 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
         return CGSize(width: width, height: height)
     }
 }
+
+#endif

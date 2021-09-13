@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 27.12.2020.
 //
 
+#if os(iOS)
+
 import UIKit
 
 final class ListViewHeader: UITableViewHeaderFooterView {
@@ -55,3 +57,5 @@ final class ListViewHeader: UITableViewHeaderFooterView {
     }
     
 }
+
+#endif

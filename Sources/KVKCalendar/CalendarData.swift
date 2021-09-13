@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 02/01/2019.
 //
 
+#if os(iOS)
+
 import Foundation
 
 struct CalendarData {
@@ -204,3 +206,5 @@ public enum DayType: String, CaseIterable {
 public enum StartDayType: Int {
     case monday, sunday
 }
+
+#endif

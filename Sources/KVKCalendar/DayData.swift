@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 02/01/2019.
 //
 
+#if os(iOS)
+
 import Foundation
 
 struct DayData {
@@ -21,3 +23,5 @@ struct DayData {
         self.days = data.addStartEmptyDays(tempDays, startDay: startDay) + endWeek
     }
 }
+
+#endif

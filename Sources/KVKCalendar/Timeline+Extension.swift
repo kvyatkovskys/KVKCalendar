@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 19.07.2020.
 //
 
+#if os(iOS)
+
 import UIKit
 
 extension TimelineView: UIScrollViewDelegate {
@@ -663,3 +665,5 @@ extension TimelineView: AllDayEventDelegate {
     }
     
 }
+
+#endif

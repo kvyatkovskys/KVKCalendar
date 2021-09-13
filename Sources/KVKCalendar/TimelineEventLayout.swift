@@ -5,6 +5,8 @@
 //  Created by Tom Knapen on 12/07/2021.
 //
 
+#if os(iOS)
+
 import UIKit
 
 public struct TimelineEventLayoutContext {
@@ -103,3 +105,5 @@ public struct CrossEvent {
     public let eventTime: EventTime
     public var events: [Event] = []
 }
+
+#endif
