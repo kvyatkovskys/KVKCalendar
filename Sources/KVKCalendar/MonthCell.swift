@@ -81,7 +81,7 @@ final class MonthCell: UICollectionViewCell {
             
             let customY = dateLabel.frame.origin.y + dateLabel.frame.height + 5
             let customFrame = CGRect(x: 0, y: customY, width: frame.width, height: frame.height - customY)
-            if let date = day.date, let customView = delegate?.dequeueViewEvents(date, frame: customFrame)  {
+            if let date = day.date, let customView = delegate?.dequeueViewEvents(events, date: date, frame: customFrame)  {
                 addSubview(customView)
                 return
             }
@@ -434,6 +434,6 @@ protocol MonthCellDelegate: AnyObject {
     func didStartMoveEvent(_ event: EventViewGeneral, snapshot: UIView?, gesture: UILongPressGestureRecognizer)
     func didEndMoveEvent(gesture: UILongPressGestureRecognizer)
     func didChangeMoveEvent(gesture: UIPanGestureRecognizer)
-    func dequeueViewEvents(_ date: Date, frame: CGRect) -> UIView?
+    func dequeueViewEvents(_ events: [Event], date: Date, frame: CGRect) -> UIView?
     
 }
