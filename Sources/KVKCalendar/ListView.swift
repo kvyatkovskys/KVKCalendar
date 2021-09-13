@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 26.12.2020.
 //
 
+#if os(iOS)
+
 import UIKit
 
 public final class ListView: UIView, CalendarSettingProtocol {
@@ -152,3 +154,5 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
         params.delegate?.didSelectEvent(event, type: .list, frame: frameCell)
     }
 }
+
+#endif

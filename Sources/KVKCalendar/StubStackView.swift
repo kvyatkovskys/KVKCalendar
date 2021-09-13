@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 04.10.2020.
 //
 
+#if os(iOS)
+
 import UIKit
 
 final class StubStackView: UIStackView {
@@ -25,3 +27,5 @@ final class StubStackView: UIStackView {
         fatalError("init(coder:) has not been implemented")
     }
 }
+
+#endif

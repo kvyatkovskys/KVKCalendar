@@ -5,6 +5,8 @@
 //  Created by Tom Knapen on 12/07/2021.
 //
 
+#if os(iOS)
+
 import UIKit
 
 public struct DefaultTimelineEventLayout: TimelineEventLayout {
@@ -41,3 +43,5 @@ public struct DefaultTimelineEventLayout: TimelineEventLayout {
         return rects
     }
 }
+
+#endif

@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 01.10.2020.
 //
 
+#if os(iOS)
+
 import UIKit
 
 final class DayPhoneCell: DayCell {
@@ -50,3 +52,5 @@ final class DayPhoneCell: DayCell {
         fatalError("init(coder:) has not been implemented")
     }
 }
+
+#endif

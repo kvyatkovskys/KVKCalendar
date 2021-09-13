@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 24.08.2020.
 //
 
+#if os(iOS)
+
 import UIKit
 
 final class VerticalLineView: UIView {
@@ -18,3 +20,5 @@ final class VerticalLineView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 }
+
+#endif

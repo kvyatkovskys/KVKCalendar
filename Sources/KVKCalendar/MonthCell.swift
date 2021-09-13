@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 02/01/2019.
 //
 
+#if os(iOS)
+
 import UIKit
 
 final class MonthCell: UICollectionViewCell {
@@ -437,3 +439,5 @@ protocol MonthCellDelegate: AnyObject {
     func dequeueViewEvents(_ events: [Event], date: Date, frame: CGRect) -> UIView?
     
 }
+
+#endif

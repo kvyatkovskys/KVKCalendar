@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 02/01/2019.
 //
 
+#if os(iOS)
+
 import UIKit
 
 final class WeekView: UIView {
@@ -338,3 +340,5 @@ extension WeekView: TimelineDelegate {
     }
     
 }
+
+#endif

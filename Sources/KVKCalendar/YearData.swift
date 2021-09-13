@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 28.11.2020.
 //
 
+#if os(iOS)
+
 import Foundation
 
 final class YearData {
@@ -43,3 +45,5 @@ final class YearData {
         })
     }
 }
+
+#endif

@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 27.12.2020.
 //
 
+#if os(iOS)
+
 import UIKit
 
 final class ListViewCell: UITableViewCell {
@@ -65,3 +67,5 @@ final class ListViewCell: UITableViewCell {
     }
     
 }
+
+#endif

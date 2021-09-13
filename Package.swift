@@ -27,5 +27,5 @@ let package = Package(
             name: "KVKCalendarTests",
             dependencies: ["KVKCalendar"]),
     ],
-    swiftLanguageVersions: [.version("5.0")]
+    swiftLanguageVersions: [.version("5")]
 )

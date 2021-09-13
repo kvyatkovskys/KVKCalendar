@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 26.12.2020.
 //
 
+#if os(iOS)
+
 import Foundation
 
 public final class ListViewData {
@@ -68,3 +70,4 @@ public final class ListViewData {
     
 }
 
+#endif

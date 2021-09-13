@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 14.12.2020.
 //
 
+#if os(iOS)
+
 import UIKit
 import EventKit
 
@@ -306,3 +308,5 @@ extension CalendarView: CalendarSettingProtocol {
         
     }
 }
+
+#endif

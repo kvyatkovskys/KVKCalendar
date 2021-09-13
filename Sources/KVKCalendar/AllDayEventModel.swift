@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 02/01/2019.
 //
 
+#if os(iOS)
+
 import UIKit
 
 //@available(iOS 13.4, *)
@@ -40,3 +42,5 @@ protocol AllDayEventDelegate: AnyObject {
     func didSelectAllDayEvent(_ event: Event, frame: CGRect?)
     
 }
+
+#endif

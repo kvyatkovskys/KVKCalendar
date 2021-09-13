@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 19.07.2021.
 //
 
+#if os(iOS)
+
 import UIKit
 
 private enum Consts {
@@ -122,3 +124,5 @@ extension UIView {
     }
     
 }
+
+#endif

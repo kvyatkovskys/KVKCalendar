@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 02/01/2019.
 //
 
+#if os(iOS)
+
 import UIKit
 
 final class TimelineLabel: UILabel {
@@ -20,3 +22,5 @@ final class TimelineLabel: UILabel {
         fatalError("init(coder:) has not been implemented")
     }
 }
+
+#endif

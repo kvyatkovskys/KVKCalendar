@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 09.03.2020.
 //
 
+#if os(iOS)
+
 import UIKit
 
 struct TimeContainer {
@@ -64,3 +66,5 @@ extension TimelineView {
         case up, down
     }
 }
+
+#endif

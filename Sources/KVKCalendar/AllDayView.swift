@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 20.05.2021.
 //
 
+#if os(iOS)
+
 import UIKit
 
 final class AllDayView: UIView {
@@ -186,3 +188,5 @@ extension AllDayView: CalendarSettingProtocol {
     }
     
 }
+
+#endif

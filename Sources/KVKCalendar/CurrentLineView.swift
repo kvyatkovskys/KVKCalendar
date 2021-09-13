@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 22.08.2020.
 //
 
+#if os(iOS)
+
 import UIKit
 
 final class CurrentLineView: UIView {
@@ -97,3 +99,5 @@ extension CurrentLineView: CalendarSettingProtocol {
         lineView.frame.size.width = frame.width
     }
 }
+
+#endif

@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 13.03.2020.
 //
 
+#if os(iOS)
+
 import UIKit
 
 final class EventListView: UIView {
@@ -23,3 +25,5 @@ final class EventListView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 }
+
+#endif

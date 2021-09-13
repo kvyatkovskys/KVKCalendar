@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 19.07.2020.
 //
 
+#if os(iOS)
+
 import UIKit
 
 open class EventViewGeneral: UIView, CalendarTimer {
@@ -209,3 +211,5 @@ protocol EventDelegate: AnyObject {
     func deselectEvent(_ event: Event)
     
 }
+
+#endif

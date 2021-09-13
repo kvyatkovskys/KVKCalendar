@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 03/01/2019.
 //
 
+#if os(iOS)
+
 import UIKit
 
 final class YearHeaderView: UICollectionReusableView {
@@ -67,3 +69,5 @@ extension YearHeaderView: CalendarSettingProtocol {
         self.style = style
     }
 }
+
+#endif
