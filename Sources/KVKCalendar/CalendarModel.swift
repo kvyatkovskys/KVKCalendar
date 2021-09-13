@@ -305,33 +305,37 @@ public protocol CalendarDataSource: AnyObject {
     
     @available(iOS 14.0, *)
     func willDisplayEventOptionMenu(_ event: Event, type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)?
+    
+    func dequeueMonthViewEvents(_ date: Date, frame: CGRect) -> UIView?
 }
 
 public extension CalendarDataSource {
-    func willDisplayEventViewer(date: Date, frame: CGRect) -> UIView? { return nil }
+    func willDisplayEventViewer(date: Date, frame: CGRect) -> UIView? { nil }
     
     func willDisplayDate(_ date: Date?, events: [Event]) {}
     
-    func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? { return nil }
+    func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? { nil }
     
-    func willDisplayHeaderSubview(date: Date?, frame: CGRect, type: CalendarType) -> UIView? { return nil }
+    func willDisplayHeaderSubview(date: Date?, frame: CGRect, type: CalendarType) -> UIView? { nil }
     
-    func willDisplayCollectionView(frame: CGRect, type: CalendarType) -> UICollectionView? { return nil }
+    func willDisplayCollectionView(frame: CGRect, type: CalendarType) -> UICollectionView? { nil }
 
-    func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? { return nil }
+    func dequeueDateCell(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell? { nil }
     
-    func dequeueHeaderView(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionReusableView? { return nil }
+    func dequeueHeaderView(date: Date?, type: CalendarType, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionReusableView? { nil }
 
-    func dequeueListCell(date: Date?, tableView: UITableView, indexPath: IndexPath) -> UITableViewCell? { return nil }
+    func dequeueListCell(date: Date?, tableView: UITableView, indexPath: IndexPath) -> UITableViewCell? { nil }
     
-    func dequeueCell<T: UIScrollView>(dateParameter: DateParameter, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol? { return nil }
+    func dequeueCell<T: UIScrollView>(dateParameter: DateParameter, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol? { nil }
     
-    func dequeueHeader<T: UIScrollView>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarHeaderProtocol? { return nil }
+    func dequeueHeader<T: UIScrollView>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarHeaderProtocol? { nil }
     
     @available(iOS 14.0, *)
     func willDisplayEventOptionMenu(_ event: Event, type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)? {
-        return nil
+        nil
     }
+    
+    func dequeueMonthViewEvents(_ date: Date, frame: CGRect) -> UIView? { nil }
 }
 
 // MARK: - Delegate protocol

@@ -11,10 +11,11 @@ final class MonthCell: UICollectionViewCell {
     private let titlesCount = 3
     private let countInCell: CGFloat = 4
     private let offset: CGFloat = 3
+    private let defaultTagView = -1
     
     private lazy var dateLabel: UILabel = {
         let label = UILabel()
-        label.tag = -1
+        label.tag = defaultTagView
         label.font = monthStyle.fontNameDate
         label.textAlignment = .center
         label.clipsToBounds = true
@@ -61,18 +62,11 @@ final class MonthCell: UICollectionViewCell {
     
     var events: [Event] = [] {
         didSet {
-            subviews.filter({ $0.tag != -1 }).forEach({ $0.removeFromSuperview() })
+            subviews.filter({ $0.tag != defaultTagView }).forEach({ $0.removeFromSuperview() })
+            
             guard bounds.height > (dateLabel.bounds.height + 10) && day.type != .empty else {
                 if monthStyle.showDatesForOtherMonths {
-                    let monthLabel = UILabel(frame: CGRect(x: dateLabel.frame.origin.x - 50, y: dateLabel.frame.origin.y, width: 50, height: dateLabel.bounds.height))
-                    if let date = day.date, date.day == 1, UIDevice.current.userInterfaceIdiom != .phone {
-                        monthLabel.textAlignment = .right
-                        monthLabel.textColor = monthStyle.colorNameEmptyDay
-                        monthLabel.text = "\(date.titleForLocale(style.locale, formatter: monthStyle.shortInDayMonthFormatter))".capitalized
-                        addSubview(monthLabel)
-                    } else {
-                        monthLabel.removeFromSuperview()
-                    }
+                    showMonthName(day: day)
                 }
                 return
             }
@@ -81,12 +75,26 @@ final class MonthCell: UICollectionViewCell {
                 return
             }
             
+            if monthStyle.showMonthNameInFirstDay {
+                showMonthName(day: day)
+            }
+            
+            let customY = dateLabel.frame.origin.y + dateLabel.frame.height + 5
+            let customFrame = CGRect(x: 0, y: customY, width: frame.width, height: frame.height - customY)
+            if let date = day.date, let customView = delegate?.dequeueViewEvents(date, frame: customFrame)  {
+                addSubview(customView)
+                return
+            }
+            
             let height = (frame.height - dateLabel.bounds.height - 5) / countInCell
             
             for (idx, event) in events.enumerated() {
                 let width = frame.width - 10
                 let count = idx + 1
-                let label = UILabel(frame: CGRect(x: 5, y: 5 + dateLabel.bounds.height + height * CGFloat(idx), width: width, height: height))
+                let label = UILabel(frame: CGRect(x: 5,
+                                                  y: 5 + dateLabel.bounds.height + height * CGFloat(idx),
+                                                  width: width,
+                                                  height: height))
                 label.isUserInteractionEnabled = true
                 
                 if count > titlesCount {
@@ -236,6 +244,21 @@ final class MonthCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    private func showMonthName(day: Day) {
+        let monthLabel = UILabel(frame: CGRect(x: dateLabel.frame.origin.x - 50,
+                                               y: dateLabel.frame.origin.y,
+                                               width: 50,
+                                               height: dateLabel.bounds.height))
+        if let date = day.date, date.day == 1, UIDevice.current.userInterfaceIdiom != .phone {
+            monthLabel.textAlignment = .right
+            monthLabel.textColor = dateLabel.textColor
+            monthLabel.text = "\(date.titleForLocale(style.locale, formatter: monthStyle.shortInDayMonthFormatter))".capitalized
+            addSubview(monthLabel)
+        } else {
+            monthLabel.removeFromSuperview()
+        }
+    }
+    
     @objc private func processMovingEvent(gesture: UIPanGestureRecognizer) {
         switch gesture.state {
         case .changed:
@@ -248,7 +271,9 @@ final class MonthCell: UICollectionViewCell {
     @objc private func activateMovingEvent(gesture: UILongPressGestureRecognizer) {
         switch gesture.state {
         case .began:
-            guard let idx = events.firstIndex(where: { $0.hash == gesture.view?.tag }), let view = gesture.view else {
+            guard let idx = events.firstIndex(where: { $0.hash == gesture.view?.tag }),
+                  let view = gesture.view else
+            {
                 return
             }
             
@@ -403,9 +428,12 @@ extension MonthCell: PointerInteractionProtocol {
 }
 
 protocol MonthCellDelegate: AnyObject {
+    
     func didSelectEvent(_ event: Event, frame: CGRect?)
     func didSelectMore(_ date: Date, frame: CGRect?)
     func didStartMoveEvent(_ event: EventViewGeneral, snapshot: UIView?, gesture: UILongPressGestureRecognizer)
     func didEndMoveEvent(gesture: UILongPressGestureRecognizer)
     func didChangeMoveEvent(gesture: UIPanGestureRecognizer)
+    func dequeueViewEvents(_ date: Date, frame: CGRect) -> UIView?
+    
 }
