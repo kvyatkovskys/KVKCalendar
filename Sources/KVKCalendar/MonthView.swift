@@ -385,8 +385,8 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
 
 extension MonthView: MonthCellDelegate {
     
-    func dequeueViewEvents(_ date: Date, frame: CGRect) -> UIView? {
-        dataSource?.dequeueMonthViewEvents(date, frame: frame)
+    func dequeueViewEvents(_ events: [Event], date: Date, frame: CGRect) -> UIView? {
+        dataSource?.dequeueMonthViewEvents(events, date: date, frame: frame)
     }
     
     func didSelectEvent(_ event: Event, frame: CGRect?) {

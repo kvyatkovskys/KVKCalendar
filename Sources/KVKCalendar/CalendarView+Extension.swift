@@ -230,8 +230,8 @@ extension CalendarView: DisplayDataSource {
         return dataSource?.willDisplayEventOptionMenu(event, type: type)
     }
     
-    public func dequeueMonthViewEvents(_ date: Date, frame: CGRect) -> UIView? {
-        return dataSource?.dequeueMonthViewEvents(date, frame: frame)
+    public func dequeueMonthViewEvents(_ events: [Event], date: Date, frame: CGRect) -> UIView? {
+        return dataSource?.dequeueMonthViewEvents(events, date: date, frame: frame)
     }
 }
 
