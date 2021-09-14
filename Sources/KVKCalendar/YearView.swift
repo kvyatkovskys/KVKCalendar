@@ -172,7 +172,7 @@ extension YearView: UICollectionViewDataSource {
         if let cell = dataSource?.dequeueCell(dateParameter: .init(date: month.date), type: .year, view: collectionView, indexPath: index) as? UICollectionViewCell {
             return cell
         } else {
-            return collectionView.dequeueCell(indexPath: index) { (cell: YearCell) in
+            return collectionView.kvkDequeueCell(indexPath: index) { (cell: YearCell) in
                 cell.style = data.style
                 cell.selectDate = data.date
                 cell.title = month.name
@@ -189,7 +189,7 @@ extension YearView: UICollectionViewDataSource {
         if let headerView = dataSource?.dequeueHeader(date: date, type: .year, view: collectionView, indexPath: index) as? UICollectionReusableView {
             return headerView
         } else {
-            return collectionView.dequeueView(indexPath: index) { (headerView: YearHeaderView) in
+            return collectionView.kvkDequeueView(indexPath: index) { (headerView: YearHeaderView) in
                 headerView.style = data.style
                 headerView.date = date
             }

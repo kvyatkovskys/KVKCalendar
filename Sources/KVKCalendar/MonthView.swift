@@ -258,7 +258,7 @@ extension MonthView: UICollectionViewDataSource {
         if let cell = dataSource?.dequeueCell(dateParameter: .init(date: day.date, type: day.type), type: .month, view: collectionView, indexPath: index) as? UICollectionViewCell {
             return cell
         } else {
-            return collectionView.dequeueCell(indexPath: index) { (cell: MonthCell) in
+            return collectionView.kvkDequeueCell(indexPath: index) { (cell: MonthCell) in
                 let date = day.date ?? Date()
                 switch style.month.selectionMode {
                 case .multiple:

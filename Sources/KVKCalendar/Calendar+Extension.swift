@@ -113,11 +113,11 @@ extension Collection {
 
 extension UICollectionView {
     
-    func register<T: UICollectionViewCell>(_ cell: T.Type, id: String? = nil) {
+    func kvkRegister<T: UICollectionViewCell>(_ cell: T.Type, id: String? = nil) {
         register(T.self, forCellWithReuseIdentifier: id ?? cell.kvkIdentifier)
     }
     
-    func registerView<T: UICollectionReusableView>(_ view: T.Type, id: String? = nil, kind: String = UICollectionView.elementKindSectionHeader) {
+    func kvkRegisterView<T: UICollectionReusableView>(_ view: T.Type, id: String? = nil, kind: String = UICollectionView.elementKindSectionHeader) {
         register(T.self, forSupplementaryViewOfKind: kind, withReuseIdentifier: id ?? view.kvkIdentifier)
     }
     
@@ -133,11 +133,11 @@ public extension UIView {
 
 extension UITableView {
     
-    func register<T: UITableViewCell>(_ cell: T.Type) {
+    func kvkRegister<T: UITableViewCell>(_ cell: T.Type) {
         register(T.self, forCellReuseIdentifier: cell.kvkIdentifier)
     }
     
-    func register<T: UIView>(_ view: T.Type) {
+    func kvkRegister<T: UIView>(_ view: T.Type) {
         register(T.self, forHeaderFooterViewReuseIdentifier: view.kvkIdentifier)
     }
     
@@ -244,8 +244,8 @@ extension UIRectCorner {
 
 public extension UITableView {
     
-    func dequeueCell<T: UITableViewCell>(id: String = T.kvkIdentifier, indexPath: IndexPath? = nil, configure: (T) -> Void) -> T {
-        register(T.self)
+    func kvkDequeueCell<T: UITableViewCell>(id: String = T.kvkIdentifier, indexPath: IndexPath? = nil, configure: (T) -> Void) -> T {
+        kvkRegister(T.self)
         
         let cell: T
         if let index = indexPath, let dequeued = dequeueReusableCell(withIdentifier: id, for: index) as? T {
@@ -260,8 +260,8 @@ public extension UITableView {
         return cell
     }
     
-    func dequeueView<T: UIView>(id: String = T.kvkIdentifier, configure: (T) -> Void) -> T {
-        register(T.self)
+    func kvkDequeueView<T: UIView>(id: String = T.kvkIdentifier, configure: (T) -> Void) -> T {
+        kvkRegister(T.self)
         
         let view: T
         if let dequeued = dequeueReusableHeaderFooterView(withIdentifier: id) as? T {
@@ -278,8 +278,8 @@ public extension UITableView {
 
 public extension UICollectionView {
     
-    func dequeueCell<T: UICollectionViewCell>(id: String = T.kvkIdentifier, indexPath: IndexPath, configure: (T) -> Void) -> T {
-        register(T.self, id: id)
+    func kvkDequeueCell<T: UICollectionViewCell>(id: String = T.kvkIdentifier, indexPath: IndexPath, configure: (T) -> Void) -> T {
+        kvkRegister(T.self, id: id)
         
         let cell: T
         if let dequeued = dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as? T {
@@ -292,8 +292,8 @@ public extension UICollectionView {
         return cell
     }
     
-    func dequeueView<T: UICollectionReusableView>(id: String = T.kvkIdentifier, kind: String = UICollectionView.elementKindSectionHeader, indexPath: IndexPath, configure: (T) -> Void) -> T {
-        registerView(T.self, id: id, kind: kind)
+    func kvkDequeueView<T: UICollectionReusableView>(id: String = T.kvkIdentifier, kind: String = UICollectionView.elementKindSectionHeader, indexPath: IndexPath, configure: (T) -> Void) -> T {
+        kvkRegisterView(T.self, id: id, kind: kind)
         
         let view: T
         if let dequeued = dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: id, for: indexPath) as? T {

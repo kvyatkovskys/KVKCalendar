@@ -105,7 +105,7 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
         if let cell = params.dataSource?.dequeueCell(dateParameter: .init(date: event.start), type: .list, view: tableView, indexPath: indexPath) as? UITableViewCell {
             return cell
         } else {
-            return tableView.dequeueCell(indexPath: indexPath) { (cell: ListViewCell) in
+            return tableView.kvkDequeueCell(indexPath: indexPath) { (cell: ListViewCell) in
                 cell.txt = event.textForList
                 cell.dotColor = event.color?.value
             }
@@ -117,7 +117,7 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
         if let headerView = params.dataSource?.dequeueHeader(date: date, type: .list, view: tableView, indexPath: IndexPath(row: 0, section: section)) as? UIView {
             return headerView
         } else {
-            return tableView.dequeueView { (view: ListViewHeader) in
+            return tableView.kvkDequeueView { (view: ListViewHeader) in
                 view.title = params.data.titleOfHeader(section: section,
                                                        formatter: params.style.list.headerDateFormatter,
                                                        locale: params.style.locale)
