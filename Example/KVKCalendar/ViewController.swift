@@ -235,21 +235,21 @@ extension ViewController: CalendarDataSource {
     func dequeueCell<T>(dateParameter: DateParameter, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol? where T: UIScrollView {
         switch type {
         case .year where dateParameter.date?.month == Date().month:
-            let cell = (view as? UICollectionView)?.dequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
+            let cell = (view as? UICollectionView)?.kvkDequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
                 cell.imageView.image = UIImage(named: "ic_stub")
             }
             return cell
         case .day, .week, .month:
             guard dateParameter.date?.day == Date().day else { return nil }
             
-            let cell = (view as? UICollectionView)?.dequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
+            let cell = (view as? UICollectionView)?.kvkDequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
                 cell.imageView.image = UIImage(named: "ic_stub")
             }
             return cell
         case .list:
             guard dateParameter.date?.day == 14 else { return nil }
             
-            let cell = (view as? UITableView)?.dequeueCell { (cell) in
+            let cell = (view as? UITableView)?.kvkDequeueCell { (cell) in
                 cell.backgroundColor = .systemRed
             }
             return cell

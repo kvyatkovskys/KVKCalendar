@@ -351,13 +351,13 @@ extension ScrollDayHeaderView: UICollectionViewDataSource {
         } else {
             switch UIDevice.current.userInterfaceIdiom {
             case .phone:
-                return collectionView.dequeueCell(indexPath: indexPath) { (cell: DayPhoneCell) in
+                return collectionView.kvkDequeueCell(indexPath: indexPath) { (cell: DayPhoneCell) in
                     cell.phoneStyle = style
                     cell.day = day
                     cell.selectDate = date
                 }
             default:
-                return collectionView.dequeueCell(indexPath: indexPath) { (cell: DayPadCell) in
+                return collectionView.kvkDequeueCell(indexPath: indexPath) { (cell: DayPadCell) in
                     cell.padStyle = style
                     cell.day = day
                     cell.selectDate = date
