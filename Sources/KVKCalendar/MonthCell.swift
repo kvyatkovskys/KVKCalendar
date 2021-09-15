@@ -60,8 +60,9 @@ final class MonthCell: UICollectionViewCell {
             allDayStyle = style.allDay
         }
     }
-    weak var delegate: MonthCellDelegate?
     
+    weak var delegate: MonthCellDelegate?
+        
     var events: [Event] = [] {
         didSet {
             subviews.filter({ $0.tag != defaultTagView }).forEach({ $0.removeFromSuperview() })
@@ -81,7 +82,7 @@ final class MonthCell: UICollectionViewCell {
                 showMonthName(day: day)
             }
             
-            let customY = dateLabel.frame.origin.y + dateLabel.frame.height + 5
+            let customY = dateLabel.frame.origin.y + dateLabel.frame.height + 3
             let customFrame = CGRect(x: 0, y: customY, width: frame.width, height: frame.height - customY)
             if let date = day.date, let customView = delegate?.dequeueViewEvents(events, date: date, frame: customFrame)  {
                 addSubview(customView)

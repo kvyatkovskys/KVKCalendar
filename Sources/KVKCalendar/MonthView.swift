@@ -259,6 +259,8 @@ extension MonthView: UICollectionViewDataSource {
             return cell
         } else {
             return collectionView.kvkDequeueCell(indexPath: index) { (cell: MonthCell) in
+                cell.delegate = self
+                
                 let date = day.date ?? Date()
                 switch style.month.selectionMode {
                 case .multiple:
@@ -266,10 +268,10 @@ extension MonthView: UICollectionViewDataSource {
                 case .single:
                     cell.selectDate = monthData.date
                 }
+                
                 cell.style = style
                 cell.day = day
                 cell.events = day.events
-                cell.delegate = self
                 cell.isHidden = index.row > monthData.daysCount
                 if let date = day.date {
                     cell.isSelected = monthData.selectedDates.contains(date)
