@@ -15,9 +15,7 @@ extension CalendarView {
     
     /// **DEPRECATED**
     @available(*, deprecated, renamed: "CalendarDataSource.willDisplayEventViewer")
-    public func addEventViewToDay(view: UIView) {
-        
-    }
+    public func addEventViewToDay(view: UIView) {}
     
     public func set(type: CalendarType, date: Date? = nil) {
         self.type = type
@@ -114,6 +112,15 @@ extension CalendarView {
         switch gesture.state {
         case .changed:
             monthView.didChangeMoveEvent(gesture: gesture)
+        default:
+            break
+        }
+    }
+    
+    public func showSkeletonLoading(_ visible: Bool) {
+        switch type {
+        case .month:
+            monthView.showSkeletonVisible(visible)
         default:
             break
         }
