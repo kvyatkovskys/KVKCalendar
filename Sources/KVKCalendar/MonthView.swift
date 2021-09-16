@@ -64,6 +64,11 @@ final class MonthView: UIView {
         collectionView?.reloadData()
     }
     
+    func showSkeletonVisible(_ visible: Bool) {
+        monthData.isSkeletonVisible = visible
+        collectionView?.reloadData()
+    }
+    
     // MARK: private func
     
     private func updateHeaderView(_ date: Date, frame: CGRect) {
@@ -259,6 +264,10 @@ extension MonthView: UICollectionViewDataSource {
             return cell
         } else {
             return collectionView.kvkDequeueCell(indexPath: index) { (cell: MonthCell) in
+                cell.setSkeletons(monthData.isSkeletonVisible)
+                
+                guard !monthData.isSkeletonVisible else { return }
+                
                 cell.delegate = self
                 
                 let date = day.date ?? Date()
@@ -272,6 +281,7 @@ extension MonthView: UICollectionViewDataSource {
                 cell.style = style
                 cell.day = day
                 cell.events = day.events
+                
                 cell.isHidden = index.row > monthData.daysCount
                 if let date = day.date {
                     cell.isSelected = monthData.selectedDates.contains(date)
@@ -284,29 +294,19 @@ extension MonthView: UICollectionViewDataSource {
 }
 
 extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if monthData.isFirstLoad {
-            monthData.isFirstLoad = false
-            return
-        }
-        
-        guard let newMoveDate = getVisibleDate(), monthData.willSelectDate.month != newMoveDate.month, monthData.date != newMoveDate else {
-            return
-        }
-        
-        monthData.willSelectDate = newMoveDate
-        willSelectDate?(newMoveDate)
-    }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         if !style.month.isPagingEnabled, let visibleItems = collectionView?.indexPathsForVisibleItems.sorted(by: { $0.row < $1.row }) {
             let middleIndex = visibleItems[visibleItems.count / 2]
-            let newDate = monthData.data.months[middleIndex.section].date
-            headerView.date = newDate
+            let month = monthData.data.months[middleIndex.section]
+            headerView.date = month.date
             
             if style.month.autoSelectionDateWhenScrolling {
+                let newDate = month.days.first(where: { $0.date?.year == month.date.year
+                                                && $0.date?.month == month.date.month
+                                                && $0.date?.day == monthData.date.day })?.date ?? month.date
                 monthData.date = newDate
-                delegate?.didSelectDates([newDate], type: .month, frame: nil)
+                willSelectDate?(newDate)
                 collectionView?.reloadData()
             }
         }
@@ -325,12 +325,15 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
             fatalError()
         }
 
-        let newDate = monthData.data.months[visibleIndex].date
-        headerView.date = newDate
+        let month = monthData.data.months[visibleIndex]
+        headerView.date = month.date
         guard style.month.autoSelectionDateWhenScrolling else { return }
         
+        let newDate = month.days.first(where: { $0.date?.year == month.date.year
+                                        && $0.date?.month == month.date.month
+                                        && $0.date?.day == monthData.date.day })?.date ?? month.date
         monthData.date = newDate
-        delegate?.didSelectDates([newDate], type: .month, frame: nil)
+        willSelectDate?(newDate)
         collectionView?.reloadData()
     }
     
@@ -385,6 +388,7 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         
         return CGSize(width: width, height: height)
     }
+    
 }
 
 extension MonthView: MonthCellDelegate {

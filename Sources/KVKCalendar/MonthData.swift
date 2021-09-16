@@ -18,7 +18,6 @@ final class MonthData: EventDateProtocol {
         let monthStyle: MonthStyle
     }
     
-    var willSelectDate: Date
     var date: Date
     var data: CalendarData
     let daysCount: Int
@@ -32,6 +31,7 @@ final class MonthData: EventDateProtocol {
     var isFirstLoad = true
     var movingEvent: EventViewGeneral?
     var selectedDates: Set<Date> = []
+    var isSkeletonVisible = false
     
     private let calendar: Calendar
     private let scrollDirection: UICollectionView.ScrollDirection
@@ -62,7 +62,6 @@ final class MonthData: EventDateProtocol {
         })
         self.data.months = months
         self.date = parameters.data.date
-        self.willSelectDate = data.date
         self.daysCount = months.reduce(0, { $0 + $1.days.count })
     }
     

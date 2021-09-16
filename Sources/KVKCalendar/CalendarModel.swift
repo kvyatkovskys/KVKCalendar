@@ -348,8 +348,9 @@ public protocol CalendarDelegate: AnyObject {
     /// size cell for (month, year, list) view
     func sizeForCell(_ date: Date?, type: CalendarType) -> CGSize?
     
-    /// The method is **DEPRECATED**
-    /// Use a new **didSelectDates**
+    /** The method is **DEPRECATED**
+        Use a new **didSelectDates**
+     */
     @available(*, deprecated, renamed: "didSelectDates")
     func didSelectDate(_ date: Date?, type: CalendarType, frame: CGRect?)
     
@@ -362,8 +363,9 @@ public protocol CalendarDelegate: AnyObject {
     /// tap on more fro month view
     func didSelectMore(_ date: Date, frame: CGRect?)
     
-    /// The method is **DEPRECATED**
-    /// Use a new **didChangeViewerFrame**
+    /** The method is **DEPRECATED**
+        Use a new **didChangeViewerFrame**
+     */
     @available(*, deprecated, renamed: "didChangeViewerFrame")
     func eventViewerFrame(_ frame: CGRect)
     
@@ -382,8 +384,9 @@ public protocol CalendarDelegate: AnyObject {
     /// get next date when the calendar scrolls (works for month view)
     func willSelectDate(_ date: Date, type: CalendarType)
     
-    /// The method is **DEPRECATED**
-    /// Use a new ** func didDeselectEvent**
+    /** The method is **DEPRECATED**
+        Use a new **didDeselectEvent**
+     */
     @available(*, deprecated, renamed: "didDeselectEvent")
     func deselectEvent(_ event: Event, animated: Bool)
     
