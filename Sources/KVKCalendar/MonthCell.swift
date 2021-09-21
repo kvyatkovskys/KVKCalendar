@@ -425,7 +425,7 @@ final class MonthCell: KVKCollectionViewCell {
                                cornerRadius: CGFloat = 2)
     {
         if skeletons {
-            contentView.subviews.forEach { $0.removeFromSuperview() }
+            contentView.subviews.filter({ $0.tag != defaultTagView }).forEach({ $0.removeFromSuperview() })
             contentView.addSubview(stubView)
         } else {
             stubView.removeFromSuperview()
