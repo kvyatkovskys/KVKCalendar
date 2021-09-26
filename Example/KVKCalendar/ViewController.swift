@@ -240,7 +240,7 @@ extension ViewController: CalendarDataSource {
             }
             return cell
         case .day, .week, .month:
-            guard dateParameter.date?.day == Date().day else { return nil }
+            guard dateParameter.date?.day == Date().day && dateParameter.type != .empty else { return nil }
             
             let cell = (view as? UICollectionView)?.kvkDequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
                 cell.imageView.image = UIImage(named: "ic_stub")

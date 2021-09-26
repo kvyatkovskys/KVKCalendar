@@ -395,9 +395,9 @@ public protocol CalendarDelegate: AnyObject {
 }
 
 public extension CalendarDelegate {
-    func sizeForHeader(_ date: Date?, type: CalendarType) -> CGSize? { return nil }
+    func sizeForHeader(_ date: Date?, type: CalendarType) -> CGSize? { nil }
     
-    func sizeForCell(_ date: Date?, type: CalendarType) -> CGSize? { return nil }
+    func sizeForCell(_ date: Date?, type: CalendarType) -> CGSize? { nil }
     
     func didSelectDate(_ date: Date?, type: CalendarType, frame: CGRect?) {}
     
@@ -429,7 +429,7 @@ public extension CalendarDelegate {
 protocol DisplayDataSource: CalendarDataSource {}
 
 extension DisplayDataSource {
-    public func eventsForCalendar(systemEvents: [EKEvent]) -> [Event] { return [] }
+    public func eventsForCalendar(systemEvents: [EKEvent]) -> [Event] { [] }
 }
 
 // MARK: - Private Display delegate
