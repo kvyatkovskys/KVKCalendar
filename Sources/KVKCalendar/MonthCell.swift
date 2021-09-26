@@ -424,9 +424,10 @@ final class MonthCell: KVKCollectionViewCell {
                                insets: UIEdgeInsets = UIEdgeInsets(top: 4, left: 4, bottom: 4, right: 4),
                                cornerRadius: CGFloat = 2)
     {
+        dateLabel.isHidden = skeletons
         if skeletons {
             contentView.subviews.filter({ $0.tag != defaultTagView }).forEach({ $0.removeFromSuperview() })
-            contentView.insertSubview(stubView, at: 0)
+            contentView.addSubview(stubView)
         } else {
             stubView.removeFromSuperview()
         }

@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 16.09.2021.
 //
 
+#if os(iOS)
+
 import UIKit
 
 class KVKCollectionViewCell: UICollectionViewCell {
@@ -28,3 +30,5 @@ class KVKCollectionViewCell: UICollectionViewCell {
         contentView.subviews.forEach { $0.setAsSkeleton(skeletons, cornerRadius: cornerRadius, insets: insets) }
     }
 }
+
+#endif
