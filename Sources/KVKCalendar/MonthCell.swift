@@ -426,12 +426,12 @@ final class MonthCell: KVKCollectionViewCell {
     {
         if skeletons {
             contentView.subviews.filter({ $0.tag != defaultTagView }).forEach({ $0.removeFromSuperview() })
-            contentView.addSubview(stubView)
+            contentView.insertSubview(stubView, at: 0)
         } else {
             stubView.removeFromSuperview()
         }
         
-        super.setSkeletons(skeletons)
+        super.setSkeletons(skeletons, insets: insets, cornerRadius: cornerRadius)
     }
     
 }

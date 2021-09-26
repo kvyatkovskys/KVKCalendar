@@ -301,14 +301,17 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
             let month = monthData.data.months[middleIndex.section]
             headerView.date = month.date
             
-            if style.month.autoSelectionDateWhenScrolling {
-                let newDate = month.days.first(where: { $0.date?.year == month.date.year
-                                                && $0.date?.month == month.date.month
-                                                && $0.date?.day == monthData.date.day })?.date ?? month.date
-                monthData.date = newDate
-                willSelectDate?(newDate)
-                collectionView?.reloadData()
+            guard style.month.autoSelectionDateWhenScrolling,
+                  let newDate = month.days.first(where: { $0.date?.year == month.date.year
+                      && $0.date?.month == month.date.month
+                      && $0.date?.day == monthData.date.day })?.date, monthData.date != newDate
+            else {
+                return
             }
+            
+            monthData.date = newDate
+            willSelectDate?(newDate)
+            collectionView?.reloadData()
         }
     }
     
@@ -324,14 +327,18 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         @unknown default:
             fatalError()
         }
-
+        
         let month = monthData.data.months[visibleIndex]
         headerView.date = month.date
-        guard style.month.autoSelectionDateWhenScrolling else { return }
+        guard style.month.autoSelectionDateWhenScrolling,
+              let newDate = month.days.first(where: { $0.date?.year == month.date.year
+                  && $0.date?.month == month.date.month
+                  && $0.date?.day == monthData.date.day })?.date,
+              monthData.date != newDate
+        else {
+            return
+        }
         
-        let newDate = month.days.first(where: { $0.date?.year == month.date.year
-                                        && $0.date?.month == month.date.month
-                                        && $0.date?.day == monthData.date.day })?.date ?? month.date
         monthData.date = newDate
         willSelectDate?(newDate)
         collectionView?.reloadData()
@@ -385,7 +392,7 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         @unknown default:
             fatalError()
         }
-        
+                
         return CGSize(width: width, height: height)
     }
     
