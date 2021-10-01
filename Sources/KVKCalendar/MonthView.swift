@@ -258,7 +258,7 @@ extension MonthView: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let index = getIndexForDirection(style.month.scrollDirection, indexPath: indexPath)
-        guard let day = monthData.getDay(indexPath: index) else { return UICollectionViewCell() }
+        guard let day = monthData.getDay(indexPath: index).day else { return UICollectionViewCell() }
         
         if let cell = dataSource?.dequeueCell(dateParameter: .init(date: day.date, type: day.type), type: .month, view: collectionView, indexPath: index) as? UICollectionViewCell {
             return cell
@@ -346,7 +346,7 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let index = getIndexForDirection(style.month.scrollDirection, indexPath: indexPath)
-        guard let date = monthData.getDay(indexPath: index)?.date else { return }
+        guard let date = monthData.getDay(indexPath: index).day?.date else { return }
         
         switch style.month.selectionMode {
         case .multiple:
@@ -359,7 +359,9 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let index = getIndexForDirection(style.month.scrollDirection, indexPath: indexPath)
-        guard let day = monthData.getDay(indexPath: index) else { return .zero }
+        let item = monthData.getDay(indexPath: index)
+        
+        guard let day = item.day else { return .zero }
         
         if let size = delegate?.sizeForCell(day.date, type: .month) {
             return size
@@ -380,13 +382,13 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
             }
             
             if style.month.isPagingEnabled {
-                height = collectionView.frame.height / 6
+                height = collectionView.frame.height / CGFloat(item.weeks)
             } else {                
                 switch UIDevice.current.userInterfaceIdiom {
                 case .phone:
                     height = collectionView.frame.height / 7
                 default:
-                    height = collectionView.frame.height / 6
+                    height = collectionView.frame.height / CGFloat(item.weeks)
                 }
             }
         @unknown default:

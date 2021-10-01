@@ -63,7 +63,7 @@ final class EventView: EventViewGeneral {
         }
     }
     
-    @available(iOS 14.0, *)
+    @available(iOS 14.0, macCatalyst 14.0, *)
     func addOptionMenu(_ menu: UIMenu, customButton: UIButton?) {
         let button: UIButton
         if let item = customButton {
@@ -85,9 +85,8 @@ final class EventView: EventViewGeneral {
                 iconFileImageView.isHidden = true
             }
         }
-        #if !targetEnvironment(macCatalyst)
+        
         button.menu = menu
-        #endif
         addSubview(button)
     }
     

@@ -43,15 +43,20 @@ final class MonthData: EventDateProtocol {
         
         let months = parameters.data.months.reduce([], { (acc, month) -> [Month] in
             var daysTemp = parameters.data.addStartEmptyDays(month.days, startDay: parameters.startDay)
-            if let lastDay = daysTemp.last, daysTemp.count < parameters.data.boxCount {
-                var emptyEndDays = Array(1...(parameters.data.boxCount - daysTemp.count)).compactMap { (idx) -> Day in
+            
+            let boxCount: Int
+            switch month.weeks {
+            case 5:
+                boxCount = parameters.data.minBoxCount
+            default:
+                boxCount = parameters.data.maxBoxCount
+            }
+            
+            if let lastDay = daysTemp.last, daysTemp.count < boxCount {
+                let emptyEndDays = Array(1...(boxCount - daysTemp.count)).compactMap { (idx) -> Day in
                     var day = Day.empty()
                     day.date = parameters.data.getOffsetDate(offset: idx, to: lastDay.date)
                     return day
-                }
-                
-                if !parameters.monthStyle.isPagingEnabled && emptyEndDays.count > 7 && parameters.monthStyle.scrollDirection == .vertical {
-                    emptyEndDays = emptyEndDays.dropLast(7)
                 }
                 
                 daysTemp += emptyEndDays
@@ -66,14 +71,15 @@ final class MonthData: EventDateProtocol {
     }
     
     private func compareDate(day: Day, date: Date?) -> Bool {
-        return day.date?.year == date?.year && day.date?.month == date?.month
+        day.date?.year == date?.year && day.date?.month == date?.month
     }
     
-    func getDay(indexPath: IndexPath) -> Day? {
+    func getDay(indexPath: IndexPath) -> (day: Day?, weeks: Int) {
         // TODO: we got a crash sometime when use a horizontal scroll direction
         // got index out of array
         // safe: -> optional subscript
-        return data.months[indexPath.section].days[safe: indexPath.row]
+        let month = data.months[indexPath.section]
+        return (month.days[safe: indexPath.row], month.weeks)
     }
     
     func updateSelectedDates(_ dates: Set<Date>, date: Date, calendar: Calendar) -> Set<Date> {
@@ -149,13 +155,13 @@ final class MonthData: EventDateProtocol {
 
 extension MonthData {
     var middleRowInPage: Int {
-        return (rowsInPage * columnsInPage) / 2
+        (rowsInPage * columnsInPage) / 2
     }
     var columns: Int {
-        return ((daysCount / itemsInPage) * columnsInPage) + (daysCount % itemsInPage)
+        ((daysCount / itemsInPage) * columnsInPage) + (daysCount % itemsInPage)
     }
     var itemsInPage: Int {
-        return columnsInPage * rowsInPage
+        columnsInPage * rowsInPage
     }
 }
 

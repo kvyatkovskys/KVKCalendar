@@ -12,7 +12,8 @@ import Foundation
 struct CalendarData {
     private let style: Style
     
-    let boxCount = 42
+    let maxBoxCount = 42
+    let minBoxCount = 35
     let date: Date
     var months = [Month]()
     var yearsCount = [Int]()
@@ -22,9 +23,9 @@ struct CalendarData {
         self.style = style
         
         // count years for calendar
-        let indexsYear = [Int](repeating: 0, count: years).split(half: years / 2)
-        let lastYear = indexsYear.left
-        let nextYear = indexsYear.right
+        let indexesYear = [Int](repeating: 0, count: years).split(half: years / 2)
+        let lastYear = indexesYear.left
+        let nextYear = indexesYear.right
                 
         // last years
         for lastIdx in lastYear.indices.reversed() where years > 1 {
@@ -62,11 +63,13 @@ struct CalendarData {
                 })
             }
             
-            var months = zip(nameMonths, dateMonths).map({ Month(name: $0.0, date: $0.1, days: []) })
+            var months = zip(nameMonths, dateMonths).map({ Month(name: $0.0, date: $0.1, days: [], weeks: 6) })
             
             for (idx, month) in months.enumerated() {
                 let days = getDaysInMonth(month: idx + 1, date: month.date)
+                let weeks = numberOfWeeksInMonth(month.date, calendar: calendar)
                 months[idx].days = days
+                months[idx].weeks = weeks
             }
             monthsTemp += months
         }
@@ -147,6 +150,15 @@ struct CalendarData {
         return tempDays
     }
     
+    func numberOfWeeksInMonth(_ date: Date?, calendar: Calendar) -> Int {
+        guard let dt = date else { return 6 }
+        
+        var item = calendar
+        item.firstWeekday = 1
+        let weekRange = item.range(of: .weekOfMonth, in: .month, for: dt)
+        return weekRange?.count ?? 6
+    }
+    
     func getOffsetDate(offset: Int, to date: Date?) -> Date? {
         guard let dateTemp = date else { return nil }
         
@@ -168,6 +180,7 @@ struct Month {
     let name: String
     let date: Date
     var days: [Day]
+    var weeks: Int
 }
 
 struct Day {
