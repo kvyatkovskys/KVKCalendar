@@ -46,7 +46,7 @@ final class MonthData: EventDateProtocol {
             
             let boxCount: Int
             switch month.weeks {
-            case 5:
+            case 5 where parameters.monthStyle.scrollDirection == .vertical:
                 boxCount = parameters.data.minBoxCount
             default:
                 boxCount = parameters.data.maxBoxCount
