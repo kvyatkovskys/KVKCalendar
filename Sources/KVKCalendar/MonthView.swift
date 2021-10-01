@@ -381,16 +381,7 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
                 width = 0
             }
             
-            if style.month.isPagingEnabled {
-                height = collectionView.frame.height / CGFloat(item.weeks)
-            } else {                
-                switch UIDevice.current.userInterfaceIdiom {
-                case .phone:
-                    height = collectionView.frame.height / 7
-                default:
-                    height = collectionView.frame.height / CGFloat(item.weeks)
-                }
-            }
+            height = collectionView.frame.height / CGFloat(item.weeks)
         @unknown default:
             fatalError()
         }
