@@ -368,7 +368,7 @@ final class MonthCell: KVKCollectionViewCell {
         
         guard selectDate.day == date?.day && selectDate.month == date?.month else {
             if date?.day == nowDate.day {
-                label.textColor = monthStyle.colorDate
+                label.textColor = monthStyle.colorTitleCurrentDate
                 label.backgroundColor = .clear
             }
             return
