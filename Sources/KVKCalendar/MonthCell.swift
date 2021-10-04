@@ -49,7 +49,7 @@ final class MonthCell: KVKCollectionViewCell {
     }()
     
     private lazy var stubView: UIView = {
-        let view = UIView(frame: bounds)
+        let view = UIView()
         view.tag = defaultTagStubView
         return view
     }()
@@ -427,6 +427,7 @@ final class MonthCell: KVKCollectionViewCell {
         dateLabel.isHidden = skeletons
         if skeletons {
             contentView.subviews.filter({ $0.tag != defaultTagView }).forEach({ $0.removeFromSuperview() })
+            stubView.frame = bounds
             contentView.addSubview(stubView)
         } else {
             stubView.removeFromSuperview()
