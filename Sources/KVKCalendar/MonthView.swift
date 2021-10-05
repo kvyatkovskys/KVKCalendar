@@ -389,7 +389,13 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
                 width = 0
             }
             
-            height = collectionView.frame.height / CGFloat(item.weeks)
+            let value: CGFloat
+            if monthData.isSkeletonVisible {
+                value = 6
+            } else {
+                value = CGFloat(item.weeks)
+            }
+            height = collectionView.frame.height / value
         @unknown default:
             fatalError()
         }
