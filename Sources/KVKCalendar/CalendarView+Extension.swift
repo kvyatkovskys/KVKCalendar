@@ -71,14 +71,14 @@ extension CalendarView {
         }
     }
     
-    public func scrollTo(_ date: Date) {
+    public func scrollTo(_ date: Date, animated: Bool? = nil) {
         switch type {
         case .day:
             dayView.setDate(date)
         case .week:
             weekView.setDate(date)
         case .month:
-            monthView.setDate(date)
+            monthView.setDate(date, animated: animated)
         case .year:
             yearView.setDate(date)
         case .list:

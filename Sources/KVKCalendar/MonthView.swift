@@ -50,11 +50,11 @@ final class MonthView: UIView {
         scrollToDate(data.date, animated: false)
     }
     
-    func setDate(_ date: Date) {
+    func setDate(_ date: Date, animated: Bool? = nil) {
         updateHeaderView(date, frame: headerViewFrame)
         monthData.date = date
         monthData.selectedDates.removeAll()
-        scrollToDate(date, animated: monthData.isAnimate)
+        scrollToDate(date, animated: animated ?? monthData.isAnimate)
         collectionView?.reloadData()
     }
     
@@ -330,14 +330,22 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         
         let month = monthData.data.months[visibleIndex]
         headerView.date = month.date
-        guard style.month.autoSelectionDateWhenScrolling,
-              let newDate = month.days.first(where: { $0.date?.year == month.date.year
-                  && $0.date?.month == month.date.month
-                  && $0.date?.day == monthData.date.day })?.date,
-              monthData.date != newDate
-        else {
-            return
+        guard style.month.autoSelectionDateWhenScrolling else { return }
+        
+        let newDate: Date
+        if let date = month.days.first(where: { $0.date?.year == month.date.year
+                                        && $0.date?.month == month.date.month
+                                        && $0.date?.day == monthData.date.day })?.date {
+            newDate = date
+        } else if let date = month.days.first(where: { $0.date?.year == month.date.year
+                                            && $0.date?.month == month.date.month
+                                            && $0.date?.day == (monthData.date.day - 1) })?.date {
+            newDate = date
+        } else {
+            newDate = Date()
         }
+           
+        guard monthData.date != newDate else { return }
         
         monthData.date = newDate
         willSelectDate?(newDate)
