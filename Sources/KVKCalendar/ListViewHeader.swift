@@ -9,7 +9,7 @@
 
 import UIKit
 
-final class ListViewHeader: UITableViewHeaderFooterView {
+final class ListViewHeader: KVKTableViewHeaderFooterView {
     
     private let titleLabel: UILabel = {
         let label = UILabel()

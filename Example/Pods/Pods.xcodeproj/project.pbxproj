@@ -66,6 +66,8 @@
 		F902B98C26A4AAC30004EB05 /* DividerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F902B98B26A4AAC20004EB05 /* DividerView.swift */; };
 		F921AE5E2656EAFD007669C6 /* AllDayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F921AE5D2656EAFD007669C6 /* AllDayView.swift */; };
 		F9230C3E26586394000DD757 /* AllDayEventView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9230C3D26586394000DD757 /* AllDayEventView.swift */; };
+		F9535B33272DE8CC008AAC56 /* KVKTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9535B32272DE8CC008AAC56 /* KVKTableViewCell.swift */; };
+		F9535B35272DE9F5008AAC56 /* KVKTableViewHeaderFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9535B34272DE9F5008AAC56 /* KVKTableViewHeaderFooterView.swift */; };
 		F969448826F3534500EF4929 /* KVKCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F969448726F3534500EF4929 /* KVKCollectionViewCell.swift */; };
 		F9C481BB26A60F420007A780 /* SkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C481BA26A60F420007A780 /* SkeletonView.swift */; };
 /* End PBXBuildFile section */
@@ -169,6 +171,8 @@
 		F902B98B26A4AAC20004EB05 /* DividerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DividerView.swift; path = Sources/KVKCalendar/DividerView.swift; sourceTree = "<group>"; };
 		F921AE5D2656EAFD007669C6 /* AllDayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AllDayView.swift; path = Sources/KVKCalendar/AllDayView.swift; sourceTree = "<group>"; };
 		F9230C3D26586394000DD757 /* AllDayEventView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AllDayEventView.swift; path = Sources/KVKCalendar/AllDayEventView.swift; sourceTree = "<group>"; };
+		F9535B32272DE8CC008AAC56 /* KVKTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = KVKTableViewCell.swift; path = Sources/KVKCalendar/KVKTableViewCell.swift; sourceTree = "<group>"; };
+		F9535B34272DE9F5008AAC56 /* KVKTableViewHeaderFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = KVKTableViewHeaderFooterView.swift; path = Sources/KVKCalendar/KVKTableViewHeaderFooterView.swift; sourceTree = "<group>"; };
 		F969448726F3534500EF4929 /* KVKCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = KVKCollectionViewCell.swift; path = Sources/KVKCalendar/KVKCollectionViewCell.swift; sourceTree = "<group>"; };
 		F9A5FE2DD23FBAFCC63D57A554B1036E /* Pods-KVKCalendar_Example-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-KVKCalendar_Example-frameworks.sh"; sourceTree = "<group>"; };
 		F9C481BA26A60F420007A780 /* SkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SkeletonView.swift; path = Sources/KVKCalendar/SkeletonView.swift; sourceTree = "<group>"; };
@@ -335,6 +339,8 @@
 				8C67CAA689947993ABD3DDC4A43F27EA /* Support Files */,
 				F902B98B26A4AAC20004EB05 /* DividerView.swift */,
 				F969448726F3534500EF4929 /* KVKCollectionViewCell.swift */,
+				F9535B32272DE8CC008AAC56 /* KVKTableViewCell.swift */,
+				F9535B34272DE9F5008AAC56 /* KVKTableViewHeaderFooterView.swift */,
 			);
 			name = KVKCalendar;
 			path = ../..;
@@ -522,6 +528,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F9535B35272DE9F5008AAC56 /* KVKTableViewHeaderFooterView.swift in Sources */,
 				F969448826F3534500EF4929 /* KVKCollectionViewCell.swift in Sources */,
 				67FF774F81829D25627A95523D121DCB /* AllDayEventModel.swift in Sources */,
 				9ED826389916FA59E1F17001B1AAEC6E /* Calendar+Extension.swift in Sources */,
@@ -558,6 +565,7 @@
 				43A71B0C2D67DDAE6C0D4152B2977C07 /* StubEventView.swift in Sources */,
 				2D982E68A819D66622F6BD0FE6B13C2B /* StubStackView.swift in Sources */,
 				18E5875BD7D392E12CFD936351479DAE /* Style.swift in Sources */,
+				F9535B33272DE8CC008AAC56 /* KVKTableViewCell.swift in Sources */,
 				F9230C3E26586394000DD757 /* AllDayEventView.swift in Sources */,
 				1854C4D2AAD2F8BFB7D5D885FC47C049 /* Timeline+Extension.swift in Sources */,
 				3FE8D0253ABE9B61C42F2322700FAFA0 /* TimelineContainerVC.swift in Sources */,
