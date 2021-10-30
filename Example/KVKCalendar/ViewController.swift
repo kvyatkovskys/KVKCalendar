@@ -123,6 +123,13 @@ final class ViewController: UIViewController {
         let type = CalendarType.allCases[sender.selectedSegmentIndex]
         calendarView.set(type: type, date: selectDate)
         calendarView.reloadData()
+        
+//        switch type {
+//        case .list:
+//            calendarView.showSkeletonLoading(true)
+//        default:
+//            break
+//        }
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

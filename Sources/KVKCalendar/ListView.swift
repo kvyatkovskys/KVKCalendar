@@ -77,8 +77,15 @@ public final class ListView: UIView, CalendarSettingProtocol {
         tableView.reloadData()
     }
     
+    func showSkeletonVisible(_ visible: Bool) {
+        params.data.isSkeletonVisible = visible
+        tableView.reloadData()
+    }
+    
     func setDate(_ date: Date) {
         params.data.date = date
+        
+        guard !params.data.isSkeletonVisible else { return }
         
         if let idx = params.data.sections.firstIndex(where: { $0.date.year == date.year && $0.date.month == date.month && $0.date.day == date.day }) {
             tableView.scrollToRow(at: IndexPath(row: 0, section: idx), at: .top, animated: true)
@@ -92,15 +99,23 @@ public final class ListView: UIView, CalendarSettingProtocol {
 }
 
 extension ListView: UITableViewDataSource, UITableViewDelegate {
+    
     public func numberOfSections(in tableView: UITableView) -> Int {
-        return params.data.numberOfSection()
+        params.data.numberOfSection()
     }
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return params.data.numberOfItemsInSection(section)
+        params.data.numberOfItemsInSection(section)
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard !params.data.isSkeletonVisible else {
+            return tableView.kvkDequeueCell { (cell: ListViewCell) in
+                cell.txt = "---------"
+                cell.setSkeletons(params.data.isSkeletonVisible)
+            }
+        }
+        
         let event = params.data.event(indexPath: indexPath)
         if let cell = params.dataSource?.dequeueCell(dateParameter: .init(date: event.start), type: .list, view: tableView, indexPath: indexPath) as? UITableViewCell {
             return cell
@@ -113,6 +128,13 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
     }
     
     public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard !params.data.isSkeletonVisible else {
+            return tableView.kvkDequeueView { (view: ListViewHeader) in
+                view.title = "         "
+                view.setSkeletons(params.data.isSkeletonVisible)
+            }
+        }
+        
         let date = params.data.sections[section].date
         if let headerView = params.dataSource?.dequeueHeader(date: date, type: .list, view: tableView, indexPath: IndexPath(row: 0, section: section)) as? UIView {
             return headerView
@@ -129,6 +151,10 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
     }
     
     public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        guard !params.data.isSkeletonVisible else {
+            return UITableView.automaticDimension
+        }
+        
         let event = params.data.event(indexPath: indexPath)
         if let height = params.delegate?.sizeForCell(event.start, type: .list)?.height {
             return height
@@ -138,11 +164,17 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
     }
     
     public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        guard !params.data.isSkeletonVisible else {
+            return UITableView.automaticDimension
+        }
+        
         let date = params.data.sections[section].date
         if let height = params.delegate?.sizeForHeader(date, type: .list)?.height {
             return height
+        } else if let height = params.style.list.heightHeaderView {
+            return height
         } else {
-            return params.style.list.heightHeaderView
+            return UITableView.automaticDimension
         }
     }
     
@@ -153,6 +185,7 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
         let frameCell = tableView.cellForRow(at: indexPath)?.frame
         params.delegate?.didSelectEvent(event, type: .list, frame: frameCell)
     }
+    
 }
 
 #endif
