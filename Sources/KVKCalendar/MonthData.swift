@@ -11,6 +11,8 @@ import UIKit
 
 final class MonthData: EventDateProtocol {
     
+    typealias DayOfMonth = (indexPath: IndexPath, day: Day?, weeks: Int)
+    
     struct Parameters {
         let data: CalendarData
         let startDay: StartDayType
@@ -32,6 +34,7 @@ final class MonthData: EventDateProtocol {
     var movingEvent: EventViewGeneral?
     var selectedDates: Set<Date> = []
     var isSkeletonVisible = false
+    var days: [IndexPath: DayOfMonth] = [:]
     
     private let calendar: Calendar
     private let scrollDirection: UICollectionView.ScrollDirection
@@ -74,12 +77,12 @@ final class MonthData: EventDateProtocol {
         day.date?.year == date?.year && day.date?.month == date?.month
     }
     
-    func getDay(indexPath: IndexPath) -> (day: Day?, weeks: Int) {
+    func getDay(indexPath: IndexPath) -> DayOfMonth {
         // TODO: we got a crash sometime when use a horizontal scroll direction
         // got index out of array
         // safe: -> optional subscript
         let month = data.months[indexPath.section]
-        return (month.days[safe: indexPath.row], month.weeks)
+        return (indexPath, month.days[safe: indexPath.row], month.weeks)
     }
     
     func updateSelectedDates(_ dates: Set<Date>, date: Date, calendar: Calendar) -> Set<Date> {
