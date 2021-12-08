@@ -11,16 +11,19 @@ import UIKit
 
 final class MonthCell: KVKCollectionViewCell {
     
+    var customViewFrame: CGRect {
+        let customY = dateLabel.frame.origin.y + dateLabel.frame.height + 3
+        return CGRect(x: 0, y: customY, width: frame.width, height: frame.height - customY)
+    }
+    
     private let titlesCount = 3
     private let countInCell: CGFloat = 4
     private let offset: CGFloat = 3
     private let defaultTagView = -1
     private let defaultTagStubView = -2
     
-    private lazy var dateLabel: UILabel = {
+    private let dateLabel: UILabel = {
         let label = UILabel()
-        label.tag = defaultTagView
-        label.font = monthStyle.fontNameDate
         label.textAlignment = .center
         label.clipsToBounds = true
         return label
@@ -32,7 +35,11 @@ final class MonthCell: KVKCollectionViewCell {
         return formatter.string(from: date)
     }
     
-    private var monthStyle = MonthStyle()
+    private var monthStyle = MonthStyle() {
+        didSet {
+            dateLabel.font = monthStyle.fontNameDate
+        }
+    }
     private var allDayStyle = AllDayStyle()
     
     private lazy var panGesture: UIPanGestureRecognizer = {
@@ -90,10 +97,9 @@ final class MonthCell: KVKCollectionViewCell {
                 showMonthName(day: day)
             }
             
-            let customY = dateLabel.frame.origin.y + dateLabel.frame.height + 3
-            let customFrame = CGRect(x: 0, y: customY, width: frame.width, height: frame.height - customY)
-            if let date = day.date, let customView = delegate?.dequeueViewEvents(events, date: date, frame: customFrame)  {
-            contentView.addSubview(customView)
+            // using a custom view below the date label
+            if let date = day.date, let customView = delegate?.dequeueViewEvents(events, date: date, frame: customViewFrame) {
+                contentView.addSubview(customView)
                 return
             }
             
@@ -246,6 +252,7 @@ final class MonthCell: KVKCollectionViewCell {
         }
         dateFrame.origin.y = offset
         dateLabel.frame = dateFrame
+        dateLabel.tag = defaultTagView
         contentView.addSubview(dateLabel)
         
         if #available(iOS 13.4, *) {

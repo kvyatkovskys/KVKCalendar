@@ -35,6 +35,7 @@ final class MonthData: EventDateProtocol {
     var selectedDates: Set<Date> = []
     var isSkeletonVisible = false
     var days: [IndexPath: DayOfMonth] = [:]
+    var customEventsView: [Date: UIView] = [:]
     
     private let calendar: Calendar
     private let scrollDirection: UICollectionView.ScrollDirection
