@@ -9,6 +9,14 @@
 
 import UIKit
 
+extension TimelineView {
+    
+    var calculatedTimeY: CGFloat {
+        style.timeline.offsetTimeY * zoomScale
+    }
+    
+}
+
 extension TimelineView: UIScrollViewDelegate {
     
     var contentOffset: CGPoint {
@@ -51,7 +59,8 @@ extension TimelineView: UIScrollViewDelegate {
 
             guard !visibleView(eventView.frame) else { return }
             
-            let stubView = StubEventView(event: eventView.event, frame: CGRect(x: 0, y: 0, width: stack.top.frame.width, height: style.event.heightStubView))
+            let stubView = StubEventView(event: eventView.event,
+                                         frame: CGRect(x: 0, y: 0, width: stack.top.frame.width, height: style.event.heightStubView))
             stubView.valueHash = eventView.event.hash
             
             if scrollView.contentOffset.y > eventView.frame.origin.y {
@@ -128,15 +137,15 @@ extension TimelineView: UIScrollViewDelegate {
 
 extension TimelineView {
     var bottomStabStackOffsetY: CGFloat {
-        return UIApplication.shared.isAvailableBottomHomeIndicator ? 30 : 5
+        UIApplication.shared.isAvailableBottomHomeIndicator ? 30 : 5
     }
     
     func topStabStackOffsetY(allDayEventsIsPinned: Bool, eventsCount: Int, height: CGFloat) -> CGFloat {
-        return allDayEventsIsPinned ? (CGFloat(eventsCount) * height) + 5 : 5
+        allDayEventsIsPinned ? (CGFloat(eventsCount) * height) + 5 : 5
     }
     
     var scrollableEventViews: [UIView] {
-        return getAllScrollableEvents()
+        getAllScrollableEvents()
     }
 }
 
@@ -237,7 +246,7 @@ extension TimelineView {
     func createTimesLabel(start: Int) -> [TimelineLabel] {
         var times = [TimelineLabel]()
         for (idx, hour) in availabilityHours.enumerated() where idx >= start {
-            let yTime = (style.timeline.offsetTimeY + style.timeline.heightTime) * CGFloat(idx - start)
+            let yTime = (calculatedTimeY + style.timeline.heightTime) * CGFloat(idx - start)
             
             let time = TimelineLabel(frame: CGRect(x: style.timeline.offsetTimeX,
                                                    y: yTime,
@@ -271,7 +280,7 @@ extension TimelineView {
             
             var lines = [line]
             if let dividerType = style.timeline.dividerType {
-                let heightBlock = style.timeline.offsetTimeY + style.timeline.heightTime
+                let heightBlock = calculatedTimeY + style.timeline.heightTime
                 lines += (1..<dividerType.rawValue).compactMap({ idxDivider in
                     let yOffset = heightBlock / CGFloat(dividerType.rawValue) * CGFloat(idxDivider)
                     let divider = DividerView(style: style,
@@ -375,8 +384,17 @@ extension TimelineView {
         return eventViews
     }
     
-    func identityViews(duration: TimeInterval = 0.3, delay: TimeInterval = 0.1, _ views: [UIView], action: @escaping (() -> Void) = {}) {
-        UIView.animate(withDuration: duration, delay: delay, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.8, options: .curveLinear, animations: {
+    func identityViews(duration: TimeInterval = 0.3,
+                       delay: TimeInterval = 0.1,
+                       _ views: [UIView],
+                       action: @escaping (() -> Void) = {})
+    {
+        UIView.animate(withDuration: duration,
+                       delay: delay,
+                       usingSpringWithDamping: 0.8,
+                       initialSpringVelocity: 0.8,
+                       options: .curveLinear,
+                       animations: {
             views.forEach { (view) in
                 view.transform = .identity
             }
@@ -432,11 +450,11 @@ extension TimelineView: ResizeEventViewDelegate {
 // MARK: EventDelegate
 extension TimelineView: EventDelegate {
     var eventPreviewXOffset: CGFloat {
-        return eventPreviewSize.width * 0.5
+        eventPreviewSize.width * 0.5
     }
     
     var eventPreviewYOffset: CGFloat {
-        return eventPreviewSize.height * 0.7
+        eventPreviewSize.height * 0.7
     }
     
     func deselectEvent(_ event: Event) {
@@ -503,14 +521,16 @@ extension TimelineView: EventDelegate {
             eventPreviewSize = CGSize(width: 150, height: 150)
             eventPreview = EventView(event: event,
                                      style: style,
-                                     frame: CGRect(origin: CGPoint(x: location.x - eventPreviewXOffset, y: location.y - eventPreviewYOffset),
+                                     frame: CGRect(origin: CGPoint(x: location.x - eventPreviewXOffset,
+                                                                   y: location.y - eventPreviewYOffset),
                                                    size: eventPreviewSize))
         } else {
             eventPreview = event.isNew ? view : view.snapshotView(afterScreenUpdates: false)
             if let size = eventPreview?.frame.size {
                 eventPreviewSize = size
             }
-            eventPreview?.frame.origin = CGPoint(x: location.x - eventPreviewXOffset, y: location.y - eventPreviewYOffset)
+            eventPreview?.frame.origin = CGPoint(x: location.x - eventPreviewXOffset,
+                                                 y: location.y - eventPreviewYOffset)
         }
         
         eventPreview?.alpha = 0.9
@@ -605,8 +625,8 @@ extension TimelineView: EventDelegate {
     func calculateChangingTime(pointY: CGFloat) -> (hour: Int?, minute: Int?) {
         guard let time = timeLabels.first(where: { $0.frame.origin.y >= pointY }) else { return (nil, nil) }
 
-        let firstY = time.frame.origin.y - (style.timeline.offsetTimeY + style.timeline.heightTime)
-        let percent = (pointY - firstY) / (style.timeline.offsetTimeY + style.timeline.heightTime)
+        let firstY = time.frame.origin.y - (calculatedTimeY + style.timeline.heightTime)
+        let percent = (pointY - firstY) / (calculatedTimeY + style.timeline.heightTime)
         let newMinute = Int(60.0 * percent)
         let newHour = time.tag - 1
         return (newHour, newMinute)

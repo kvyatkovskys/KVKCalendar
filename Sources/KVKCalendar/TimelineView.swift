@@ -49,6 +49,8 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     private(set) var selectedDate: Date?
     private(set) var type: CalendarType
     private(set) var eventLayout: TimelineEventLayout
+    private(set) var zoomScale: CGFloat = 1
+    private var lastSavedZoomScale: CGFloat = 1
 
     private(set) lazy var shadowView: ShadowDayView = {
         let view = ShadowDayView()
@@ -96,6 +98,9 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(forceDeselectEvent))
         addGestureRecognizer(tap)
+        
+        let pinch = UIPinchGestureRecognizer(target: self, action: #selector(pinchZooming))
+        addGestureRecognizer(pinch)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -104,6 +109,26 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     
     deinit {
         stopTimer(timerKey)
+    }
+    
+    @objc private func pinchZooming(gesture: UIPinchGestureRecognizer) {
+        print(gesture.scale)
+        switch gesture.state {
+        case .ended, .failed, .cancelled:
+            if zoomScale < 1 {
+                zoomScale = 1
+            } else if zoomScale > 6 {
+                zoomScale = 6
+            }
+            lastSavedZoomScale = gesture.scale
+        case .changed:
+            zoomScale = gesture.scale
+        default:
+            break
+        }
+        
+        print(zoomScale)
+        create(dates: dates, events: events, selectedDate: selectedDate)
     }
     
     private func setOffsetScrollView(allDayEventsCount: Int) {
@@ -187,15 +212,15 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         let pointY: CGFloat
         if 1...59 ~= minute {
             let minutePercent = 59.0 / CGFloat(minute)
-            let newY = (style.timeline.offsetTimeY + time.frame.height) / minutePercent
-            let summY = (CGFloat(time.tag) * (style.timeline.offsetTimeY + time.frame.height)) + (time.frame.height / 2)
+            let newY = (calculatedTimeY + time.frame.height) / minutePercent
+            let summY = (CGFloat(time.tag) * (calculatedTimeY + time.frame.height)) + (time.frame.height / 2)
             if time.tag == 0 {
                 pointY = newY + (time.frame.height / 2)
             } else {
                 pointY = summY + newY
             }
         } else {
-            pointY = (CGFloat(time.tag) * (style.timeline.offsetTimeY + time.frame.height)) + (time.frame.height / 2)
+            pointY = (CGFloat(time.tag) * (calculatedTimeY + time.frame.height)) + (time.frame.height / 2)
         }
         return pointY
     }
@@ -267,7 +292,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         let lines = createLines(times: timeLabels)
         
         // calculate all height by time label minus the last offset
-        let heightAllTimes = timeLabels.reduce(0, { $0 + ($1.frame.height + style.timeline.offsetTimeY) }) - style.timeline.offsetTimeY
+        let heightAllTimes = timeLabels.reduce(0, { $0 + ($1.frame.height + calculatedTimeY) }) - calculatedTimeY
         scrollView.contentSize = CGSize(width: frame.width, height: heightAllTimes)
         timeLabels.forEach({ scrollView.addSubview($0) })
         lines.forEach({ scrollView.addSubview($0) })
