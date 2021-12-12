@@ -149,6 +149,9 @@ public struct TimelineStyle {
     public var eventLayout: TimelineEventLayout = DefaultTimelineEventLayout()
     public var timeDividerColor: UIColor = .lightGray
     public var timeDividerFont: UIFont = .systemFont(ofSize: 10)
+    public var scale: Scale? = (1, 6)
+    
+    public typealias Scale = (min: CGFloat, max: CGFloat)
     
     public enum DividerType: Int {
         case mins5 = 12

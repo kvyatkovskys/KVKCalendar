@@ -26,6 +26,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     var eventResizePreview: ResizeEventView?
     var eventPreviewSize = CGSize(width: 150, height: 150)
     var isResizeEnableMode = false
+    var zoomScale: CGFloat = 1
     
     let timeLabelFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -49,8 +50,6 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     private(set) var selectedDate: Date?
     private(set) var type: CalendarType
     private(set) var eventLayout: TimelineEventLayout
-    private(set) var zoomScale: CGFloat = 1
-    private var lastSavedZoomScale: CGFloat = 1
 
     private(set) lazy var shadowView: ShadowDayView = {
         let view = ShadowDayView()
@@ -99,8 +98,10 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         let tap = UITapGestureRecognizer(target: self, action: #selector(forceDeselectEvent))
         addGestureRecognizer(tap)
         
-        let pinch = UIPinchGestureRecognizer(target: self, action: #selector(pinchZooming))
-        addGestureRecognizer(pinch)
+        if style.timeline.scale != nil {
+            let pinch = UIPinchGestureRecognizer(target: self, action: #selector(pinchZooming))
+            addGestureRecognizer(pinch)
+        }
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -109,26 +110,6 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     
     deinit {
         stopTimer(timerKey)
-    }
-    
-    @objc private func pinchZooming(gesture: UIPinchGestureRecognizer) {
-        print(gesture.scale)
-        switch gesture.state {
-        case .ended, .failed, .cancelled:
-            if zoomScale < 1 {
-                zoomScale = 1
-            } else if zoomScale > 6 {
-                zoomScale = 6
-            }
-            lastSavedZoomScale = gesture.scale
-        case .changed:
-            zoomScale = gesture.scale
-        default:
-            break
-        }
-        
-        print(zoomScale)
-        create(dates: dates, events: events, selectedDate: selectedDate)
     }
     
     private func setOffsetScrollView(allDayEventsCount: Int) {
@@ -349,13 +330,14 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                                       date: date,
                                       xOffset: pointX - leftOffset,
                                       width: widthPage))
-
+            
             do {
                 let context = TimelineEventLayoutContext(
                     style: style,
                     pageFrame: .init(x: pointX, y: 0, width: widthPage, height: heightPage),
                     startHour: startHour,
                     timeLabels: timeLabels,
+                    calculatedTimeY: calculatedTimeY,
                     calculatePointYByMinute: calculatePointYByMinute(_:time:),
                     getTimelineLabel: getTimelineLabel(hour:)
                 )

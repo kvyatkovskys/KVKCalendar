@@ -29,6 +29,7 @@ class KVKCollectionViewCell: UICollectionViewCell {
         isUserInteractionEnabled = !skeletons
         contentView.subviews.forEach { $0.setAsSkeleton(skeletons, cornerRadius: cornerRadius, insets: insets) }
     }
+    
 }
 
 #endif

@@ -121,8 +121,6 @@ extension CalendarView {
         switch type {
         case .month:
             monthView.showSkeletonVisible(visible)
-        case .list:
-            listView.showSkeletonVisible(visible)
         default:
             break
         }
