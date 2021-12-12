@@ -189,6 +189,30 @@ extension TimelineView {
         scrollView.subviews.filter({ $0 is EventViewGeneral }).forEach({ $0.isUserInteractionEnabled = enable })
     }
     
+    @objc func pinchZooming(gesture: UIPinchGestureRecognizer) {
+        switch gesture.state {
+        case .ended, .failed, .cancelled:
+            gesture.scale = 1
+            
+            if let defaultScale = style.timeline.scale {
+                if zoomScale < defaultScale.min {
+                    zoomScale = defaultScale.min
+                } else if zoomScale > defaultScale.max {
+                    zoomScale = defaultScale.max
+                }
+            }
+        case .changed:
+            zoomScale *= gesture.scale
+            gesture.scale = 1
+        default:
+            break
+        }
+                
+        guard 1...6 ~= zoomScale else { return }
+        
+        create(dates: dates, events: events, selectedDate: selectedDate)
+    }
+    
     @objc func forceDeselectEvent() {
         removeEventResizeView()
         

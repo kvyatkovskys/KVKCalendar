@@ -33,10 +33,11 @@ final class ListViewHeader: KVKTableViewHeaderFooterView {
     
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
-        addSubview(titleLabel)
+        contentView.addSubview(titleLabel)
         addGestureRecognizer(tapGesture)
         
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        
         let top = titleLabel.topAnchor.constraint(equalTo: topAnchor)
         let bottom = titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor)
         let left = titleLabel.leftAnchor.constraint(equalTo: leftAnchor)

@@ -14,6 +14,7 @@ public struct TimelineEventLayoutContext {
     let pageFrame: CGRect
     let startHour: Int
     let timeLabels: [TimelineLabel]
+    let calculatedTimeY: CGFloat
     let calculatePointYByMinute: (_ minute: Int, _ label: TimelineLabel) -> CGFloat
     let getTimelineLabel: (_ hour: Int) -> TimelineLabel?
 }
@@ -50,16 +51,16 @@ public extension TimelineEventLayoutContext {
                     timeTemp = newTime
                 }
 
-                let summHeight = (CGFloat(timeTemp.tag) * (style.timeline.offsetTimeY + timeTemp.frame.height)) - newFrame.origin.y + (timeTemp.frame.height / 2)
+                let summHeight = (CGFloat(timeTemp.tag) * (calculatedTimeY + timeTemp.frame.height)) - newFrame.origin.y + (timeTemp.frame.height / 2)
                 if 0...59 ~= end.minute {
                     let minutePercent = 59.0 / CGFloat(end.minute)
-                    let newY = (style.timeline.offsetTimeY + timeTemp.frame.height) / minutePercent
+                    let newY = (calculatedTimeY + timeTemp.frame.height) / minutePercent
                     newFrame.size.height = summHeight + newY - style.timeline.offsetEvent
                 } else {
                     newFrame.size.height = summHeight - style.timeline.offsetEvent
                 }
             } else if end.day != date?.day {
-                newFrame.size.height = (CGFloat(time.tag) * (style.timeline.offsetTimeY + time.frame.height)) - newFrame.origin.y + (time.frame.height / 2)
+                newFrame.size.height = (CGFloat(time.tag) * (calculatedTimeY + time.frame.height)) - newFrame.origin.y + (time.frame.height / 2)
             }
         }
 

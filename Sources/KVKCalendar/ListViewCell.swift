@@ -38,19 +38,13 @@ final class ListViewCell: KVKTableViewCell {
     }
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        super.init(style: style, reuseIdentifier: reuseIdentifier)        
         contentView.addSubview(txtLabel)
         contentView.addSubview(dotView)
+        
         dotView.translatesAutoresizingMaskIntoConstraints = false
         txtLabel.translatesAutoresizingMaskIntoConstraints = false
-        updateConstraints()
-    }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func updateConstraints() {
         let leftDot: NSLayoutConstraint
         if #available(iOS 11.0, *) {
             leftDot = dotView.leftAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leftAnchor)
@@ -67,8 +61,10 @@ final class ListViewCell: KVKTableViewCell {
         let leftTxt = txtLabel.leftAnchor.constraint(equalTo: dotView.rightAnchor, constant: 10)
         let rightTxt = txtLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15)
         NSLayoutConstraint.activate([topTxt, bottomTxt, leftTxt, rightTxt])
-        
-        super.updateConstraints()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
 }

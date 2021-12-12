@@ -16,7 +16,10 @@ public struct DefaultTimelineEventLayout: TimelineEventLayout {
         let crossEvents = context.calculateCrossEvents(forEvents: events)
 
         for event in events {
-            var frame = context.getEventRect(start: event.start, end: event.end, date: date, style: event.style)
+            var frame = context.getEventRect(start: event.start,
+                                             end: event.end,
+                                             date: date,
+                                             style: event.style)
 
             // calculate 'width' and position 'x'
             if let crossEvent = crossEvents[event.start.timeIntervalSince1970] {

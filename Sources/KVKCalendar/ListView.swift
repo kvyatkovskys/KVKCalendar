@@ -36,6 +36,9 @@ public final class ListView: UIView, CalendarSettingProtocol {
         table.tableFooterView = UIView()
         table.dataSource = self
         table.delegate = self
+        if #available(iOS 15.0, *) {
+            table.sectionHeaderTopPadding = 0
+        }
         return table
     }()
     
@@ -111,7 +114,6 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard !params.data.isSkeletonVisible else {
             return tableView.kvkDequeueCell { (cell: ListViewCell) in
-                cell.txt = "---------"
                 cell.setSkeletons(params.data.isSkeletonVisible)
             }
         }
@@ -130,7 +132,6 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
     public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         guard !params.data.isSkeletonVisible else {
             return tableView.kvkDequeueView { (view: ListViewHeader) in
-                view.title = "         "
                 view.setSkeletons(params.data.isSkeletonVisible)
             }
         }
@@ -152,7 +153,7 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
     
     public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         guard !params.data.isSkeletonVisible else {
-            return UITableView.automaticDimension
+            return 45
         }
         
         let event = params.data.event(indexPath: indexPath)
@@ -165,7 +166,7 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
     
     public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         guard !params.data.isSkeletonVisible else {
-            return UITableView.automaticDimension
+            return 50
         }
         
         let date = params.data.sections[section].date
