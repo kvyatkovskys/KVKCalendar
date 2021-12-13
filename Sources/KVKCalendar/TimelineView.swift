@@ -8,6 +8,7 @@
 #if os(iOS)
 
 import UIKit
+import CoreGraphics
 
 final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     
@@ -41,6 +42,8 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     private(set) var tagAllDayEventView = -70
     private(set) var tagStubEvent = -80
     private(set) var timeLabels = [TimelineLabel]()
+    private(set) var horizontalLines = [UIView]()
+    private(set) var todayEvents = [EventViewGeneral]()
     private(set) var availabilityHours: [String]
     private var timeSystem: TimeHourSystem
     private let timerKey = "CurrentHourTimerKey"
@@ -49,6 +52,8 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     private(set) var selectedDate: Date?
     private(set) var type: CalendarType
     private(set) var eventLayout: TimelineEventLayout
+    
+    private(set) var startHour = Int()
 
     private(set) lazy var shadowView: ShadowDayView = {
         let view = ShadowDayView()
@@ -87,15 +92,125 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         self.style = style
         self.eventLayout = style.timeline.eventLayout
         super.init(frame: frame)
-        
         var scrollFrame = frame
         scrollFrame.origin.y = 0
         scrollView.frame = scrollFrame
         addSubview(scrollView)
         setUI()
-        
         let tap = UITapGestureRecognizer(target: self, action: #selector(forceDeselectEvent))
         addGestureRecognizer(tap)
+        
+        guard type == .day, style.timeline.allowZoom else { return }
+        addPinchToZoom()
+    }
+    
+    func addPinchToZoom() {
+        let pinch = UIPinchGestureRecognizer(target: self, action: #selector(didPinch(_:)))
+        addGestureRecognizer(pinch)
+    }
+
+    
+    @objc private func didPinch(_ recognizer: UIPinchGestureRecognizer) {
+        if recognizer.state == .ended {
+            automaticallyResize(with: recognizer)
+        }
+        
+        guard recognizer.state == .changed else { return }
+        
+        let currentPoint = recognizer.location(in: scrollView)
+        let offsetToZeroPoint = recognizer.location(in: self)
+        
+        let stopMax = style.timeline.maxZoom * 1.1
+        let stopMin = style.timeline.minZoom * 0.8
+        let velocity = recognizer.velocity
+        let increase = style.timeline.offsetTimeY + velocity * style.timeline.zoomSpeed
+        let height = velocity >= 0.0 ? min(increase, stopMax) : max(increase, stopMin)
+        
+        guard style.timeline.offsetTimeY != height else { return }
+        
+        resizeViewsRoutine(currentPoint.y, height: height, zeroYPoint: offsetToZeroPoint.y)
+    }
+    
+    private func automaticallyResize(with recognizer: UIPinchGestureRecognizer) {
+        let currentHeight = style.timeline.offsetTimeY
+        let maxZoom = style.timeline.maxZoom
+        let minZoom = style.timeline.minZoom
+        
+        guard currentHeight > maxZoom || currentHeight < minZoom else { return }
+        let endHeight = currentHeight > maxZoom ? maxZoom : minZoom
+        let currentPoint = recognizer.location(in: scrollView)
+        let offsetToZeroPoint = recognizer.location(in: self)
+
+        UIView.animate(withDuration: 0.1) {
+            self.resizeViewsRoutine(currentPoint.y, height: endHeight, zeroYPoint: offsetToZeroPoint.y)
+        }
+    }
+    
+    private func resizeViewsRoutine(_ yPoint: CGFloat, height: CGFloat, zeroYPoint: CGFloat) {
+        let ratio = min(yPoint / scrollView.contentSize.height, scrollView.contentSize.height / yPoint)
+        
+        style.timeline.offsetTimeY = height
+        resizeViews(with: height)
+        focusOnPinchCenter(ratio, zeroYPoint: zeroYPoint)
+    }
+    
+    private func resizeViews(with height: CGFloat) {
+        resizeTimeLabelAndLines(with: height)
+        resizeScrollView()
+        resizeEvents()
+        showCurrentLineHour()
+    }
+    
+    private func focusOnPinchCenter(_ ratio: CGFloat, zeroYPoint: CGFloat) {
+        let newPinchPosition = scrollView.contentSize.height * ratio
+        let maxYZeroPosition = scrollView.contentSize.height - frame.height
+        var pinchZeroPoint = newPinchPosition - zeroYPoint
+        pinchZeroPoint = pinchZeroPoint < 0 ? 0 : pinchZeroPoint
+        pinchZeroPoint = pinchZeroPoint > maxYZeroPosition ? maxYZeroPosition : pinchZeroPoint
+        
+        let pinchPoint = CGPoint(x: 0, y: pinchZeroPoint)
+        scrollView.setContentOffset(pinchPoint, animated: false)
+    }
+    
+    private func resizeTimeLabelAndLines(with height: CGFloat) {
+        for (index, label) in timeLabels.enumerated() {
+            let yTime = (height + style.timeline.heightTime) * CGFloat(index - startHour)
+            label.frame = CGRect(x: style.timeline.offsetTimeX, y: yTime, width: style.timeline.widthTime, height: style.timeline.heightTime)
+            
+            let xLine = label.frame.width + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
+            horizontalLines[index].frame = CGRect(x: xLine,y: label.center.y, width: frame.width - xLine, height: style.timeline.heightLine)
+        }
+    }
+    
+    private func resizeEvents() {
+        for date in dates {
+            let eventsByDate = usualEvents(events).filter({ compareStartDate(date, with: $0) || compareEndDate(date, with: $0) || checkMultipleDate(date, with: $0) })
+            let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
+            let widthPage = (frame.width - leftOffset) / CGFloat(dates.count)
+            let heightPage = scrollView.contentSize.height
+            let filteredRecurringEvents = getRecurringEventsByDate(events, date: date)
+            let sortedEventsByDate = (eventsByDate + filteredRecurringEvents).sorted(by: { $0.start < $1.start })
+            
+            
+            let context = TimelineEventLayoutContext(
+                style: style,
+                pageFrame: .init(x: leftOffset, y: 0, width: widthPage, height: heightPage),
+                startHour: startHour,
+                timeLabels: timeLabels,
+                calculatePointYByMinute: calculatePointYByMinute(_:time:),
+                getTimelineLabel: getTimelineLabel(hour:)
+            )
+            
+            let rects = eventLayout.getEventRects(
+                forEvents: sortedEventsByDate,
+                date: date,
+                context: context
+            )
+            
+            for (event, rect) in zip(todayEvents, rects) {
+                event.frame = rect
+            }
+        }
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -224,107 +339,92 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         frame.origin.y = time.frame.origin.y - 10
         scrollView.scrollRectToVisible(frame, animated: true)
     }
-    
+
     func create(dates: [Date?], events: [Event], selectedDate: Date?) {
+        cleanView()
         isResizeEnableMode = false
         delegate?.didDisplayEvents(events, dates: dates)
         
         self.dates = dates
         self.events = events
         self.selectedDate = selectedDate
-        
-        if style.allDay.isPinned {
-            subviews.filter({ $0.tag == tagAllDayEventView }).forEach({ $0.removeFromSuperview() })
-        }
-        subviews.filter({ $0.tag == tagStubEvent || $0.tag == tagVerticalLine }).forEach({ $0.removeFromSuperview() })
-        scrollView.subviews.forEach({ $0.removeFromSuperview() })
-        
+
         // filter events
-        let recurringEvents = events.filter({ $0.recurringType != .none })
-        let allEventsForDates = events.filter { (event) -> Bool in
-            return dates.contains(where: { compareStartDate($0, with: event) || compareEndDate($0, with: event) || (checkMultipleDate($0, with: event) && type == .day) })
-        }
-        let filteredEvents = allEventsForDates.filter({ !$0.isAllDay })
-        let filteredAllDayEvents = allEventsForDates.filter({ $0.isAllDay })
+        let filteredEvents = usualEvents(events)
 
         // calculate a start hour
-        let startHour: Int
-        if !style.timeline.startFromFirstEvent {
-            startHour = style.timeline.startHour
-        } else {
-            if dates.count > 1 {
-                startHour = filteredEvents.sorted(by: { $0.start.hour < $1.start.hour }).first?.start.hour ?? style.timeline.startHour
-            } else {
-                startHour = filteredEvents.filter({ compareStartDate(selectedDate, with: $0) })
-                    .sorted(by: { $0.start.hour < $1.start.hour })
-                    .first?.start.hour ?? style.timeline.startHour
-            }
-        }
+        createStartDate(filteredEvents)
         
         // add time label to timeline
         timeLabels = createTimesLabel(start: startHour)
         // add separator line
-        let lines = createLines(times: timeLabels)
-        
+        horizontalLines = createLines(times: timeLabels)
         // calculate all height by time label minus the last offset
+        resizeScrollView()
+        timeLabels.forEach({ scrollView.addSubview($0) })
+        horizontalLines.forEach({ scrollView.addSubview($0) })
+        
+        // horror
+        createEventViews(for: events)
+       
+        if let preferredHour = style.timeline.scrollToHour, !style.timeline.startFromFirstEvent {
+            scrollToHour(preferredHour)
+        } else {
+            scrollToCurrentTime(startHour)
+        }
+        
+        showCurrentLineHour()
+        addStubInvisibleEvents()
+    }
+    
+    private func cleanView() {
+        subviews.filter({ $0.tag == tagStubEvent || $0.tag == tagVerticalLine }).forEach({ $0.removeFromSuperview() })
+        scrollView.subviews.forEach({ $0.removeFromSuperview() })
+        
+        guard style.allDay.isPinned else { return }
+        subviews.filter({ $0.tag == tagAllDayEventView }).forEach({ $0.removeFromSuperview() })
+    }
+    
+    private func createStartDate(_ events: [Event]) {
+        if !style.timeline.startFromFirstEvent {
+            startHour = style.timeline.startHour
+        } else {
+            if dates.count > 1 {
+                startHour = events.sorted(by: { $0.start.hour < $1.start.hour }).first?.start.hour ?? style.timeline.startHour
+            } else {
+                startHour = events.filter({ compareStartDate(selectedDate, with: $0) })
+                    .sorted(by: { $0.start.hour < $1.start.hour })
+                    .first?.start.hour ?? style.timeline.startHour
+            }
+        }
+    }
+    
+    private func resizeScrollView() {
         let heightAllTimes = timeLabels.reduce(0, { $0 + ($1.frame.height + style.timeline.offsetTimeY) }) - style.timeline.offsetTimeY
         scrollView.contentSize = CGSize(width: frame.width, height: heightAllTimes)
-        timeLabels.forEach({ scrollView.addSubview($0) })
-        lines.forEach({ scrollView.addSubview($0) })
-
+    }
+    
+    func createEventViews(for events: [Event]) {
+        todayEvents = []
         let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
         let widthPage = (frame.width - leftOffset) / CGFloat(dates.count)
         let heightPage = scrollView.contentSize.height
         var allDayEvents = [AllDayView.PrepareEvents]()
         
-        // horror
         for (idx, date) in dates.enumerated() {
-            let pointX: CGFloat
-            if idx == 0 {
-                pointX = leftOffset
-            } else {
-                pointX = CGFloat(idx) * widthPage + leftOffset
-            }
+            let pointX = idx == 0 ? leftOffset : CGFloat(idx) * widthPage + leftOffset
             
             let verticalLine = createVerticalLine(pointX: pointX, date: date)
             addSubview(verticalLine)
             bringSubviewToFront(verticalLine)
             
-            let eventsByDate = filteredEvents.filter({ compareStartDate(date, with: $0) || compareEndDate(date, with: $0) || checkMultipleDate(date, with: $0) })
-            let allDayEventsForDate = filteredAllDayEvents.filter({ compareStartDate(date, with: $0) || compareEndDate(date, with: $0) }).compactMap { (oldEvent) -> Event in
-                var updatedEvent = oldEvent
-                updatedEvent.start = date ?? oldEvent.start
-                updatedEvent.end = date ?? oldEvent.end
-                return updatedEvent
-            }
+            let eventsByDate = usualEvents(events).filter({ compareStartDate(date, with: $0) || compareEndDate(date, with: $0) || checkMultipleDate(date, with: $0) })
             
-            let recurringEventByDate: [Event]
-            if !recurringEvents.isEmpty, let dt = date {
-                recurringEventByDate = recurringEvents.reduce([], { (acc, event) -> [Event] in
-                    guard !eventsByDate.contains(where: { $0.ID == event.ID })
-                            && dt.compare(event.start) == .orderedDescending else { return acc }
-                    
-                    guard let recurringEvent = event.updateDate(newDate: date, calendar: style.calendar) else {
-                        return acc
-                    }
-                    
-                    return acc + [recurringEvent]
-                    
-                })
-            } else {
-                recurringEventByDate = []
-            }
-            
+            let recurringEventByDate = getRecurringEventsByDate(events, date: date)
             let filteredRecurringEvents = recurringEventByDate.filter({ !$0.isAllDay })
             let filteredAllDayRecurringEvents = recurringEventByDate.filter({ $0.isAllDay })
             let sortedEventsByDate = (eventsByDate + filteredRecurringEvents).sorted(by: { $0.start < $1.start })
             
-            // create an all day events
-            allDayEvents.append(.init(events: allDayEventsForDate + filteredAllDayRecurringEvents,
-                                      date: date,
-                                      xOffset: pointX - leftOffset,
-                                      width: widthPage))
-
             do {
                 let context = TimelineEventLayoutContext(
                     style: style,
@@ -339,6 +439,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                     date: date,
                     context: context
                 )
+               
                 for (event, rect) in zip(sortedEventsByDate, rects) {
                     let view: EventViewGeneral = {
                         if let view = dataSource?.willDisplayEventView(event, frame: rect, date: date) {
@@ -353,35 +454,85 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                     }()
 
                     view.delegate = self
+                    todayEvents.append(view)
                     scrollView.addSubview(view)
                 }
             }
-            
-            if !style.timeline.isHiddenStubEvent, let day = date?.day {
-                let y = topStabStackOffsetY(allDayEventsIsPinned: style.allDay.isPinned,
-                                            eventsCount: (allDayEventsForDate + filteredAllDayRecurringEvents).count,
-                                            height: style.allDay.height)
-                let topStackFrame = CGRect(x: pointX, y: y, width: widthPage - style.timeline.offsetEvent, height: style.event.heightStubView)
-                let bottomStackFrame = CGRect(x: pointX, y: frame.height - bottomStabStackOffsetY, width: widthPage - style.timeline.offsetEvent, height: style.event.heightStubView)
-                
-                addSubview(createStackView(day: day, type: .top, frame: topStackFrame))
-                addSubview(createStackView(day: day, type: .bottom, frame: bottomStackFrame))
-            }
+            prepareAllDayEvents(events, date: date, pointX: pointX, allDayRecurringEvents: filteredAllDayRecurringEvents, allDayEvents: &allDayEvents)
         }
         
         if let maxEvents = allDayEvents.max(by: { $0.events.count < $1.events.count })?.events.count, maxEvents > 0 {
             setOffsetScrollView(allDayEventsCount: maxEvents)
             createAllDayEvents(events: allDayEvents, maxEvents: maxEvents)
         }
+    }
+    
+    private func getRecurringEventsByDate(_ events: [Event], date: Date?) -> [Event] {
+        let recurringEvents = recurringEvents(events)
+        let eventsByDate = usualEvents(events).filter({ compareStartDate(date, with: $0) || compareEndDate(date, with: $0) || checkMultipleDate(date, with: $0) })
         
-        if let preferredHour = style.timeline.scrollToHour, !style.timeline.startFromFirstEvent {
-            scrollToHour(preferredHour)
+        let recurringEventByDate: [Event]
+        if !recurringEvents.isEmpty, let dt = date {
+            recurringEventByDate = recurringEvents.reduce([], { (acc, event) -> [Event] in
+                guard !eventsByDate.contains(where: { $0.ID == event.ID })
+                        && dt.compare(event.start) == .orderedDescending else { return acc }
+                
+                guard let recurringEvent = event.updateDate(newDate: date, calendar: style.calendar) else {
+                    return acc
+                }
+                
+                return acc + [recurringEvent]
+                
+            })
         } else {
-            scrollToCurrentTime(startHour)
+            recurringEventByDate = []
         }
         
-        showCurrentLineHour()
-        addStubInvisibleEvents()
+        return recurringEventByDate
+    }
+    
+    func prepareAllDayEvents(_ events: [Event], date: Date?, pointX: CGFloat, allDayRecurringEvents: [Event], allDayEvents: inout [AllDayView.PrepareEvents]) {
+        let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
+        let widthPage = (frame.width - leftOffset) / CGFloat(dates.count)
+        
+        let allDayEventsForDate = allDayLongEvents(events).filter({ compareStartDate(date, with: $0) || compareEndDate(date, with: $0) }).compactMap { (oldEvent) -> Event in
+            var updatedEvent = oldEvent
+            updatedEvent.start = date ?? oldEvent.start
+            updatedEvent.end = date ?? oldEvent.end
+            return updatedEvent
+        }
+        
+        allDayEvents.append(.init(events: allDayEventsForDate + allDayRecurringEvents,
+                                  date: date,
+                                  xOffset: pointX - leftOffset,
+                                  width: widthPage))
+        
+        if !style.timeline.isHiddenStubEvent, let day = date?.day {
+            let y = topStabStackOffsetY(allDayEventsIsPinned: style.allDay.isPinned,
+                                        eventsCount: (allDayEventsForDate + allDayRecurringEvents).count,
+                                        height: style.allDay.height)
+            let topStackFrame = CGRect(x: pointX, y: y, width: widthPage - style.timeline.offsetEvent, height: style.event.heightStubView)
+            let bottomStackFrame = CGRect(x: pointX, y: frame.height - bottomStabStackOffsetY, width: widthPage - style.timeline.offsetEvent, height: style.event.heightStubView)
+            addSubview(createStackView(day: day, type: .top, frame: topStackFrame))
+            addSubview(createStackView(day: day, type: .bottom, frame: bottomStackFrame))
+        }
+    }
+    
+    private func recurringEvents(_ events: [Event]) -> [Event] {
+        events.filter({ $0.recurringType != .none })
+    }
+    
+    private func eventsForDate(_ events: [Event]) -> [Event] {
+        return events.filter { (event) -> Bool in
+            dates.contains(where: { compareStartDate($0, with: event) || compareEndDate($0, with: event) || (checkMultipleDate($0, with: event) && type == .day) }) }
+    }
+    
+    private func usualEvents(_ events: [Event]) -> [Event] {
+        eventsForDate(events).filter({ !$0.isAllDay })
+    }
+    
+    private func allDayLongEvents(_ events: [Event]) -> [Event] {
+        eventsForDate(events).filter({ $0.isAllDay })
     }
 }
 

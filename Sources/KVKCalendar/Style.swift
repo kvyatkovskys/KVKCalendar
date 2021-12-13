@@ -8,6 +8,7 @@
 #if os(iOS)
 
 import UIKit
+import CoreGraphics
 
 private let gainsboro: UIColor = UIColor(red: 220 / 255, green: 220 / 255, blue: 220 / 255, alpha: 1)
 
@@ -117,6 +118,11 @@ public struct TimelineStyle {
     public var timeColor: UIColor = .systemGray
     public var timeFont: UIFont = .systemFont(ofSize: 12)
     public var widthEventViewer: CGFloat? = nil
+    
+    public var allowZoom: Bool = false
+    public var zoomSpeed: CGFloat = 1
+    public var maxZoom: CGFloat = 200
+    public var minZoom: CGFloat = 30
     
     @available(swift, deprecated: 0.4.2, obsoleted: 0.4.3, renamed: "showLineHourMode")
     public var showCurrentLineHour: Bool = true
