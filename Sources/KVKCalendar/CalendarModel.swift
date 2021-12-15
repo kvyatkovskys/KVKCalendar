@@ -247,7 +247,7 @@ public protocol EventProtocol {
 
 protocol CalendarSettingProtocol: AnyObject {
     
-    var currentStyle: Style { get }
+    var style: Style { get }
     
     func reloadFrame(_ frame: CGRect)
     func updateStyle(_ style: Style)
@@ -276,10 +276,13 @@ public protocol CalendarDataSource: AnyObject {
     /// Use this method to add a custom event view
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral?
     
-    /// Use this method to add a custom header view (works on Day, Week, Month)
+    /// Use this method to add a custom header subview (works for Day, Week, Month)
     func willDisplayHeaderSubview(date: Date?, frame: CGRect, type: CalendarType) -> UIView?
     
-    /// Use the method to replace the collectionView. Works for month/year View
+    /// Use this method to add a custom header view (works for Day, Week)
+    //func willDisplayHeaderView(date: Date?, frame: CGRect, type: CalendarType) -> UIView?
+    
+    /// Use the method to replace the collectionView (works for Month, Year)
     func willDisplayCollectionView(frame: CGRect, type: CalendarType) -> UICollectionView?
     
     func willDisplayEventViewer(date: Date, frame: CGRect) -> UIView?
@@ -312,6 +315,8 @@ public protocol CalendarDataSource: AnyObject {
 }
 
 public extension CalendarDataSource {
+    func willDisplayHeaderView(date: Date?, frame: CGRect, type: CalendarType) -> UIView? { nil }
+    
     func willDisplayEventViewer(date: Date, frame: CGRect) -> UIView? { nil }
     
     func willDisplayDate(_ date: Date?, events: [Event]) {}

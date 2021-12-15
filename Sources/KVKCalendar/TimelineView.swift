@@ -69,7 +69,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     }()
     
     private(set) lazy var currentLineView: CurrentLineView = {
-        let view = CurrentLineView(style: style,
+        let view = CurrentLineView(parameters: .init(style: style),
                                    frame: CGRect(x: 0, y: 0, width: scrollView.frame.width, height: 15))
         view.tag = tagCurrentHourLine
         return view

@@ -11,7 +11,11 @@ import UIKit
 
 final class CurrentLineView: UIView {
     
-    private var style: Style
+    struct Parameters {
+        var style: Style
+    }
+    
+    private var parameters: Parameters
 
     private let timeLabel: TimelineLabel = {
         let label = TimelineLabel()
@@ -44,8 +48,8 @@ final class CurrentLineView: UIView {
         }
     }
     
-    init(style: Style, frame: CGRect) {
-        self.style = style
+    init(parameters: Parameters, frame: CGRect) {
+        self.parameters = parameters
         super.init(frame: frame)
         
         setUI()
@@ -58,8 +62,8 @@ final class CurrentLineView: UIView {
 
 extension CurrentLineView: CalendarSettingProtocol {
     
-    var currentStyle: Style {
-        style
+    var style: Style {
+        parameters.style
     }
     
     func setUI() {
@@ -89,7 +93,7 @@ extension CurrentLineView: CalendarSettingProtocol {
     }
     
     func updateStyle(_ style: Style) {
-        self.style = style
+        parameters.style = style
         setUI()
         date = Date()
     }

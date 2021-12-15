@@ -213,7 +213,7 @@ extension ViewController: CalendarDataSource {
         
         return (UIMenu(title: "Test menu", children: [action]), nil)
     }
-    
+        
     func eventsForCalendar(systemEvents: [EKEvent]) -> [Event] {
         // if you want to get a system events, you need to set style.systemCalendars = ["test"]
         let mappedEvents = systemEvents.compactMap { (event) -> Event in

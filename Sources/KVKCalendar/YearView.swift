@@ -112,7 +112,7 @@ final class YearView: UIView {
 
 extension YearView: CalendarSettingProtocol {
     
-    var currentStyle: Style {
+    var style: Style {
         data.style
     }
     
