@@ -298,6 +298,7 @@ public struct MonthStyle {
     public var colorBackground: UIColor = .white
     public var selectionMode: SelectionMode = .multiple
     public var showMonthNameInFirstDay: Bool = false
+    public var isPrefetchingEnabled: Bool = true
     
     public enum SelectionMode: Int {
         case single, multiple

@@ -89,6 +89,15 @@ final class MonthView: UIView {
             if customCollectionView.dataSource == nil {
                 customCollectionView.dataSource = self
             }
+            
+            if style.isPrefetchingEnabled
+                && !customCollectionView.isPrefetchingEnabled
+                && customCollectionView.prefetchDataSource == nil
+            {
+                customCollectionView.isPrefetchingEnabled = true
+                customCollectionView.prefetchDataSource = self
+            }
+            
             return customCollectionView
         }
         
@@ -98,8 +107,12 @@ final class MonthView: UIView {
         collection.isScrollEnabled = style.isScrollEnabled
         collection.dataSource = self
         collection.delegate = self
-        collection.prefetchDataSource = self
-        collection.isPrefetchingEnabled = true
+        
+        if style.isPrefetchingEnabled {
+            collection.prefetchDataSource = self
+            collection.isPrefetchingEnabled = true
+        }
+        
         collection.showsVerticalScrollIndicator = false
         collection.showsHorizontalScrollIndicator = false
         return collection
@@ -393,7 +406,8 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let item = monthData.days[indexPath], let date = item.day?.date else { return }
+        let item = getActualCachedDay(indexPath: indexPath)
+        guard let date = item.day?.date else { return }
         
         switch style.month.selectionMode {
         case .multiple:

@@ -201,14 +201,12 @@ extension TimelineView {
                     zoomScale = defaultScale.max
                 }
             }
-        case .changed:
+        case .changed, .began:
             zoomScale *= gesture.scale
             gesture.scale = 1
         default:
             break
         }
-                
-        guard 1...6 ~= zoomScale else { return }
         
         create(dates: dates, events: events, selectedDate: selectedDate)
     }
