@@ -48,7 +48,9 @@ final class YearCell: UICollectionViewCell {
             titleLabel.textColor = style.year.colorTitle
             
             subviews.filter({ $0 is WeekHeaderView }).forEach({ $0.removeFromSuperview() })
-            let view = WeekHeaderView(frame: CGRect(x: 0, y: topHeight + 5, width: frame.width, height: topHeight), style: style, fromYear: true)
+            let view = WeekHeaderView(parameters: .init(style: style, isFromYear: true),
+                                      frame: CGRect(x: 0, y: topHeight + 5,
+                                                    width: frame.width, height: topHeight))
             addSubview(view)
         }
     }

@@ -10,8 +10,13 @@
 import UIKit
 
 final class WeekHeaderView: UIView {
-    private var style: Style
-    private let isFromYear: Bool
+    
+    struct Parameters {
+        var style: Style
+        var isFromYear: Bool = false
+    }
+    
+    private var parameters: Parameters
     private var days = [Date]()
     
     private lazy var titleLabel: UILabel = {
@@ -28,9 +33,8 @@ final class WeekHeaderView: UIView {
         }
     }
     
-    init(frame: CGRect, style: Style, fromYear: Bool = false) {
-        self.style = style
-        self.isFromYear = fromYear
+    init(parameters: Parameters, frame: CGRect) {
+        self.parameters = parameters
         super.init(frame: frame)
         setUI()
     }
@@ -116,8 +120,12 @@ final class WeekHeaderView: UIView {
 
 extension WeekHeaderView: CalendarSettingProtocol {
     
-    var currentStyle: Style {
-        style
+    var style: Style {
+        parameters.style
+    }
+    
+    var isFromYear: Bool {
+        parameters.isFromYear
     }
     
     func setUI() {
@@ -137,7 +145,7 @@ extension WeekHeaderView: CalendarSettingProtocol {
     }
     
     func updateStyle(_ style: Style) {
-        self.style = style
+        parameters.style = style
         setUI()
     }
 }

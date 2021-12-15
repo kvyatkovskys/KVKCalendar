@@ -25,7 +25,7 @@ public final class ListView: UIView, CalendarSettingProtocol {
         }
     }
     
-    var currentStyle: Style {
+    var style: Style {
         params.style
     }
     
@@ -42,8 +42,8 @@ public final class ListView: UIView, CalendarSettingProtocol {
         return table
     }()
     
-    private var style: ListViewStyle {
-        return params.style.list
+    private var listStyle: ListViewStyle {
+        params.style.list
     }
     
     public init(parameters: Parameters, frame: CGRect) {
@@ -64,8 +64,8 @@ public final class ListView: UIView, CalendarSettingProtocol {
     func setUI() {
         subviews.forEach({ $0.removeFromSuperview() })
         
-        backgroundColor = style.backgroundColor
-        tableView.backgroundColor = style.backgroundColor
+        backgroundColor = listStyle.backgroundColor
+        tableView.backgroundColor = listStyle.backgroundColor
         tableView.frame = CGRect(origin: .zero, size: frame.size)
         addSubview(tableView)
     }

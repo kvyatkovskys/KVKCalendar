@@ -11,6 +11,12 @@ import UIKit
 import EventKit
 
 public final class CalendarView: UIView {
+    
+    struct Parameters {
+        var type = CalendarType.day
+        var style: Style
+    }
+    
     public weak var delegate: CalendarDelegate?
     public weak var dataSource: CalendarDataSource? {
         didSet {
@@ -18,12 +24,11 @@ public final class CalendarView: UIView {
         }
     }
     public var selectedType: CalendarType {
-        return type
+        parameters.type
     }
     
     let eventStore = EKEventStore()
-    var type = CalendarType.day
-    var style: Style
+    var parameters: Parameters
     
     private(set) var calendarData: CalendarData
     private var weekData: WeekData
@@ -44,7 +49,7 @@ public final class CalendarView: UIView {
     }()
     
     private(set) lazy var weekView: WeekView = {
-        let week = WeekView(data: weekData, frame: frame, style: style)
+        let week = WeekView(parameters: .init(data: weekData, style: style), frame: frame)
         week.delegate = self
         week.dataSource = self
         week.scrollHeaderDay.dataSource = self
@@ -52,7 +57,7 @@ public final class CalendarView: UIView {
     }()
     
     private(set) lazy var monthView: MonthView = {
-        let month = MonthView(data: monthData, frame: frame, style: style)
+        let month = MonthView(parameters: .init(monthData: monthData, style: style), frame: frame)
         month.delegate = self
         month.dataSource = self
         month.willSelectDate = { [weak self] (date) in
@@ -75,7 +80,7 @@ public final class CalendarView: UIView {
     }()
     
     public init(frame: CGRect, date: Date = Date(), style: Style = Style(), years: Int = 4) {
-        self.style = style.checkStyle
+        self.parameters = .init(type: style.defaultType ?? .day, style: style.checkStyle)
         self.calendarData = CalendarData(date: date, years: years, style: style)
         self.dayData = DayData(data: calendarData, startDay: style.startWeekDay)
         self.weekData = WeekData(data: calendarData, startDay: style.startWeekDay)
@@ -84,10 +89,10 @@ public final class CalendarView: UIView {
         super.init(frame: frame)
         
         if let defaultType = style.defaultType {
-            type = defaultType
+            parameters.type = defaultType
         }
         
-        set(type: type, date: date)
+        set(type: parameters.type, date: date)
     }
     
     required init?(coder aDecoder: NSCoder) {

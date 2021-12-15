@@ -305,7 +305,7 @@ extension TimelineView {
                 let heightBlock = calculatedTimeY + style.timeline.heightTime
                 lines += (1..<dividerType.rawValue).compactMap({ idxDivider in
                     let yOffset = heightBlock / CGFloat(dividerType.rawValue) * CGFloat(idxDivider)
-                    let divider = DividerView(style: style,
+                    let divider = DividerView(parameters: .init(style: style),
                                               frame: CGRect(x: 0,
                                                             y: line.frame.origin.y + yOffset - (style.timeline.heightTime / 2),
                                                             width: scrollView.bounds.width,

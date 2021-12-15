@@ -11,7 +11,11 @@ import UIKit
 
 final class DividerView: UIView {
     
-    private var style: Style
+    struct Parameters {
+        var style: Style
+    }
+    
+    private var parameters: Parameters
     
     private lazy var timeLabel: UILabel = {
         let label = UILabel()
@@ -33,8 +37,8 @@ final class DividerView: UIView {
         }
     }
     
-    init(style: Style, frame: CGRect) {
-        self.style = style
+    init(parameters: Parameters, frame: CGRect) {
+        self.parameters = parameters
         super.init(frame: frame)
 
         setUI()
@@ -48,8 +52,8 @@ final class DividerView: UIView {
 
 extension DividerView: CalendarSettingProtocol {
     
-    var currentStyle: Style {
-        style
+    var style: Style {
+        parameters.style
     }
     
     func reloadFrame(_ frame: CGRect) {
@@ -59,7 +63,7 @@ extension DividerView: CalendarSettingProtocol {
     }
     
     func updateStyle(_ style: Style) {
-        self.style = style
+        parameters.style = style
     }
     
     func setUI() {

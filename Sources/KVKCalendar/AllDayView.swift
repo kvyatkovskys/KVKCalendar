@@ -169,7 +169,7 @@ extension AllDayView: AllDayEventDelegate {
 
 extension AllDayView: CalendarSettingProtocol {
     
-    var currentStyle: Style {
+    var style: Style {
         params.style
     }
     
