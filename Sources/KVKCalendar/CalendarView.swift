@@ -84,7 +84,10 @@ public final class CalendarView: UIView {
         self.calendarData = CalendarData(date: date, years: years, style: style)
         self.dayData = DayData(data: calendarData, startDay: style.startWeekDay)
         self.weekData = WeekData(data: calendarData, startDay: style.startWeekDay)
-        self.monthData = MonthData(parameters: .init(data: calendarData, startDay: style.startWeekDay, calendar: style.calendar, monthStyle: style.month))
+        self.monthData = MonthData(parameters: .init(data: calendarData,
+                                                     startDay: style.startWeekDay,
+                                                     calendar: style.calendar,
+                                                     style: style))
         self.listData = ListViewData(data: calendarData)
         super.init(frame: frame)
         

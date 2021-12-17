@@ -11,14 +11,19 @@ import UIKit
 
 final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     
+    struct Parameters {
+        var style: Style
+        var type: CalendarType
+    }
+    
     weak var delegate: TimelineDelegate?
     weak var dataSource: DisplayDataSource?
     
     var deselectEvent: ((Event) -> Void)?
     
-    var style: Style {
+    var paramaters: Parameters {
         didSet {
-            timeSystem = style.timeSystem
+            timeSystem = paramaters.style.timeSystem
             availabilityHours = timeSystem.hours
         }
     }
@@ -48,9 +53,8 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     private(set) var events = [Event]()
     private(set) var dates = [Date?]()
     private(set) var selectedDate: Date?
-    private(set) var type: CalendarType
     private(set) var eventLayout: TimelineEventLayout
-
+    
     private(set) lazy var shadowView: ShadowDayView = {
         let view = ShadowDayView()
         view.backgroundColor = style.timeline.shadowColumnColor
@@ -81,12 +85,11 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         return scroll
     }()
     
-    init(type: CalendarType, style: Style, frame: CGRect) {
-        self.type = type
-        self.timeSystem = style.timeSystem
+    init(parameters: Parameters, frame: CGRect) {
+        self.paramaters = parameters
+        self.timeSystem = parameters.style.timeSystem
         self.availabilityHours = timeSystem.hours
-        self.style = style
-        self.eventLayout = style.timeline.eventLayout
+        self.eventLayout = parameters.style.timeline.eventLayout
         super.init(frame: frame)
         
         var scrollFrame = frame
@@ -124,7 +127,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             }
         }
         
-        switch type {
+        switch paramaters.type {
         case .day:
             scrollView.contentInset = UIEdgeInsets(top: offsetY, left: 0, bottom: 0, right: 0)
         case .week where scrollView.contentInset.top < offsetY:
@@ -142,7 +145,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     
     private func movingCurrentLineHour() {
         guard !isValidTimer(timerKey) else { return }
-                
+        
         let action = { [weak self] in
             guard let self = self else { return }
             
@@ -214,7 +217,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             scrollView.setContentOffset(.zero, animated: true)
             return
         }
-                
+        
         var frame = scrollView.frame
         frame.origin.y = time.frame.origin.y - 10
         scrollView.scrollRectToVisible(frame, animated: true)
@@ -248,11 +251,11 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         // filter events
         let recurringEvents = events.filter({ $0.recurringType != .none })
         let allEventsForDates = events.filter { (event) -> Bool in
-            return dates.contains(where: { compareStartDate($0, with: event) || compareEndDate($0, with: event) || (checkMultipleDate($0, with: event) && type == .day) })
+            return dates.contains(where: { compareStartDate($0, with: event) || compareEndDate($0, with: event) || (checkMultipleDate($0, with: event) && paramaters.type == .day) })
         }
         let filteredEvents = allEventsForDates.filter({ !$0.isAllDay })
         let filteredAllDayEvents = allEventsForDates.filter({ $0.isAllDay })
-
+        
         // calculate a start hour
         let startHour: Int
         if !style.timeline.startFromFirstEvent {
@@ -277,7 +280,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         scrollView.contentSize = CGSize(width: frame.width, height: heightAllTimes)
         timeLabels.forEach({ scrollView.addSubview($0) })
         lines.forEach({ scrollView.addSubview($0) })
-
+        
         let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
         let widthPage = (frame.width - leftOffset) / CGFloat(dates.count)
         let heightPage = scrollView.contentSize.height
@@ -308,7 +311,8 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             if !recurringEvents.isEmpty, let dt = date {
                 recurringEventByDate = recurringEvents.reduce([], { (acc, event) -> [Event] in
                     guard !eventsByDate.contains(where: { $0.ID == event.ID })
-                            && dt.compare(event.start) == .orderedDescending else { return acc }
+                            && (dt.compare(event.start) == .orderedDescending || style.event.showRecurringEventInPast)
+                    else { return acc }
                     
                     guard let recurringEvent = event.updateDate(newDate: date, calendar: style.calendar) else {
                         return acc
@@ -352,13 +356,15 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                             return view
                         } else {
                             let eventView = EventView(event: event, style: style, frame: rect)
-                            if #available(iOS 14.0, *), let item = dataSource?.willDisplayEventOptionMenu(event, type: self.type) {
+                            if #available(iOS 14.0, *),
+                                let item = dataSource?.willDisplayEventOptionMenu(event, type: paramaters.type)
+                            {
                                 eventView.addOptionMenu(item.menu, customButton: item.customButton)
                             }
                             return eventView
                         }
                     }()
-
+                    
                     view.delegate = self
                     scrollView.addSubview(view)
                 }
@@ -366,10 +372,14 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             
             if !style.timeline.isHiddenStubEvent, let day = date?.day {
                 let y = topStabStackOffsetY(allDayEventsIsPinned: style.allDay.isPinned,
-                                            eventsCount: (allDayEventsForDate + filteredAllDayRecurringEvents).count,
+                                            eventsCount: allDayEventsForDate.count + filteredAllDayRecurringEvents.count,
                                             height: style.allDay.height)
-                let topStackFrame = CGRect(x: pointX, y: y, width: widthPage - style.timeline.offsetEvent, height: style.event.heightStubView)
-                let bottomStackFrame = CGRect(x: pointX, y: frame.height - bottomStabStackOffsetY, width: widthPage - style.timeline.offsetEvent, height: style.event.heightStubView)
+                let topStackFrame = CGRect(x: pointX, y: y,
+                                           width: widthPage - style.timeline.offsetEvent,
+                                           height: style.event.heightStubView)
+                let bottomStackFrame = CGRect(x: pointX, y: frame.height - bottomStabStackOffsetY,
+                                              width: widthPage - style.timeline.offsetEvent,
+                                              height: style.event.heightStubView)
                 
                 addSubview(createStackView(day: day, type: .top, frame: topStackFrame))
                 addSubview(createStackView(day: day, type: .bottom, frame: bottomStackFrame))

@@ -17,7 +17,7 @@ final class MonthData: EventDateProtocol {
         let data: CalendarData
         let startDay: StartDayType
         let calendar: Calendar
-        let monthStyle: MonthStyle
+        let style: Style
     }
     
     var date: Date
@@ -39,18 +39,20 @@ final class MonthData: EventDateProtocol {
     
     private let calendar: Calendar
     private let scrollDirection: UICollectionView.ScrollDirection
+    private let showRecurringEventInPast: Bool
     
     init(parameters: Parameters) {
         self.data = parameters.data
         self.calendar = parameters.calendar
-        self.scrollDirection = parameters.monthStyle.scrollDirection
+        self.scrollDirection = parameters.style.month.scrollDirection
+        self.showRecurringEventInPast = parameters.style.event.showRecurringEventInPast
         
         let months = parameters.data.months.reduce([], { (acc, month) -> [Month] in
             var daysTemp = parameters.data.addStartEmptyDays(month.days, startDay: parameters.startDay)
             
             let boxCount: Int
             switch month.weeks {
-            case 5 where parameters.monthStyle.scrollDirection == .vertical:
+            case 5 where parameters.style.month.scrollDirection == .vertical:
                 boxCount = parameters.data.minBoxCount
             default:
                 boxCount = parameters.data.maxBoxCount
@@ -134,7 +136,8 @@ final class MonthData: EventDateProtocol {
             if !recurringEvents.isEmpty, let date = day.date {
                 recurringEventByDate = recurringEvents.reduce([], { (acc, event) -> [Event] in
                     guard !filteredEventsByDay.contains(where: { $0.ID == event.ID })
-                            && date.compare(event.start) == .orderedDescending else { return acc }
+                            && (date.compare(event.start) == .orderedDescending
+                                || showRecurringEventInPast) else { return acc }
                     
                     guard let recurringEvent = event.updateDate(newDate: day.date, calendar: calendar) else {
                         return acc
