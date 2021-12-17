@@ -228,7 +228,8 @@ extension Event {
             endComponents.day = newDate?.day
         }
         
-        guard let newStart = calendar.date(from: startComponents), let newEnd = calendar.date(from: endComponents) else { return nil }
+        guard let newStart = calendar.date(from: startComponents),
+              let newEnd = calendar.date(from: endComponents) else { return nil }
         
         var newEvent = self
         newEvent.start = newStart

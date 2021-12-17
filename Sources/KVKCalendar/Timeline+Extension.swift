@@ -255,7 +255,10 @@ extension TimelineView {
             y = -allDayHeight
         }
         
-        let newAllDayView = AllDayView(parameters: .init(prepareEvents: events, type: type, style: style, delegate: delegate),
+        let newAllDayView = AllDayView(parameters: .init(prepareEvents: events,
+                                                         type: paramaters.type,
+                                                         style: style,
+                                                         delegate: delegate),
                                        frame: CGRect(x: 0, y: y, width: bounds.width, height: allDayHeight))
         newAllDayView.tag = tagAllDayEventView
         if style.allDay.isPinned {
@@ -335,7 +338,7 @@ extension TimelineView {
             return eventView
         } else {
             let eventView = EventView(event: event, style: style, frame: frame)
-            if #available(iOS 14.0, *), let item = dataSource?.willDisplayEventOptionMenu(event, type: type) {
+            if #available(iOS 14.0, *), let item = dataSource?.willDisplayEventOptionMenu(event, type: paramaters.type) {
                 eventView.addOptionMenu(item.menu, customButton: item.customButton)
             }
             return eventView
@@ -361,7 +364,7 @@ extension TimelineView {
         case .ended, .failed, .cancelled:
             guard let minute = time.minute, let hour = time.hour else { return }
             
-            switch type {
+            switch paramaters.type {
             case .day:
                 newEvent.start = selectedDate ?? Date()
             case .week:
@@ -583,7 +586,7 @@ extension TimelineView: EventDelegate {
             var newDayEvent: Int?
             var updatedEvent = event
             
-            if type == .week, let newDate = shadowView.date {
+            if paramaters.type == .week, let newDate = shadowView.date {
                 newDayEvent = newDate.day
                 
                 if event.recurringType != .none {
@@ -655,7 +658,7 @@ extension TimelineView: EventDelegate {
     }
     
     private func moveShadowView(pointX: CGFloat) -> (frame: CGRect, date: Date?)? {
-        guard type == .week else { return nil }
+        guard paramaters.type == .week else { return nil }
         
         let lines = subviews.filter({ $0.tag == tagVerticalLine })
         var width: CGFloat = 200
@@ -670,8 +673,8 @@ extension TimelineView: EventDelegate {
 
 extension TimelineView: CalendarSettingProtocol {
     
-    var currentStyle: Style {
-        style
+    var style: Style {
+        paramaters.style
     }
     
     func setUI() {
@@ -694,7 +697,7 @@ extension TimelineView: CalendarSettingProtocol {
     }
     
     func updateStyle(_ style: Style) {
-        self.style = style
+        paramaters.style = style
         currentLineView.updateStyle(style)
         setUI()
     }

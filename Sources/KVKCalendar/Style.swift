@@ -427,6 +427,7 @@ public struct EventStyle {
     public var delayForStartMove: TimeInterval = 1.5
     public var states: Set<EventViewGeneral.EventViewState> = [.move, .resize]
     public var defaultHeight: CGFloat? = nil
+    public var showRecurringEventInPast: Bool = true
     
     var defaultWidth: CGFloat? = nil
     var isEnableContextMenu: Bool = false
