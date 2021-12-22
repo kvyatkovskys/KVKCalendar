@@ -167,6 +167,10 @@ extension TimelinePageView: UIPageViewControllerDataSource, UIPageViewController
         newIndex -= 1
         guard let newTimelineView = pages[newIndex] else { return nil }
         
+        if let scale = timelineView?.paramaters.scale, newTimelineView.paramaters.scale != scale {
+            newTimelineView.paramaters.scale = scale
+        }
+        
         willDisplayTimelineView?(newTimelineView, .previous)
         let container = TimelineContainerVC(index: newIndex, contentView: newTimelineView)
         return container
@@ -177,6 +181,10 @@ extension TimelinePageView: UIPageViewControllerDataSource, UIPageViewController
         
         newIndex += 1
         guard let newTimelineView = pages[newIndex] else { return nil }
+        
+        if let scale = timelineView?.paramaters.scale, newTimelineView.paramaters.scale != scale {
+            newTimelineView.paramaters.scale = scale
+        }
         
         willDisplayTimelineView?(newTimelineView, .next)
         let container = TimelineContainerVC(index: newIndex, contentView: newTimelineView)
