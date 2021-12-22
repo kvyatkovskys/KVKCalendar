@@ -18,11 +18,7 @@ final class WeekView: UIView {
     }
     
     private var parameters: Parameters
-    private var timelineScale: CGFloat {
-        didSet {
-            timelinePage.reloadScale(timelineScale)
-        }
-    }
+    private var timelineScale: CGFloat
     
     weak var delegate: DisplayDelegate?
     weak var dataSource: DisplayDataSource?

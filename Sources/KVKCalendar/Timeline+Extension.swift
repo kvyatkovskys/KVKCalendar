@@ -221,7 +221,7 @@ extension TimelineView {
             }
         }
         
-        didChangeScale?(paramaters.scale)
+        reloadTimeline()
         
         if let label = potentiallyCenterLabel, enabledZoomCenteringTemporary {
             scrollView.scrollRectToVisible(label.frame, animated: false)

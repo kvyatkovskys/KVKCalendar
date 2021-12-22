@@ -16,11 +16,7 @@ final class DayView: UIView {
     
     private var parameters: Parameters
     private let tagEventViewer = -10
-    private var timelineScale: CGFloat {
-        didSet {
-            timelinePage.reloadScale(timelineScale)
-        }
-    }
+    private var timelineScale: CGFloat
     
     struct Parameters {
         var style: Style
