@@ -12,7 +12,7 @@ import UIKit
 extension TimelineView {
     
     var calculatedTimeY: CGFloat {
-        style.timeline.offsetTimeY * zoomScale
+        style.timeline.offsetTimeY * paramaters.scale
     }
     
 }
@@ -189,26 +189,50 @@ extension TimelineView {
         scrollView.subviews.filter({ $0 is EventViewGeneral }).forEach({ $0.isUserInteractionEnabled = enable })
     }
     
+    private var enabledZoomCenteringTemporary: Bool {
+        false
+    }
+    
     @objc func pinchZooming(gesture: UIPinchGestureRecognizer) {
         switch gesture.state {
         case .ended, .failed, .cancelled:
             gesture.scale = 1
             
             if let defaultScale = style.timeline.scale {
-                if zoomScale < defaultScale.min {
-                    zoomScale = defaultScale.min
-                } else if zoomScale > defaultScale.max {
-                    zoomScale = defaultScale.max
+                if paramaters.scale < defaultScale.min {
+                    paramaters.scale = defaultScale.min
+                } else if paramaters.scale > defaultScale.max {
+                    paramaters.scale = defaultScale.max
                 }
             }
         case .changed, .began:
-            zoomScale *= gesture.scale
+            paramaters.scale *= gesture.scale
             gesture.scale = 1
         default:
             break
         }
+                
+        if enabledZoomCenteringTemporary {
+            let yPoint = gesture.location(in: scrollView).y
+            if let label = potentiallyCenterLabel, let updatedLabel = timeLabels.first(where: { $0.tag >= label.tag }) {
+                potentiallyCenterLabel = updatedLabel
+            } else if let label = timeLabels.first(where: { $0.frame.origin.y >= (yPoint + calculatedTimeY) }) {
+                potentiallyCenterLabel = label
+            }
+        }
         
-        create(dates: dates, events: events, selectedDate: selectedDate)
+        didChangeScale?(paramaters.scale)
+        
+        if let label = potentiallyCenterLabel, enabledZoomCenteringTemporary {
+            scrollView.scrollRectToVisible(label.frame, animated: false)
+        }
+        
+        switch gesture.state {
+        case .ended, .failed, .cancelled:
+            potentiallyCenterLabel = nil
+        default:
+            break
+        }
     }
     
     @objc func forceDeselectEvent() {
@@ -224,7 +248,7 @@ extension TimelineView {
         eventView.deselectEvent()
     }
     
-    func reloadData() {
+    func reloadTimeline() {
         create(dates: dates, events: events, selectedDate: selectedDate)
     }
     
