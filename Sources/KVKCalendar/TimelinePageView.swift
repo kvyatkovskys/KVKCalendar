@@ -36,7 +36,7 @@ final class TimelinePageView: UIView {
     var willDisplayTimelineView: ((TimelineView, SwitchPageType) -> Void)?
     
     var timelineView: TimelineView? {
-        return pages[currentIndex]
+        pages[currentIndex]
     }
     
     var isPagingEnabled = true
@@ -67,15 +67,41 @@ final class TimelinePageView: UIView {
     }
     
     func updateStyle(_ style: Style) {
-        pages.forEach({ $0.value.updateStyle(style) })
+        pages.forEach { $0.value.updateStyle(style) }
     }
     
-    func reloadPages() {
-        pages.forEach({ $0.value.reloadData() })
+    func reloadPages(excludeCurrentPage: Bool = false) {
+        var items: [Int: TimelineView]
+        if excludeCurrentPage {
+            items = pages
+            items.removeValue(forKey: currentIndex)
+        } else {
+            items = pages
+        }
+        items.forEach { $0.value.reloadTimeline() }
     }
     
-    func removeAll() {
-        pages.removeAll()
+    func removeAll(excludeCurrentPage: Bool = false) {
+        if excludeCurrentPage {
+            pages = pages.filter { $0.key == currentIndex }
+        } else {
+            pages.removeAll()
+        }
+    }
+    
+    func reloadScale(_ scale: CGFloat, excludeCurrentPage: Bool = false) {
+        var items: [Int: TimelineView]
+        if excludeCurrentPage {
+            items = pages
+            items.removeValue(forKey: currentIndex)
+        } else {
+            items = pages
+        }
+        
+        items.forEach {
+            $0.value.paramaters.scale = scale
+            $0.value.reloadTimeline()
+        }
     }
     
     func reloadCacheControllers() {

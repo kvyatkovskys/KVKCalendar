@@ -89,9 +89,9 @@ extension CalendarView {
     public func deselectEvent(_ event: Event, animated: Bool) {
         switch parameters.type {
         case .day:
-            dayView.timelinePages.timelineView?.deselectEvent(event, animated: animated)
+            dayView.timelinePage.timelineView?.deselectEvent(event, animated: animated)
         case .week:
-            weekView.timelinePages.timelineView?.deselectEvent(event, animated: animated)
+            weekView.timelinePage.timelineView?.deselectEvent(event, animated: animated)
         default:
             break
         }

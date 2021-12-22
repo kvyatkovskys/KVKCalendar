@@ -14,12 +14,14 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     struct Parameters {
         var style: Style
         var type: CalendarType
+        var scale: CGFloat = 1
     }
     
     weak var delegate: TimelineDelegate?
     weak var dataSource: DisplayDataSource?
     
     var deselectEvent: ((Event) -> Void)?
+    var didChangeScale: ((CGFloat) -> Void)?
     
     var paramaters: Parameters {
         didSet {
@@ -31,7 +33,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     var eventResizePreview: ResizeEventView?
     var eventPreviewSize = CGSize(width: 150, height: 150)
     var isResizeEnableMode = false
-    var zoomScale: CGFloat = 1
+    var potentiallyCenterLabel: TimelineLabel?
     
     let timeLabelFormatter: DateFormatter = {
         let formatter = DateFormatter()
