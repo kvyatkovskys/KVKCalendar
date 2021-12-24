@@ -197,19 +197,21 @@ extension TimelineView {
         switch gesture.state {
         case .ended, .failed, .cancelled:
             gesture.scale = 1
-            
-            if let defaultScale = style.timeline.scale {
-                if paramaters.scale < defaultScale.min {
-                    paramaters.scale = defaultScale.min
-                } else if paramaters.scale > defaultScale.max {
-                    paramaters.scale = defaultScale.max
-                }
-            }
         case .changed, .began:
             paramaters.scale *= gesture.scale
             gesture.scale = 1
         default:
             break
+        }
+        
+        if let defaultScale = style.timeline.scale {
+            if paramaters.scale < defaultScale.min {
+                paramaters.scale = defaultScale.min
+                return
+            } else if paramaters.scale > defaultScale.max {
+                paramaters.scale = defaultScale.max
+                return
+            }
         }
                 
         if enabledZoomCenteringTemporary {
