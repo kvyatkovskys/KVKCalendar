@@ -20,7 +20,6 @@ final class MonthCell: KVKCollectionViewCell {
     private let countInCell: CGFloat = 4
     private let offset: CGFloat = 3
     private let defaultTagView = -1
-    private let defaultTagStubView = -2
     
     private let dateLabel: UILabel = {
         let label = UILabel()
@@ -53,12 +52,6 @@ final class MonthCell: KVKCollectionViewCell {
         longGesture.delegate = self
         longGesture.minimumPressDuration = style.event.minimumPressDuration
         return longGesture
-    }()
-    
-    private lazy var stubView: UIView = {
-        let view = UIView()
-        view.tag = defaultTagStubView
-        return view
     }()
     
     override var isHighlighted: Bool {
@@ -254,7 +247,7 @@ final class MonthCell: KVKCollectionViewCell {
         dateLabel.frame = dateFrame
         dateLabel.tag = defaultTagView
         contentView.addSubview(dateLabel)
-        
+                
         if #available(iOS 13.4, *) {
             addPointInteraction(on: self, delegate: self)
         }
@@ -428,19 +421,20 @@ final class MonthCell: KVKCollectionViewCell {
     }
     
     override func setSkeletons(_ skeletons: Bool,
-                               insets: UIEdgeInsets = UIEdgeInsets(top: 4, left: 4, bottom: 4, right: 4),
+                               insets: UIEdgeInsets = UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5),
                                cornerRadius: CGFloat = 2)
     {
         dateLabel.isHidden = skeletons
-        stubView.removeFromSuperview()
         
+        let stubView = UIView(frame: bounds)
         if skeletons {
             contentView.subviews.filter({ $0.tag != defaultTagView }).forEach({ $0.removeFromSuperview() })
-            stubView.frame = bounds
+            
             contentView.addSubview(stubView)
+            stubView.setAsSkeleton(skeletons, cornerRadius: cornerRadius, insets: insets)
+        } else {
+            stubView.removeFromSuperview()
         }
-        
-        super.setSkeletons(skeletons, insets: insets, cornerRadius: cornerRadius)
     }
     
 }

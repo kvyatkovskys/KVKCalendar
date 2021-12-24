@@ -105,6 +105,7 @@ extension UIView {
         }
         
         isUserInteractionEnabled = !asSkeleton
+        skeletonView.removeFromSuperview()
         
         if asSkeleton {
             skeletonView.layer.cornerRadius = cornerRadius ?? layer.cornerRadius
@@ -113,13 +114,11 @@ extension UIView {
             if insets != .zero {
                 skeletonView.frame.origin.x += insets.left
                 skeletonView.frame.origin.y += insets.top
-                skeletonView.frame.size.height -= insets.bottom
-                skeletonView.frame.size.width -= insets.right
+                skeletonView.frame.size.height -= (insets.bottom * 2)
+                skeletonView.frame.size.width -= (insets.right * 2)
             }
             
             addSubview(skeletonView)
-        } else {
-            skeletonView.removeFromSuperview()
         }
     }
     
