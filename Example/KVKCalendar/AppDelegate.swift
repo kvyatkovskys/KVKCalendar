@@ -21,10 +21,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         if #available(iOS 15.0, *) {
             let appearance = UINavigationBarAppearance()
-            appearance.configureWithDefaultBackground()
+            appearance.configureWithOpaqueBackground()
             navVC.navigationBar.standardAppearance = appearance
             navVC.navigationBar.scrollEdgeAppearance = appearance
-            navVC.navigationBar.compactAppearance = appearance
         }
         
         window?.rootViewController = navVC
