@@ -220,7 +220,7 @@ extension TimelineView {
         reloadTimeline()
         
         let yPointGlobal = gesture.location(in: self).y
-        if let y = potentiallyCenteredLabel?.frame.origin.y {
+        if let y = potentiallyCenteredLabel?.frame.origin.y, gesture.state == .changed {
             let offset = y - yPointGlobal
             scrollView.setContentOffset(.init(x: 0, y: offset), animated: false)
         }
