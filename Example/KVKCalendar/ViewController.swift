@@ -33,25 +33,7 @@ final class ViewController: UIViewController {
     
     private var style: Style = {
         var style = Style()
-        if UIDevice.current.userInterfaceIdiom == .phone {
-            style.timeline.widthTime = 40
-            style.timeline.currentLineHourWidth = 45
-            style.timeline.offsetTimeX = 2
-            style.timeline.offsetLineLeft = 2
-            style.headerScroll.titleDateAlignment = .center
-            style.headerScroll.isAnimateTitleDate = true
-            style.headerScroll.heightHeaderWeek = 70
-            style.event.isEnableVisualSelect = false
-            style.month.isHiddenTitle = true
-            style.month.weekDayAlignment = .center
-        } else {
-            style.timeline.widthEventViewer = 350
-            style.headerScroll.fontNameDay = .systemFont(ofSize: 17)
-        }
-        style.month.autoSelectionDateWhenScrolling = true
-        style.timeline.offsetTimeY = 25
         style.startWeekDay = .sunday
-        style.timeSystem = .current ?? .twelve
         style.systemCalendars = ["Calendar1", "Calendar2", "Calendar3"]
         if #available(iOS 13.0, *) {
             style.event.iconFile = UIImage(systemName: "paperclip")
@@ -261,6 +243,12 @@ extension ViewController: CalendarDataSource {
     func willDisplayEventViewer(date: Date, frame: CGRect) -> UIView? {
         eventViewer.frame = frame
         return eventViewer
+    }
+    
+    func sizeForCell(_ date: Date?, type: CalendarType) -> CGSize? {
+        guard type == .month && UIDevice.current.userInterfaceIdiom == .phone else { return nil }
+        
+        return CGSize(width: view.bounds.width / 7, height: 70)
     }
 }
 

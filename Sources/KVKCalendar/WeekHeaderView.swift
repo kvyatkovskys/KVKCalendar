@@ -21,8 +21,8 @@ final class WeekHeaderView: UIView {
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.textAlignment = style.month.titleDateAlignment
-        label.font = style.month.fontTitleDate
+        label.textAlignment = style.month.titleHeaderAlignment
+        label.font = style.month.fontTitleHeader
         label.tag = -999
         return label
     }()
@@ -55,19 +55,19 @@ final class WeekHeaderView: UIView {
             days = Array(0..<7).compactMap({ getOffsetDate(offset: $0, to: startWeekDate) })
         }
         
-        if !style.month.isHiddenTitleDate && !isFromYear {
+        if !style.month.isHiddenTitleHeader && !isFromYear {
             titleLabel.frame = CGRect(x: 10,
                                       y: 5,
                                       width: frame.width - 20,
-                                      height: style.month.heightTitleDate)
+                                      height: style.month.heightTitleHeader)
             addSubview(titleLabel)
         }
         
         let y: CGFloat
         if isFromYear {
             y = 0
-        } else if !style.month.isHiddenTitleDate {
-            y = style.month.heightTitleDate + 5
+        } else if !style.month.isHiddenTitleHeader {
+            y = style.month.heightTitleHeader + 5
         } else {
             y = 0
         }
@@ -106,13 +106,13 @@ final class WeekHeaderView: UIView {
     }
     
     private func setDateToTitle(date: Date?, style: Style) {
-        if let date = date, !style.month.isHiddenTitleDate, !isFromYear {
+        if let date = date, !style.month.isHiddenTitleHeader, !isFromYear {
             titleLabel.text = date.titleForLocale(style.locale, formatter: style.month.titleFormatter)
             
             if Date().year == date.year && Date().month == date.month {
                 titleLabel.textColor = style.month.colorTitleCurrentDate
             } else {
-                titleLabel.textColor = style.month.colorTitleDate
+                titleLabel.textColor = style.month.colorTitleHeader
             }
         }
     }

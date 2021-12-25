@@ -29,7 +29,30 @@ public struct Style {
     public var followInSystemTheme: Bool = true
     public var systemCalendars: Set<String> = []
     
-    public init() {}
+    public init(configureAsDefaultCalendar: Bool = true) {
+        guard configureAsDefaultCalendar else { return }
+        
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            timeline.currentLineHourWidth = 45
+            timeline.offsetTimeX = 2
+            timeline.offsetLineLeft = 2
+            headerScroll.titleDateAlignment = .center
+            headerScroll.isAnimateTitleDate = true
+            headerScroll.heightHeaderWeek = 70
+            event.isEnableVisualSelect = false
+            month.isHiddenEventTitle = true
+            month.weekDayAlignment = .center
+            month.isHiddenSeparatorOnEmptyDate = true
+            month.colorBackgroundWeekendDate = .clear
+            month.fontTitleHeader =  .boldSystemFont(ofSize: 19)
+            month.isHiddenSectionHeader = false
+        } else {
+            timeline.widthEventViewer = 350
+            headerScroll.fontNameDay = .systemFont(ofSize: 17)
+        }
+        
+        timeSystem = .current ?? .twelve
+    }
 }
 
 // MARK: Header scroll style
@@ -113,7 +136,7 @@ public struct TimelineStyle {
     public var widthTime: CGFloat = 40
     public var heightTime: CGFloat = 20
     public var offsetTimeX: CGFloat = 10
-    public var offsetTimeY: CGFloat = 80
+    public var offsetTimeY: CGFloat = 25
     public var timeColor: UIColor = .systemGray
     public var timeFont: UIFont = .systemFont(ofSize: 12)
     public var widthEventViewer: CGFloat? = nil
@@ -188,7 +211,7 @@ public struct TimelineStyle {
                 return dates.contains(where: { customDate.year == $0?.year && customDate.month == $0?.month && customDate.day == $0?.day })
             }
         }
-
+        
     }
     
     public enum CurrentLineHourScrollMode: Equatable {
@@ -251,8 +274,15 @@ public struct MonthStyle {
         return format
     }
     public var heightHeaderWeek: CGFloat = 25
+    
+    @available(swift, deprecated: 0.5.5, obsoleted: 0.5.6, renamed: "heightTitleHeader")
     public var heightTitleDate: CGFloat = 40
+    public var heightTitleHeader: CGFloat = 40
+    
+    @available(swift, deprecated: 0.5.5, obsoleted: 0.5.6, renamed: "isHiddenTitleHeader")
     public var isHiddenTitleDate: Bool = false
+    public var isHiddenTitleHeader: Bool = false
+    
     public var colorDate: UIColor = .black
     public var colorNameEmptyDay: UIColor = gainsboro
     public var fontNameDate: UIFont = .boldSystemFont(ofSize: 16)
@@ -271,14 +301,14 @@ public struct MonthStyle {
     public var fontEventBullet: UIFont = .boldSystemFont(ofSize: 18)
     public var isHiddenSeparator: Bool = false
     public var isHiddenSeparatorOnEmptyDate: Bool = false
-    public var widthSeparator: CGFloat = 0.4
+    public var widthSeparator: CGFloat = 0.3
     public var colorSeparator: UIColor = gainsboro.withAlphaComponent(0.9)
     public var colorBackgroundWeekendDate: UIColor = gainsboro.withAlphaComponent(0.2)
     public var colorBackgroundDate: UIColor = .white
     public var scrollDirection: UICollectionView.ScrollDirection = .vertical
     public var selectCalendarType: CalendarType = .week
-    public var isAnimateSelection: Bool = true
-    public var isPagingEnabled: Bool = true
+    public var isAnimateSelection: Bool = false
+    public var isPagingEnabled: Bool = false
     public var isScrollEnabled: Bool = true
     
     @available(swift, deprecated: 0.4.7, obsoleted: 0.4.8, renamed: "autoSelectionDateWhenScrolling")
@@ -294,16 +324,26 @@ public struct MonthStyle {
     public var isHiddenEventTitle: Bool = false
     
     public var weekDayAlignment: NSTextAlignment = .right
+    
+    @available(swift, deprecated: 0.5.5, obsoleted: 0.5.6, renamed: "titleHeaderAlignment")
     public var titleDateAlignment: NSTextAlignment = .left
+    public var titleHeaderAlignment: NSTextAlignment = .left
+    
+    @available(swift, deprecated: 0.5.5, obsoleted: 0.5.6, renamed: "fontTitleHeader")
     public var fontTitleDate: UIFont = .boldSystemFont(ofSize: 30)
+    public var fontTitleHeader: UIFont = .boldSystemFont(ofSize: 30)
+    
+    @available(swift, deprecated: 0.5.5, obsoleted: 0.5.6, renamed: "colorTitleHeader")
     public var colorTitleDate: UIColor = .black
+    public var colorTitleHeader: UIColor = .black
+    
     public var colorTitleCurrentDate: UIColor = .systemRed
     public var showDatesForOtherMonths: Bool = false
     public var colorBackground: UIColor = .white
     public var selectionMode: SelectionMode = .multiple
     public var showMonthNameInFirstDay: Bool = false
     public var isPrefetchingEnabled: Bool = true
-    public var isHiddenSectionHeader: Bool = false
+    public var isHiddenSectionHeader: Bool = true
     public var heightSectionHeader: CGFloat = 50
     
     public enum SelectionMode: Int {
@@ -367,7 +407,7 @@ public struct YearStyle {
     }
     public var colorDayTitle: UIColor = .black
     public var selectCalendarType: CalendarType = .month
-    public var isAnimateSelection: Bool = true
+    public var isAnimateSelection: Bool = false
     public var isPagingEnabled: Bool = true
     public var isAutoSelectDateScrolling: Bool = true
     public var weekDayAlignment: NSTextAlignment = .center
@@ -393,7 +433,7 @@ public struct AllDayStyle {
     public var font: UIFont = .systemFont(ofSize: 12)
     
     public var offsetWidth: CGFloat = 2
-    public var offsetHeight: CGFloat = 2    
+    public var offsetHeight: CGFloat = 2
     public var offsetX: CGFloat = 0
     public var height: CGFloat = 25
     public var maxHeight: CGFloat = 70
@@ -458,65 +498,86 @@ extension Style {
         guard followInSystemTheme else { return self }
         
         var newStyle = self
-        if #available(iOS 13.0, *) {            
+        if #available(iOS 13.0, *) {
             // event
             newStyle.event.colorIconFile = UIColor.useForStyle(dark: .systemGray, white: newStyle.event.colorIconFile)
             
             // header
-            newStyle.headerScroll.colorNameEmptyDay = UIColor.useForStyle(dark: .systemGray6, white: newStyle.headerScroll.colorNameEmptyDay)
+            newStyle.headerScroll.colorNameEmptyDay = UIColor.useForStyle(dark: .systemGray6,
+                                                                          white: newStyle.headerScroll.colorNameEmptyDay)
             newStyle.headerScroll.colorBackground = UIColor.useForStyle(dark: .black, white: newStyle.headerScroll.colorBackground)
             newStyle.headerScroll.colorTitleDate = UIColor.useForStyle(dark: .white, white: newStyle.headerScroll.colorTitleDate)
-            newStyle.headerScroll.colorTitleCornerDate = UIColor.useForStyle(dark: .systemRed, white: newStyle.headerScroll.colorTitleCornerDate)
+            newStyle.headerScroll.colorTitleCornerDate = UIColor.useForStyle(dark: .systemRed,
+                                                                             white: newStyle.headerScroll.colorTitleCornerDate)
             newStyle.headerScroll.colorDate = UIColor.useForStyle(dark: .white, white: newStyle.headerScroll.colorDate)
             newStyle.headerScroll.colorNameDay = UIColor.useForStyle(dark: .white, white: newStyle.headerScroll.colorNameDay)
-            newStyle.headerScroll.colorCurrentDate = UIColor.useForStyle(dark: .systemGray6, white: newStyle.headerScroll.colorCurrentDate)
-            newStyle.headerScroll.colorBackgroundCurrentDate = UIColor.useForStyle(dark: .systemRed, white: newStyle.headerScroll.colorBackgroundCurrentDate)
-            newStyle.headerScroll.colorBackgroundSelectDate = UIColor.useForStyle(dark: .white, white: newStyle.headerScroll.colorBackgroundSelectDate)
+            newStyle.headerScroll.colorCurrentDate = UIColor.useForStyle(dark: .systemGray6,
+                                                                         white: newStyle.headerScroll.colorCurrentDate)
+            newStyle.headerScroll.colorBackgroundCurrentDate = UIColor.useForStyle(dark: .systemRed,
+                                                                                   white: newStyle.headerScroll.colorBackgroundCurrentDate)
+            newStyle.headerScroll.colorBackgroundSelectDate = UIColor.useForStyle(dark: .white,
+                                                                                  white: newStyle.headerScroll.colorBackgroundSelectDate)
             newStyle.headerScroll.colorSelectDate = UIColor.useForStyle(dark: .black, white: newStyle.headerScroll.colorSelectDate)
-            newStyle.headerScroll.colorCurrentSelectDateForDarkStyle = UIColor.useForStyle(dark: .white, white: newStyle.headerScroll.colorCurrentSelectDateForDarkStyle)
-            newStyle.headerScroll.colorWeekendDate = UIColor.useForStyle(dark: .systemGray2, white: newStyle.headerScroll.colorWeekendDate)
+            newStyle.headerScroll.colorCurrentSelectDateForDarkStyle = UIColor.useForStyle(dark: .white,
+                                                                                           white: newStyle.headerScroll.colorCurrentSelectDateForDarkStyle)
+            newStyle.headerScroll.colorWeekendDate = UIColor.useForStyle(dark: .systemGray2,
+                                                                         white: newStyle.headerScroll.colorWeekendDate)
             
             // timeline
             newStyle.timeline.backgroundColor = UIColor.useForStyle(dark: .black, white: newStyle.timeline.backgroundColor)
             newStyle.timeline.timeColor = UIColor.useForStyle(dark: .systemGray, white: newStyle.timeline.timeColor)
-            newStyle.timeline.currentLineHourColor = UIColor.useForStyle(dark: .systemRed, white: newStyle.timeline.currentLineHourColor)
+            newStyle.timeline.currentLineHourColor = UIColor.useForStyle(dark: .systemRed,
+                                                                         white: newStyle.timeline.currentLineHourColor)
             
             // week
             newStyle.week.colorBackground = UIColor.useForStyle(dark: .black, white: newStyle.week.colorBackground)
             newStyle.week.colorDate = UIColor.useForStyle(dark: .white, white: newStyle.week.colorDate)
             newStyle.week.colorNameDay = UIColor.useForStyle(dark: .systemGray, white: newStyle.week.colorNameDay)
             newStyle.week.colorCurrentDate = UIColor.useForStyle(dark: .systemGray, white: newStyle.week.colorCurrentDate)
-            newStyle.week.colorBackgroundSelectDate = UIColor.useForStyle(dark: .systemGray, white: newStyle.week.colorBackgroundSelectDate)
-            newStyle.week.colorBackgroundCurrentDate = UIColor.useForStyle(dark: .systemGray, white: newStyle.week.colorBackgroundCurrentDate)
+            newStyle.week.colorBackgroundSelectDate = UIColor.useForStyle(dark: .systemGray,
+                                                                          white: newStyle.week.colorBackgroundSelectDate)
+            newStyle.week.colorBackgroundCurrentDate = UIColor.useForStyle(dark: .systemGray,
+                                                                           white: newStyle.week.colorBackgroundCurrentDate)
             newStyle.week.colorSelectDate = UIColor.useForStyle(dark: .white, white: newStyle.week.colorSelectDate)
             newStyle.week.colorWeekendDate = UIColor.useForStyle(dark: .systemGray2, white: newStyle.week.colorWeekendDate)
             newStyle.week.colorWeekendBackground = UIColor.useForStyle(dark: .clear, white: newStyle.week.colorWeekendBackground)
             newStyle.week.colorWeekdayBackground = UIColor.useForStyle(dark: .clear, white: newStyle.week.colorWeekdayBackground)
             
             // month
-            newStyle.month.colorDate = UIColor.useForStyle(dark: .systemGray, white: newStyle.month.colorDate)
+            newStyle.month.colorDate = UIColor.useForStyle(dark: .white, white: newStyle.month.colorDate)
             newStyle.month.colorNameEmptyDay = UIColor.useForStyle(dark: .systemGray6, white: newStyle.month.colorNameEmptyDay)
             newStyle.month.colorCurrentDate = UIColor.useForStyle(dark: .white, white: newStyle.month.colorCurrentDate)
-            newStyle.month.colorBackgroundCurrentDate = UIColor.useForStyle(dark: .systemRed, white: newStyle.month.colorBackgroundCurrentDate)
-            newStyle.month.colorBackgroundSelectDate = UIColor.useForStyle(dark: .white, white: newStyle.month.colorBackgroundSelectDate)
+            newStyle.month.colorBackgroundCurrentDate = UIColor.useForStyle(dark: .systemRed,
+                                                                            white: newStyle.month.colorBackgroundCurrentDate)
+            newStyle.month.colorBackgroundSelectDate = UIColor.useForStyle(dark: .white,
+                                                                           white: newStyle.month.colorBackgroundSelectDate)
             newStyle.month.colorSelectDate = UIColor.useForStyle(dark: .black, white: newStyle.month.colorSelectDate)
             newStyle.month.colorWeekendDate = UIColor.useForStyle(dark: .systemGray2, white: newStyle.month.colorWeekendDate)
             newStyle.month.colorMoreTitle = UIColor.useForStyle(dark: .systemGray3, white: newStyle.month.colorMoreTitle)
             newStyle.month.colorEventTitle = UIColor.useForStyle(dark: .systemGray, white: newStyle.month.colorEventTitle)
             newStyle.month.colorSeparator = UIColor.useForStyle(dark: .systemGray, white: newStyle.month.colorSeparator)
-            newStyle.month.colorBackgroundWeekendDate = UIColor.useForStyle(dark: .systemGray6, white: newStyle.month.colorBackgroundWeekendDate)
+            if UIDevice.current.userInterfaceIdiom == .phone {
+                newStyle.month.colorBackgroundWeekendDate = UIColor.useForStyle(dark: .black,
+                                                                                white: newStyle.month.colorBackgroundWeekendDate)
+            } else {
+                newStyle.month.colorBackgroundWeekendDate = UIColor.useForStyle(dark: .systemGray6,
+                                                                                white: newStyle.month.colorBackgroundWeekendDate)
+            }
             newStyle.month.colorBackgroundDate = UIColor.useForStyle(dark: .black, white: newStyle.month.colorBackgroundDate)
-            newStyle.month.colorTitleDate = UIColor.useForStyle(dark: .white, white: newStyle.month.colorTitleDate)
+            newStyle.month.colorTitleHeader = UIColor.useForStyle(dark: .white, white: newStyle.month.colorTitleHeader)
             newStyle.month.colorBackground = UIColor.useForStyle(dark: .black, white: newStyle.month.colorBackground)
             newStyle.month.colorTitleCurrentDate = .useForStyle(dark: .systemRed, white: newStyle.month.colorTitleCurrentDate)
             
             // year
             newStyle.year.colorCurrentDate = UIColor.useForStyle(dark: .white, white: newStyle.year.colorCurrentDate)
-            newStyle.year.colorBackgroundCurrentDate = UIColor.useForStyle(dark: .systemRed, white: newStyle.year.colorBackgroundCurrentDate)
-            newStyle.year.colorBackgroundSelectDate = UIColor.useForStyle(dark: .systemGray, white: newStyle.year.colorBackgroundSelectDate)
+            newStyle.year.colorBackgroundCurrentDate = UIColor.useForStyle(dark: .systemRed,
+                                                                           white: newStyle.year.colorBackgroundCurrentDate)
+            newStyle.year.colorBackgroundSelectDate = UIColor.useForStyle(dark: .systemGray,
+                                                                          white: newStyle.year.colorBackgroundSelectDate)
             newStyle.year.colorSelectDate = UIColor.useForStyle(dark: .white, white: newStyle.year.colorSelectDate)
             newStyle.year.colorWeekendDate = UIColor.useForStyle(dark: .systemGray2, white: newStyle.year.colorWeekendDate)
-            newStyle.year.colorBackgroundWeekendDate = UIColor.useForStyle(dark: .clear, white: newStyle.year.colorBackgroundWeekendDate)
+            newStyle.year.colorBackgroundWeekendDate = UIColor.useForStyle(dark: .clear,
+                                                                           white: newStyle.year.colorBackgroundWeekendDate)
             newStyle.year.colorTitle = UIColor.useForStyle(dark: .white, white: newStyle.year.colorTitle)
             newStyle.year.colorBackgroundHeader = UIColor.useForStyle(dark: .black, white: newStyle.year.colorBackgroundHeader)
             newStyle.year.colorTitleHeader = UIColor.useForStyle(dark: .white, white: newStyle.year.colorTitleHeader)
@@ -543,20 +604,20 @@ extension Style: Equatable {
         }
         
         return compare(\.event)
-            && compare(\.timeline)
-            && compare(\.allDay)
-            && compare(\.week)
-            && compare(\.headerScroll)
-            && compare(\.month)
-            && compare(\.year)
-            && compare(\.list)
-            && compare(\.locale)
-            && compare(\.timezone)
-            && compare(\.defaultType)
-            && compare(\.timeSystem)
-            && compare(\.startWeekDay)
-            && compare(\.followInSystemTheme)
-            && compare(\.systemCalendars)
+        && compare(\.timeline)
+        && compare(\.allDay)
+        && compare(\.week)
+        && compare(\.headerScroll)
+        && compare(\.month)
+        && compare(\.year)
+        && compare(\.list)
+        && compare(\.locale)
+        && compare(\.timezone)
+        && compare(\.defaultType)
+        && compare(\.timeSystem)
+        && compare(\.startWeekDay)
+        && compare(\.followInSystemTheme)
+        && compare(\.systemCalendars)
     }
     
 }
@@ -569,37 +630,37 @@ extension YearStyle: Equatable {
         }
         
         return compare(\.titleFormatter)
-            && compare(\.weekdayFormatter)
-            && compare(\.colorCurrentDate)
-            && compare(\.colorBackgroundCurrentDate)
-            && compare(\.colorBackgroundSelectDate)
-            && compare(\.colorSelectDate)
-            && compare(\.colorWeekendDate)
-            && compare(\.weekFont)
-            && compare(\.colorBackgroundWeekendDate)
-            && compare(\.scrollDirection)
-            && compare(\.isAnimateSelection)
-            && compare(\.isPagingEnabled)
-            && compare(\.weekDayAlignment)
-            && compare(\.titleDateAlignment)
-            && compare(\.colorBackground)
-            && compare(\.weekFontPad)
-            && compare(\.weekFontPhone)
-            && compare(\.fontTitle)
-            && compare(\.colorTitle)
-            && compare(\.colorBackgroundHeader)
-            && compare(\.fontTitleHeader)
-            && compare(\.colorTitleHeader)
-            && compare(\.heightTitleHeader)
-            && compare(\.alignmentTitleHeader)
-            && compare(\.fontDayTitlePad)
-            && compare(\.fontDayTitlePhone)
-            && compare(\.fontDayTitle)
-            && compare(\.colorDayTitle)
-            && compare(\.selectCalendarType)
-            && compare(\.isAutoSelectDateScrolling)
-            && compare(\.weekDayAlignment)
-            && compare(\.titleDateAlignment)
+        && compare(\.weekdayFormatter)
+        && compare(\.colorCurrentDate)
+        && compare(\.colorBackgroundCurrentDate)
+        && compare(\.colorBackgroundSelectDate)
+        && compare(\.colorSelectDate)
+        && compare(\.colorWeekendDate)
+        && compare(\.weekFont)
+        && compare(\.colorBackgroundWeekendDate)
+        && compare(\.scrollDirection)
+        && compare(\.isAnimateSelection)
+        && compare(\.isPagingEnabled)
+        && compare(\.weekDayAlignment)
+        && compare(\.titleDateAlignment)
+        && compare(\.colorBackground)
+        && compare(\.weekFontPad)
+        && compare(\.weekFontPhone)
+        && compare(\.fontTitle)
+        && compare(\.colorTitle)
+        && compare(\.colorBackgroundHeader)
+        && compare(\.fontTitleHeader)
+        && compare(\.colorTitleHeader)
+        && compare(\.heightTitleHeader)
+        && compare(\.alignmentTitleHeader)
+        && compare(\.fontDayTitlePad)
+        && compare(\.fontDayTitlePhone)
+        && compare(\.fontDayTitle)
+        && compare(\.colorDayTitle)
+        && compare(\.selectCalendarType)
+        && compare(\.isAutoSelectDateScrolling)
+        && compare(\.weekDayAlignment)
+        && compare(\.titleDateAlignment)
     }
     
 }
@@ -612,50 +673,50 @@ extension MonthStyle: Equatable {
         }
         
         return compare(\.titleFormatter)
-            && compare(\.weekdayFormatter)
-            && compare(\.shortInDayMonthFormatter)
-            && compare(\.heightHeaderWeek)
-            && compare(\.heightTitleDate)
-            && compare(\.isHiddenTitleDate)
-            && compare(\.colorDate)
-            && compare(\.colorNameEmptyDay)
-            && compare(\.fontNameDate)
-            && compare(\.colorCurrentDate)
-            && compare(\.colorBackgroundCurrentDate)
-            && compare(\.colorBackgroundSelectDate)
-            && compare(\.colorSelectDate)
-            && compare(\.colorWeekendDate)
-            && compare(\.moreTitle)
-            && compare(\.isHiddenMoreTitle)
-            && compare(\.colorMoreTitle)
-            && compare(\.colorEventTitle)
-            && compare(\.weekFont)
-            && compare(\.fontEventTitle)
-            && compare(\.fontEventTime)
-            && compare(\.fontEventBullet)
-            && compare(\.isHiddenSeparator)
-            && compare(\.isHiddenSeparatorOnEmptyDate)
-            && compare(\.widthSeparator)
-            && compare(\.colorSeparator)
-            && compare(\.colorBackgroundWeekendDate)
-            && compare(\.colorBackgroundDate)
-            && compare(\.scrollDirection)
-            && compare(\.isAnimateSelection)
-            && compare(\.isPagingEnabled)
-            && compare(\.isScrollEnabled)
-            && compare(\.autoSelectionDateWhenScrolling)
-            && compare(\.eventCorners)
-            && compare(\.eventCornersRadius)
-            && compare(\.isHiddenDotInTitle)
-            && compare(\.isHiddenEventTitle)
-            && compare(\.weekDayAlignment)
-            && compare(\.titleDateAlignment)
-            && compare(\.fontTitleDate)
-            && compare(\.colorTitleDate)
-            && compare(\.showDatesForOtherMonths)
-            && compare(\.colorBackground)
-            && compare(\.selectionMode)
-            && compare(\.colorTitleCurrentDate)
+        && compare(\.weekdayFormatter)
+        && compare(\.shortInDayMonthFormatter)
+        && compare(\.heightHeaderWeek)
+        && compare(\.heightTitleHeader)
+        && compare(\.isHiddenTitleHeader)
+        && compare(\.colorDate)
+        && compare(\.colorNameEmptyDay)
+        && compare(\.fontNameDate)
+        && compare(\.colorCurrentDate)
+        && compare(\.colorBackgroundCurrentDate)
+        && compare(\.colorBackgroundSelectDate)
+        && compare(\.colorSelectDate)
+        && compare(\.colorWeekendDate)
+        && compare(\.moreTitle)
+        && compare(\.isHiddenMoreTitle)
+        && compare(\.colorMoreTitle)
+        && compare(\.colorEventTitle)
+        && compare(\.weekFont)
+        && compare(\.fontEventTitle)
+        && compare(\.fontEventTime)
+        && compare(\.fontEventBullet)
+        && compare(\.isHiddenSeparator)
+        && compare(\.isHiddenSeparatorOnEmptyDate)
+        && compare(\.widthSeparator)
+        && compare(\.colorSeparator)
+        && compare(\.colorBackgroundWeekendDate)
+        && compare(\.colorBackgroundDate)
+        && compare(\.scrollDirection)
+        && compare(\.isAnimateSelection)
+        && compare(\.isPagingEnabled)
+        && compare(\.isScrollEnabled)
+        && compare(\.autoSelectionDateWhenScrolling)
+        && compare(\.eventCorners)
+        && compare(\.eventCornersRadius)
+        && compare(\.isHiddenDotInTitle)
+        && compare(\.isHiddenEventTitle)
+        && compare(\.weekDayAlignment)
+        && compare(\.titleHeaderAlignment)
+        && compare(\.fontTitleHeader)
+        && compare(\.colorTitleHeader)
+        && compare(\.showDatesForOtherMonths)
+        && compare(\.colorBackground)
+        && compare(\.selectionMode)
+        && compare(\.colorTitleCurrentDate)
     }
     
 }
@@ -668,10 +729,10 @@ extension ListViewStyle: Equatable {
         }
         
         return compare(\.fontBullet)
-            && compare(\.fontTitle)
-            && compare(\.heightHeaderView)
-            && compare(\.backgroundColor)
-            && compare(\.headerDateFormatter)
+        && compare(\.fontTitle)
+        && compare(\.heightHeaderView)
+        && compare(\.backgroundColor)
+        && compare(\.headerDateFormatter)
     }
     
 }
@@ -684,37 +745,37 @@ extension HeaderScrollStyle: Equatable {
         }
         
         return compare(\.titleDays)
-            && compare(\.heightHeaderWeek)
-            && compare(\.heightSubviewHeader)
-            && compare(\.colorBackground)
-            && compare(\.isHidden)
-            && compare(\.isHiddenSubview)
-            && compare(\.titleFormatter)
-            && compare(\.weekdayFormatter)
-            && compare(\.colorTitleDate)
-            && compare(\.colorTitleCornerDate)
-            && compare(\.colorDate)
-            && compare(\.fontDate)
-            && compare(\.colorNameDay)
-            && compare(\.fontNameDay)
-            && compare(\.colorCurrentDate)
-            && compare(\.colorBackgroundCurrentDate)
-            && compare(\.colorBackgroundSelectDate)
-            && compare(\.colorSelectDate)
-            && compare(\.colorCurrentSelectDateForDarkStyle)
-            && compare(\.colorWeekendDate)
-            && compare(\.isScrollEnabled)
-            && compare(\.colorWeekdayBackground)
-            && compare(\.colorWeekendBackground)
-            && compare(\.isHidden)
-            && compare(\.dotCorners)
-            && compare(\.dotCornersRadius)
-            && compare(\.titleDateAlignment)
-            && compare(\.titleDateFont)
-            && compare(\.isAnimateTitleDate)
-            && compare(\.colorNameEmptyDay)
-            && compare(\.showDatesForOtherMonths)
-            && compare(\.isAnimateSelection)
+        && compare(\.heightHeaderWeek)
+        && compare(\.heightSubviewHeader)
+        && compare(\.colorBackground)
+        && compare(\.isHidden)
+        && compare(\.isHiddenSubview)
+        && compare(\.titleFormatter)
+        && compare(\.weekdayFormatter)
+        && compare(\.colorTitleDate)
+        && compare(\.colorTitleCornerDate)
+        && compare(\.colorDate)
+        && compare(\.fontDate)
+        && compare(\.colorNameDay)
+        && compare(\.fontNameDay)
+        && compare(\.colorCurrentDate)
+        && compare(\.colorBackgroundCurrentDate)
+        && compare(\.colorBackgroundSelectDate)
+        && compare(\.colorSelectDate)
+        && compare(\.colorCurrentSelectDateForDarkStyle)
+        && compare(\.colorWeekendDate)
+        && compare(\.isScrollEnabled)
+        && compare(\.colorWeekdayBackground)
+        && compare(\.colorWeekendBackground)
+        && compare(\.isHidden)
+        && compare(\.dotCorners)
+        && compare(\.dotCornersRadius)
+        && compare(\.titleDateAlignment)
+        && compare(\.titleDateFont)
+        && compare(\.isAnimateTitleDate)
+        && compare(\.colorNameEmptyDay)
+        && compare(\.showDatesForOtherMonths)
+        && compare(\.isAnimateSelection)
     }
     
 }
@@ -727,17 +788,17 @@ extension WeekStyle: Equatable {
         }
         
         return compare(\.colorBackground)
-            && compare(\.colorDate)
-            && compare(\.colorNameDay)
-            && compare(\.colorCurrentDate)
-            && compare(\.colorBackgroundCurrentDate)
-            && compare(\.colorBackgroundSelectDate)
-            && compare(\.colorSelectDate)
-            && compare(\.colorWeekendDate)
-            && compare(\.colorWeekendBackground)
-            && compare(\.colorWeekdayBackground)
-            && compare(\.selectCalendarType)
-            && compare(\.showVerticalDayDivider)
+        && compare(\.colorDate)
+        && compare(\.colorNameDay)
+        && compare(\.colorCurrentDate)
+        && compare(\.colorBackgroundCurrentDate)
+        && compare(\.colorBackgroundSelectDate)
+        && compare(\.colorSelectDate)
+        && compare(\.colorWeekendDate)
+        && compare(\.colorWeekendBackground)
+        && compare(\.colorWeekdayBackground)
+        && compare(\.selectCalendarType)
+        && compare(\.showVerticalDayDivider)
     }
     
 }
@@ -750,20 +811,20 @@ extension AllDayStyle: Equatable {
         }
         
         return compare(\.backgroundColor)
-            && compare(\.titleText)
-            && compare(\.titleColor)
-            && compare(\.titleAlignment)
-            && compare(\.textColor)
-            && compare(\.offsetWidth)
-            && compare(\.offsetHeight)
-            && compare(\.height)
-            && compare(\.maxHeight)
-            && compare(\.offsetX)
-            && compare(\.fontTitle)
-            && compare(\.isPinned)
-            && compare(\.eventCorners)
-            && compare(\.eventCornersRadius)
-            && compare(\.isHiddenStubEvent)
+        && compare(\.titleText)
+        && compare(\.titleColor)
+        && compare(\.titleAlignment)
+        && compare(\.textColor)
+        && compare(\.offsetWidth)
+        && compare(\.offsetHeight)
+        && compare(\.height)
+        && compare(\.maxHeight)
+        && compare(\.offsetX)
+        && compare(\.fontTitle)
+        && compare(\.isPinned)
+        && compare(\.eventCorners)
+        && compare(\.eventCornersRadius)
+        && compare(\.isHiddenStubEvent)
     }
     
 }
@@ -776,39 +837,39 @@ extension TimelineStyle: Equatable {
         }
         
         return compare(\.minimumPressDuration)
-            && compare(\.startFromFirstEvent)
-            && compare(\.eventFont)
-            && compare(\.offsetEvent)
-            && compare(\.startHour)
-            && compare(\.heightLine)
-            && compare(\.widthLine)
-            && compare(\.offsetLineLeft)
-            && compare(\.offsetLineRight)
-            && compare(\.backgroundColor)
-            && compare(\.widthTime)
-            && compare(\.heightTime)
-            && compare(\.offsetTimeX)
-            && compare(\.offsetTimeY)
-            && compare(\.timeColor)
-            && compare(\.timeFont)
-            && compare(\.widthEventViewer)
-            && compare(\.showLineHourMode)
-            && compare(\.scrollLineHourMode)
-            && compare(\.currentLineHourFont)
-            && compare(\.currentLineHourColor)
-            && compare(\.currentLineHourDotSize)
-            && compare(\.currentLineHourDotCornersRadius)
-            && compare(\.currentLineHourWidth)
-            && compare(\.currentLineHourHeight)
-            && compare(\.separatorLineColor)
-            && compare(\.movingMinutesColor)
-            && compare(\.shadowColumnColor)
-            && compare(\.shadowColumnAlpha)
-            && compare(\.minimumPressDuration)
-            && compare(\.isHiddenStubEvent)
-            && compare(\.isEnabledCreateNewEvent)
-            && compare(\.maxLimitCachedPages)
-            && compare(\.scrollDirections)
+        && compare(\.startFromFirstEvent)
+        && compare(\.eventFont)
+        && compare(\.offsetEvent)
+        && compare(\.startHour)
+        && compare(\.heightLine)
+        && compare(\.widthLine)
+        && compare(\.offsetLineLeft)
+        && compare(\.offsetLineRight)
+        && compare(\.backgroundColor)
+        && compare(\.widthTime)
+        && compare(\.heightTime)
+        && compare(\.offsetTimeX)
+        && compare(\.offsetTimeY)
+        && compare(\.timeColor)
+        && compare(\.timeFont)
+        && compare(\.widthEventViewer)
+        && compare(\.showLineHourMode)
+        && compare(\.scrollLineHourMode)
+        && compare(\.currentLineHourFont)
+        && compare(\.currentLineHourColor)
+        && compare(\.currentLineHourDotSize)
+        && compare(\.currentLineHourDotCornersRadius)
+        && compare(\.currentLineHourWidth)
+        && compare(\.currentLineHourHeight)
+        && compare(\.separatorLineColor)
+        && compare(\.movingMinutesColor)
+        && compare(\.shadowColumnColor)
+        && compare(\.shadowColumnAlpha)
+        && compare(\.minimumPressDuration)
+        && compare(\.isHiddenStubEvent)
+        && compare(\.isEnabledCreateNewEvent)
+        && compare(\.maxLimitCachedPages)
+        && compare(\.scrollDirections)
     }
     
 }
@@ -821,20 +882,20 @@ extension EventStyle: Equatable {
         }
         
         return compare(\.minimumPressDuration)
-            && compare(\.alphaWhileMoving)
-            && compare(\.textForNewEvent)
-            && compare(\.iconFile)
-            && compare(\.colorIconFile)
-            && compare(\.isEnableVisualSelect)
-            && compare(\.colorStubView)
-            && compare(\.heightStubView)
-            && compare(\.alignmentStubView)
-            && compare(\.spacingStubView)
-            && compare(\.eventCorners)
-            && compare(\.eventCornersRadius)
-            && compare(\.delayForStartMove)
-            && compare(\.states)
-            && compare(\.defaultHeight)
+        && compare(\.alphaWhileMoving)
+        && compare(\.textForNewEvent)
+        && compare(\.iconFile)
+        && compare(\.colorIconFile)
+        && compare(\.isEnableVisualSelect)
+        && compare(\.colorStubView)
+        && compare(\.heightStubView)
+        && compare(\.alignmentStubView)
+        && compare(\.spacingStubView)
+        && compare(\.eventCorners)
+        && compare(\.eventCornersRadius)
+        && compare(\.delayForStartMove)
+        && compare(\.states)
+        && compare(\.defaultHeight)
     }
     
 }

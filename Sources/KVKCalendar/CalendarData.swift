@@ -58,18 +58,19 @@ struct CalendarData {
                 let year = calendar.component(.year, from: yearDate ?? date)
                 dateMonths = Array(monthsOfYearRange.lowerBound..<monthsOfYearRange.upperBound).compactMap({ monthOfYear -> Date? in
                     var components = DateComponents(year: year, month: monthOfYear)
-                    components.day = 2
+                    components.day = 1
                     return calendar.date(from: components)
                 })
             }
             
-            var months = zip(nameMonths, dateMonths).map({ Month(name: $0.0, date: $0.1, days: [], weeks: 6) })
+            var months = zip(nameMonths, dateMonths).map { Month(name: $0.0,
+                                                                 date: $0.1,
+                                                                 days: [],
+                                                                 weeks: numberOfWeeksInMonth($0.1, calendar: calendar)) }
             
             for (idx, month) in months.enumerated() {
                 let days = getDaysInMonth(month: idx + 1, date: month.date)
-                let weeks = numberOfWeeksInMonth(month.date, calendar: calendar)
                 months[idx].days = days
-                months[idx].weeks = weeks
             }
             monthsTemp += months
         }

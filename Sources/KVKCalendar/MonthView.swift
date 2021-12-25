@@ -29,10 +29,10 @@ final class MonthView: UIView {
     
     private lazy var headerView: WeekHeaderView = {
         let height: CGFloat
-        if style.month.isHiddenTitleDate {
+        if style.month.isHiddenTitleHeader {
             height = style.month.heightHeaderWeek
         } else {
-            height = style.month.heightHeaderWeek + style.month.heightTitleDate + 5
+            height = style.month.heightHeaderWeek + style.month.heightTitleHeader + 5
         }
         let view = WeekHeaderView(parameters: .init(style: style),
                                   frame: CGRect(x: 0, y: 0, width: frame.width, height: height))
@@ -218,10 +218,10 @@ extension MonthView: CalendarSettingProtocol {
         
         if style.month.isHiddenSectionHeader {
             let height: CGFloat
-            if style.month.isHiddenTitleDate {
+            if style.month.isHiddenTitleHeader {
                 height = style.month.heightHeaderWeek
             } else {
-                height = style.month.heightHeaderWeek + style.month.heightTitleDate + 5
+                height = style.month.heightHeaderWeek + style.month.heightTitleHeader + 5
             }
             headerViewFrame = CGRect(x: 0, y: 0, width: frame.width, height: height)
             
@@ -435,7 +435,11 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         
         switch style.month.scrollDirection {
         case .horizontal:
-            width = (collectionView.frame.width - style.month.heightSectionHeader) / 7
+            var superViewWidth = collectionView.bounds.width
+            if !style.month.isHiddenSectionHeader {
+                superViewWidth -= style.month.heightSectionHeader
+            }
+            width = superViewWidth / 7
             height = collectionView.frame.height / 6
         case .vertical:
             if collectionView.frame.width > 0 {
@@ -444,7 +448,12 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
                 width = 0
             }
 
-            height = (collectionView.frame.height - style.month.heightSectionHeader) / CGFloat(item.weeks)
+            var superViewHeight = collectionView.bounds.height
+            if !style.month.isHiddenSectionHeader {
+                superViewHeight -= style.month.heightSectionHeader
+            }
+            
+            height = superViewHeight / CGFloat(item.weeks)
         @unknown default:
             fatalError()
         }
@@ -453,15 +462,15 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        let item = getActualCachedDay(indexPath: indexPath)
+        let month = parameters.monthData.data.months[indexPath.section]
+        let index = IndexPath(row: 0, section: indexPath.section)
         
-        if let date = item.day?.date,
-           let headerView = dataSource?.dequeueHeader(date: date, type: .month, view: collectionView, indexPath: item.indexPath) as? UICollectionReusableView
+        if let headerView = dataSource?.dequeueHeader(date: month.date, type: .month, view: collectionView, indexPath: index) as? UICollectionReusableView
         {
             return headerView
         } else {
-            return collectionView.kvkDequeueView(indexPath: item.indexPath) { (headerView: MonthHeaderView) in
-                
+            return collectionView.kvkDequeueView(indexPath: index) { (headerView: MonthHeaderView) in
+                headerView.value = (style, month.date)
             }
         }
     }
