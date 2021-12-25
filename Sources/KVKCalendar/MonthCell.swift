@@ -96,9 +96,21 @@ final class MonthCell: KVKCollectionViewCell {
                 return
             }
             
-            let height = (frame.height - dateLabel.bounds.height - 5) / countInCell
+            let height: CGFloat
+            let items: [Event]
             
-            for (idx, event) in events.enumerated() {
+            if frame.height > 70 {
+                items = events
+                height = (frame.height - dateLabel.bounds.height - 5) / countInCell
+            } else if let event = events.first {
+                items = [event]
+                height = (frame.height - dateLabel.bounds.height - 5)
+            } else {
+                items = []
+                height = (frame.height - dateLabel.bounds.height - 5)
+            }
+            
+            for (idx, event) in items.enumerated() {
                 let width = frame.width - 10
                 let count = idx + 1
                 let label = UILabel(frame: CGRect(x: 5,
@@ -127,9 +139,12 @@ final class MonthCell: KVKCollectionViewCell {
                         } else {
                             text = ""
                         }
-                        label.text = text
+                        
+                        if !text.isEmpty {
+                            label.text = text
+                            contentView.addSubview(label)
+                        }
                     }
-                    contentView.addSubview(label)
                     return
                 } else {
                     if !event.isAllDay || UIDevice.current.userInterfaceIdiom == .phone {
@@ -159,7 +174,7 @@ final class MonthCell: KVKCollectionViewCell {
                     label.addGestureRecognizer(tap)
                     label.tag = event.hash
                     
-                    if style.event.states.contains(.move), UIDevice.current.userInterfaceIdiom != .phone, !event.isAllDay {
+                    if style.event.states.contains(.move) && UIDevice.current.userInterfaceIdiom != .phone && !event.isAllDay {
                         label.addGestureRecognizer(longGesture)
                         label.addGestureRecognizer(panGesture)
                     }
@@ -190,12 +205,19 @@ final class MonthCell: KVKCollectionViewCell {
             }
 
             if !monthStyle.isHiddenSeparator {
-                if UIDevice.current.userInterfaceIdiom == .phone {
+                switch UIDevice.current.userInterfaceIdiom {
+                case .phone:
                     let topLineLayer = CALayer()
-                    topLineLayer.frame = CGRect(x: 0, y: 0, width: frame.width, height: monthStyle.widthSeparator)
-                    topLineLayer.backgroundColor = monthStyle.colorSeparator.cgColor
-                    layer.addSublayer(topLineLayer)
-                } else {
+                    topLineLayer.name = "line_layer"
+                    
+                    if monthStyle.isHiddenSeparatorOnEmptyDate && day.type == .empty {
+                        layer.sublayers?.removeAll(where: { $0.name == "line_layer" })
+                    } else {
+                        topLineLayer.frame = CGRect(x: 0, y: 0, width: frame.width, height: monthStyle.widthSeparator)
+                        topLineLayer.backgroundColor = monthStyle.colorSeparator.cgColor
+                        layer.addSublayer(topLineLayer)
+                    }
+                default:
                     if day.type != .empty {
                         layer.borderWidth = monthStyle.isHiddenSeparatorOnEmptyDate ? 0 : monthStyle.widthSeparator
                         layer.borderColor = monthStyle.isHiddenSeparatorOnEmptyDate ? UIColor.clear.cgColor : monthStyle.colorSeparator.cgColor
@@ -327,8 +349,14 @@ final class MonthCell: KVKCollectionViewCell {
         }
         
         if weekend {
+            switch UIDevice.current.userInterfaceIdiom {
+            case .phone where day.type == .empty:
+                view.backgroundColor = UIColor.clear
+            default:
+                view.backgroundColor = monthStyle.colorBackgroundWeekendDate
+            }
+            
             label.textColor = textColorForEmptyDay ?? monthStyle.colorWeekendDate
-            view.backgroundColor = monthStyle.colorBackgroundWeekendDate
         } else {
             view.backgroundColor = monthStyle.colorBackgroundDate
             label.textColor = textColorForEmptyDay ?? monthStyle.colorDate
@@ -392,7 +420,7 @@ final class MonthCell: KVKCollectionViewCell {
         
         return eventList.reduce(NSMutableAttributedString()) { (_, event) -> NSMutableAttributedString in
             let text: String
-            if monthStyle.isHiddenTitle {
+            if monthStyle.isHiddenEventTitle {
                 text = ""
             } else {
                 text = event.textForMonth
@@ -429,7 +457,6 @@ final class MonthCell: KVKCollectionViewCell {
         let stubView = UIView(frame: bounds)
         if skeletons {
             contentView.subviews.filter({ $0.tag != defaultTagView }).forEach({ $0.removeFromSuperview() })
-            
             contentView.addSubview(stubView)
             stubView.setAsSkeleton(skeletons, cornerRadius: cornerRadius, insets: insets)
         } else {

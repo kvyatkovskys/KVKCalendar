@@ -288,7 +288,11 @@ public struct MonthStyle {
     public var eventCorners: UIRectCorner = .allCorners
     public var eventCornersRadius: CGSize = CGSize(width: 5, height: 5)
     public var isHiddenDotInTitle: Bool = false
+    
+    @available(swift, deprecated: 0.5.5, obsoleted: 0.5.6, renamed: "isHiddenEventTitle")
     public var isHiddenTitle: Bool = false
+    public var isHiddenEventTitle: Bool = false
+    
     public var weekDayAlignment: NSTextAlignment = .right
     public var titleDateAlignment: NSTextAlignment = .left
     public var fontTitleDate: UIFont = .boldSystemFont(ofSize: 30)
@@ -299,6 +303,8 @@ public struct MonthStyle {
     public var selectionMode: SelectionMode = .multiple
     public var showMonthNameInFirstDay: Bool = false
     public var isPrefetchingEnabled: Bool = true
+    public var isHiddenSectionHeader: Bool = false
+    public var heightSectionHeader: CGFloat = 50
     
     public enum SelectionMode: Int {
         case single, multiple
@@ -641,7 +647,7 @@ extension MonthStyle: Equatable {
             && compare(\.eventCorners)
             && compare(\.eventCornersRadius)
             && compare(\.isHiddenDotInTitle)
-            && compare(\.isHiddenTitle)
+            && compare(\.isHiddenEventTitle)
             && compare(\.weekDayAlignment)
             && compare(\.titleDateAlignment)
             && compare(\.fontTitleDate)
