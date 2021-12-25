@@ -555,11 +555,12 @@ extension Style {
             newStyle.month.colorWeekendDate = UIColor.useForStyle(dark: .systemGray2, white: newStyle.month.colorWeekendDate)
             newStyle.month.colorMoreTitle = UIColor.useForStyle(dark: .systemGray3, white: newStyle.month.colorMoreTitle)
             newStyle.month.colorEventTitle = UIColor.useForStyle(dark: .systemGray, white: newStyle.month.colorEventTitle)
-            newStyle.month.colorSeparator = UIColor.useForStyle(dark: .systemGray, white: newStyle.month.colorSeparator)
             if UIDevice.current.userInterfaceIdiom == .phone {
+                newStyle.month.colorSeparator = UIColor.useForStyle(dark: .systemGray4, white: newStyle.month.colorSeparator)
                 newStyle.month.colorBackgroundWeekendDate = UIColor.useForStyle(dark: .black,
                                                                                 white: newStyle.month.colorBackgroundWeekendDate)
             } else {
+                newStyle.month.colorSeparator = UIColor.useForStyle(dark: .systemGray, white: newStyle.month.colorSeparator)
                 newStyle.month.colorBackgroundWeekendDate = UIColor.useForStyle(dark: .systemGray6,
                                                                                 white: newStyle.month.colorBackgroundWeekendDate)
             }
