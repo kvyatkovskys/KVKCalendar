@@ -33,7 +33,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     var eventResizePreview: ResizeEventView?
     var eventPreviewSize = CGSize(width: 150, height: 150)
     var isResizeEnableMode = false
-    var potentiallyCenterLabel: TimelineLabel?
+    var potentiallyCenteredLabel: TimelineLabel?
     
     let timeLabelFormatter: DateFormatter = {
         let formatter = DateFormatter()

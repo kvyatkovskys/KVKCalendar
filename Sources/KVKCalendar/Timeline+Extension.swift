@@ -188,11 +188,7 @@ extension TimelineView {
         
         scrollView.subviews.filter({ $0 is EventViewGeneral }).forEach({ $0.isUserInteractionEnabled = enable })
     }
-    
-    private var enabledZoomCenteringTemporary: Bool {
-        false
-    }
-    
+        
     @objc func pinchZooming(gesture: UIPinchGestureRecognizer) {
         switch gesture.state {
         case .ended, .failed, .cancelled:
@@ -214,24 +210,24 @@ extension TimelineView {
             }
         }
                 
-        if enabledZoomCenteringTemporary {
-            let yPoint = gesture.location(in: scrollView).y
-            if let label = potentiallyCenterLabel, let updatedLabel = timeLabels.first(where: { $0.tag >= label.tag }) {
-                potentiallyCenterLabel = updatedLabel
-            } else if let label = timeLabels.first(where: { $0.frame.origin.y >= (yPoint + calculatedTimeY) }) {
-                potentiallyCenterLabel = label
-            }
+        let yPoint = gesture.location(in: scrollView).y
+        if let label = potentiallyCenteredLabel, let updatedLabel = timeLabels.first(where: { $0.tag >= label.tag }) {
+            potentiallyCenteredLabel = updatedLabel
+        } else if let label = timeLabels.first(where: { $0.frame.origin.y >= (yPoint + calculatedTimeY) }) {
+            potentiallyCenteredLabel = label
         }
         
         reloadTimeline()
         
-        if let label = potentiallyCenterLabel, enabledZoomCenteringTemporary {
-            scrollView.scrollRectToVisible(label.frame, animated: false)
+        let yPointGlobal = gesture.location(in: self).y
+        if let y = potentiallyCenteredLabel?.frame.origin.y {
+            let offset = y - yPointGlobal
+            scrollView.setContentOffset(.init(x: 0, y: offset), animated: false)
         }
         
         switch gesture.state {
         case .ended, .failed, .cancelled:
-            potentiallyCenterLabel = nil
+            potentiallyCenteredLabel = nil
         default:
             break
         }

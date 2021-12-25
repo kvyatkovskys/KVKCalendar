@@ -128,8 +128,20 @@ public struct TimelineStyle {
     public var offsetEvent: CGFloat = 3
     public var startHour: Int = 0
     public var scrollToHour: Int? = nil
-    public var heightLine: CGFloat = 0.5
-    public var widthLine: CGFloat = 0.5
+    public var heightLine: CGFloat = {
+#if targetEnvironment(macCatalyst)
+        return 1
+#else
+        return 0.5
+#endif
+    }()
+    public var widthLine: CGFloat = {
+#if targetEnvironment(macCatalyst)
+        return 1
+#else
+        return 0.5
+#endif
+    }()
     public var offsetLineLeft: CGFloat = 10
     public var offsetLineRight: CGFloat = 10
     public var backgroundColor: UIColor = .white
