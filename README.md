@@ -13,12 +13,12 @@
 
 **Additional features:**
 - [x] Dark mode
-- [ ] Skeleton loading
+- [ ] Skeleton loading (month)
 - [x] Custom event view
 - [x] Custom date cell
 - [x] Custom header view and collection view
 - [x] Custom calendar localization
-- [x] Ability to set a divider line
+- [x] Ability to set a divider line (timeline)
 - [x] UIMenu supports in event view (iOS 14.0 and above)
 
 ## Need Help?
