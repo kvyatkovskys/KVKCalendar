@@ -173,22 +173,26 @@ extension MonthView: CalendarSettingProtocol {
     
     func reloadFrame(_ frame: CGRect) {
         self.frame = frame
+        var collectionFrame = frame
         
-        headerViewFrame.size.width = frame.width
-        if let customHeaderView = dataSource?.willDisplayHeaderSubview(date: parameters.monthData.date, frame: headerViewFrame, type: .month) {
-            headerViewFrame = customHeaderView.frame
-            addSubview(customHeaderView)
-        } else {
-            headerView.reloadFrame(frame)
+        if style.month.isHiddenSectionHeader {
+            headerViewFrame.size.width = frame.width
+            if let customHeaderView = dataSource?.willDisplayHeaderSubview(date: parameters.monthData.date, frame: headerViewFrame, type: .month) {
+                headerViewFrame = customHeaderView.frame
+                addSubview(customHeaderView)
+            } else {
+                headerView.reloadFrame(frame)
+            }
+            
+            collectionFrame.origin.y = headerViewFrame.height
+            collectionFrame.size.height = collectionFrame.height - headerViewFrame.height
         }
+        
         
         collectionView?.removeFromSuperview()
         collectionView = nil
-        
-        var collectionFrame = frame
-        collectionFrame.origin.y = headerViewFrame.height
-        collectionFrame.size.height = collectionFrame.height - headerViewFrame.height
         collectionView = createCollectionView(frame: collectionFrame, style: style.month)
+        
         if let tempView = collectionView {
             addSubview(tempView)
         }
@@ -209,29 +213,33 @@ extension MonthView: CalendarSettingProtocol {
     func setUI() {
         subviews.forEach({ $0.removeFromSuperview() })
         
-        let height: CGFloat
-        if style.month.isHiddenTitleDate {
-            height = style.month.heightHeaderWeek
-        } else {
-            height = style.month.heightHeaderWeek + style.month.heightTitleDate + 5
-        }
-        headerViewFrame = CGRect(x: 0, y: 0, width: frame.width, height: height)
-        
-        if let customHeaderView = dataSource?.willDisplayHeaderSubview(date: parameters.monthData.date,
-                                                                       frame: headerViewFrame,
-                                                                       type: .month)
-        {
-            headerViewFrame = customHeaderView.frame
-            addSubview(customHeaderView)
-        } else {
-            headerView.frame = headerViewFrame
-            addSubview(headerView)
-        }
-        
         collectionView = nil
         var collectionFrame = frame
-        collectionFrame.origin.y = headerViewFrame.height
-        collectionFrame.size.height = collectionFrame.height - headerViewFrame.height
+        
+        if style.month.isHiddenSectionHeader {
+            let height: CGFloat
+            if style.month.isHiddenTitleDate {
+                height = style.month.heightHeaderWeek
+            } else {
+                height = style.month.heightHeaderWeek + style.month.heightTitleDate + 5
+            }
+            headerViewFrame = CGRect(x: 0, y: 0, width: frame.width, height: height)
+            
+            if let customHeaderView = dataSource?.willDisplayHeaderSubview(date: parameters.monthData.date,
+                                                                           frame: headerViewFrame,
+                                                                           type: .month)
+            {
+                headerViewFrame = customHeaderView.frame
+                addSubview(customHeaderView)
+            } else {
+                headerView.frame = headerViewFrame
+                addSubview(headerView)
+            }
+            
+            collectionFrame.origin.y = headerViewFrame.height
+            collectionFrame.size.height = collectionFrame.height - headerViewFrame.height
+        }
+        
         collectionView = createCollectionView(frame: collectionFrame, style: style.month)
         if let tempView = collectionView {
             addSubview(tempView)
@@ -427,7 +435,7 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         
         switch style.month.scrollDirection {
         case .horizontal:
-            width = collectionView.frame.width / 7
+            width = (collectionView.frame.width - style.month.heightSectionHeader) / 7
             height = collectionView.frame.height / 6
         case .vertical:
             if collectionView.frame.width > 0 {
@@ -436,12 +444,45 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
                 width = 0
             }
 
-            height = collectionView.frame.height / CGFloat(item.weeks)
+            height = (collectionView.frame.height - style.month.heightSectionHeader) / CGFloat(item.weeks)
         @unknown default:
             fatalError()
         }
                 
         return CGSize(width: width, height: height)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        let item = getActualCachedDay(indexPath: indexPath)
+        
+        if let date = item.day?.date,
+           let headerView = dataSource?.dequeueHeader(date: date, type: .month, view: collectionView, indexPath: item.indexPath) as? UICollectionReusableView
+        {
+            return headerView
+        } else {
+            return collectionView.kvkDequeueView(indexPath: item.indexPath) { (headerView: MonthHeaderView) in
+                
+            }
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        guard !style.month.isHiddenSectionHeader else { return .zero }
+        
+        let item = getActualCachedDay(indexPath: IndexPath(row: 0, section: section))
+        
+        if let date = item.day?.date, let size = delegate?.sizeForHeader(date, type: .month) {
+            return size
+        } else {
+            switch style.month.scrollDirection {
+            case .horizontal:
+                return CGSize(width: style.month.heightSectionHeader, height: collectionView.bounds.height)
+            case .vertical:
+                return CGSize(width: collectionView.bounds.width, height: style.month.heightSectionHeader)
+            @unknown default:
+                fatalError()
+            }
+        }
     }
     
 }

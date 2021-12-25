@@ -158,11 +158,11 @@ extension YearView: CalendarSettingProtocol {
 
 extension YearView: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return data.sections.count
+        data.sections.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return data.sections[section].months.count
+        data.sections[section].months.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
