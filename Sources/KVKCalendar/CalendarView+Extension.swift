@@ -232,6 +232,7 @@ extension CalendarView: DisplayDataSource {
         dataSource?.willDisplayHeaderSubview(date: date, frame: frame, type: type)
     }
     
+    /// **Temporary disabled**
     private func willDisplayHeaderView(date: Date?, frame: CGRect, type: CalendarType) -> UIView? {
         dataSource?.willDisplayHeaderView(date: date, frame: frame, type: type)
     }
