@@ -57,6 +57,21 @@ final class ListViewHeader: KVKTableViewHeaderFooterView {
         didTap?()
     }
     
+    override func setSkeletons(_ skeletons: Bool,
+                               insets: UIEdgeInsets = UIEdgeInsets(top: 4, left: 4, bottom: 4, right: 4),
+                               cornerRadius: CGFloat = 2)
+    {
+        isUserInteractionEnabled = !skeletons
+        titleLabel.isHidden = skeletons
+        let stubView = UIView(frame: bounds)
+        if skeletons {
+            contentView.addSubview(stubView)
+            stubView.setAsSkeleton(skeletons, cornerRadius: cornerRadius, insets: insets)
+        } else {
+            stubView.removeFromSuperview()
+        }
+    }
+    
 }
 
 #endif
