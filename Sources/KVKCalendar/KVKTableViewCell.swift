@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 30.10.2021.
 //
 
+#if os(iOS)
+
 import UIKit
 
 class KVKTableViewCell: UITableViewCell {
@@ -29,3 +31,5 @@ class KVKTableViewCell: UITableViewCell {
     }
     
 }
+
+#endif
