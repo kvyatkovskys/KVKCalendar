@@ -40,7 +40,14 @@ final class MonthHeaderView: UICollectionReusableView {
             case .sunday:
                 value = CGFloat(date.weekday - 1)
             }
-            let offset: CGFloat = ((superview?.bounds.width ?? UIScreen.main.bounds.width) / 7) * value + 5
+            
+            let offset: CGFloat
+            if style.month.scrollDirection == .vertical {
+                offset = ((superview?.bounds.width ?? UIScreen.main.bounds.width) / 7) * value + 5
+            } else {
+                offset = 0
+            }
+            
             dateLabel.frame = CGRect(origin: CGPoint(x: offset, y: 0),
                                      size: CGSize(width: frame.width - offset, height: frame.height))
             addSubview(dateLabel)
