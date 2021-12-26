@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 31.10.2021.
 //
 
+#if os(iOS)
+
 import UIKit
 
 class KVKTableViewHeaderFooterView: UITableViewHeaderFooterView {
@@ -29,3 +31,5 @@ class KVKTableViewHeaderFooterView: UITableViewHeaderFooterView {
     }
     
 }
+
+#endif
