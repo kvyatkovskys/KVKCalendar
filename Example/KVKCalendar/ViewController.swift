@@ -248,7 +248,14 @@ extension ViewController: CalendarDataSource {
     func sizeForCell(_ date: Date?, type: CalendarType) -> CGSize? {
         guard type == .month && UIDevice.current.userInterfaceIdiom == .phone else { return nil }
         
-        return CGSize(width: view.bounds.width / 7, height: 70)
+        switch style.month.scrollDirection {
+        case .vertical:
+            return CGSize(width: view.bounds.width / 7, height: 70)
+        case .horizontal:
+            return nil
+        @unknown default:
+            return nil
+        }
     }
 }
 
