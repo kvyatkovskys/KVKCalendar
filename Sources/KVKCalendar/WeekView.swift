@@ -118,7 +118,7 @@ final class WeekView: UIView {
     
     init(parameters: Parameters, frame: CGRect) {
         self.parameters = parameters
-        self.timelineScale = 1
+        self.timelineScale = parameters.style.timeline.scale?.min ?? 1
         super.init(frame: frame)
         setUI()
         
