@@ -449,7 +449,7 @@ final class MonthCell: KVKCollectionViewCell {
     }
     
     override func setSkeletons(_ skeletons: Bool,
-                               insets: UIEdgeInsets = UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5),
+                               insets: UIEdgeInsets = UIEdgeInsets(top: 4, left: 4, bottom: 4, right: 4),
                                cornerRadius: CGFloat = 2)
     {
         dateLabel.isHidden = skeletons
