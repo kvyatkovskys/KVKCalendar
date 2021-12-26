@@ -67,6 +67,26 @@ final class ListViewCell: KVKTableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func setSkeletons(_ skeletons: Bool,
+                               insets: UIEdgeInsets = UIEdgeInsets(top: 4, left: 4, bottom: 4, right: 4),
+                               cornerRadius: CGFloat = 2)
+    {
+        isUserInteractionEnabled = !skeletons
+        txtLabel.isHidden = skeletons
+        dotView.isHidden = skeletons
+        
+        let stubLabelView = UIView(frame: CGRect(x: 30, y: 0, width: bounds.width - 60, height: bounds.height))
+        let stubDotView = UIView(frame: CGRect(x: 10, y: (bounds.height / 2) - 18, width: 30, height: 30))
+        if skeletons {
+            contentView.addSubview(stubDotView)
+            contentView.addSubview(stubLabelView)
+            [stubDotView, stubLabelView].forEach { $0.setAsSkeleton(skeletons, cornerRadius: cornerRadius, insets: insets) }
+        } else {
+            stubDotView.removeFromSuperview()
+            stubLabelView.removeFromSuperview()
+        }
+    }
+    
 }
 
 #endif
