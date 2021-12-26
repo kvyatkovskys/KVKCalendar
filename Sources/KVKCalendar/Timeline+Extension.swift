@@ -193,9 +193,11 @@ extension TimelineView {
         switch gesture.state {
         case .ended, .failed, .cancelled:
             gesture.scale = 1
+            scrollView.isScrollEnabled = true
         case .changed, .began:
             paramaters.scale *= gesture.scale
             gesture.scale = 1
+            scrollView.isScrollEnabled = false
         default:
             break
         }
