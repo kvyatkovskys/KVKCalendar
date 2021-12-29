@@ -52,6 +52,7 @@ final class MonthView: UIView {
         self.parameters = parameters
         super.init(frame: frame)
         setUI()
+        reload()
         scrollToDate(parameters.monthData.date, animated: false)
     }
     
@@ -59,8 +60,8 @@ final class MonthView: UIView {
         updateHeaderView(date, frame: headerViewFrame)
         parameters.monthData.date = date
         parameters.monthData.selectedDates.removeAll()
-        scrollToDate(date, animated: animated ?? parameters.monthData.isAnimate)
         reload()
+        scrollToDate(date, animated: animated ?? parameters.monthData.isAnimate)
     }
     
     func reloadData(_ events: [Event]) {
@@ -120,7 +121,7 @@ final class MonthView: UIView {
     }
     
     private func scrollToIndex(_ idx: Int, animated: Bool) {
-        guard !parameters.monthData.data.months.isEmpty else { return }
+        guard idx <= parameters.monthData.data.months.count else { return }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
             if let attributes = self?.collectionView?.layoutAttributesForSupplementaryElement(ofKind: UICollectionView.elementKindSectionHeader, at: IndexPath(row: 0, section: idx)),
