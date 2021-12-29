@@ -52,8 +52,7 @@ final class MonthView: UIView {
         self.parameters = parameters
         super.init(frame: frame)
         setUI()
-//        reload()
-//        scrollToDate(parameters.monthData.date, animated: false)
+        scrollToDate(parameters.monthData.date, animated: false)
     }
     
     func setDate(_ date: Date, animated: Bool? = nil) {
@@ -125,7 +124,8 @@ final class MonthView: UIView {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
             if let attributes = self?.collectionView?.layoutAttributesForSupplementaryElement(ofKind: UICollectionView.elementKindSectionHeader, at: IndexPath(row: 0, section: idx)),
-               let inset = self?.collectionView?.contentInset
+               let inset = self?.collectionView?.contentInset,
+               self?.style.month.isHiddenSectionHeader == false
             {
                 switch self?.style.month.scrollDirection {
                 case .vertical:
