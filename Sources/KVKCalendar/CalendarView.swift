@@ -95,7 +95,7 @@ public final class CalendarView: UIView {
             parameters.type = defaultType
         }
         
-        set(type: parameters.type, date: date)
+        set(type: parameters.type)
     }
     
     required init?(coder aDecoder: NSCoder) {
