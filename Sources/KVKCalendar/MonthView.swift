@@ -52,7 +52,6 @@ final class MonthView: UIView {
         self.parameters = parameters
         super.init(frame: frame)
         setUI()
-        scrollToDate(parameters.monthData.date, animated: false)
     }
     
     func setDate(_ date: Date, animated: Bool? = nil) {
@@ -120,30 +119,29 @@ final class MonthView: UIView {
     }
     
     private func scrollToIndex(_ idx: Int, animated: Bool) {
-//        guard idx <= parameters.monthData.data.months.count else { return }
-//        
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-//            if let attributes = self?.collectionView?.layoutAttributesForSupplementaryElement(ofKind: UICollectionView.elementKindSectionHeader, at: IndexPath(row: 0, section: idx)),
-//               let inset = self?.collectionView?.contentInset,
-//               self?.style.month.isHiddenSectionHeader == false
-//            {
-//                switch self?.style.month.scrollDirection {
-//                case .vertical:
-//                    let offset = attributes.frame.origin.y - inset.top
-//                    self?.collectionView?.setContentOffset(.init(x: 0, y: offset), animated: true)
-//                case .horizontal:
-//                    let offset = attributes.frame.origin.x - inset.left
-//                    self?.collectionView?.setContentOffset(.init(x: offset, y: 0), animated: true)
-//                case .none:
-//                    break
-//                @unknown default:
-//                    break
-//                }
-//            } else {
-//                let scrollType: UICollectionView.ScrollPosition = self?.style.month.scrollDirection == .horizontal ? .left : .top
-//                self?.collectionView?.scrollToItem(at: IndexPath(row: 0, section: idx), at: scrollType, animated: animated)
-//            }
-//        }
+        guard idx <= parameters.monthData.data.months.count else { return }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+            if let attributes = self?.collectionView?.layoutAttributesForSupplementaryElement(ofKind: UICollectionView.elementKindSectionHeader, at: IndexPath(row: 0, section: idx)),
+               let inset = self?.collectionView?.contentInset
+            {
+                switch self?.style.month.scrollDirection {
+                case .vertical:
+                    let offset = attributes.frame.origin.y - inset.top
+                    self?.collectionView?.setContentOffset(.init(x: 0, y: offset), animated: true)
+                case .horizontal:
+                    let offset = attributes.frame.origin.x - inset.left
+                    self?.collectionView?.setContentOffset(.init(x: offset, y: 0), animated: true)
+                case .none:
+                    break
+                @unknown default:
+                    break
+                }
+            } else {
+                let scrollType: UICollectionView.ScrollPosition = self?.style.month.scrollDirection == .horizontal ? .left : .top
+                self?.collectionView?.scrollToItem(at: IndexPath(row: 0, section: idx), at: scrollType, animated: animated)
+            }
+        }
     }
     
     private func didSelectDates(_ dates: [Date], indexPath: IndexPath) {
