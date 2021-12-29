@@ -79,9 +79,9 @@ public final class CalendarView: UIView {
         return list
     }()
     
-    public init(frame: CGRect, date: Date = Date(), style: Style = Style(), years: Int = 4) {
+    public init(frame: CGRect, date: Date? = nil, style: Style = Style(), years: Int = 4) {
         self.parameters = .init(type: style.defaultType ?? .day, style: style.checkStyle)
-        self.calendarData = CalendarData(date: date, years: years, style: style)
+        self.calendarData = CalendarData(date: date ?? Date(), years: years, style: style)
         self.dayData = DayData(data: calendarData, startDay: style.startWeekDay)
         self.weekData = WeekData(data: calendarData, startDay: style.startWeekDay)
         self.monthData = MonthData(parameters: .init(data: calendarData,
@@ -95,7 +95,7 @@ public final class CalendarView: UIView {
             parameters.type = defaultType
         }
         
-        set(type: parameters.type)
+        set(type: parameters.type, date: date)
     }
     
     required init?(coder aDecoder: NSCoder) {
