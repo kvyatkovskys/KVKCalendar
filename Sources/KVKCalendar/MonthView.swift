@@ -52,8 +52,8 @@ final class MonthView: UIView {
         self.parameters = parameters
         super.init(frame: frame)
         setUI()
-        reload()
-        scrollToDate(parameters.monthData.date, animated: false)
+//        reload()
+//        scrollToDate(parameters.monthData.date, animated: false)
     }
     
     func setDate(_ date: Date, animated: Bool? = nil) {
