@@ -122,7 +122,7 @@ final class MonthView: UIView {
     private func scrollToIndex(_ idx: Int, animated: Bool) {
         guard idx <= parameters.monthData.data.months.count else { return }
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             if let attributes = self?.collectionView?.layoutAttributesForSupplementaryElement(ofKind: UICollectionView.elementKindSectionHeader, at: IndexPath(row: 0, section: idx)),
                let inset = self?.collectionView?.contentInset,
                self?.style.month.isHiddenSectionHeader == false
