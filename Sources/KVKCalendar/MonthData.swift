@@ -24,7 +24,6 @@ final class MonthData: EventDateProtocol {
     var data: CalendarData
     let daysCount: Int
     
-    var isAnimate: Bool = false
     let tagEventPagePreview = -20
     let eventPreviewYOffset: CGFloat = 30
     var eventPreviewXOffset: CGFloat = 60
