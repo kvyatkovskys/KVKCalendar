@@ -97,7 +97,7 @@ final class ViewController: UIViewController {
     
     @objc private func today() {
         selectDate = Date()
-        calendarView.scrollTo(selectDate)
+        calendarView.scrollTo(selectDate, animated: true)
         calendarView.reloadData()
     }
     
