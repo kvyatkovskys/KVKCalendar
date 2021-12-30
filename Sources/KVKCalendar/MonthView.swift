@@ -59,7 +59,7 @@ final class MonthView: UIView {
         parameters.monthData.date = date
         parameters.monthData.selectedDates.removeAll()
         reload()
-        scrollToDate(date, animated: animated ?? parameters.monthData.isAnimate)
+        scrollToDate(date, animated: animated ?? false)
     }
     
     func reloadData(_ events: [Event]) {
@@ -112,14 +112,11 @@ final class MonthView: UIView {
         if let idx = parameters.monthData.data.months.firstIndex(where: { $0.date.month == date.month && $0.date.year == date.year }) {
             scrollToIndex(idx, animated: animated)
         }
-        
-        if !parameters.monthData.isAnimate {
-            parameters.monthData.isAnimate = true
-        }
     }
     
     private func scrollToIndex(_ idx: Int, animated: Bool) {
-        guard idx <= parameters.monthData.data.months.count else { return }
+        // to check when the calendarView is displayed on superview
+        guard superview?.superview != nil && collectionView?.dataSource != nil else { return }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
             if let attributes = self?.collectionView?.layoutAttributesForSupplementaryElement(ofKind: UICollectionView.elementKindSectionHeader, at: IndexPath(row: 0, section: idx)),
@@ -128,10 +125,10 @@ final class MonthView: UIView {
                 switch self?.style.month.scrollDirection {
                 case .vertical:
                     let offset = attributes.frame.origin.y - inset.top
-                    self?.collectionView?.setContentOffset(.init(x: 0, y: offset), animated: true)
+                    self?.collectionView?.setContentOffset(.init(x: 0, y: offset), animated: animated)
                 case .horizontal:
                     let offset = attributes.frame.origin.x - inset.left
-                    self?.collectionView?.setContentOffset(.init(x: offset, y: 0), animated: true)
+                    self?.collectionView?.setContentOffset(.init(x: offset, y: 0), animated: animated)
                 case .none:
                     break
                 @unknown default:
