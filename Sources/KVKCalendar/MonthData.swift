@@ -142,11 +142,7 @@ final class MonthData: EventDateProtocol {
                         return acc
                     }
                     
-                    if recurringEvent.start.day != recurringEvent.end.day {
-                        return acc + [recurringEvent, recurringEvent]
-                    } else {
-                        return acc + [recurringEvent]
-                    }
+                    return acc + [recurringEvent]
                 })
             } else {
                 recurringEventByDate = []

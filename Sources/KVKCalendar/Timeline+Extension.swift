@@ -21,7 +21,7 @@ extension TimelineView: UIScrollViewDelegate {
     
     var contentOffset: CGPoint {
         get {
-            return scrollView.contentOffset
+            scrollView.contentOffset
         }
         set {
             scrollView.setContentOffset(newValue, animated: false)
@@ -29,10 +29,10 @@ extension TimelineView: UIScrollViewDelegate {
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        addStubInvisibleEvents()
+        addStubForInvisibleEvents()
     }
     
-    func addStubInvisibleEvents() {
+    func addStubForInvisibleEvents() {
         guard !style.timeline.isHiddenStubEvent else { return }
         
         let events = scrollView.subviews.compactMap { (view) -> StubEvent? in
@@ -44,26 +44,29 @@ extension TimelineView: UIScrollViewDelegate {
         var eventsAllDay: [StubEvent] = []
         if !style.allDay.isPinned && !style.allDay.isHiddenStubEvent {
             eventsAllDay = scrollView.subviews.compactMap { (view) -> [StubEvent]? in
-                guard let item = view as? AllDayView else { return nil }
+                guard let allDayView = view as? AllDayView else { return nil }
                 
-                return item.items.flatMap({ $0.compactMap({ item in StubEvent(event: item.event, frame: view.frame)}) })
-            }.flatMap({ $0 })
+                return allDayView.items.flatMap { $0.compactMap { item in StubEvent(event: item.event,
+                                                                                    frame: view.frame)} }
+            }.flatMap { $0 }
         }
         
         let stubEvents = events + eventsAllDay
         stubEvents.forEach { (eventView) in
             guard let stack = getStubStackView(day: eventView.event.start.day) else { return }
             
-            stack.top.subviews.filter({ ($0 as? StubEventView)?.valueHash == eventView.event.hash }).forEach({ $0.removeFromSuperview() })
-            stack.bottom.subviews.filter({ ($0 as? StubEventView)?.valueHash == eventView.event.hash }).forEach({ $0.removeFromSuperview() })
+            stack.top.subviews.filter { ($0 as? StubEventView)?.valueHash == eventView.event.hash }.forEach { $0.removeFromSuperview() }
+            stack.bottom.subviews.filter { ($0 as? StubEventView)?.valueHash == eventView.event.hash }.forEach { $0.removeFromSuperview() }
 
             guard !visibleView(eventView.frame) else { return }
             
             let stubView = StubEventView(event: eventView.event,
-                                         frame: CGRect(x: 0, y: 0, width: stack.top.frame.width, height: style.event.heightStubView))
+                                         frame: CGRect(x: 0, y: 0,
+                                                       width: stack.top.frame.width,
+                                                       height: style.event.heightStubView))
             stubView.valueHash = eventView.event.hash
             
-            if scrollView.contentOffset.y > eventView.frame.origin.y {
+            if contentOffset.y > eventView.frame.origin.y {
                 stack.top.addArrangedSubview(stubView)
                 
                 if stack.top.subviews.count >= 1 {
@@ -72,19 +75,19 @@ extension TimelineView: UIScrollViewDelegate {
                         stack.top.frame.size.height = style.event.heightStubView * CGFloat(stack.top.subviews.count)
                     case .horizontal:
                         let newWidth = stack.top.frame.width / CGFloat(stack.top.subviews.count) - 3
-                        stack.top.subviews.forEach({ $0.frame.size.width = newWidth })
+                        stack.top.subviews.forEach { $0.frame.size.width = newWidth }
                     @unknown default:
                         fatalError()
                     }
                 }
             } else {
-                stack.bottom.insertArrangedSubview(stubView, at: 0)
+                stack.bottom.addArrangedSubview(stubView)
                 
                 if stack.bottom.subviews.count >= 1 {
                     switch stack.bottom.axis {
                     case .horizontal:
                         let newWidth = stack.bottom.frame.width / CGFloat(stack.bottom.subviews.count) - 3
-                        stack.bottom.subviews.forEach({ $0.frame.size.width = newWidth })
+                        stack.bottom.subviews.forEach { $0.frame.size.width = newWidth }
                     case .vertical:
                         stack.bottom.frame.size.height = style.event.heightStubView * CGFloat(stack.bottom.subviews.count)
                         stack.bottom.frame.origin.y = (frame.height - stack.bottom.frame.height) - bottomStabStackOffsetY
@@ -95,19 +98,6 @@ extension TimelineView: UIScrollViewDelegate {
             }
             
             stubView.setRoundCorners(style.event.eventCorners, radius: style.event.eventCornersRadius)
-        }
-    }
-    
-    private func getDayEvent(_ event: Event, scrollDirection: ScrollDirectionType) -> Int {
-        if event.start.day == event.end.day {
-            return event.start.day
-        } else {
-            switch scrollDirection {
-            case .up:
-                return event.start.day
-            case .down:
-                return event.start.day
-            }
         }
     }
     
@@ -638,15 +628,15 @@ extension TimelineView: EventDelegate {
         let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
         guard scrollView.frame.width >= (location.x + 20), (location.x - 20) >= leftOffset else { return }
         
-        var offset = scrollView.contentOffset
+        var offset = contentOffset
         if (location.y - 80) < scrollView.contentOffset.y, (location.y - eventPreviewSize.height) >= 0 {
             // scroll up
             offset.y -= 5
-            scrollView.setContentOffset(offset, animated: false)
-        } else if (location.y + 80) > (scrollView.contentOffset.y + scrollView.bounds.height), location.y + eventPreviewSize.height <= scrollView.contentSize.height {
+            contentOffset = offset
+        } else if (location.y + 80) > (contentOffset.y + scrollView.bounds.height), location.y + eventPreviewSize.height <= scrollView.contentSize.height {
             // scroll down
             offset.y += 5
-            scrollView.setContentOffset(offset, animated: false)
+            contentOffset = offset
         }
         
         eventPreview?.frame.origin = CGPoint(x: location.x - eventPreviewXOffset, y: location.y - eventPreviewYOffset)

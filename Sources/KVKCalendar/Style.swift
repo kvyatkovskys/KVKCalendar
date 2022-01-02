@@ -46,6 +46,8 @@ public struct Style {
             month.colorBackgroundWeekendDate = .clear
             month.fontTitleHeader =  .boldSystemFont(ofSize: 19)
             month.isHiddenSectionHeader = false
+            month.isHiddenTitleHeader = true
+            week.colorBackground = .white
         } else {
             timeline.widthEventViewer = 350
             headerScroll.fontNameDay = .systemFont(ofSize: 17)
@@ -173,7 +175,7 @@ public struct TimelineStyle {
     public var shadowColumnColor: UIColor = .systemTeal
     public var shadowColumnAlpha: CGFloat = 0.1
     public var minimumPressDuration: TimeInterval = 0.5
-    public var isHiddenStubEvent: Bool = false
+    public var isHiddenStubEvent: Bool = true
     public var isEnabledCreateNewEvent: Bool = true
     
     @available(swift, deprecated: 0.5.1, obsoleted: 0.5.2, renamed: "maxLimitCachedPages")
