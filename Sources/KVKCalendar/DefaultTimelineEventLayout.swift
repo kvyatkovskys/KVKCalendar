@@ -15,13 +15,13 @@ public struct DefaultTimelineEventLayout: TimelineEventLayout {
 
         let crossEvents = context.calculateCrossEvents(forEvents: events)
 
-        for event in events {
+        events.forEach { (event) in
             var frame = context.getEventRect(start: event.start,
                                              end: event.end,
                                              date: date,
                                              style: event.style)
 
-            // calculate 'width' and position 'x'
+            // calculate 'width' and position 'x' event
             if let crossEvent = crossEvents[event.start.timeIntervalSince1970] {
                 var newOriginX = frame.origin.x
                 var newWidth = frame.width
@@ -30,8 +30,11 @@ public struct DefaultTimelineEventLayout: TimelineEventLayout {
                 frame.size.width = newWidth
 
                 if crossEvent.events.count > 1 {
-                    for rect in rects {
-                        while rect.intersects(CGRect(x: newOriginX, y: frame.origin.y, width: frame.width, height: frame.height)) {
+                    rects.forEach { (rect) in
+                        while rect.intersects(CGRect(x: newOriginX,
+                                                     y: frame.origin.y,
+                                                     width: frame.width,
+                                                     height: frame.height)) {
                             newOriginX += (rect.width + context.style.timeline.offsetEvent).rounded()
                         }
                     }

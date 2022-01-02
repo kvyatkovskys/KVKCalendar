@@ -31,15 +31,15 @@ extension TimelineDelegate {
     func swipeX(transform: CGAffineTransform, stop: Bool) {}
 }
 
-protocol EventDateProtocol {}
+protocol EventDateProtocol: AnyObject {}
 
 extension EventDateProtocol {
     func compareStartDate(_ date: Date?, with event: Event) -> Bool {
-        return event.start.year == date?.year && event.start.month == date?.month && event.start.day == date?.day
+        event.start.year == date?.year && event.start.month == date?.month && event.start.day == date?.day
     }
     
     func compareEndDate(_ date: Date?, with event: Event) -> Bool {
-        return event.end.year == date?.year && event.end.month == date?.month && event.end.day == date?.day
+        event.end.year == date?.year && event.end.month == date?.month && event.end.day == date?.day
     }
     
     func checkMultipleDate(_ date: Date?, with event: Event) -> Bool {

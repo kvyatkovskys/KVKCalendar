@@ -28,9 +28,9 @@ public extension TimelineEventLayoutContext {
         var newFrame = pageFrame
         let midnight = 24
 
-        for time in timeLabels {
-            // calculate position 'y'
-            if start.hour.hashValue == time.valueHash, start.day == date?.day {
+        timeLabels.forEach { (time) in
+            // calculate position 'y' event
+            if start.hour.hashValue == time.valueHash && start.day == date?.day {
                 if time.tag == midnight, let newTime = timeLabels.first(where: { $0.tag == 0 }) {
                     newFrame.origin.y = calculatePointYByMinute(start.minute, newTime)
                 } else {
@@ -86,7 +86,10 @@ public extension TimelineEventLayoutContext {
                 let itemStart = item.start.timeIntervalSince1970
                 guard itemEnd > itemStart else { return false }
 
-                return (itemStart...itemEnd).contains(start) || (itemStart...itemEnd).contains(endCalculated) || (start...endCalculated).contains(itemStart) || (start...endCalculated).contains(itemEnd)
+                return (itemStart...itemEnd).contains(start)
+                || (itemStart...itemEnd).contains(endCalculated)
+                || (start...endCalculated).contains(itemStart)
+                || (start...endCalculated).contains(itemEnd)
             }
 
             crossEvents[crossEventNew.eventTime.start] = crossEventNew

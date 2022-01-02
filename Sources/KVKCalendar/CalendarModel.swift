@@ -191,41 +191,40 @@ extension Event: EventProtocol {
 }
 
 extension Event {
-    func updateDate(newDate: Date?, calendar: Calendar = Calendar.current) -> Event? {
+    func updateDate(newDate: Date, calendar: Calendar = Calendar.current) -> Event? {
         var startComponents = DateComponents()
-        startComponents.year = newDate?.year
-        startComponents.month = newDate?.month
+        startComponents.year = newDate.year
+        startComponents.month = newDate.month
         startComponents.hour = start.hour
         startComponents.minute = start.minute
         
         var endComponents = DateComponents()
-        endComponents.year = newDate?.year
-        endComponents.month = newDate?.month
+        endComponents.year = newDate.year
+        endComponents.month = newDate.month
         endComponents.hour = end.hour
         endComponents.minute = end.minute
         
+        let newDay = newDate.day
         switch recurringType {
         case .everyDay:
-            startComponents.day = newDate?.day
-        case .everyWeek where newDate?.weekday == start.weekday:
-            startComponents.day = newDate?.day
-            startComponents.weekday = newDate?.weekday
-            endComponents.weekday = newDate?.weekday
-        case .everyMonth where newDate?.month != start.month && newDate?.day == start.day:
-            startComponents.day = newDate?.day
-        case .everyYear where newDate?.year != start.year && newDate?.month == start.month && newDate?.day == start.day:
-            startComponents.day = newDate?.day
+            startComponents.day = newDay
+        case .everyWeek where newDate.weekday == start.weekday:
+            startComponents.day = newDay
+            startComponents.weekday = newDate.weekday
+            endComponents.weekday = newDate.weekday
+        case .everyMonth where newDate.month != start.month && newDate.day == start.day:
+            startComponents.day = newDay
+        case .everyYear where newDate.year != start.year && newDate.month == start.month && newDate.day == start.day:
+            startComponents.day = newDay
         default:
             return nil
         }
         
         let offsetDay = end.day - start.day
         if start.day == end.day {
-            endComponents.day = newDate?.day
-        } else if let newDay = newDate?.day {
-            endComponents.day = newDay + offsetDay
+            endComponents.day = newDay
         } else {
-            endComponents.day = newDate?.day
+            endComponents.day = newDay + offsetDay
         }
         
         guard let newStart = calendar.date(from: startComponents),

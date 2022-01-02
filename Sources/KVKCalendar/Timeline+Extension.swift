@@ -140,8 +140,8 @@ extension TimelineView {
         UIApplication.shared.isAvailableBottomHomeIndicator ? 30 : 5
     }
     
-    func topStabStackOffsetY(allDayEventsIsPinned: Bool, eventsCount: Int, height: CGFloat) -> CGFloat {
-        allDayEventsIsPinned ? (CGFloat(eventsCount) * height) + 5 : 5
+    func topStabStackOffsetY(allDayEventsIsPinned: Bool, height: CGFloat) -> CGFloat {
+        allDayEventsIsPinned ? height + 5 : 5
     }
     
     var scrollableEventViews: [UIView] {
@@ -167,8 +167,14 @@ extension TimelineView {
                 endTime = (eventResizePreview?.event.end.hour, eventResizePreview?.event.end.minute)
             }
             
-            if let startHour = startTime.hour, let endHour = endTime.hour, let startMinute = startTime.minute, let endMinute = endTime.minute {
-                delegate?.didResizeEvent(event, startTime: ResizeTime(startHour, startMinute), endTime: ResizeTime(endHour, endMinute))
+            if let startHour = startTime.hour,
+               let endHour = endTime.hour,
+               let startMinute = startTime.minute,
+                let endMinute = endTime.minute
+            {
+                delegate?.didResizeEvent(event,
+                                         startTime: ResizeTime(startHour, startMinute),
+                                         endTime: ResizeTime(endHour, endMinute))
             }
         }
         
@@ -264,7 +270,7 @@ extension TimelineView {
     }
     
     func createAllDayEvents(events: [AllDayView.PrepareEvents], maxEvents: Int) {
-        guard !events.isEmpty else { return }
+        guard !events.allSatisfy({ $0.events.isEmpty }) else { return }
         
         var allDayHeight = style.allDay.height
         if 3...4 ~= maxEvents {
@@ -292,6 +298,10 @@ extension TimelineView {
         }
     }
     
+    func getTimelineLabel(hour: Int) -> TimelineLabel? {
+        timeLabels.first(where: { $0.valueHash == hour.hashValue })
+    }
+    
     func createTimesLabel(start: Int) -> [TimelineLabel] {
         var times = [TimelineLabel]()
         for (idx, hour) in availabilityHours.enumerated() where idx >= start {
@@ -302,7 +312,7 @@ extension TimelineView {
                                                    width: style.timeline.widthTime,
                                                    height: style.timeline.heightTime))
             time.font = style.timeline.timeFont
-            time.textAlignment = .center
+            time.textAlignment = style.timeline.timeAlignment
             time.textColor = style.timeline.timeColor
             time.text = hour
             let hourTmp = TimeHourSystem.twentyFour.hours[idx]

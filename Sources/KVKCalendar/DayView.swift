@@ -89,7 +89,7 @@ final class DayView: UIView {
             timelineFrame.size.height -= scrollHeaderDay.frame.height
         }
         
-        if UIDevice.current.userInterfaceIdiom == .pad {
+        if UIDevice.current.userInterfaceIdiom != .phone {
             if UIDevice.current.orientation.isPortrait {
                 timelineFrame.size.width = UIScreen.main.bounds.width * 0.5
             } else {
@@ -344,8 +344,8 @@ extension DayView: CalendarSettingProtocol {
         timelinePage.frame = timelineFrame
         timelinePage.timelineView?.reloadFrame(CGRect(origin: .zero, size: timelineFrame.size))
         timelinePage.timelineView?.create(dates: [parameters.data.date],
-                                           events: parameters.data.events,
-                                           selectedDate: parameters.data.date)
+                                          events: parameters.data.events,
+                                          selectedDate: parameters.data.date)
         timelinePage.reloadCacheControllers()
     }
     

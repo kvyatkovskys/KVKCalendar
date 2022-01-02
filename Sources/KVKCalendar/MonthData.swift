@@ -138,11 +138,15 @@ final class MonthData: EventDateProtocol {
                             && (date.compare(event.start) == .orderedDescending
                                 || showRecurringEventInPast) else { return acc }
                     
-                    guard let recurringEvent = event.updateDate(newDate: day.date, calendar: calendar) else {
+                    guard let recurringEvent = event.updateDate(newDate: date, calendar: calendar) else {
                         return acc
                     }
                     
-                    return acc + [recurringEvent]
+                    if recurringEvent.start.day != recurringEvent.end.day {
+                        return acc + [recurringEvent, recurringEvent]
+                    } else {
+                        return acc + [recurringEvent]
+                    }
                 })
             } else {
                 recurringEventByDate = []
