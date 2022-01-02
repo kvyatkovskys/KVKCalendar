@@ -288,7 +288,7 @@ extension ViewController {
                 event.textForList = item.title
             } else {
                 event.text = "\(startTime) - \(endTime)\n\(item.title)"
-                event.textForList = "\(startTime) - \(endTime)   \(item.title)"
+                event.textForList = "\(startTime) - \(endTime) \(item.title)"
             }
             
             if item.id == "14" {

@@ -150,6 +150,7 @@ public struct TimelineStyle {
     public var offsetTimeX: CGFloat = 10
     public var offsetTimeY: CGFloat = 25
     public var timeColor: UIColor = .systemGray
+    public var timeAlignment: NSTextAlignment = .center
     public var timeFont: UIFont = .systemFont(ofSize: 12)
     public var widthEventViewer: CGFloat? = nil
     
