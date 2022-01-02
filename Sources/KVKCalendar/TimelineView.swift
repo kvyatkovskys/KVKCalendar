@@ -318,20 +318,23 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             let recurringEventsByDate: [Event]
             if !recurringEvents.isEmpty, let dt = date {
                 recurringEventsByDate = recurringEvents.reduce([], { (acc, event) -> [Event] in
-                    guard dt.compare(event.start) == .orderedDescending
-                            || style.event.showRecurringEventInPast else { return acc }
+                    // check the first recurring event
+                    guard !eventsByDate.contains(where: { $0.ID == event.ID })
+                            && (dt.compare(event.start) == .orderedDescending
+                                || style.event.showRecurringEventInPast) else { return acc }
                     
                     guard let recurringEvent = event.updateDate(newDate: dt, calendar: style.calendar) else {
                         return acc
                     }
                     
-                    var test = [recurringEvent]
+                    var result = [recurringEvent]
+                    let previousDate = style.calendar.date(byAdding: .day, value: -1, to: dt)
                     if recurringEvent.start.day != recurringEvent.end.day,
-                       let recurringEvent2 = event.updateDate(newDate: style.calendar.date(byAdding: .day, value: -1, to: dt) ?? dt, calendar: style.calendar)
+                       let recurringPrevEvent = event.updateDate(newDate: previousDate ?? dt, calendar: style.calendar)
                     {
-                        test.append(recurringEvent2)
+                        result.append(recurringPrevEvent)
                     }
-                    return acc + test
+                    return acc + result
                 })
             } else {
                 recurringEventsByDate = []
@@ -415,7 +418,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         }
         
         showCurrentLineHour()
-        addStubInvisibleEvents()
+        addStubForInvisibleEvents()
     }
 }
 

@@ -189,19 +189,16 @@ extension MonthView: CalendarSettingProtocol {
         self.frame = frame
         var collectionFrame = frame
         
-        if style.month.isHiddenSectionHeader {
-            headerViewFrame.size.width = frame.width
-            if let customHeaderView = dataSource?.willDisplayHeaderSubview(date: parameters.monthData.date, frame: headerViewFrame, type: .month) {
-                headerViewFrame = customHeaderView.frame
-                addSubview(customHeaderView)
-            } else {
-                headerView.reloadFrame(frame)
-            }
-            
-            collectionFrame.origin.y = headerViewFrame.height
-            collectionFrame.size.height = collectionFrame.height - headerViewFrame.height
+        headerViewFrame.size.width = frame.width
+        if let customHeaderView = dataSource?.willDisplayHeaderSubview(date: parameters.monthData.date, frame: headerViewFrame, type: .month) {
+            headerViewFrame = customHeaderView.frame
+            addSubview(customHeaderView)
+        } else {
+            headerView.reloadFrame(frame)
         }
         
+        collectionFrame.origin.y = headerViewFrame.height
+        collectionFrame.size.height = collectionFrame.height - headerViewFrame.height
         
         collectionView?.removeFromSuperview()
         collectionView = nil
@@ -231,29 +228,27 @@ extension MonthView: CalendarSettingProtocol {
         collectionView = nil
         var collectionFrame = frame
         
-        if style.month.isHiddenSectionHeader {
-            let height: CGFloat
-            if style.month.isHiddenTitleHeader {
-                height = style.month.heightHeaderWeek
-            } else {
-                height = style.month.heightHeaderWeek + style.month.heightTitleHeader + 5
-            }
-            headerViewFrame = CGRect(x: 0, y: 0, width: frame.width, height: height)
-            
-            if let customHeaderView = dataSource?.willDisplayHeaderSubview(date: parameters.monthData.date,
-                                                                           frame: headerViewFrame,
-                                                                           type: .month)
-            {
-                headerViewFrame = customHeaderView.frame
-                addSubview(customHeaderView)
-            } else {
-                headerView.frame = headerViewFrame
-                addSubview(headerView)
-            }
-            
-            collectionFrame.origin.y = headerViewFrame.height
-            collectionFrame.size.height = collectionFrame.height - headerViewFrame.height
+        let height: CGFloat
+        if style.month.isHiddenTitleHeader {
+            height = style.month.heightHeaderWeek
+        } else {
+            height = style.month.heightHeaderWeek + style.month.heightTitleHeader + 5
         }
+        headerViewFrame = CGRect(x: 0, y: 0, width: frame.width, height: height)
+        
+        if let customHeaderView = dataSource?.willDisplayHeaderSubview(date: parameters.monthData.date,
+                                                                       frame: headerViewFrame,
+                                                                       type: .month)
+        {
+            headerViewFrame = customHeaderView.frame
+            addSubview(customHeaderView)
+        } else {
+            headerView.frame = headerViewFrame
+            addSubview(headerView)
+        }
+        
+        collectionFrame.origin.y = headerViewFrame.height
+        collectionFrame.size.height = collectionFrame.height - headerViewFrame.height
         
         collectionView = createCollectionView(frame: collectionFrame, style: style.month)
         if let tempView = collectionView {
