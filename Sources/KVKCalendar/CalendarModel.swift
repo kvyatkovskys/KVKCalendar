@@ -155,13 +155,13 @@ public struct Event {
 
 extension Event {
     var hash: Int {
-        return ID.hashValue
+        ID.hashValue
     }
 }
 
 public extension Event {
     var isNew: Bool {
-        return ID == Event.idForNewEvent
+        ID == Event.idForNewEvent
     }
     
     enum RecurringType: Int {
@@ -186,7 +186,7 @@ public enum RecurringType: Int {
 
 extension Event: EventProtocol {
     public func compare(_ event: Event) -> Bool {
-        return hash == event.hash
+        hash == event.hash
     }
 }
 
@@ -338,9 +338,7 @@ public extension CalendarDataSource {
     func dequeueHeader<T: UIScrollView>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarHeaderProtocol? { nil }
     
     @available(iOS 14.0, *)
-    func willDisplayEventOptionMenu(_ event: Event, type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)? {
-        nil
-    }
+    func willDisplayEventOptionMenu(_ event: Event, type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)? { nil }
     
     func dequeueMonthViewEvents(_ events: [Event], date: Date, frame: CGRect) -> UIView? { nil }
 }

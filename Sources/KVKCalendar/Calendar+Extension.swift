@@ -49,7 +49,7 @@ extension CalendarTimer {
 extension UIScrollView {
     
    var currentPage: Int {
-      return Int((contentOffset.x + (0.5 * frame.width)) / frame.width) + 1
+       Int((contentOffset.x + (0.5 * frame.width)) / frame.width) + 1
    }
     
 }
@@ -65,8 +65,7 @@ extension UIApplication {
                 .filter({ $0.isKeyWindow }).first
             {
                 return keyWindow.safeAreaInsets.bottom > 0
-            } else if let keyWindow = UIApplication.shared.windows.first(where: { $0.isKeyWindow })
-            {
+            } else if let keyWindow = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) {
                 return keyWindow.safeAreaInsets.bottom > 0
             } else {
                 return false

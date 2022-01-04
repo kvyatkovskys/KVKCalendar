@@ -85,9 +85,8 @@ final class EventView: EventViewGeneral {
                 iconFileImageView.isHidden = true
             }
         }
-        #if !targetEnvironment(macCatalyst)
+        
         button.menu = menu
-        #endif
         addSubview(button)
     }
     

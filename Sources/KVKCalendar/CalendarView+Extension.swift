@@ -130,6 +130,10 @@ extension CalendarView {
     
     // MARK: Private methods
     
+    private var calendarQueue: DispatchQueue {
+        DispatchQueue(label: "kvk.calendar.com", qos: .default, attributes: .concurrent)
+    }
+    
     private func getSystemEvents(store: EKEventStore, calendars: Set<String>, completion: @escaping ([EKEvent]) -> Void) {
         guard !calendars.isEmpty else {
             completion([])
@@ -142,7 +146,7 @@ extension CalendarView {
             return
         }
         
-        DispatchQueue.global().async { [weak self] in
+        calendarQueue.async { [weak self] in
             guard let self = self else {
                 completion([])
                 return
@@ -173,7 +177,9 @@ extension CalendarView {
         }
     }
     
-    private func requestAccessSystemCalendars(_ calendars: Set<String>, store: EKEventStore, completion: @escaping (Bool) -> Void) {
+    private func requestAccessSystemCalendars(_ calendars: Set<String>,
+                                              store: EKEventStore,
+                                              completion: @escaping (Bool) -> Void) {
         let status = EKEventStore.authorizationStatus(for: .event)
         
         store.requestAccess(to: .event) { (access, error) in
