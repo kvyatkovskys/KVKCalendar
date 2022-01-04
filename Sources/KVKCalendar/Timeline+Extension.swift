@@ -58,6 +58,8 @@ extension TimelineView: UIScrollViewDelegate {
             stack.top.subviews.filter { ($0 as? StubEventView)?.valueHash == eventView.event.hash }.forEach { $0.removeFromSuperview() }
             stack.bottom.subviews.filter { ($0 as? StubEventView)?.valueHash == eventView.event.hash }.forEach { $0.removeFromSuperview() }
 
+            // TODO: need fix
+            // some recurring events are not displayed in top stack
             guard !visibleView(eventView.frame) else { return }
             
             let stubView = StubEventView(event: eventView.event,
@@ -259,8 +261,8 @@ extension TimelineView {
         eventView.deselectEvent()
     }
     
-    func createAllDayEvents(events: [AllDayView.PrepareEvents], maxEvents: Int) {
-        guard !events.allSatisfy({ $0.events.isEmpty }) else { return }
+    func createAllDayEvents(events: [AllDayView.PrepareEvents], maxEvents: Int) -> AllDayView? {
+        guard !events.allSatisfy({ $0.events.isEmpty }) else { return nil }
         
         var allDayHeight = style.allDay.height
         if 3...4 ~= maxEvents {
@@ -268,24 +270,26 @@ extension TimelineView {
         } else if maxEvents > 4 {
             allDayHeight = style.allDay.maxHeight
         }
-        let y: CGFloat
+        let yPoint: CGFloat
         if style.allDay.isPinned {
-            y = 0
+            yPoint = 0
         } else {
-            y = -allDayHeight
+            yPoint = -allDayHeight
         }
         
         let newAllDayView = AllDayView(parameters: .init(prepareEvents: events,
                                                          type: paramaters.type,
                                                          style: style,
                                                          delegate: delegate),
-                                       frame: CGRect(x: 0, y: y, width: bounds.width, height: allDayHeight))
+                                       frame: CGRect(x: 0, y: yPoint, width: bounds.width, height: allDayHeight))
         newAllDayView.tag = tagAllDayEventView
         if style.allDay.isPinned {
             addSubview(newAllDayView)
         } else {
             scrollView.addSubview(newAllDayView)
         }
+        
+        return newAllDayView
     }
     
     func getTimelineLabel(hour: Int) -> TimelineLabel? {

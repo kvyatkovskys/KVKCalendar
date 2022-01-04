@@ -34,11 +34,9 @@ open class EventViewGeneral: UIView, CalendarTimer {
     
     public let optionButton: UIButton = {
         let button = UIButton(type: .infoLight)
-        #if !targetEnvironment(macCatalyst)
         if #available(iOS 14.0, macCatalyst 14.0, *) {
             button.showsMenuAsPrimaryAction = true
         }
-        #endif
         return button
     }()
     

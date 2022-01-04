@@ -117,18 +117,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         stopTimer(timerKey)
     }
     
-    private func setOffsetScrollView(allDayEventsCount: Int) {
-        var offsetY: CGFloat = 0
-        if allDayEventsCount > 0 {
-            if 3...4 ~= allDayEventsCount {
-                offsetY = style.allDay.height * 2
-            } else if allDayEventsCount > 4 {
-                offsetY = style.allDay.maxHeight
-            } else {
-                offsetY = style.allDay.height
-            }
-        }
-        
+    private func setOffsetScrollView(offsetY: CGFloat) {
         switch paramaters.type {
         case .day:
             scrollView.contentInset = UIEdgeInsets(top: offsetY, left: 0, bottom: 0, right: 0)
@@ -286,6 +275,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         let widthPage = (frame.width - leftOffset) / CGFloat(dates.count)
         let heightPage = scrollView.contentSize.height
         var allDayEvents = [AllDayView.PrepareEvents]()
+        var topStackViews = [StubStackView]()
         
         // horror
         dates.enumerated().forEach { (idx, date) in
@@ -318,7 +308,8 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             let recurringEventsByDate: [Event]
             if !recurringEvents.isEmpty, let dt = date {
                 recurringEventsByDate = recurringEvents.reduce([], { (acc, event) -> [Event] in
-                    // check the first recurring event
+                    // TODO: need fix
+                    // there's still a problem with the second recurring event when an event is created for severel dates
                     guard !eventsByDate.contains(where: { $0.ID == event.ID })
                             && (dt.compare(event.start) == .orderedDescending
                                 || style.event.showRecurringEventInPast) else { return acc }
@@ -390,7 +381,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                 } else if maxAllDayEvents > 4 {
                     allDayHeight = style.allDay.maxHeight
                 } else {
-                    allDayHeight = 5
+                    allDayHeight += 5
                 }
                 let yPoint = topStabStackOffsetY(allDayEventsIsPinned: style.allDay.isPinned,
                                                  height: allDayHeight)
@@ -401,14 +392,22 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                                               width: widthPage - style.timeline.offsetEvent,
                                               height: style.event.heightStubView)
                 
-                addSubview(createStackView(day: day, type: .top, frame: topStackFrame))
+                let topStackView = createStackView(day: day, type: .top, frame: topStackFrame)
+                topStackViews.append(topStackView)
+                addSubview(topStackView)
                 addSubview(createStackView(day: day, type: .bottom, frame: bottomStackFrame))
             }
         }
         
         if let maxAllDayEvents = allDayEvents.max(by: { $0.events.count < $1.events.count })?.events.count {
-            setOffsetScrollView(allDayEventsCount: maxAllDayEvents)
-            createAllDayEvents(events: allDayEvents, maxEvents: maxAllDayEvents)
+            if let allDayView = createAllDayEvents(events: allDayEvents, maxEvents: maxAllDayEvents) {
+                let offsetY = allDayView.frame.origin.y + allDayView.frame.height
+                topStackViews.forEach {
+                    $0.frame.origin.y = offsetY + 5
+                }
+                
+                setOffsetScrollView(offsetY: offsetY)
+            }
         }
         
         if let preferredHour = style.timeline.scrollToHour, !style.timeline.startFromFirstEvent {
