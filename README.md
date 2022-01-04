@@ -14,7 +14,6 @@
 **Additional features:**
 - [x] Dark mode
 - [ ] Skeleton loading (month/list)
-- [x] Zoom (day/week)
 - [x] Custom event view
 - [x] Custom date cell
 - [x] Custom header view and collection view
