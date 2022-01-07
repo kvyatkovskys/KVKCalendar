@@ -19,7 +19,7 @@
 - [x] Custom header view and collection view
 - [x] Custom calendar localization
 - [x] Ability to set a divider line (day/week)
-- [x] UIMenu supports in event view (iOS 14.0 and above)
+- [x] UIMenu supports in event view (iOS/Mac Catalyst 14.0 and above)
 - [x] [Ability to configure the frame for viewing events](https://github.com/kvyatkovskys/KVKCalendar/pull/198)
 
 ## Need Help?
@@ -30,7 +30,7 @@ Please, use [Issues](https://github.com/kvyatkovskys/KVKCalendar/issues) only fo
 
 ## Requirements
 
-- iOS 10.0+, iPadOS 10.0+, MacOS 10.15+ (Supports Mac Catalyst 14.0)
+- iOS 10.0+, iPadOS 10.0+, MacOS 10.15+ (Supports Mac Catalyst)
 - Swift 5.0+
 
 ## Installation
