@@ -247,7 +247,7 @@ extension TimelineView {
     }
     
     func reloadTimeline() {
-        create(dates: dates, events: events, selectedDate: selectedDate)
+        create(dates: dates, events: events, recurringEvents: recurringEvents, selectedDate: selectedDate)
     }
     
     func deselectEvent(_ event: Event, animated: Bool) {
@@ -720,7 +720,7 @@ extension TimelineView: CalendarSettingProtocol {
     
     func reloadFrame(_ frame: CGRect) {
         self.frame.size = frame.size
-        scrollView.frame.size = frame.size
+        layoutIfNeeded()
         currentLineView.reloadFrame(frame)
     }
     

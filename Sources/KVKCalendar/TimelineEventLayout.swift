@@ -31,7 +31,7 @@ public extension TimelineEventLayoutContext {
         timeLabels.forEach { (time) in
             // calculate position 'y' event
             if start.hour.hashValue == time.valueHash && start.day == date?.day {
-                if time.tag == midnight, let newTime = timeLabels.first(where: { $0.tag == 0 }) {
+                if time.tag == midnight, let newTime = timeLabels.first {
                     newFrame.origin.y = calculatePointYByMinute(start.minute, newTime)
                 } else {
                     newFrame.origin.y = calculatePointYByMinute(start.minute, time)
@@ -47,7 +47,7 @@ public extension TimelineEventLayoutContext {
                 newFrame.size.height = globalDefaultHeight
             } else if end.hour.hashValue == time.valueHash, end.day == date?.day {
                 var timeTemp = time
-                if time.tag == midnight, let newTime = timeLabels.first(where: { $0.tag == 0 }) {
+                if time.tag == midnight, let newTime = timeLabels.first {
                     timeTemp = newTime
                 }
 

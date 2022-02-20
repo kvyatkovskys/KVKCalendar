@@ -9,10 +9,11 @@
 
 import Foundation
 
-struct DayData {
+final class DayData: EventDateProtocol {
     let days: [Day]
     var date: Date
     var events: [Event] = []
+    var recurringEvents: [Event] = []
     
     init(data: CalendarData, startDay: StartDayType) {
         self.date = data.date
@@ -21,6 +22,14 @@ struct DayData {
         let endWeek = data.addEndEmptyDays(Array(tempDays[startIdx..<tempDays.count]), startDay: startDay)
         tempDays.removeSubrange(startIdx..<tempDays.count)
         self.days = data.addStartEmptyDays(tempDays, startDay: startDay) + endWeek
+    }
+    
+    func filterEvents(_ events: [Event], date: Date) -> [Event] {
+        events.filter { (event) -> Bool in
+            compareStartDate(date, with: event)
+            || compareEndDate(date, with: event)
+            || checkMultipleDate(date, with: event)
+        }
     }
 }
 

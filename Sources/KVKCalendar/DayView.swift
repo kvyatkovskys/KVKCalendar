@@ -152,16 +152,17 @@ final class DayView: UIView {
             switch type {
             case .next:
                 nextDate = self.style.calendar.date(byAdding: .day,
-                                                           value: 1,
-                                                           to: self.parameters.data.date)
+                                                    value: 1,
+                                                    to: self.parameters.data.date)
             case .previous:
                 nextDate = self.style.calendar.date(byAdding: .day,
-                                                           value: -1,
-                                                           to: self.parameters.data.date)
+                                                    value: -1,
+                                                    to: self.parameters.data.date)
             }
             
             timeline.create(dates: [nextDate],
                             events: self.parameters.data.events,
+                            recurringEvents: self.parameters.data.recurringEvents,
                             selectedDate: self.parameters.data.date)
         }
     }
@@ -176,10 +177,12 @@ final class DayView: UIView {
     }
     
     func reloadData(_ events: [Event]) {
-        parameters.data.events = events
+        parameters.data.recurringEvents = events.filter { $0.recurringType != .none }
+        parameters.data.events = parameters.data.filterEvents(events, date: parameters.data.date)
         timelinePage.timelineView?.create(dates: [parameters.data.date],
-                                           events: events,
-                                           selectedDate: parameters.data.date)
+                                          events: parameters.data.events,
+                                          recurringEvents: parameters.data.recurringEvents,
+                                          selectedDate: parameters.data.date)
     }
     
     func reloadEventViewer() {
@@ -255,7 +258,7 @@ extension DayView: TimelineDelegate {
         endComponents.hour = endTime.hour
         endComponents.minute = endTime.minute
         let endDate = style.calendar.date(from: endComponents)
-                
+        
         delegate?.didChangeEvent(event, start: startDate, end: endDate)
     }
     
@@ -288,7 +291,7 @@ extension DayView: TimelineDelegate {
         endComponents.hour = hour + hourOffset
         endComponents.minute = minute + minuteOffset
         let endDate = style.calendar.date(from: endComponents)
-                
+        
         delegate?.didChangeEvent(event, start: startDate, end: endDate)
     }
     
@@ -345,6 +348,7 @@ extension DayView: CalendarSettingProtocol {
         timelinePage.timelineView?.reloadFrame(CGRect(origin: .zero, size: timelineFrame.size))
         timelinePage.timelineView?.create(dates: [parameters.data.date],
                                           events: parameters.data.events,
+                                          recurringEvents: parameters.data.recurringEvents,
                                           selectedDate: parameters.data.date)
         timelinePage.reloadCacheControllers()
     }
