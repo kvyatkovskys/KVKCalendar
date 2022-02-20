@@ -160,6 +160,7 @@ final class WeekView: UIView {
             
             timeline.create(dates: self.getVisibleDatesFor(date: nextDate ?? self.parameters.data.date),
                             events: self.parameters.data.events,
+                            recurringEvents: parameters.data.recurringEvents,
                             selectedDate: self.parameters.data.date)
         }
     }
@@ -171,17 +172,19 @@ final class WeekView: UIView {
     }
     
     func reloadData(_ events: [Event]) {
-        parameters.data.events = events
+        parameters.data.recurringEvents = events.filter { $0.recurringType != .none }
+        parameters.data.events = parameters.data.filterEvents(events, dates: parameters.visibleDates)
         timelinePage.timelineView?.create(dates: parameters.visibleDates,
-                                           events: events,
-                                           selectedDate: parameters.data.date)
+                                          events: parameters.data.events,
+                                          recurringEvents: parameters.data.recurringEvents,
+                                          selectedDate: parameters.data.date)
     }
     
     private func getVisibleDatesFor(date: Date) -> [Date?] {
         guard let scrollDate = getScrollDate(date: date),
               let idx = parameters.data.days.firstIndex(where: { $0.date?.year == scrollDate.year
-                && $0.date?.month == scrollDate.month
-                && $0.date?.day == scrollDate.day }) else { return [] }
+                  && $0.date?.month == scrollDate.month
+                  && $0.date?.day == scrollDate.day }) else { return [] }
         
         var endIdx = idx + 7
         if endIdx > parameters.data.days.count {
@@ -247,8 +250,9 @@ extension WeekView: CalendarSettingProtocol {
         timelinePage.frame = timelineFrame
         timelinePage.timelineView?.reloadFrame(CGRect(origin: .zero, size: timelineFrame.size))
         timelinePage.timelineView?.create(dates: parameters.visibleDates,
-                                           events: parameters.data.events,
-                                           selectedDate: parameters.data.date)
+                                          events: parameters.data.events,
+                                          recurringEvents: parameters.data.recurringEvents,
+                                          selectedDate: parameters.data.date)
         timelinePage.reloadCacheControllers()
     }
     
@@ -312,7 +316,7 @@ extension WeekView: TimelineDelegate {
         endComponents.hour = endTime.hour
         endComponents.minute = endTime.minute
         let endDate = style.calendar.date(from: endComponents)
-                
+        
         delegate?.didChangeEvent(event, start: startDate, end: endDate)
     }
     

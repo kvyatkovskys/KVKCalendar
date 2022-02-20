@@ -53,6 +53,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     private var timeSystem: TimeHourSystem
     private let timerKey = "CurrentHourTimerKey"
     private(set) var events = [Event]()
+    private(set) var recurringEvents = [Event]()
     private(set) var dates = [Date?]()
     private(set) var selectedDate: Date?
     private(set) var eventLayout: TimelineEventLayout
@@ -94,11 +95,17 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         self.eventLayout = parameters.style.timeline.eventLayout
         super.init(frame: frame)
         
-        var scrollFrame = frame
-        scrollFrame.origin.y = 0
-        scrollView.frame = scrollFrame
         addSubview(scrollView)
         setUI()
+        
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        
+        let top = scrollView.topAnchor.constraint(equalTo: self.topAnchor)
+        let left = scrollView.leftAnchor.constraint(equalTo: self.leftAnchor)
+        let right = scrollView.rightAnchor.constraint(equalTo: self.rightAnchor)
+        let bottom = scrollView.bottomAnchor.constraint(equalTo: self.bottomAnchor)
+        
+        NSLayoutConstraint.activate([top, left, right, bottom])
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(forceDeselectEvent))
         addGestureRecognizer(tap)
@@ -220,13 +227,16 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         scrollView.scrollRectToVisible(frame, animated: true)
     }
     
-    func create(dates: [Date?], events: [Event], selectedDate: Date?) {
+    func create(dates: [Date?], events: [Event], recurringEvents: [Event], selectedDate: Date?) {
         isResizeEnableMode = false
         delegate?.didDisplayEvents(events, dates: dates)
         
         self.dates = dates
         self.events = events
+        self.recurringEvents = recurringEvents
         self.selectedDate = selectedDate
+        let keyAllDayEvents = "allDayEvents"
+        let keyEvents = "events"
         
         if style.allDay.isPinned {
             subviews.filter { $0.tag == tagAllDayEventView }.forEach { $0.removeFromSuperview() }
@@ -235,15 +245,28 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         scrollView.subviews.forEach { $0.removeFromSuperview() }
         
         // filtering events
-        let recurringEvents = events.filter { $0.recurringType != .none }
-        let allEventsForDates = events.filter { (event) -> Bool in
-            dates.contains(where: { compareStartDate($0, with: event)
-                || compareEndDate($0, with: event)
-                || (checkMultipleDate($0, with: event)
-                    && paramaters.type == .day) })
+        let eventValues = events.reduce([:]) { (acc, event) -> [String: [Event]] in
+            var accTemp = acc
+            if event.isAllDay {
+                if var values = accTemp[keyAllDayEvents] {
+                    values.append(event)
+                    accTemp[keyAllDayEvents] = values
+                } else {
+                    accTemp[keyAllDayEvents] = [event]
+                }
+            } else {
+                if var values = accTemp[keyEvents] {
+                    values.append(event)
+                    accTemp[keyEvents] = values
+                } else {
+                    accTemp[keyEvents] = [event]
+                }
+            }
+            return accTemp
         }
-        let filteredEvents = allEventsForDates.filter { !$0.isAllDay }
-        let filteredAllDayEvents = allEventsForDates.filter { $0.isAllDay }
+        
+        let filteredEvents = eventValues[keyEvents] ?? []
+        let filteredAllDayEvents = eventValues[keyAllDayEvents] ?? []
         
         // calculate a start hour
         let startHour: Int
@@ -277,7 +300,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         var allDayEvents = [AllDayView.PrepareEvents]()
         var topStackViews = [StubStackView]()
         
-        // horror
+        // horror 👹
         dates.enumerated().forEach { (idx, date) in
             let pointX: CGFloat
             if idx == 0 {
@@ -331,8 +354,28 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                 recurringEventsByDate = []
             }
                         
-            let filteredRecurringEvents = recurringEventsByDate.filter { !$0.isAllDay }
-            let filteredAllDayRecurringEvents = recurringEventsByDate.filter { $0.isAllDay }
+            let recurringValues = recurringEventsByDate.reduce([:]) { (acc, event) -> [String: [Event]] in
+                var accTemp = acc
+                if event.isAllDay {
+                    if var values = accTemp[keyAllDayEvents] {
+                        values.append(event)
+                        accTemp[keyAllDayEvents] = values
+                    } else {
+                        accTemp[keyAllDayEvents] = [event]
+                    }
+                } else {
+                    if var values = accTemp[keyEvents] {
+                        values.append(event)
+                        accTemp[keyEvents] = values
+                    } else {
+                        accTemp[keyEvents] = [event]
+                    }
+                }
+                return accTemp
+            }
+            
+            let filteredRecurringEvents = recurringValues[keyEvents] ?? []
+            let filteredAllDayRecurringEvents = recurringValues[keyAllDayEvents] ?? []
             let sortedEventsByDate = (eventsByDate + filteredRecurringEvents).sorted(by: { $0.start < $1.start })
             
             // creating an all day events
@@ -399,15 +442,14 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             }
         }
         
-        if let maxAllDayEvents = allDayEvents.max(by: { $0.events.count < $1.events.count })?.events.count {
-            if let allDayView = createAllDayEvents(events: allDayEvents, maxEvents: maxAllDayEvents) {
-                let offsetY = allDayView.frame.origin.y + allDayView.frame.height
-                topStackViews.forEach {
-                    $0.frame.origin.y = offsetY + 5
-                }
-                
-                setOffsetScrollView(offsetY: offsetY)
+        if let maxAllDayEvents = allDayEvents.max(by: { $0.events.count < $1.events.count })?.events.count,
+           let allDayView = createAllDayEvents(events: allDayEvents, maxEvents: maxAllDayEvents) {
+            let offsetY = allDayView.frame.origin.y + allDayView.frame.height
+            topStackViews.forEach {
+                $0.frame.origin.y = offsetY + 5
             }
+            
+            setOffsetScrollView(offsetY: offsetY)
         }
         
         if let preferredHour = style.timeline.scrollToHour, !style.timeline.startFromFirstEvent {
