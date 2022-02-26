@@ -235,8 +235,6 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         self.events = events
         self.recurringEvents = recurringEvents
         self.selectedDate = selectedDate
-        let keyAllDayEvents = "allDayEvents"
-        let keyEvents = "events"
         
         if style.allDay.isPinned {
             subviews.filter { $0.tag == tagAllDayEventView }.forEach { $0.removeFromSuperview() }
@@ -245,28 +243,9 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         scrollView.subviews.forEach { $0.removeFromSuperview() }
         
         // filtering events
-        let eventValues = events.reduce([:]) { (acc, event) -> [String: [Event]] in
-            var accTemp = acc
-            if event.isAllDay {
-                if var values = accTemp[keyAllDayEvents] {
-                    values.append(event)
-                    accTemp[keyAllDayEvents] = values
-                } else {
-                    accTemp[keyAllDayEvents] = [event]
-                }
-            } else {
-                if var values = accTemp[keyEvents] {
-                    values.append(event)
-                    accTemp[keyEvents] = values
-                } else {
-                    accTemp[keyEvents] = [event]
-                }
-            }
-            return accTemp
-        }
-        
-        let filteredEvents = eventValues[keyEvents] ?? []
-        let filteredAllDayEvents = eventValues[keyAllDayEvents] ?? []
+        let eventValues = events.splitEvents
+        let filteredEvents = eventValues[.usual] ?? []
+        let filteredAllDayEvents = eventValues[.allDay] ?? []
         
         // calculate a start hour
         let startHour: Int
@@ -354,32 +333,13 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                 recurringEventsByDate = []
             }
                         
-            let recurringValues = recurringEventsByDate.reduce([:]) { (acc, event) -> [String: [Event]] in
-                var accTemp = acc
-                if event.isAllDay {
-                    if var values = accTemp[keyAllDayEvents] {
-                        values.append(event)
-                        accTemp[keyAllDayEvents] = values
-                    } else {
-                        accTemp[keyAllDayEvents] = [event]
-                    }
-                } else {
-                    if var values = accTemp[keyEvents] {
-                        values.append(event)
-                        accTemp[keyEvents] = values
-                    } else {
-                        accTemp[keyEvents] = [event]
-                    }
-                }
-                return accTemp
-            }
-            
-            let filteredRecurringEvents = recurringValues[keyEvents] ?? []
-            let filteredAllDayRecurringEvents = recurringValues[keyAllDayEvents] ?? []
+            let recurringValues = recurringEventsByDate.splitEvents
+            let filteredRecurringEvents = recurringValues[.usual] ?? []
+            let filteredAllDayRecurringEvents = recurringValues[.allDay] ?? []
             let sortedEventsByDate = (eventsByDate + filteredRecurringEvents).sorted(by: { $0.start < $1.start })
-            
+            let groupAllEvents = allDayEventsForDate + filteredAllDayRecurringEvents
             // creating an all day events
-            allDayEvents.append(.init(events: allDayEventsForDate + filteredAllDayRecurringEvents,
+            allDayEvents.append(.init(events: groupAllEvents,
                                       date: date,
                                       xOffset: pointX - leftOffset,
                                       width: widthPage))
@@ -417,11 +377,11 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             }
             
             if !style.timeline.isHiddenStubEvent, let day = date?.day {
-                let maxAllDayEvents = allDayEvents.max(by: { $0.events.count < $1.events.count })?.events.count ?? 0
+                let maxAllDayEventsFordDate = groupAllEvents.count
                 var allDayHeight = style.allDay.height
-                if 3...4 ~= maxAllDayEvents {
+                if 3...4 ~= maxAllDayEventsFordDate {
                     allDayHeight *= 2
-                } else if maxAllDayEvents > 4 {
+                } else if maxAllDayEventsFordDate > 4 {
                     allDayHeight = style.allDay.maxHeight
                 } else {
                     allDayHeight += 5

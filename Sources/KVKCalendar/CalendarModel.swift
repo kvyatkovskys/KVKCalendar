@@ -154,6 +154,14 @@ public struct Event {
 }
 
 extension Event {
+    
+    enum EventType: String {
+        case allDay, usual
+    }
+    
+}
+
+extension Event {
     var hash: Int {
         ID.hashValue
     }
