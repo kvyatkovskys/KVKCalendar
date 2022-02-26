@@ -110,6 +110,32 @@ extension Collection {
     
 }
 
+extension Collection where Self == [Event] {
+    
+    var splitEvents: [Event.EventType: [Event]] {
+        reduce([:]) { (acc, event) -> [Event.EventType: [Event]] in
+            var accTemp = acc
+            if event.isAllDay {
+                if var values = accTemp[.allDay] {
+                    values.append(event)
+                    accTemp[.allDay] = values
+                } else {
+                    accTemp[.allDay] = [event]
+                }
+            } else {
+                if var values = accTemp[.usual] {
+                    values.append(event)
+                    accTemp[.usual] = values
+                } else {
+                    accTemp[.usual] = [event]
+                }
+            }
+            return accTemp
+        }
+    }
+    
+}
+
 extension UICollectionView {
     
     func kvkRegister<T: UICollectionViewCell>(_ cell: T.Type, id: String? = nil) {

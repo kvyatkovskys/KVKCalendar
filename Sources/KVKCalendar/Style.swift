@@ -491,7 +491,6 @@ public struct EventStyle {
     public var showRecurringEventInPast: Bool = false
     
     var defaultWidth: CGFloat? = nil
-    var isEnableContextMenu: Bool = false
 }
 
 // MARK: List View Style
