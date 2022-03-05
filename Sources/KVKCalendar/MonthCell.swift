@@ -166,7 +166,7 @@ final class MonthCell: KVKCollectionViewCell {
                         label.textAlignment = .left
                         label.backgroundColor = event.color?.value ?? .systemGray
                         label.textColor = allDayStyle.textColor
-                        label.text = " \(event.text) "
+                        label.text = " \(event.title.timeline) "
                         label.setRoundCorners(monthStyle.eventCorners, radius: monthStyle.eventCornersRadius)
                     }
                     
@@ -423,7 +423,7 @@ final class MonthCell: KVKCollectionViewCell {
             if monthStyle.isHiddenEventTitle {
                 text = ""
             } else {
-                text = event.textForMonth
+                text = event.title.month ?? ""
             }
             
             let formattedString: String
@@ -436,7 +436,7 @@ final class MonthCell: KVKCollectionViewCell {
             let string: NSString = NSString(string: formattedString)
             
             let rangeForText = NSMakeRange(0, attributedString.length)
-            attributedString.addAttributes([NSAttributedString.Key.paragraphStyle: paragraphStyle], range: rangeForText)
+            attributedString.addAttributes([.paragraphStyle: paragraphStyle], range: rangeForText)
             attributedString.addAttributes(textAttributes, range: rangeForText)
             
             if !monthStyle.isHiddenDotInTitle {

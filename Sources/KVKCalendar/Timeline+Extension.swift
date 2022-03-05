@@ -380,7 +380,7 @@ extension TimelineView {
         point.y = (point.y - eventPreviewYOffset) - style.timeline.offsetEvent - 6
         let time = calculateChangingTime(pointY: point.y)
         var newEvent = Event(ID: Event.idForNewEvent)
-        newEvent.text = style.event.textForNewEvent
+        newEvent.title = TextEvent(timeline: style.event.textForNewEvent)
         let newEventPreview = getEventView(style: style, event: newEvent, frame: CGRect(origin: point, size: eventPreviewSize))
         newEventPreview.stateEvent = .move
         newEventPreview.delegate = self

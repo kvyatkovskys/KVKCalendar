@@ -98,7 +98,7 @@ final class DayView: UIView {
         }
         
         let timelineViews = Array(0..<style.timeline.maxLimitCachedPages).reduce([]) { (acc, _) -> [TimelineView] in
-            return acc + [createTimelineView(frame: timelineFrame)]
+            acc + [createTimelineView(frame: timelineFrame)]
         }
         let page = TimelinePageView(maxLimit: style.timeline.maxLimitCachedPages,
                                     pages: timelineViews,

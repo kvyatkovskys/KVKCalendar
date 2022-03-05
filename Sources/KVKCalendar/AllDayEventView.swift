@@ -36,7 +36,7 @@ final class AllDayEventView: UIView {
         bgView.addSubview(textLabel)
         
         textLabel.backgroundColor = event.backgroundColor
-        textLabel.text = event.text
+        textLabel.text = event.title.timeline
         textLabel.textColor = event.textColor
         textLabel.font = style.fontTitle
         

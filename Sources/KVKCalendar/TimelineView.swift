@@ -27,6 +27,10 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         didSet {
             timeSystem = paramaters.style.timeSystem
             availabilityHours = timeSystem.hours
+            
+            if oldValue.scale != paramaters.scale {
+                didChangeScale?(paramaters.scale)
+            }
         }
     }
     var eventPreview: UIView?
@@ -100,10 +104,10 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         
-        let top = scrollView.topAnchor.constraint(equalTo: self.topAnchor)
-        let left = scrollView.leftAnchor.constraint(equalTo: self.leftAnchor)
-        let right = scrollView.rightAnchor.constraint(equalTo: self.rightAnchor)
-        let bottom = scrollView.bottomAnchor.constraint(equalTo: self.bottomAnchor)
+        let top = scrollView.topAnchor.constraint(equalTo: topAnchor)
+        let left = scrollView.leftAnchor.constraint(equalTo: leftAnchor)
+        let right = scrollView.rightAnchor.constraint(equalTo: rightAnchor)
+        let bottom = scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
         
         NSLayoutConstraint.activate([top, left, right, bottom])
         
