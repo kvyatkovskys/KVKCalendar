@@ -27,7 +27,7 @@ public enum TimeHourSystem: Int {
     var hours: [String] {
         switch self {
         case .twelveHour, .twelve:
-            let array = ["12"] + Array(1...11).map({ String($0) })
+            let array = ["12"] + Array(1...11).map { String($0) }
             let am = array.map { $0 + " AM" } + ["Noon"]
             var pm = array.map { $0 + " PM" }
             
@@ -37,26 +37,19 @@ public enum TimeHourSystem: Int {
             }
             return am + pm
         case .twentyFourHour, .twentyFour:
-            let array = ["00:00"] + Array(1...24).map({ (i) -> String in
+            let array = ["00:00"] + Array(1...24).map { (i) -> String in
                 let i = i % 24
                 var string = i < 10 ? "0" + "\(i)" : "\(i)"
                 string.append(":00")
                 return string
-            })
+            }
             return array
         }
     }
     
-    @available(*, deprecated, renamed: "current")
+    @available(swift, deprecated: 0.5.8, obsoleted: 0.5.9, renamed: "current")
     public static var currentSystemOnDevice: TimeHourSystem? {
-        let locale = NSLocale.current
-        guard let formatter = DateFormatter.dateFormat(fromTemplate: "j", options: 0, locale: locale) else { return nil }
-        
-        if formatter.contains("a") {
-            return .twelve
-        } else {
-            return .twentyFour
-        }
+        current
     }
     
     public static var current: TimeHourSystem? {
@@ -97,12 +90,28 @@ public struct EventColor {
     }
 }
 
+public struct TextEvent {
+    public let timeline: String
+    public let month: String?
+    public let list: String?
+    
+    public init(timeline: String = "", month: String? = nil, list: String? = nil) {
+        self.timeline = timeline
+        self.month = month
+        self.list = list
+    }
+}
+
 public struct Event {
     static let idForNewEvent = "-999"
     
     /// unique identifier of Event
     public var ID: String
+    
+    @available(swift, deprecated: 0.5.8, obsoleted: 0.5.9, renamed: "title")
     public var text: String = ""
+    public var title: TextEvent = TextEvent()
+    
     public var start: Date = Date()
     public var end: Date = Date()
     public var color: Event.Color? = Event.Color(.systemBlue) {
@@ -114,11 +123,14 @@ public struct Event {
             textColor = value.text
         }
     }
-    public var backgroundColor: UIColor = UIColor.systemBlue.withAlphaComponent(0.3)
+    public var backgroundColor: UIColor = .systemBlue.withAlphaComponent(0.3)
     public var textColor: UIColor = .white
     public var isAllDay: Bool = false
     public var isContainsFile: Bool = false
+    
+    @available(swift, deprecated: 0.5.8, obsoleted: 0.5.9, renamed: "title")
     public var textForMonth: String = ""
+    @available(swift, deprecated: 0.5.8, obsoleted: 0.5.9, renamed: "title")
     public var textForList: String = ""
     
     @available(swift, deprecated: 0.4.6, obsoleted: 0.4.7, renamed: "data")
@@ -460,13 +472,13 @@ extension DisplayDelegate {
 public extension EKEvent {
     func transform(text: String? = nil, textForMonth: String? = nil, textForList: String? = nil) -> Event {
         var event = Event(ID: eventIdentifier)
-        event.text = text ?? title
+        event.title = TextEvent(timeline: text ?? title,
+                                month: textForMonth ?? title,
+                                list: textForList ?? title)
         event.start = startDate
         event.end = endDate
         event.color = Event.Color(UIColor(cgColor: calendar.cgColor))
         event.isAllDay = isAllDay
-        event.textForMonth = textForMonth ?? title
-        event.textForList = textForList ?? title
         return event
     }
 }

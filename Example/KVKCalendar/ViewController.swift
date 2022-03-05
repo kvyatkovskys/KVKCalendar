@@ -51,18 +51,15 @@ final class ViewController: UIViewController {
     
     private lazy var segmentedControl: UISegmentedControl = {
         let array = CalendarType.allCases
-        let control = UISegmentedControl(items: array.map({ $0.rawValue.capitalized }))
+        let control = UISegmentedControl(items: array.map { $0.rawValue.capitalized })
         control.tintColor = .systemRed
         control.selectedSegmentIndex = 0
         control.addTarget(self, action: #selector(switchCalendar), for: .valueChanged)
         return control
     }()
     
-    private var eventViewer: EventViewer = {
-        let view = EventViewer()
-        return view
-    }()
-        
+    private var eventViewer = EventViewer()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -74,7 +71,7 @@ final class ViewController: UIViewController {
         view.addSubview(calendarView)
         navigationItem.titleView = segmentedControl
         navigationItem.rightBarButtonItems = [todayButton, reloadStyle]
-                
+        
         loadEvents { (events) in
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
                 self?.events = events
@@ -127,9 +124,9 @@ extension ViewController: CalendarDelegate {
         let endTime = timeFormatter(date: endTemp)
         eventTemp.start = startTemp
         eventTemp.end = endTemp
-        eventTemp.text = "\(startTime) - \(endTime)\n new time"
-        eventTemp.textForList = "\(startTime) - \(endTime)\n new time"
-        eventTemp.textForMonth = "\(startTime) - \(endTime)\n new time"
+        eventTemp.title = TextEvent(timeline: "\(startTime) - \(endTime)\n new time",
+                                    month: "\(startTime) - \(endTime)\n new time",
+                                    list: "\(startTime) - \(endTime)\n new time")
         
         if let idx = events.firstIndex(where: { $0.compare(eventTemp) }) {
             events.remove(at: idx)
@@ -147,7 +144,7 @@ extension ViewController: CalendarDelegate {
         print(type, event)
         switch type {
         case .day:
-            eventViewer.text = event.text
+            eventViewer.text = event.title.timeline
         default:
             break
         }
@@ -169,15 +166,15 @@ extension ViewController: CalendarDelegate {
         var newEvent = event
         
         guard let start = date, let end = Calendar.current.date(byAdding: .minute, value: 30, to: start) else { return }
-
+        
         let startTime = timeFormatter(date: start)
         let endTime = timeFormatter(date: end)
         newEvent.start = start
         newEvent.end = end
         newEvent.ID = "\(events.count + 1)"
-        newEvent.text = "\(startTime) - \(endTime)\n new event"
-        newEvent.textForList = "\(startTime) - \(endTime)\n new time"
-        newEvent.textForMonth = "\(startTime) - \(endTime)\n new time"
+        newEvent.title = TextEvent(timeline: "\(startTime) - \(endTime)\n new time",
+                                   month: "\(startTime) - \(endTime)\n new time",
+                                   list: "\(startTime) - \(endTime)\n new time")
         events.append(newEvent)
         calendarView.reloadData()
     }
@@ -196,7 +193,7 @@ extension ViewController: CalendarDataSource {
         
         return (UIMenu(title: "Test menu", children: [action]), nil)
     }
-        
+    
     func eventsForCalendar(systemEvents: [EKEvent]) -> [Event] {
         // if you want to get a system events, you need to set style.systemCalendars = ["test"]
         let mappedEvents = systemEvents.compactMap { (event) -> Event in
@@ -265,10 +262,10 @@ extension ViewController: CalendarDataSource {
 extension ViewController {
     func loadEvents(completion: ([Event]) -> Void) {
         let decoder = JSONDecoder()
-                
+        
         guard let path = Bundle.main.path(forResource: "events", ofType: "json"),
-            let data = try? Data(contentsOf: URL(fileURLWithPath: path), options: .mappedIfSafe),
-            let result = try? decoder.decode(ItemData.self, from: data) else { return }
+              let data = try? Data(contentsOf: URL(fileURLWithPath: path), options: .mappedIfSafe),
+              let result = try? decoder.decode(ItemData.self, from: data) else { return }
         
         let events = result.data.compactMap({ (item) -> Event in
             let startDate = formatter(date: item.start)
@@ -282,14 +279,15 @@ extension ViewController {
             event.color = Event.Color(item.color)
             event.isAllDay = item.allDay
             event.isContainsFile = !item.files.isEmpty
-            event.textForMonth = "\(item.title) \(startTime)"
             
             if item.allDay {
-                event.text = " \(item.title)"
-                event.textForList = item.title
+                event.title = TextEvent(timeline: " \(item.title)",
+                                        month: "\(item.title) \(startTime)",
+                                        list: item.title)
             } else {
-                event.text = "\(startTime) - \(endTime)\n\(item.title)"
-                event.textForList = "\(startTime) - \(endTime) \(item.title)"
+                event.title = TextEvent(timeline: "\(startTime) - \(endTime)\n\(item.title)",
+                                        month: "\(item.title) \(startTime)",
+                                        list: "\(startTime) - \(endTime) \(item.title)")
             }
             
             if item.id == "14" {

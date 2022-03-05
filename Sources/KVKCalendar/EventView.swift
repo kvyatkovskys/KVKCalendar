@@ -46,7 +46,7 @@ final class EventView: EventViewGeneral {
         textFrame.size.width = textFrame.width - pointX
         textView.frame = textFrame
         textView.font = style.timeline.eventFont
-        textView.text = event.text
+        textView.text = event.title.timeline
         
         if isSelected {
             backgroundColor = color

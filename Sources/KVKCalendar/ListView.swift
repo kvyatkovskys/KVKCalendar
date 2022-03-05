@@ -123,7 +123,7 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
             return cell
         } else {
             return tableView.kvkDequeueCell(indexPath: indexPath) { (cell: ListViewCell) in
-                cell.txt = event.textForList
+                cell.txt = event.title.list
                 cell.dotColor = event.color?.value
             }
         }
