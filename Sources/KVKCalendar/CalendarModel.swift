@@ -139,12 +139,31 @@ public struct Event {
     
     public var recurringType: Event.RecurringType = .none
     
-    ///individual event customization
+    ///custom style
     ///(in-progress) works only with a default height
     public var style: EventStyle? = nil
+    public var systemEvent: EKEvent? = nil
     
     public init(ID: String) {
         self.ID = ID
+        
+        if let tempColor = color {
+            let value = prepareColor(tempColor)
+            backgroundColor = value.background
+            textColor = value.text
+        }
+    }
+    
+    public init(event: EKEvent, monthTitle: String? = nil, listTitle: String? = nil) {
+        ID = event.eventIdentifier
+        title = TextEvent(timeline: event.title,
+                          month: monthTitle ?? event.title,
+                          list: listTitle ?? event.title)
+        start = event.startDate
+        end = event.endDate
+        color = Event.Color(UIColor(cgColor: event.calendar.cgColor))
+        isAllDay = event.isAllDay
+        systemEvent = event
         
         if let tempColor = color {
             let value = prepareColor(tempColor)
@@ -470,6 +489,7 @@ extension DisplayDelegate {
 // MARK: - EKEvent
 
 public extension EKEvent {
+    @available(swift, deprecated: 0.5.8, obsoleted: 0.5.9, message: "Please use a constructor Event(event: _)")
     func transform(text: String? = nil, textForMonth: String? = nil, textForList: String? = nil) -> Event {
         var event = Event(ID: eventIdentifier)
         event.title = TextEvent(timeline: text ?? title,
