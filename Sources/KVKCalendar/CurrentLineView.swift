@@ -100,7 +100,8 @@ extension CurrentLineView: CalendarSettingProtocol {
     
     func reloadFrame(_ frame: CGRect) {
         self.frame.size.width = frame.width
-        lineView.frame.size.width = frame.width
+        lineView.frame.origin.x = style.timeline.currentLineHourWidth
+        lineView.frame.size.width = frame.width - style.timeline.currentLineHourWidth
     }
 }
 
