@@ -199,8 +199,9 @@ extension ViewController: CalendarDataSource {
         let mappedEvents = systemEvents.compactMap { (event) -> Event in
             let startTime = timeFormatter(date: event.startDate)
             let endTime = timeFormatter(date: event.endDate)
+            event.title = "\(startTime) - \(endTime)\n\(event.title ?? "")"
             
-            return event.transform(text: "\(startTime) - \(endTime)\n\(event.title ?? "")")
+            return Event(event: event)
         }
         
         return events + mappedEvents

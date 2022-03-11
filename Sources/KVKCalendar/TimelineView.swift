@@ -36,7 +36,8 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     var eventPreview: UIView?
     var eventResizePreview: ResizeEventView?
     var eventPreviewSize = CGSize(width: 150, height: 150)
-    var isResizeEnableMode = false
+    var isResizableEventEnable = false
+    var forceDisableScrollToCurrentTime = false
     var potentiallyCenteredLabel: TimelineLabel?
     
     let timeLabelFormatter: DateFormatter = {
@@ -238,7 +239,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     }
     
     func create(dates: [Date?], events: [Event], recurringEvents: [Event], selectedDate: Date?) {
-        isResizeEnableMode = false
+        isResizableEventEnable = false
         delegate?.didDisplayEvents(events, dates: dates)
         
         self.dates = dates
@@ -422,10 +423,12 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             setOffsetScrollView(offsetY: offsetY)
         }
         
-        if let preferredHour = style.timeline.scrollToHour, !style.timeline.startFromFirstEvent {
-            scrollToHour(preferredHour)
-        } else {
-            scrollToCurrentTime(startHour)
+        if !forceDisableScrollToCurrentTime {
+            if let preferredHour = style.timeline.scrollToHour, !style.timeline.startFromFirstEvent {
+                scrollToHour(preferredHour)
+            } else {
+                scrollToCurrentTime(startHour)
+            }
         }
         
         showCurrentLineHour()

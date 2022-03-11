@@ -173,7 +173,7 @@ extension TimelineView {
         eventResizePreview?.frame = .zero
         eventResizePreview?.removeFromSuperview()
         eventResizePreview = nil
-        isResizeEnableMode = false
+        isResizableEventEnable = false
         enableAllEvents(enable: true)
     }
     
@@ -217,7 +217,10 @@ extension TimelineView {
             potentiallyCenteredLabel = label
         }
         
+        // to avoid auto scrolling to current time
+        forceDisableScrollToCurrentTime = true
         reloadTimeline()
+        forceDisableScrollToCurrentTime = false
         
         let yPointGlobal = gesture.location(in: self).y
         if let y = potentiallyCenteredLabel?.frame.origin.y, gesture.state == .changed {
@@ -374,7 +377,7 @@ extension TimelineView {
     }
     
     @objc func addNewEvent(gesture: UILongPressGestureRecognizer) {
-        guard !isResizeEnableMode else { return }
+        guard !isResizableEventEnable else { return }
         
         var point = gesture.location(in: scrollView)
         point.y = (point.y - eventPreviewYOffset) - style.timeline.offsetEvent - 6
@@ -521,7 +524,7 @@ extension TimelineView: EventDelegate {
     
     func didStartResizeEvent(_ event: Event, gesture: UILongPressGestureRecognizer, view: UIView) {
         forceDeselectEvent()
-        isResizeEnableMode = true
+        isResizableEventEnable = true
         
         var viewFrame = view.frame
         if viewFrame.width < 50 {
