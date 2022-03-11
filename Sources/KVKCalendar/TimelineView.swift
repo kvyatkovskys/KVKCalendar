@@ -101,15 +101,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         
         addSubview(scrollView)
         setUI()
-        
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        
-        let top = scrollView.topAnchor.constraint(equalTo: topAnchor)
-        let left = scrollView.leftAnchor.constraint(equalTo: leftAnchor)
-        let right = scrollView.rightAnchor.constraint(equalTo: rightAnchor)
-        let bottom = scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
-        
-        NSLayoutConstraint.activate([top, left, right, bottom])
+        setupConstraints()
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(forceDeselectEvent))
         addGestureRecognizer(tap)
@@ -126,6 +118,20 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     
     deinit {
         stopTimer(timerKey)
+    }
+    
+    func deactivateConstraints() {
+        NSLayoutConstraint.deactivate(scrollView.constraints)
+    }
+    
+    func setupConstraints() {
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        
+        let top = scrollView.topAnchor.constraint(equalTo: topAnchor)
+        let left = scrollView.leftAnchor.constraint(equalTo: leftAnchor)
+        let right = scrollView.rightAnchor.constraint(equalTo: rightAnchor)
+        let bottom = scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        NSLayoutConstraint.activate([top, left, right, bottom])
     }
     
     private func setOffsetScrollView(offsetY: CGFloat) {
@@ -261,8 +267,8 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                     .first?.start.hour ?? style.timeline.startHour
             } else {
                 startHour = filteredEvents.filter { compareStartDate(selectedDate, with: $0) }
-                    .sorted(by: { $0.start.hour < $1.start.hour })
-                    .first?.start.hour ?? style.timeline.startHour
+                .sorted(by: { $0.start.hour < $1.start.hour })
+                .first?.start.hour ?? style.timeline.startHour
             }
         }
         
@@ -336,7 +342,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             } else {
                 recurringEventsByDate = []
             }
-                        
+            
             let recurringValues = recurringEventsByDate.splitEvents
             let filteredRecurringEvents = recurringValues[.usual] ?? []
             let filteredAllDayRecurringEvents = recurringValues[.allDay] ?? []
@@ -367,7 +373,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                         } else {
                             let eventView = EventView(event: event, style: style, frame: rect)
                             if #available(iOS 14.0, *),
-                                let item = dataSource?.willDisplayEventOptionMenu(event, type: paramaters.type)
+                               let item = dataSource?.willDisplayEventOptionMenu(event, type: paramaters.type)
                             {
                                 eventView.addOptionMenu(item.menu, customButton: item.customButton)
                             }
