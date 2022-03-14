@@ -146,11 +146,11 @@ final class WeekView: UIView {
             switch type {
             case .next:
                 nextDate = self.parameters.style.calendar.date(byAdding: .day,
-                                                               value: 7,
+                                                               value: self.style.week.maxDays,
                                                                to: self.parameters.data.date)
             case .previous:
                 nextDate = self.parameters.style.calendar.date(byAdding: .day,
-                                                               value: -7,
+                                                               value: -self.style.week.maxDays,
                                                                to: self.parameters.data.date)
             }
             
@@ -186,11 +186,11 @@ final class WeekView: UIView {
                   && $0.date?.month == scrollDate.month
                   && $0.date?.day == scrollDate.day }) else { return [] }
         
-        var endIdx = idx + 7
+        var endIdx = idx + style.week.maxDays
         if endIdx > parameters.data.days.count {
             endIdx = parameters.data.days.count
         }
-        let newVisibleDates = parameters.data.days[idx..<endIdx].map({ $0.date })
+        let newVisibleDates = parameters.data.days[idx..<endIdx].map { $0.date }
         return newVisibleDates
     }
     
@@ -287,11 +287,11 @@ extension WeekView: TimelineDelegate {
     }
     
     func nextDate() {
-        parameters.data.date = scrollHeaderDay.calculateDateWithOffset(7, needScrollToDate: true)
+        parameters.data.date = scrollHeaderDay.calculateDateWithOffset(style.week.maxDays, needScrollToDate: true)
     }
     
     func previousDate() {
-        parameters.data.date = scrollHeaderDay.calculateDateWithOffset(-7, needScrollToDate: true)
+        parameters.data.date = scrollHeaderDay.calculateDateWithOffset(-style.week.maxDays, needScrollToDate: true)
     }
     
     func swipeX(transform: CGAffineTransform, stop: Bool) {
