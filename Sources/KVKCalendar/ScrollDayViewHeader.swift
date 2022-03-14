@@ -413,6 +413,7 @@ extension ScrollDayHeaderView: CalendarSettingProtocol {
 }
 
 extension ScrollDayHeaderView: UICollectionViewDataSource {
+        
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         1
     }
@@ -446,6 +447,7 @@ extension ScrollDayHeaderView: UICollectionViewDataSource {
 }
 
 extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+    
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let translation = scrollView.panGestureRecognizer.translation(in: collectionView)
         
@@ -505,6 +507,7 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
         let height = collectionView.frame.height
         return CGSize(width: width, height: height)
     }
+    
 }
 
 #endif
