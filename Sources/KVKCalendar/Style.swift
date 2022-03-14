@@ -261,12 +261,12 @@ public struct WeekStyle {
     public var colorWeekdayBackground: UIColor = .clear
     public var selectCalendarType: CalendarType = .day
     public var showVerticalDayDivider: Bool = true
-    public var days: Int = 7
+    public var daysInOneWeek: Int = 7
     
     var maxDays: Int {
-        guard 2...6 ~= days else { return 7 }
+        guard 2...6 ~= daysInOneWeek else { return 7 }
         
-        return days
+        return daysInOneWeek
     }
 }
 

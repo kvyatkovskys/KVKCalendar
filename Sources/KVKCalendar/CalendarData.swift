@@ -95,7 +95,7 @@ struct CalendarData {
         return days
     }
     
-    func addStartEmptyDays(_ days: [Day], startDay: StartDayType) -> [Day] {
+    func addStartEmptyDays(_ days: [Day], startDay: StartDayType, maxDaysInWeek: Int? = nil) -> [Day] {
         var tempDays = [Day]()
         if let firstDay = days.first {
             var endIdx = (firstDay.date?.weekday ?? 1)
@@ -123,7 +123,7 @@ struct CalendarData {
         return tempDays
     }
     
-    func addEndEmptyDays(_ days: [Day], startDay: StartDayType) -> [Day] {
+    func addEndEmptyDays(_ days: [Day], startDay: StartDayType, maxDaysInWeek: Int? = nil) -> [Day] {
         var tempDays = [Day]()
         if let lastDay = days.last {
             var emptyDays = [Day]()
