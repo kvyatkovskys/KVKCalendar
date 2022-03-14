@@ -39,6 +39,7 @@ final class ViewController: UIViewController {
         if #available(iOS 13.0, *) {
             style.event.iconFile = UIImage(systemName: "paperclip")
         }
+        style.week.days = 3
         return style
     }()
     

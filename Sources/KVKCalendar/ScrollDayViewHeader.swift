@@ -51,6 +51,19 @@ final class ScrollDayHeaderView: UIView {
         }
     }
     
+    private var maxDays: Int {
+        switch type {
+        case .week:
+            return style.week.maxDays
+        default:
+            return 7
+        }
+    }
+    
+    private var isFullyWeek: Bool {
+        maxDays == 7
+    }
+    
     weak var dataSource: DisplayDataSource?
     
     private lazy var titleLabel: UILabel = {
@@ -391,17 +404,21 @@ extension ScrollDayHeaderView: CalendarSettingProtocol {
     }
     
     private func getScrollDate(_ date: Date) -> Date? {
-        style.startWeekDay == .sunday ? date.startSundayOfWeek : date.startMondayOfWeek
+        guard isFullyWeek else {
+            return date
+        }
+        
+        return style.startWeekDay == .sunday ? date.startSundayOfWeek : date.startMondayOfWeek
     }
 }
 
 extension ScrollDayHeaderView: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
+        1
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return days.count
+        days.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -448,11 +465,11 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
             didTrackScrollOffset?(translation.x, true)
         } else if targetOffset.x < lastContentOffset {
             didChangeDay?(.previous)
-            calculateDateWithOffset(-7, needScrollToDate: false)
+            calculateDateWithOffset(-maxDays, needScrollToDate: false)
             didSelectDate?(date, type)
         } else if targetOffset.x > lastContentOffset {
             didChangeDay?(.next)
-            calculateDateWithOffset(7, needScrollToDate: false)
+            calculateDateWithOffset(maxDays, needScrollToDate: false)
             didSelectDate?(date, type)
         }
         
@@ -484,7 +501,7 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = collectionView.frame.width / 7
+        let width = collectionView.frame.width / CGFloat(maxDays)
         let height = collectionView.frame.height
         return CGSize(width: width, height: height)
     }
