@@ -177,14 +177,12 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     }
     
     private func showCurrentLineHour() {
-        currentLineView.removeFromSuperview()
-        
         let date = Date().convertTimeZone(TimeZone.current, to: style.timezone)
         guard style.timeline.showLineHourMode.showForDates(dates), let time = getTimelineLabel(hour: date.hour) else {
             stopTimer(timerKey)
             return
         }
-        
+
         let pointY = calculatePointYByMinute(date.minute, time: time)
         currentLineView.frame.origin.y = pointY - (currentLineView.frame.height * 0.5)
         scrollView.addSubview(currentLineView)
