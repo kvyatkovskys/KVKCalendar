@@ -272,6 +272,8 @@ extension TimelineView {
             allDayHeight *= 2
         } else if maxEvents > 4 {
             allDayHeight = style.allDay.maxHeight
+        } else if maxEvents == 2 && UIDevice.current.userInterfaceIdiom == .phone && paramaters.type == .week {
+            allDayHeight *= 2
         }
         let yPoint: CGFloat
         if style.allDay.isPinned {
