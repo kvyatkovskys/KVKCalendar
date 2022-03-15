@@ -237,7 +237,8 @@ final class ScrollDayHeaderView: UIView {
     private func selectDate(_ date: Date, type: CalendarType) {
         if let newSubview = dataSource?.willDisplayHeaderSubview(date: date,
                                                                  frame: subviewFrameForDevice,
-                                                                 type: type)
+                                                                 type: type),
+           !style.headerScroll.isHiddenSubview
         {
             subviewCustomHeader?.removeFromSuperview()
             subviewCustomHeader = newSubview
@@ -268,7 +269,7 @@ extension ScrollDayHeaderView: CalendarSettingProtocol {
         case .phone:
             newFrame.origin.y = 0
             
-            if !isUsedCustomHeaderView {
+            if !isUsedCustomHeaderView && !style.headerScroll.isHiddenSubview {
                 if let subviewHeader = dataSource?.willDisplayHeaderSubview(date: date,
                                                                             frame: subviewFrameForDevice,
                                                                             type: type)
@@ -284,7 +285,7 @@ extension ScrollDayHeaderView: CalendarSettingProtocol {
                 newFrame.size.height = frame.height - subviewFrameForDevice.height
             }
         default:
-            if !isUsedCustomHeaderView {
+            if !isUsedCustomHeaderView && !style.headerScroll.isHiddenSubview {
                 if let subviewHeader = dataSource?.willDisplayHeaderSubview(date: date,
                                                                             frame: subviewFrameForDevice,
                                                                             type: type)
@@ -326,7 +327,7 @@ extension ScrollDayHeaderView: CalendarSettingProtocol {
         case .phone:
             newFrame.origin.y = 0
             
-            if !isUsedCustomHeaderView {
+            if !isUsedCustomHeaderView && !style.headerScroll.isHiddenSubview {
                 subviewCustomHeader?.removeFromSuperview()
                 titleLabel.removeFromSuperview()
                 
@@ -345,7 +346,7 @@ extension ScrollDayHeaderView: CalendarSettingProtocol {
                 newFrame.size.height = (self.frame.height - subviewFrameForDevice.height) - subviewFrameForDevice.origin.x
             }
         default:
-            if !isUsedCustomHeaderView {
+            if !isUsedCustomHeaderView && !style.headerScroll.isHiddenSubview {
                 subviewCustomHeader?.removeFromSuperview()
                 titleLabel.removeFromSuperview()
                 
