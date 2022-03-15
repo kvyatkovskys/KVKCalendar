@@ -20,6 +20,10 @@ final class WeekView: UIView {
     private var parameters: Parameters
     private var timelineScale: CGFloat
     
+    private var isFullyWeek: Bool {
+        style.week.maxDays == 7
+    }
+    
     weak var delegate: DisplayDelegate?
     weak var dataSource: DisplayDataSource?
     
@@ -195,7 +199,11 @@ final class WeekView: UIView {
     }
     
     private func getScrollDate(date: Date) -> Date? {
-        style.startWeekDay == .sunday ? date.startSundayOfWeek : date.startMondayOfWeek
+        guard isFullyWeek else {
+            return date
+        }
+        
+        return style.startWeekDay == .sunday ? date.startSundayOfWeek : date.startMondayOfWeek
     }
     
     required init?(coder aDecoder: NSCoder) {
