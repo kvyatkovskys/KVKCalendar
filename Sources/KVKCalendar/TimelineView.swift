@@ -309,6 +309,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             let allDayEventsForDate = filteredAllDayEvents.filter {
                 compareStartDate(date, with: $0)
                 || compareEndDate(date, with: $0)
+                || checkMultipleDate(date, with: $0)
             }.compactMap { (oldEvent) -> Event in
                 var updatedEvent = oldEvent
                 updatedEvent.start = date ?? oldEvent.start
@@ -332,8 +333,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                     var result = [recurringEvent]
                     let previousDate = style.calendar.date(byAdding: .day, value: -1, to: dt)
                     if recurringEvent.start.day != recurringEvent.end.day,
-                       let recurringPrevEvent = event.updateDate(newDate: previousDate ?? dt, calendar: style.calendar)
-                    {
+                       let recurringPrevEvent = event.updateDate(newDate: previousDate ?? dt, calendar: style.calendar) {
                         result.append(recurringPrevEvent)
                     }
                     return acc + result
