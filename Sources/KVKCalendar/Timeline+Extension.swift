@@ -322,7 +322,7 @@ extension TimelineView {
         return times
     }
     
-    func createLines(times: [TimelineLabel]) -> [UIView] {
+    func createHorizontalLines(times: [TimelineLabel]) -> [UIView] {
         return times.enumerated().reduce([]) { acc, item -> [UIView] in
             let time = item.element
             let idx = item.offset
@@ -355,14 +355,18 @@ extension TimelineView {
             return acc + lines
         }
     }
-    
-    func createVerticalLine(pointX: CGFloat, date: Date?) -> VerticalLineView {
+
+    func createVerticalLine(pointX: CGFloat, date: Date?) -> VerticalLineLayer {
         let frame = CGRect(x: pointX, y: 0, width: style.timeline.widthLine, height: scrollView.contentSize.height)
-        let line = VerticalLineView(frame: frame)
-        line.tag = tagVerticalLine
-        line.backgroundColor = style.timeline.separatorLineColor
+
+        let line = VerticalLineLayer(date: date,
+                             frame: frame,
+                             tag: tagVerticalLine,
+                             start: CGPoint(x: pointX, y: 0),
+                             end: CGPoint(x: pointX, y: scrollView.contentSize.height),
+                             color: style.timeline.separatorLineColor,
+                             width: style.timeline.widthLine)
         line.isHidden = !style.week.showVerticalDayDivider
-        line.date = date
         return line
     }
     
@@ -693,14 +697,14 @@ extension TimelineView: EventDelegate {
     private func moveShadowView(pointX: CGFloat) -> (frame: CGRect, date: Date?)? {
         guard paramaters.type == .week else { return nil }
         
-        let lines = subviews.filter({ $0.tag == tagVerticalLine })
+        let lines = layer.sublayers?.filter { $0.name == "\(tagVerticalLine)" } as? [VerticalLineLayer] ?? []
         var width: CGFloat = 200
         if let firstLine = lines[safe: 0], let secondLine = lines[safe: 1] {
-            width = secondLine.frame.origin.x - firstLine.frame.origin.x
+            width = secondLine.lineFrame.origin.x - firstLine.lineFrame.origin.x
         }
-        guard let line = lines.first(where: { $0.frame.origin.x...($0.frame.origin.x + width) ~= pointX }) as? VerticalLineView else { return nil }
+        guard let line = lines.first(where: { $0.lineFrame.origin.x...($0.lineFrame.origin.x + width) ~= pointX }) else { return nil }
         
-        return (CGRect(origin: line.frame.origin, size: CGSize(width: width, height: line.bounds.height)), line.date)
+        return (CGRect(origin: line.lineFrame.origin, size: CGSize(width: width, height: line.lineFrame.height)), line.date)
     }
 }
 

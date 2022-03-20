@@ -250,6 +250,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         }
         subviews.filter { $0.tag == tagStubEvent || $0.tag == tagVerticalLine }.forEach { $0.removeFromSuperview() }
         scrollView.subviews.forEach { $0.removeFromSuperview() }
+        layer.sublayers?.filter { $0.name == "\(tagVerticalLine)" }.forEach { $0.removeFromSuperlayer() }
         
         // filtering events
         let eventValues = events.splitEvents
@@ -274,7 +275,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         // add time label to timeline
         timeLabels = createTimesLabel(start: startHour)
         // add separator line
-        let lines = createLines(times: timeLabels)
+        let lines = createHorizontalLines(times: timeLabels)
         
         // calculate all height by time label minus the last offset
         let heightAllTimes = timeLabels.reduce(0, { $0 + ($1.frame.height + calculatedTimeY) }) - calculatedTimeY
@@ -298,8 +299,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             }
             
             let verticalLine = createVerticalLine(pointX: pointX, date: date)
-            addSubview(verticalLine)
-            bringSubviewToFront(verticalLine)
+            layer.addSublayer(verticalLine)
             
             let eventsByDate = filteredEvents.filter {
                 compareStartDate(date, with: $0)
