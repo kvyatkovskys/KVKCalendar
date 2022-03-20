@@ -127,9 +127,13 @@ final class MonthData: EventDateProtocol {
             var newDay = day
             guard newDay.events.isEmpty else { return acc + [day] }
             
-            let filteredEventsByDay = events.filter({ compareStartDate(day.date, with: $0) && !$0.isAllDay })
-            let filteredAllDayEvents = events.filter({ $0.isAllDay })
-            let allDayEvents = filteredAllDayEvents.filter({ compareStartDate(day.date, with: $0) || compareEndDate(day.date, with: $0) })
+            let filteredEventsByDay = events.filter { compareStartDate(day.date, with: $0) && !$0.isAllDay }
+            let filteredAllDayEvents = events.filter { $0.isAllDay }
+            let allDayEvents = filteredAllDayEvents.filter {
+                compareStartDate(day.date, with: $0)
+                || compareEndDate(day.date, with: $0)
+                || checkMultipleDate(day.date, with: $0)
+            }
             
             let recurringEventByDate: [Event]
             if !recurringEvents.isEmpty, let date = day.date {
