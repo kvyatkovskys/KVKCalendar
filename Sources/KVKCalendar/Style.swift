@@ -130,6 +130,7 @@ public struct TimelineStyle {
     public var offsetEvent: CGFloat = 3
     public var startHour: Int = 0
     public var scrollToHour: Int? = nil
+    public var movingMinuteLabelRoundUpTime: Int = 1
     public var heightLine: CGFloat = {
 #if targetEnvironment(macCatalyst)
         return 1
@@ -865,6 +866,7 @@ extension TimelineStyle: Equatable {
         && compare(\.offsetEvent)
         && compare(\.startHour)
         && compare(\.heightLine)
+        && compare(\.movingMinuteLabelRoundUpTime)
         && compare(\.widthLine)
         && compare(\.offsetLineLeft)
         && compare(\.offsetLineRight)
