@@ -399,6 +399,7 @@ extension TimelineView {
         case .began:
             UIImpactFeedbackGenerator().impactOccurred()
         case .ended, .failed, .cancelled:
+            UIImpactFeedbackGenerator().impactOccurred()
             guard let minute = time.minute, let hour = time.hour else { return }
             
             switch paramaters.type {
@@ -676,8 +677,12 @@ extension TimelineView: EventDelegate {
             movingMinuteLabel.frame = CGRect(x: style.timeline.offsetTimeX, y: (pointY - offset) - style.timeline.heightTime,
                                              width: style.timeline.widthTime, height: style.timeline.heightTime)
             scrollView.addSubview(movingMinuteLabel)
-            movingMinuteLabel.text = ":\(minute)"
-            movingMinuteLabel.time?.minute = minute
+            
+            let roundedMinute = minute.roundToNearest(style.timeline.onChangeRoundUpToNearest)
+            scrollView.addSubview(movingMinuteLabel)
+            
+            movingMinuteLabel.text = ":\(roundedMinute)"
+            movingMinuteLabel.time?.minute = roundedMinute
         } else {
             movingMinuteLabel.text = ":0"
             movingMinuteLabel.time?.minute = 0
@@ -746,6 +751,13 @@ extension TimelineView: AllDayEventDelegate {
         delegate?.didSelectEvent(event, frame: frame)
     }
     
+}
+
+extension Int {
+    /// SwifterSwift: Rounds to the closest multiple of n.
+    func roundToNearest(_ number: Int) -> Int {
+        return number == 0 ? self : Int(round(Double(self) / Double(number))) * number
+    }
 }
 
 #endif
