@@ -677,9 +677,7 @@ extension TimelineView: EventDelegate {
             movingMinuteLabel.frame = CGRect(x: style.timeline.offsetTimeX, y: (pointY - offset) - style.timeline.heightTime,
                                              width: style.timeline.widthTime, height: style.timeline.heightTime)
             scrollView.addSubview(movingMinuteLabel)
-            
             let roundedMinute = minute.roundToNearest(style.timeline.movingMinuteLabelRoundUpTime)
-            scrollView.addSubview(movingMinuteLabel)
             
             movingMinuteLabel.text = ":\(roundedMinute)"
             movingMinuteLabel.time?.minute = roundedMinute
