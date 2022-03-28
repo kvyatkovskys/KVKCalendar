@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class ScrollDayHeaderReusableView: UICollectionReusableView {
+final class ScrollDayHeaderReusableView: UIView {
         
     var style: Style? {
         didSet {
@@ -37,6 +37,21 @@ final class ScrollDayHeaderReusableView: UICollectionReusableView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func animateTitleIfNeeded() {
+        if style?.headerScroll.isAnimateTitleDate == true {
+//            let value: CGFloat
+//            if offset < 0 {
+//                value = -40
+//            } else {
+//                value = 40
+//            }
+//            titleLabel.transform = CGAffineTransform(translationX: value, y: 0)
+//            UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: {
+//                self.titleLabel.transform = CGAffineTransform.identity
+//            })
+        }
     }
     
 }
