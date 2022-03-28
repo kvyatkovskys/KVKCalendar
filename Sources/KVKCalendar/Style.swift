@@ -118,6 +118,7 @@ public struct HeaderScrollStyle {
     public var colorNameEmptyDay: UIColor = gainsboro
     public var showDatesForOtherMonths: Bool = true
     public var isAnimateSelection: Bool = true
+    public var shouldTimelineTrackScroll: Bool = true
     
     var backgroundBlurStyle: UIBlurEffect.Style? = nil
 }
@@ -130,6 +131,7 @@ public struct TimelineStyle {
     public var offsetEvent: CGFloat = 3
     public var startHour: Int = 0
     public var scrollToHour: Int? = nil
+    public var movingMinuteLabelRoundUpTime: Int = 1
     public var heightLine: CGFloat = {
 #if targetEnvironment(macCatalyst)
         return 1
@@ -799,6 +801,7 @@ extension HeaderScrollStyle: Equatable {
         && compare(\.colorNameEmptyDay)
         && compare(\.showDatesForOtherMonths)
         && compare(\.isAnimateSelection)
+        && compare(\.shouldTimelineTrackScroll)
     }
     
 }
@@ -865,6 +868,7 @@ extension TimelineStyle: Equatable {
         && compare(\.offsetEvent)
         && compare(\.startHour)
         && compare(\.heightLine)
+        && compare(\.movingMinuteLabelRoundUpTime)
         && compare(\.widthLine)
         && compare(\.offsetLineLeft)
         && compare(\.offsetLineRight)
