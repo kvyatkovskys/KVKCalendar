@@ -118,6 +118,7 @@ public struct HeaderScrollStyle {
     public var colorNameEmptyDay: UIColor = gainsboro
     public var showDatesForOtherMonths: Bool = true
     public var isAnimateSelection: Bool = true
+    public var shouldTimelineTrackScroll: Bool = true
     
     var backgroundBlurStyle: UIBlurEffect.Style? = nil
 }
@@ -800,6 +801,7 @@ extension HeaderScrollStyle: Equatable {
         && compare(\.colorNameEmptyDay)
         && compare(\.showDatesForOtherMonths)
         && compare(\.isAnimateSelection)
+        && compare(\.shouldTimelineTrackScroll)
     }
     
 }
