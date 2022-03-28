@@ -307,7 +307,9 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
         
         if trackingTranslation != translation.x {
             trackingTranslation = translation.x
-            didTrackScrollOffset?(translation.x, false)
+            if style.headerScroll.shouldTimelineTrackScroll {
+                didTrackScrollOffset?(translation.x, false)
+            }
         }
     }
     
@@ -318,7 +320,9 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
         let targetOffset = targetContentOffset.pointee
 
         if targetOffset.x == lastContentOffset {
-            didTrackScrollOffset?(translation.x, true)
+            if style.headerScroll.shouldTimelineTrackScroll {
+                didTrackScrollOffset?(translation.x, true)
+            }
         } else if targetOffset.x < lastContentOffset {
             didChangeDay?(.previous)
             calculateDateWithOffset(-maxDays, needScrollToDate: false)
