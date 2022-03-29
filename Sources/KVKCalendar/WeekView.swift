@@ -12,7 +12,7 @@ import UIKit
 final class WeekView: UIView {
     
     struct Parameters {
-        var visibleDates: [Date?] = []
+        var visibleDates: [Date] = []
         var data: WeekData
         var style: Style
     }
@@ -116,7 +116,7 @@ final class WeekView: UIView {
         let label = UILabel()
         label.textAlignment = .center
         label.adjustsFontSizeToFitWidth = true
-        label.textColor = parameters.style.headerScroll.colorTitleCornerDate
+        label.textColor = parameters.style.headerScroll.titleDateColorCorner
         return label
     }()
     
@@ -184,7 +184,7 @@ final class WeekView: UIView {
                                           selectedDate: parameters.data.date)
     }
     
-    private func getVisibleDatesFor(date: Date) -> [Date?] {
+    private func getVisibleDatesFor(date: Date) -> [Date] {
         guard let scrollDate = getScrollDate(date: date),
               let idx = parameters.data.days.firstIndex(where: { $0.date?.year == scrollDate.year
                   && $0.date?.month == scrollDate.month
@@ -194,13 +194,13 @@ final class WeekView: UIView {
         if endIdx > parameters.data.days.count {
             endIdx = parameters.data.days.count
         }
-        let newVisibleDates = parameters.data.days[idx..<endIdx].map { $0.date }
-        return newVisibleDates
+        
+        return parameters.data.days[idx..<endIdx].compactMap { $0.date }
     }
     
     private func getScrollDate(date: Date) -> Date? {
         guard isFullyWeek else {
-            return date
+            return date.startSundayOfWeek
         }
         
         return style.startWeekDay == .sunday ? date.startSundayOfWeek : date.startMondayOfWeek

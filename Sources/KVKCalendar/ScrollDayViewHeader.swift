@@ -341,14 +341,14 @@ extension ScrollDayHeaderView: UICollectionViewDelegate, UICollectionViewDelegat
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let dateNew = days[indexPath.row].date else { return }
+        
         switch type {
         case .day:
-            guard date != days[indexPath.row].date, let dateNew = days[indexPath.row].date else { return }
+            guard date != days[indexPath.row].date else { return }
             
             date = dateNew
         case .week:
-            guard let dateNew = days[indexPath.row].date else { return }
-            
             date = dateNew
         default:
             break

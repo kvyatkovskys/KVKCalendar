@@ -108,8 +108,14 @@ public struct HeaderScrollStyle {
         return format
     }()
     
+    @available(swift, deprecated: 0.5.9, obsoleted: 0.6.0, renamed: "titleDateColor")
     public var colorTitleDate: UIColor = .black
+    public var titleDateColor: UIColor = .black
+        
+    @available(swift, deprecated: 0.5.9, obsoleted: 0.6.0, renamed: "titleDateColorCorner")
     public var colorTitleCornerDate: UIColor = .red
+    public var titleDateColorCorner: UIColor = .red
+    
     public var colorDate: UIColor = .black
     public var fontDate: UIFont = .systemFont(ofSize: 17)
     public var colorNameDay: UIColor = .black
@@ -278,7 +284,7 @@ public struct WeekStyle {
     public var selectCalendarType: CalendarType = .day
     public var showVerticalDayDivider: Bool = true
     /// work in progress
-    var daysInOneWeek: Int = 7
+    var daysInOneWeek: Int = 3
     
     var maxDays: Int {
         guard 2...6 ~= daysInOneWeek else { return 7 }
@@ -544,9 +550,9 @@ extension Style {
             newStyle.headerScroll.colorNameEmptyDay = UIColor.useForStyle(dark: .systemGray6,
                                                                           white: newStyle.headerScroll.colorNameEmptyDay)
             newStyle.headerScroll.colorBackground = UIColor.useForStyle(dark: .black, white: newStyle.headerScroll.colorBackground)
-            newStyle.headerScroll.colorTitleDate = UIColor.useForStyle(dark: .white, white: newStyle.headerScroll.colorTitleDate)
-            newStyle.headerScroll.colorTitleCornerDate = UIColor.useForStyle(dark: .systemRed,
-                                                                             white: newStyle.headerScroll.colorTitleCornerDate)
+            newStyle.headerScroll.titleDateColor = UIColor.useForStyle(dark: .white, white: newStyle.headerScroll.titleDateColor)
+            newStyle.headerScroll.titleDateColorCorner = UIColor.useForStyle(dark: .systemRed,
+                                                                             white: newStyle.headerScroll.titleDateColorCorner)
             newStyle.headerScroll.colorDate = UIColor.useForStyle(dark: .white, white: newStyle.headerScroll.colorDate)
             newStyle.headerScroll.colorNameDay = UIColor.useForStyle(dark: .white, white: newStyle.headerScroll.colorNameDay)
             newStyle.headerScroll.colorCurrentDate = UIColor.useForStyle(dark: .systemGray6,
@@ -791,8 +797,8 @@ extension HeaderScrollStyle: Equatable {
         && compare(\.isHiddenSubview)
         && compare(\.titleFormatter)
         && compare(\.weekdayFormatter)
-        && compare(\.colorTitleDate)
-        && compare(\.colorTitleCornerDate)
+        && compare(\.titleDateColor)
+        && compare(\.titleDateColorCorner)
         && compare(\.colorDate)
         && compare(\.fontDate)
         && compare(\.colorNameDay)
