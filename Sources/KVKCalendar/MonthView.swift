@@ -377,7 +377,6 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
             
             parameters.monthData.date = newDate
             willSelectDate?(newDate)
-            reload()
         }
     }
     
@@ -415,7 +414,6 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         
         parameters.monthData.date = newDate
         willSelectDate?(newDate)
-        reload()
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
