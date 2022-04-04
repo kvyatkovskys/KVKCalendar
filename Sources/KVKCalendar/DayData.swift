@@ -14,9 +14,11 @@ final class DayData: EventDateProtocol {
     var date: Date
     var events: [Event] = []
     var recurringEvents: [Event] = []
+    var daysBySection: [[Day]] = []
     
-    init(data: CalendarData, startDay: StartDayType) {
+    init(data: CalendarData, startDay: StartDayType, daysBySection: [[Day]]) {
         self.date = data.date
+        self.daysBySection = daysBySection
         var tempDays = data.months.reduce([], { $0 + $1.days })
         let startIdx = tempDays.count > 7 ? tempDays.count - 7 : tempDays.count
         let endWeek = data.addEndEmptyDays(Array(tempDays[startIdx..<tempDays.count]), startDay: startDay)

@@ -297,8 +297,8 @@ extension MonthView: UICollectionViewDataSource, UICollectionViewDataSourcePrefe
             parameters.monthData.days[$0] = item
             
             if let cell = collectionView.cellForItem(at: indexPath) as? MonthCell,
-                let day = item.day,
-                let date = day.date
+               let day = item.day,
+               let date = day.date
             {
                 if let customEventsView = dataSource?.dequeueMonthViewEvents(day.events, date: date, frame: cell.customViewFrame) {
                     parameters.monthData.customEventsView[date] = customEventsView
@@ -377,6 +377,7 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
             
             parameters.monthData.date = newDate
             willSelectDate?(newDate)
+            reload()
         }
     }
     
@@ -399,21 +400,22 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         
         let newDate: Date
         if let date = month.days.first(where: { $0.date?.year == month.date.year
-                                        && $0.date?.month == month.date.month
+            && $0.date?.month == month.date.month
             && $0.date?.day == parameters.monthData.date.day })?.date {
             newDate = date
         } else if let date = month.days.first(where: { $0.date?.year == month.date.year
-                                            && $0.date?.month == month.date.month
+            && $0.date?.month == month.date.month
             && $0.date?.day == (parameters.monthData.date.day - 1) })?.date {
             newDate = date
         } else {
             newDate = Date()
         }
-           
+        
         guard parameters.monthData.date != newDate else { return }
         
         parameters.monthData.date = newDate
         willSelectDate?(newDate)
+        reload()
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -455,7 +457,7 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
             } else {
                 width = 0
             }
-
+            
             var superViewHeight = collectionView.bounds.height
             if !style.month.isHiddenSectionHeader {
                 superViewHeight -= style.month.heightSectionHeader
@@ -465,7 +467,7 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         @unknown default:
             fatalError()
         }
-                
+        
         return CGSize(width: width, height: height)
     }
     
@@ -556,7 +558,7 @@ extension MonthView: MonthCellDelegate {
         let index = getIndexForDirection(style.month.scrollDirection, indexPath: indexPath)
         let day = parameters.monthData.data.months[index.section].days[index.row]
         let newDate = day.date ?? event.start
-
+        
         var startComponents = DateComponents()
         startComponents.year = newDate.year
         startComponents.month = newDate.month
@@ -564,7 +566,7 @@ extension MonthView: MonthCellDelegate {
         startComponents.hour = event.start.hour
         startComponents.minute = event.start.minute
         let startDate = style.calendar.date(from: startComponents)
-
+        
         var endComponents = DateComponents()
         endComponents.year = newDate.year
         endComponents.month = newDate.month
@@ -572,7 +574,7 @@ extension MonthView: MonthCellDelegate {
         endComponents.hour = event.end.hour
         endComponents.minute = event.end.minute
         let endDate = style.calendar.date(from: endComponents)
-
+        
         delegate?.didChangeEvent(event, start: startDate, end: endDate)
         scrollToDate(newDate, animated: true)
         didSelectDates([newDate], indexPath: index)

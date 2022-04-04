@@ -23,20 +23,20 @@ final class DayView: UIView {
         var data: DayData
     }
     
-    lazy var scrollHeaderDay: ScrollDayHeaderView = {
+    lazy var scrollableWeekView: ScrollableWeekView = {
         let heightView: CGFloat
         if style.headerScroll.isHiddenSubview {
             heightView = style.headerScroll.heightHeaderWeek
         } else {
             heightView = style.headerScroll.heightHeaderWeek + style.headerScroll.heightSubviewHeader
         }
-        let view = ScrollDayHeaderView(parameters: .init(frame: CGRect(x: 0, y: 0,
-                                                                       width: frame.width,
-                                                                       height: heightView),
-                                                         days: parameters.data.days,
-                                                         date: parameters.data.date,
-                                                         type: .day,
-                                                         style: style))
+        let view = ScrollableWeekView(parameters: .init(frame: CGRect(x: 0, y: 0,
+                                                                      width: frame.width,
+                                                                      height: heightView),
+                                                        weeks: parameters.data.daysBySection,
+                                                        date: parameters.data.date,
+                                                        type: .day,
+                                                        style: style))
         view.didSelectDate = { [weak self] (date, type) in
             if let item = date {
                 self?.parameters.data.date = item
@@ -85,8 +85,8 @@ final class DayView: UIView {
         var timelineFrame = frame
         
         if !style.headerScroll.isHidden {
-            timelineFrame.origin.y = scrollHeaderDay.frame.height
-            timelineFrame.size.height -= scrollHeaderDay.frame.height
+            timelineFrame.origin.y = scrollableWeekView.frame.height
+            timelineFrame.size.height -= scrollableWeekView.frame.height
         }
         
         if UIDevice.current.userInterfaceIdiom != .phone {
@@ -173,7 +173,7 @@ final class DayView: UIView {
     
     func setDate(_ date: Date) {
         parameters.data.date = date
-        scrollHeaderDay.setDate(date)
+        scrollableWeekView.setDate(date)
     }
     
     func reloadData(_ events: [Event]) {
@@ -235,11 +235,11 @@ extension DayView: TimelineDelegate {
     }
     
     func nextDate() {
-        parameters.data.date = scrollHeaderDay.calculateDateWithOffset(1, needScrollToDate: true)
+        parameters.data.date = scrollableWeekView.calculateDateWithOffset(1, needScrollToDate: true)
     }
     
     func previousDate() {
-        parameters.data.date = scrollHeaderDay.calculateDateWithOffset(-1, needScrollToDate: true)
+        parameters.data.date = scrollableWeekView.calculateDateWithOffset(-1, needScrollToDate: true)
     }
     
     func didResizeEvent(_ event: Event, startTime: ResizeTime, endTime: ResizeTime) {
@@ -309,8 +309,8 @@ extension DayView: CalendarSettingProtocol {
         
         if !style.headerScroll.isHidden {
             topBackgroundView.frame.size.width = frame.width
-            scrollHeaderDay.reloadFrame(frame)
-            timelineFrame.size.height = frame.height - scrollHeaderDay.frame.height
+            scrollableWeekView.reloadFrame(frame)
+            timelineFrame.size.height = frame.height - scrollableWeekView.frame.height
         } else {
             timelineFrame.size.height = frame.height
         }
@@ -355,7 +355,7 @@ extension DayView: CalendarSettingProtocol {
     
     func updateStyle(_ style: Style) {
         parameters.style = style
-        scrollHeaderDay.updateStyle(style)
+        scrollableWeekView.updateStyle(style)
         timelinePage.updateStyle(style)
         timelinePage.reloadPages()
         setUI()
@@ -368,7 +368,7 @@ extension DayView: CalendarSettingProtocol {
         
         if !parameters.style.headerScroll.isHidden {
             addSubview(topBackgroundView)
-            topBackgroundView.addSubview(scrollHeaderDay)
+            topBackgroundView.addSubview(scrollableWeekView)
         }
         addSubview(timelinePage)
         timelinePage.isPagingEnabled = style.timeline.scrollDirections.contains(.horizontal)
