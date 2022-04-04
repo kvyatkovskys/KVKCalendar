@@ -127,7 +127,7 @@ final class ResizeEventView: UIView {
         
         switch gesture.state {
         case .began:
-            UIImpactFeedbackGenerator().impactOccurred()
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
         case .changed:
             delegate?.didStart(gesture: gesture, type: type)
         case .cancelled, .failed, .ended:

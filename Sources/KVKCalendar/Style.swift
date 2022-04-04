@@ -151,7 +151,12 @@ public struct TimelineStyle {
     public var offsetEvent: CGFloat = 3
     public var startHour: Int = 0
     public var scrollToHour: Int? = nil
-    public var movingMinuteLabelRoundUpTime: Int = 1
+    public var movingMinuteLabelRoundUpTime: UInt = 15
+    var minuteLabelRoundUpTime: Int {
+        guard 1...60 ~= movingMinuteLabelRoundUpTime else { return 1 }
+        
+        return Int(movingMinuteLabelRoundUpTime)
+    }
     public var heightLine: CGFloat = {
 #if targetEnvironment(macCatalyst)
         return 1
@@ -283,12 +288,12 @@ public struct WeekStyle {
     public var colorWeekdayBackground: UIColor = .clear
     public var selectCalendarType: CalendarType = .day
     public var showVerticalDayDivider: Bool = true
-    public var daysInOneWeek: Int = 3
+    public var daysInOneWeek: UInt = 3
     
     var maxDays: Int {
         guard 2...6 ~= daysInOneWeek else { return 7 }
         
-        return daysInOneWeek
+        return Int(daysInOneWeek)
     }
 }
 

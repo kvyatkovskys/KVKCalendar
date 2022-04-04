@@ -543,7 +543,7 @@ extension MonthView: MonthCellDelegate {
         UIView.animate(withDuration: 0.3) {
             self.eventPreview?.transform = CGAffineTransform(scaleX: 1, y: 1)
         }
-        UIImpactFeedbackGenerator().impactOccurred()
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
         collectionView?.isScrollEnabled = false
     }
     

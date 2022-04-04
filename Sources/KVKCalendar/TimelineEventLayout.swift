@@ -80,11 +80,11 @@ public extension TimelineEventLayoutContext {
             let start = event.start.timeIntervalSince1970
             let end = event.end.timeIntervalSince1970
             var crossEventNew = CrossEvent(eventTime: EventTime(start: start, end: end))
-            let endCalculated: TimeInterval = crossEventNew.eventTime.end - TimeInterval(style.timeline.offsetEvent)
+            let endCalculated = crossEventNew.eventTime.end - TimeInterval(style.timeline.offsetEvent)
             crossEventNew.events = events.filter { item in
                 let itemEnd = item.end.timeIntervalSince1970 - TimeInterval(style.timeline.offsetEvent)
                 let itemStart = item.start.timeIntervalSince1970
-                guard itemEnd > itemStart else { return false }
+                guard itemEnd > itemStart && endCalculated > start else { return false }
 
                 return (itemStart...itemEnd).contains(start)
                 || (itemStart...itemEnd).contains(endCalculated)

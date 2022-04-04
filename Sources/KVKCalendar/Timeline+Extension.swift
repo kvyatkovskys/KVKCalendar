@@ -170,7 +170,6 @@ extension TimelineView {
             }
         }
         
-        eventResizePreview?.frame = .zero
         eventResizePreview?.removeFromSuperview()
         eventResizePreview = nil
         isResizableEventEnable = false
@@ -179,12 +178,12 @@ extension TimelineView {
     
     private func enableAllEvents(enable: Bool) {
         if style.allDay.isPinned {
-            subviews.filter({ $0.tag == tagAllDayEventView }).forEach({ $0.isUserInteractionEnabled = enable })
+            subviews.filter { $0.tag == tagAllDayEventView }.forEach { $0.isUserInteractionEnabled = enable }
         } else {
-            scrollView.subviews.filter({ $0.tag == tagAllDayEventView }).forEach({ $0.isUserInteractionEnabled = enable })
+            scrollView.subviews.filter { $0.tag == tagAllDayEventView }.forEach { $0.isUserInteractionEnabled = enable }
         }
         
-        scrollView.subviews.filter({ $0 is EventViewGeneral }).forEach({ $0.isUserInteractionEnabled = enable })
+        scrollView.subviews.filter { $0 is EventViewGeneral }.forEach{ $0.isUserInteractionEnabled = enable }
     }
         
     @objc func pinchZooming(gesture: UIPinchGestureRecognizer) {
@@ -397,9 +396,9 @@ extension TimelineView {
         
         switch gesture.state {
         case .began:
-            UIImpactFeedbackGenerator().impactOccurred()
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
         case .ended, .failed, .cancelled:
-            UIImpactFeedbackGenerator().impactOccurred()
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
             guard let minute = time.minute, let hour = time.hour else { return }
             
             switch paramaters.type {
@@ -481,6 +480,7 @@ extension TimelineView: ResizeEventViewDelegate {
             eventResizePreview?.frame.origin.y = location.y
             eventResizePreview?.frame.size.height += offsetY
             eventResizePreview?.startTime = movingMinuteLabel.time
+            print(movingMinuteLabel.time)
         case .bottom:
             let offset = location.y - (eventResizePreview?.mainYOffset ?? 0) + style.timeline.offsetEvent
             guard (location.y - (eventResizePreview?.frame.origin.y ?? 0)) > 80 else { return }
@@ -671,19 +671,15 @@ extension TimelineView: EventDelegate {
             pointTempY -= eventPreviewYOffset
         }
         let time = calculateChangingTime(pointY: pointTempY)
-        movingMinuteLabel.time = TimeContainer(minute: 0, hour: time.hour ?? 0)
         
         if let minute = time.minute, 0...59 ~= minute {
             movingMinuteLabel.frame = CGRect(x: style.timeline.offsetTimeX, y: (pointY - offset) - style.timeline.heightTime,
                                              width: style.timeline.widthTime, height: style.timeline.heightTime)
             scrollView.addSubview(movingMinuteLabel)
-            let roundedMinute = minute.roundToNearest(style.timeline.movingMinuteLabelRoundUpTime)
-            
-            movingMinuteLabel.text = ":\(roundedMinute)"
-            movingMinuteLabel.time?.minute = roundedMinute
+            let roundedMinute = minute.roundToNearest(style.timeline.minuteLabelRoundUpTime)
+            movingMinuteLabel.time = TimeContainer(minute: roundedMinute, hour: time.hour ?? 0)
         } else {
-            movingMinuteLabel.text = ":0"
-            movingMinuteLabel.time?.minute = 0
+            movingMinuteLabel.time.minute = 0
         }
     }
     

@@ -115,13 +115,13 @@ open class EventViewGeneral: UIView, CalendarTimer {
                         self.stateEvent = .move
                         self.delegate?.didEndResizeEvent(self.event, gesture: gesture)
                         
-                        UIImpactFeedbackGenerator().impactOccurred()
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         self.alpha = self.style.event.alphaWhileMoving
                         self.delegate?.didStartMovingEvent(self.event, gesture: gesture, view: self)
                     }
                 }
                 
-                UIImpactFeedbackGenerator().impactOccurred()
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 delegate?.didStartResizeEvent(event, gesture: gesture, view: self)
             case .move:
                 guard isAvailableMove else { return }
@@ -143,7 +143,7 @@ open class EventViewGeneral: UIView, CalendarTimer {
                 stateEvent = .move
                 delegate?.didEndResizeEvent(event, gesture: gesture)
                 
-                UIImpactFeedbackGenerator().impactOccurred()
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 alpha = style.event.alphaWhileMoving
                 delegate?.didStartMovingEvent(event, gesture: gesture, view: self)
             case .move:
