@@ -11,9 +11,6 @@ import UIKit
 
 final class DayView: UIView {
     
-    weak var delegate: DisplayDelegate?
-    weak var dataSource: DisplayDataSource?
-    
     private var parameters: Parameters
     private let tagEventViewer = -10
     private var timelineScale: CGFloat
@@ -21,6 +18,8 @@ final class DayView: UIView {
     struct Parameters {
         var style: Style
         var data: DayData
+        weak var delegate: DisplayDelegate?
+        weak var dataSource: DisplayDataSource?
     }
     
     lazy var scrollableWeekView: ScrollableWeekView = {
@@ -40,7 +39,7 @@ final class DayView: UIView {
         view.didSelectDate = { [weak self] (date, type) in
             if let item = date {
                 self?.parameters.data.date = item
-                self?.delegate?.didSelectDates([item], type: type, frame: nil)
+                self?.parameters.delegate?.didSelectDates([item], type: type, frame: nil)
             }
         }
         view.didTrackScrollOffset = { [weak self] (offset, stop) in
@@ -69,9 +68,9 @@ final class DayView: UIView {
         
         let view = TimelineView(parameters: .init(style: style, type: .day, scale: timelineScale), frame: viewFrame)
         view.delegate = self
-        view.dataSource = self
+        view.dataSource = parameters.dataSource
         view.deselectEvent = { [weak self] (event) in
-            self?.delegate?.didDeselectEvent(event, animated: true)
+            self?.parameters.delegate?.didDeselectEvent(event, animated: true)
         }
         view.didChangeScale = { [weak self] (newScale) in
             if newScale != self?.timelineScale {
@@ -142,7 +141,7 @@ final class DayView: UIView {
                 self.timelinePage.addNewTimelineView(newTimeline, to: .begin)
             }
             
-            self.delegate?.didSelectDates([self.parameters.data.date], type: .day, frame: nil)
+            self.parameters.delegate?.didSelectDates([self.parameters.data.date], type: .day, frame: nil)
         }
         
         timelinePage.willDisplayTimelineView = { [weak self] (timeline, type) in
@@ -204,7 +203,7 @@ final class DayView: UIView {
         } else {
             viewerFrame.origin.x = bounds.width - viewerFrame.width
         }
-        guard let eventViewer = dataSource?.willDisplayEventViewer(date: parameters.data.date, frame: viewerFrame) else { return nil }
+        guard let eventViewer = parameters.dataSource?.willDisplayEventViewer(date: parameters.data.date, frame: viewerFrame) else { return nil }
         
         eventViewer.tag = tagEventViewer
         addSubview(eventViewer)
@@ -212,26 +211,14 @@ final class DayView: UIView {
     }
 }
 
-extension DayView: DisplayDataSource {
-    
-    func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? {
-        dataSource?.willDisplayEventView(event, frame: frame, date: date)
-    }
-    
-    @available(iOS 14.0, *)
-    func willDisplayEventOptionMenu(_ event: Event, type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)? {
-        dataSource?.willDisplayEventOptionMenu(event, type: type)
-    }
-}
-
 extension DayView: TimelineDelegate {
     
     func didDisplayEvents(_ events: [Event], dates: [Date?]) {
-        delegate?.didDisplayEvents(events, dates: dates, type: .day)
+        parameters.delegate?.didDisplayEvents(events, dates: dates, type: .day)
     }
     
     func didSelectEvent(_ event: Event, frame: CGRect?) {
-        delegate?.didSelectEvent(event, type: .day, frame: frame)
+        parameters.delegate?.didSelectEvent(event, type: .day, frame: frame)
     }
     
     func nextDate() {
@@ -259,7 +246,7 @@ extension DayView: TimelineDelegate {
         endComponents.minute = endTime.minute
         let endDate = style.calendar.date(from: endComponents)
         
-        delegate?.didChangeEvent(event, start: startDate, end: endDate)
+        parameters.delegate?.didChangeEvent(event, start: startDate, end: endDate)
     }
     
     func didAddNewEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint) {
@@ -270,7 +257,7 @@ extension DayView: TimelineDelegate {
         components.hour = hour
         components.minute = minute
         let date = style.calendar.date(from: components)
-        delegate?.didAddNewEvent(event, date)
+        parameters.delegate?.didAddNewEvent(event, date)
     }
     
     func didChangeEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint, newDay: Int?) {
@@ -292,7 +279,7 @@ extension DayView: TimelineDelegate {
         endComponents.minute = minute + minuteOffset
         let endDate = style.calendar.date(from: endComponents)
         
-        delegate?.didChangeEvent(event, start: startDate, end: endDate)
+        parameters.delegate?.didChangeEvent(event, start: startDate, end: endDate)
     }
     
 }
@@ -334,7 +321,7 @@ extension DayView: CalendarSettingProtocol {
                     viewerFrame.size.width = width
                     if let resultViewerFrame = updateEventViewer(frame: viewerFrame) {
                         // notify when we did change the frame of viewer
-                        delegate?.didChangeViewerFrame(resultViewerFrame)
+                        parameters.delegate?.didChangeViewerFrame(resultViewerFrame)
                     }
                 }
             } else {

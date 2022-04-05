@@ -41,17 +41,13 @@ public final class CalendarView: UIView {
     internal lazy var currentViewCache: UIView? = nil
     
     private(set) lazy var dayView: DayView = {
-        let day = DayView(parameters: .init(style: style, data: dayData), frame: frame)
-        day.dataSource = self
-        day.delegate = self
+        let day = DayView(parameters: .init(style: style, data: dayData, delegate: self, dataSource: self), frame: frame)
         day.scrollableWeekView.dataSource = self
         return day
     }()
     
     private(set) lazy var weekView: WeekView = {
-        let week = WeekView(parameters: .init(data: weekData, style: style), frame: frame)
-        week.delegate = self
-        week.dataSource = self
+        let week = WeekView(parameters: .init(data: weekData, style: style, delegate: self, dataSource: self), frame: frame)
         week.scrollableWeekView.dataSource = self
         return week
     }()

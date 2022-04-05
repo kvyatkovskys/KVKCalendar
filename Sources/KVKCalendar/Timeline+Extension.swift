@@ -281,19 +281,20 @@ extension TimelineView {
             yPoint = -allDayHeight
         }
         
-        let newAllDayView = AllDayView(parameters: .init(prepareEvents: events,
+        let allDayView = AllDayView(parameters: .init(prepareEvents: events,
                                                          type: paramaters.type,
                                                          style: style,
                                                          delegate: delegate),
-                                       frame: CGRect(x: 0, y: yPoint, width: bounds.width, height: allDayHeight))
-        newAllDayView.tag = tagAllDayEventView
+                                    frame: CGRect(x: 0, y: yPoint, width: bounds.width, height: allDayHeight),
+                                    dataSource: dataSource)
+        allDayView.tag = tagAllDayEventView
         if style.allDay.isPinned {
-            addSubview(newAllDayView)
+            addSubview(allDayView)
         } else {
-            scrollView.addSubview(newAllDayView)
+            scrollView.addSubview(allDayView)
         }
         
-        return newAllDayView
+        return allDayView
     }
     
     func getTimelineLabel(hour: Int) -> TimelineLabel? {

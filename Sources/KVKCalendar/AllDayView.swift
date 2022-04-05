@@ -34,17 +34,17 @@ final class AllDayView: UIView {
     private let scrollView = UIScrollView()
     private let linePoints: [CGPoint]
     private var params: Parameters
-    
+    private weak var dataSource: DisplayDataSource?
+
     let items: [[AllDayEvent]]
     
-    init(parameters: Parameters, frame: CGRect) {
+    init(parameters: Parameters, frame: CGRect, dataSource: DisplayDataSource?) {
         self.params = parameters
-        
-        self.items = parameters.prepareEvents.compactMap({ item -> [AllDayEvent] in
-            return item.events.compactMap({ AllDayEvent(date: $0.start, event: $0, xOffset: item.xOffset, width: item.width) })
-        })
+        self.items = parameters.prepareEvents.compactMap { item -> [AllDayEvent] in
+            item.events.compactMap { AllDayEvent(date: $0.start, event: $0, xOffset: item.xOffset, width: item.width) }
+        }
         self.linePoints = parameters.prepareEvents.compactMap({ CGPoint(x: $0.xOffset, y: 0) })
-        
+        self.dataSource = dataSource
         super.init(frame: frame)
         setUI()
     }
@@ -120,8 +120,7 @@ final class AllDayView: UIView {
                                                     countEvents: item.count,
                                                     width: scrollView.bounds.width,
                                                     height: params.style.allDay.height)
-                    let eventView = AllDayEventView(style: params.style.allDay, event: event.element.event, frame: frameEvent)
-                    eventView.delegate = self
+                    let eventView = createEventView(event: event.element.event, frame: frameEvent)
                     scrollView.addSubview(eventView)
                 }
             }
@@ -132,8 +131,7 @@ final class AllDayView: UIView {
                     let frameEvent = CGRect(origin: CGPoint(x: x, y: params.style.allDay.height * CGFloat(event.offset)),
                                             size: CGSize(width: event.element.width - params.style.allDay.offsetWidth,
                                                          height: params.style.allDay.height - params.style.allDay.offsetHeight))
-                    let eventView = AllDayEventView(style: params.style.allDay, event: event.element.event, frame: frameEvent)
-                    eventView.delegate = self
+                    let eventView = createEventView(event: event.element.event, frame: frameEvent)
                     scrollView.addSubview(eventView)
                 }
             }
@@ -147,6 +145,16 @@ final class AllDayView: UIView {
             }
         default:
             break
+        }
+    }
+    
+    private func createEventView(event: Event, frame: CGRect) -> UIView {
+        if let customView = dataSource?.dequeueAllDayViewEvent(event, date: event.start, frame: frame) {
+            return customView
+        } else {
+            let eventView = AllDayEventView(style: params.style.allDay, event: event,  frame: frame)
+            eventView.delegate = self
+            return eventView
         }
     }
     

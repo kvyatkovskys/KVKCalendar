@@ -255,6 +255,11 @@ extension CalendarView: DisplayDataSource {
     public func dequeueMonthViewEvents(_ events: [Event], date: Date, frame: CGRect) -> UIView? {
         dataSource?.dequeueMonthViewEvents(events, date: date, frame: frame)
     }
+    
+    public func dequeueAllDayViewEvent(_ event: Event, date: Date, frame: CGRect) -> UIView? {
+        dataSource?.dequeueAllDayViewEvent(event, date: date, frame: frame)
+    }
+
 }
 
 extension CalendarView: DisplayDelegate {

@@ -351,6 +351,8 @@ public protocol CalendarDataSource: AnyObject {
     func willDisplayEventOptionMenu(_ event: Event, type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)?
     
     func dequeueMonthViewEvents(_ events: [Event], date: Date, frame: CGRect) -> UIView?
+    
+    func dequeueAllDayViewEvent(_ event: Event, date: Date, frame: CGRect) -> UIView?
 }
 
 public extension CalendarDataSource {
@@ -380,6 +382,8 @@ public extension CalendarDataSource {
     func willDisplayEventOptionMenu(_ event: Event, type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)? { nil }
     
     func dequeueMonthViewEvents(_ events: [Event], date: Date, frame: CGRect) -> UIView? { nil }
+    
+    func dequeueAllDayViewEvent(_ event: Event, date: Date, frame: CGRect) -> UIView? { nil }
 }
 
 // MARK: - Delegate protocol
