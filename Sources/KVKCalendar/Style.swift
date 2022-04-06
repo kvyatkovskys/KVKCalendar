@@ -523,6 +523,7 @@ public struct EventStyle {
     public var states: Set<EventViewGeneral.EventViewState> = [.move, .resize]
     public var defaultHeight: CGFloat? = nil
     public var showRecurringEventInPast: Bool = false
+    public var textContainerInset: UIEdgeInsets = .zero
     
     var defaultWidth: CGFloat? = nil
 }

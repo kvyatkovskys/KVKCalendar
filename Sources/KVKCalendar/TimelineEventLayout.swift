@@ -43,9 +43,13 @@ public extension TimelineEventLayoutContext {
             // calculate 'height' event
             if let defaultHeight = eventStyle?.defaultHeight {
                 newFrame.size.height = defaultHeight
-            } else if let globalDefaultHeight = style.event.defaultHeight {
-                newFrame.size.height = globalDefaultHeight
             } else if end.hour.hashValue == time.valueHash, end.day == date?.day {
+                // to avoid crash https://github.com/kvyatkovskys/KVKCalendar/issues/237
+                if start.hour == end.hour && start.minute == end.minute {
+                    newFrame.size.height = 30
+                    return
+                }
+                
                 var timeTemp = time
                 if time.tag == midnight, let newTime = timeLabels.first {
                     timeTemp = newTime
