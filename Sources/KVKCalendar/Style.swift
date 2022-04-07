@@ -65,7 +65,9 @@ public struct HeaderScrollStyle {
     
     public var heightSubviewHeader: CGFloat = 30 {
         didSet {
-            heightSubviewHeaderCached = heightSubviewHeader
+            if heightSubviewHeader > 0 {
+                heightSubviewHeaderCached = heightSubviewHeader
+            }
         }
     }
     private var heightSubviewHeaderCached: CGFloat = 30

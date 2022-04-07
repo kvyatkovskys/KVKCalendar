@@ -56,11 +56,13 @@ final class TimelinePageView: UIView {
         self.currentIndex = (pages.count / 2) - 1
         super.init(frame: frame)
         
-        let view = pages[currentIndex]
-        let container = TimelineContainerVC(index: currentIndex, contentView: view)
-        mainPageView.setViewControllers([container], direction: .forward, animated: false, completion: nil)
-        mainPageView.view.frame = CGRect(origin: .zero, size: frame.size)
-        addSubview(mainPageView.view)
+        if !pages.isEmpty {
+            let view = pages[currentIndex]
+            let container = TimelineContainerVC(index: currentIndex, contentView: view)
+            mainPageView.setViewControllers([container], direction: .forward, animated: false, completion: nil)
+            mainPageView.view.frame = CGRect(origin: .zero, size: frame.size)
+            addSubview(mainPageView.view)
+        }
         
         mainPageView.dataSource = self
         mainPageView.delegate = self
