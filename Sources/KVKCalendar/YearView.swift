@@ -17,23 +17,7 @@ final class YearView: UIView {
     weak var delegate: DisplayDelegate?
     weak var dataSource: DisplayDataSource?
     
-    private lazy var layout: UICollectionViewFlowLayout = {
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = data.style.year.scrollDirection
-        
-        switch data.style.year.scrollDirection {
-        case .horizontal:
-            layout.minimumLineSpacing = 0
-            layout.minimumInteritemSpacing = 0
-        case .vertical:
-            layout.minimumLineSpacing = 0
-            layout.minimumInteritemSpacing = 5
-        @unknown default:
-            fatalError()
-        }
-        
-        return layout
-    }()
+    private var layout = UICollectionViewFlowLayout()
     
     private func scrollDirection(month: Int) -> UICollectionView.ScrollPosition {
         switch month {
@@ -145,7 +129,20 @@ extension YearView: CalendarSettingProtocol {
     }
     
     func setUI() {
-        subviews.forEach({ $0.removeFromSuperview() })
+        subviews.forEach { $0.removeFromSuperview() }
+        
+        layout.scrollDirection = data.style.year.scrollDirection
+        
+        switch data.style.year.scrollDirection {
+        case .horizontal:
+            layout.minimumLineSpacing = 0
+            layout.minimumInteritemSpacing = 0
+        case .vertical:
+            layout.minimumLineSpacing = 0
+            layout.minimumInteritemSpacing = 5
+        @unknown default:
+            fatalError()
+        }
         
         collectionView = nil
         collectionView = createCollectionView(frame: frame, style: data.style.year)

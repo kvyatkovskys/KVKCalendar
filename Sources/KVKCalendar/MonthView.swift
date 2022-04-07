@@ -26,25 +26,12 @@ final class MonthView: UIView {
     var willSelectDate: ((Date) -> Void)?
     
     private var headerViewFrame: CGRect = .zero
+    private var weekHeaderView = WeekHeaderView(parameters: .init(style: Style()), frame: .zero)
     
-    private lazy var headerView: WeekHeaderView = {
-        let height: CGFloat
-        if style.month.isHiddenTitleHeader {
-            height = style.month.heightHeaderWeek
-        } else {
-            height = style.month.heightHeaderWeek + style.month.heightTitleHeader + 5
-        }
-        let view = WeekHeaderView(parameters: .init(style: style),
-                                  frame: CGRect(x: 0, y: 0, width: frame.width, height: height))
-        view.backgroundColor = style.week.colorBackground
-        return view
-    }()
-    
-    private lazy var layout: UICollectionViewFlowLayout = {
+    private var layout: UICollectionViewFlowLayout = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 0
-        layout.scrollDirection = style.month.scrollDirection
         return layout
     }()
     
@@ -82,7 +69,7 @@ final class MonthView: UIView {
             headerViewFrame = customHeaderView.frame
             addSubview(customHeaderView)
         } else {
-            headerView.date = date
+            weekHeaderView.date = date
         }
     }
     
@@ -194,7 +181,7 @@ extension MonthView: CalendarSettingProtocol {
             headerViewFrame = customHeaderView.frame
             addSubview(customHeaderView)
         } else {
-            headerView.reloadFrame(frame)
+            weekHeaderView.reloadFrame(frame)
         }
         
         collectionFrame.origin.y = headerViewFrame.height
@@ -217,14 +204,16 @@ extension MonthView: CalendarSettingProtocol {
     
     func updateStyle(_ style: Style) {
         parameters.style = style
-        headerView.updateStyle(style)
+        weekHeaderView.updateStyle(style)
+        weekHeaderView.setDate(parameters.monthData.date)
         setUI()
         scrollToDate(parameters.monthData.date, animated: false)
     }
     
     func setUI() {
-        subviews.forEach({ $0.removeFromSuperview() })
+        subviews.forEach { $0.removeFromSuperview() }
         
+        layout.scrollDirection = style.month.scrollDirection
         collectionView = nil
         var collectionFrame = frame
         
@@ -243,8 +232,8 @@ extension MonthView: CalendarSettingProtocol {
             headerViewFrame = customHeaderView.frame
             addSubview(customHeaderView)
         } else {
-            headerView.frame = headerViewFrame
-            addSubview(headerView)
+            weekHeaderView = setupWeekHeaderView(prepareFrame: headerViewFrame)
+            addSubview(weekHeaderView)
         }
         
         collectionFrame.origin.y = headerViewFrame.height
@@ -254,6 +243,12 @@ extension MonthView: CalendarSettingProtocol {
         if let tempView = collectionView {
             addSubview(tempView)
         }
+    }
+    
+    private func setupWeekHeaderView(prepareFrame: CGRect) -> WeekHeaderView {
+        let view = WeekHeaderView(parameters: .init(style: style), frame: prepareFrame)
+        view.backgroundColor = style.week.colorBackground
+        return view
     }
     
     private func getIndexForDirection(_ direction: UICollectionView.ScrollDirection, indexPath: IndexPath) -> IndexPath {
@@ -364,7 +359,7 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         if !style.month.isPagingEnabled, let visibleItems = collectionView?.indexPathsForVisibleItems.sorted(by: { $0.row < $1.row }) {
             let middleIndex = visibleItems[visibleItems.count / 2]
             let month = parameters.monthData.data.months[middleIndex.section]
-            headerView.date = month.date
+            weekHeaderView.date = month.date
             
             guard style.month.autoSelectionDateWhenScrolling,
                   let newDate = month.days.first(where: { $0.date?.year == month.date.year
@@ -395,7 +390,7 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         }
         
         let month = parameters.monthData.data.months[visibleIndex]
-        headerView.date = month.date
+        weekHeaderView.date = month.date
         guard style.month.autoSelectionDateWhenScrolling else { return }
         
         let newDate: Date
