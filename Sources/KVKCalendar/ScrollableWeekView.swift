@@ -66,7 +66,7 @@ final class ScrollableWeekView: UIView {
         case .week:
             return maxDays == 7
         default:
-            return false
+            return true
         }
     }
     

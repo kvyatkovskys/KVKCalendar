@@ -518,4 +518,37 @@ public protocol KVKCalendarHeaderProtocol: AnyObject {}
 
 extension UIView: KVKCalendarHeaderProtocol {}
 
+// MARK: - Scrollable Week settings
+
+protocol ScrollableWeekProtocol: AnyObject {
+    
+    var daysBySection: [[Day]] { get set }
+    
+}
+
+extension ScrollableWeekProtocol {
+    
+    func prepareDays(_ days: [Day], maxDayInWeek: Int) -> [[Day]] {
+        var daysBySection: [[Day]] = []
+        var idx = 0
+        var stop = false
+        
+        while !stop {
+            var endIdx = idx + maxDayInWeek
+            if endIdx > days.count {
+                endIdx = days.count
+            }
+            let items = Array(days[idx..<endIdx])
+            daysBySection.append(items)
+            idx += maxDayInWeek
+            if idx > days.count - 1 {
+                stop = true
+            }
+        }
+        
+        return daysBySection
+    }
+    
+}
+
 #endif
