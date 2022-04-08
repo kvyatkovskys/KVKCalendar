@@ -20,7 +20,7 @@ public final class CalendarView: UIView {
     public weak var delegate: CalendarDelegate?
     public weak var dataSource: CalendarDataSource? {
         didSet {
-            dayView.reloadEventViewer()
+            dayView.reloadEventViewerIfNeeded()
         }
     }
     public var selectedType: CalendarType {

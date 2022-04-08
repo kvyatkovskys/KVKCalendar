@@ -48,48 +48,6 @@ final class WeekView: UIView {
         self.timelineScale = parameters.style.timeline.scale?.min ?? 1
         super.init(frame: frame)
         setUI()
-        
-        timelinePage.didSwitchTimelineView = { [weak self] (timeline, type) in
-            guard let self = self else { return }
-            
-            let newTimeline = self.createTimelineView(frame: self.timelinePage.frame)
-            
-            switch type {
-            case .next:
-                self.nextDate()
-                self.timelinePage.addNewTimelineView(newTimeline, to: .end)
-            case .previous:
-                self.previousDate()
-                self.timelinePage.addNewTimelineView(newTimeline, to: .begin)
-            }
-            
-            self.didSelectDate(self.scrollableWeekView.date, type: .week)
-        }
-        
-        timelinePage.willDisplayTimelineView = { [weak self] (timeline, type) in
-            guard let self = self else { return }
-            
-            let nextDate: Date?
-            switch type {
-            case .next:
-                nextDate = self.parameters.style.calendar.date(byAdding: .day,
-                                                               value: self.style.week.maxDays,
-                                                               to: self.parameters.data.date)
-            case .previous:
-                nextDate = self.parameters.style.calendar.date(byAdding: .day,
-                                                               value: -self.style.week.maxDays,
-                                                               to: self.parameters.data.date)
-            }
-            
-            if let offset = self.timelinePage.timelineView?.contentOffset {
-                timeline.contentOffset = offset
-            }
-            
-            timeline.create(dates: self.getVisibleDatesFor(date: nextDate ?? self.parameters.data.date),
-                            events: self.parameters.data.events,
-                            recurringEvents: parameters.data.recurringEvents,
-                            selectedDate: self.parameters.data.date)
-        }
     }
     
     func setDate(_ date: Date) {
@@ -220,6 +178,49 @@ extension WeekView: CalendarSettingProtocol {
         let page = TimelinePageView(maxLimit: style.timeline.maxLimitCachedPages,
                                     pages: timelineViews,
                                     frame: timelineFrame)
+        
+        page.didSwitchTimelineView = { [weak self] (timeline, type) in
+            guard let self = self else { return }
+            
+            let newTimeline = self.createTimelineView(frame: timelineFrame)
+            
+            switch type {
+            case .next:
+                self.nextDate()
+                self.timelinePage.addNewTimelineView(newTimeline, to: .end)
+            case .previous:
+                self.previousDate()
+                self.timelinePage.addNewTimelineView(newTimeline, to: .begin)
+            }
+            
+            self.didSelectDate(self.scrollableWeekView.date, type: .week)
+        }
+        
+        page.willDisplayTimelineView = { [weak self] (timeline, type) in
+            guard let self = self else { return }
+            
+            let nextDate: Date?
+            switch type {
+            case .next:
+                nextDate = self.parameters.style.calendar.date(byAdding: .day,
+                                                               value: self.style.week.maxDays,
+                                                               to: self.parameters.data.date)
+            case .previous:
+                nextDate = self.parameters.style.calendar.date(byAdding: .day,
+                                                               value: -self.style.week.maxDays,
+                                                               to: self.parameters.data.date)
+            }
+            
+            if let offset = self.timelinePage.timelineView?.contentOffset {
+                timeline.contentOffset = offset
+            }
+            
+            timeline.create(dates: self.getVisibleDatesFor(date: nextDate ?? self.parameters.data.date),
+                            events: self.parameters.data.events,
+                            recurringEvents: self.parameters.data.recurringEvents,
+                            selectedDate: self.parameters.data.date)
+        }
+        
         return page
     }
     

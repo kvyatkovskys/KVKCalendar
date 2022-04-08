@@ -37,44 +37,6 @@ final class DayView: UIView {
         self.timelineScale = parameters.style.timeline.scale?.min ?? 1
         super.init(frame: frame)
         setUI()
-        
-        timelinePage.didSwitchTimelineView = { [weak self] (_, type) in
-            guard let self = self else { return }
-            
-            let newTimeline = self.createTimelineView(frame: self.timelinePage.frame)
-            
-            switch type {
-            case .next:
-                self.nextDate()
-                self.timelinePage.addNewTimelineView(newTimeline, to: .end)
-            case .previous:
-                self.previousDate()
-                self.timelinePage.addNewTimelineView(newTimeline, to: .begin)
-            }
-            
-            self.parameters.delegate?.didSelectDates([self.parameters.data.date], type: .day, frame: nil)
-        }
-        
-        timelinePage.willDisplayTimelineView = { [weak self] (timeline, type) in
-            guard let self = self else { return }
-            
-            let nextDate: Date?
-            switch type {
-            case .next:
-                nextDate = self.style.calendar.date(byAdding: .day,
-                                                    value: 1,
-                                                    to: self.parameters.data.date)
-            case .previous:
-                nextDate = self.style.calendar.date(byAdding: .day,
-                                                    value: -1,
-                                                    to: self.parameters.data.date)
-            }
-            
-            timeline.create(dates: [nextDate],
-                            events: self.parameters.data.events,
-                            recurringEvents: self.parameters.data.recurringEvents,
-                            selectedDate: self.parameters.data.date)
-        }
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -95,7 +57,7 @@ final class DayView: UIView {
                                           selectedDate: parameters.data.date)
     }
     
-    func reloadEventViewer() {
+    func reloadEventViewerIfNeeded() {
         guard UIDevice.current.userInterfaceIdiom == .pad else { return }
         
         var defaultFrame = timelinePage.frame
@@ -258,7 +220,7 @@ extension DayView: CalendarSettingProtocol {
         timelinePage.reloadPages()
         setUI()
         reloadFrame(frame)
-        reloadEventViewer()
+        reloadEventViewerIfNeeded()
     }
     
     func setUI() {
@@ -317,6 +279,45 @@ extension DayView: CalendarSettingProtocol {
         let page = TimelinePageView(maxLimit: style.timeline.maxLimitCachedPages,
                                     pages: timelineViews,
                                     frame: timelineFrame)
+        
+        page.didSwitchTimelineView = { [weak self] (_, type) in
+            guard let self = self else { return }
+            
+            let newTimeline = self.createTimelineView(frame: timelineFrame)
+            
+            switch type {
+            case .next:
+                self.nextDate()
+                self.timelinePage.addNewTimelineView(newTimeline, to: .end)
+            case .previous:
+                self.previousDate()
+                self.timelinePage.addNewTimelineView(newTimeline, to: .begin)
+            }
+            
+            self.parameters.delegate?.didSelectDates([self.parameters.data.date], type: .day, frame: nil)
+        }
+        
+        page.willDisplayTimelineView = { [weak self] (timeline, type) in
+            guard let self = self else { return }
+            
+            let nextDate: Date?
+            switch type {
+            case .next:
+                nextDate = self.style.calendar.date(byAdding: .day,
+                                                    value: 1,
+                                                    to: self.parameters.data.date)
+            case .previous:
+                nextDate = self.style.calendar.date(byAdding: .day,
+                                                    value: -1,
+                                                    to: self.parameters.data.date)
+            }
+            
+            timeline.create(dates: [nextDate],
+                            events: self.parameters.data.events,
+                            recurringEvents: self.parameters.data.recurringEvents,
+                            selectedDate: self.parameters.data.date)
+        }
+        
         return page
     }
     
