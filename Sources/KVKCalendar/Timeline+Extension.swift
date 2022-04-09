@@ -142,6 +142,14 @@ extension TimelineView {
 }
 
 extension TimelineView {
+    
+    // to avoid auto scrolling to current time
+    private func doNotScrollToCurrentTimeAndRunAction(_ action: @escaping () -> Void) {
+        forceDisableScrollToCurrentTime = true
+        action()
+        forceDisableScrollToCurrentTime = false
+    }
+    
     private func removeEventResizeView() {
         if let value = eventResizePreview?.haveNewSize, value.needSave, let event = eventResizePreview?.event {
             var startTime: (hour: Int?, minute: Int?)
@@ -216,10 +224,9 @@ extension TimelineView {
             potentiallyCenteredLabel = label
         }
         
-        // to avoid auto scrolling to current time
-        forceDisableScrollToCurrentTime = true
-        reloadTimeline()
-        forceDisableScrollToCurrentTime = false
+        doNotScrollToCurrentTimeAndRunAction { [weak self] in
+            self?.reloadTimeline()
+        }
         
         let yPointGlobal = gesture.location(in: self).y
         if let y = potentiallyCenteredLabel?.frame.origin.y, gesture.state == .changed {
@@ -481,7 +488,6 @@ extension TimelineView: ResizeEventViewDelegate {
             eventResizePreview?.frame.origin.y = location.y
             eventResizePreview?.frame.size.height += offsetY
             eventResizePreview?.startTime = movingMinuteLabel.time
-            print(movingMinuteLabel.time)
         case .bottom:
             let offset = location.y - (eventResizePreview?.mainYOffset ?? 0) + style.timeline.offsetEvent
             guard (location.y - (eventResizePreview?.frame.origin.y ?? 0)) > 80 else { return }
@@ -489,8 +495,7 @@ extension TimelineView: ResizeEventViewDelegate {
             showChangingMinute(pointY: offset)
             eventResizePreview?.frame.size.height = location.y - (eventResizePreview?.frame.origin.y ?? 0)
             eventResizePreview?.endTime = movingMinuteLabel.time
-        }
-        
+        }        
         eventResizePreview?.updateHeight()
     }
     
@@ -561,6 +566,7 @@ extension TimelineView: EventDelegate {
             scrollView.addSubview(resizeView)
         }
         enableAllEvents(enable: false)
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
     }
     
     func didEndResizeEvent(_ event: Event, gesture: UILongPressGestureRecognizer) {
@@ -608,6 +614,8 @@ extension TimelineView: EventDelegate {
                 self.eventPreview?.transform = CGAffineTransform(scaleX: 1, y: 1)
             }
         }
+        
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
     }
     
     func didEndMovingEvent(_ event: Event, gesture: UILongPressGestureRecognizer) {
@@ -636,6 +644,7 @@ extension TimelineView: EventDelegate {
         }
         
         shadowView.removeFromSuperview()
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
     }
     
     func didChangeMovingEvent(_ event: Event, gesture: UILongPressGestureRecognizer) {
@@ -751,7 +760,7 @@ extension TimelineView: AllDayEventDelegate {
 extension Int {
     /// SwifterSwift: Rounds to the closest multiple of n.
     func roundToNearest(_ number: Int) -> Int {
-        return number == 0 ? self : Int(round(Double(self) / Double(number))) * number
+        number == 0 ? self : Int(round(Double(self) / Double(number))) * number
     }
 }
 

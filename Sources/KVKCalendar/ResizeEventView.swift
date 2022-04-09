@@ -132,6 +132,7 @@ final class ResizeEventView: UIView {
             delegate?.didStart(gesture: gesture, type: type)
         case .cancelled, .failed, .ended:
             delegate?.didEnd(gesture: gesture, type: type)
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
         default:
             break
         }

@@ -14,8 +14,9 @@ final class TimelineLabel: UILabel {
     
     var time: TimeContainer = TimeContainer(minute: 0, hour: 0) {
         didSet {
-            if oldValue.minute != time.minute {
-                UISelectionFeedbackGenerator().selectionChanged()
+            guard 1..<60 ~= time.minute else {
+                text = nil
+                return
             }
             
             text = ":\(time.minute)"

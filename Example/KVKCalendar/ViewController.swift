@@ -183,6 +183,16 @@ extension ViewController: CalendarDelegate {
 // MARK: - Calendar datasource
 
 extension ViewController: CalendarDataSource {
+    
+    func dequeueAllDayViewEvent(_ event: Event, date: Date, frame: CGRect) -> UIView? {
+        if date.day == 11 {
+            let view = UIView(frame: frame)
+            view.backgroundColor = .systemRed
+            return view
+        }
+        return nil
+    }
+    
     @available(iOS 14.0, *)
     func willDisplayEventOptionMenu(_ event: Event, type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)? {
         guard type == .day else { return nil }
