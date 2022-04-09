@@ -29,7 +29,7 @@ enum Platform: Int {
         switch currentDevice {
         case .pad:
             if let vc = UIApplication.shared.windows.first(where: { $0.isKeyWindow })?.rootViewController {
-                if vc.view.bounds.width < 400 {
+                if vc.view.bounds.width < 600 {
                     return .phone
                 } else {
                     return .pad
