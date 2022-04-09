@@ -100,7 +100,12 @@ extension WeekView {
 extension WeekView: CalendarSettingProtocol {
     
     var style: Style {
-        parameters.style
+        get {
+            parameters.style
+        }
+        set {
+            parameters.style = newValue
+        }
     }
     
     func reloadFrame(_ frame: CGRect) {
@@ -126,7 +131,7 @@ extension WeekView: CalendarSettingProtocol {
     }
     
     func updateStyle(_ style: Style) {
-        parameters.style = style
+        self.style = style
         scrollableWeekView.updateStyle(style)
         timelinePage.updateStyle(style)
         timelinePage.reloadPages()

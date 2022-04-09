@@ -32,7 +32,7 @@ public struct Style {
     public init(configureAsDefaultCalendar: Bool = true) {
         guard configureAsDefaultCalendar else { return }
         
-        if UIDevice.current.userInterfaceIdiom == .phone {
+        if Platform.currentInterface == .phone {
             timeline.currentLineHourWidth = 45
             timeline.offsetTimeX = 2
             timeline.offsetLineLeft = 2
@@ -432,7 +432,7 @@ public struct YearStyle {
     public var weekFontPad: UIFont = .boldSystemFont(ofSize: 14)
     public var weekFontPhone: UIFont = .boldSystemFont(ofSize: 8)
     public var weekFont: UIFont {
-        switch UIDevice.current.userInterfaceIdiom {
+        switch Platform.currentInterface {
         case .phone:
             return weekFontPhone
         default:
@@ -449,7 +449,7 @@ public struct YearStyle {
     public var fontDayTitlePad: UIFont = .systemFont(ofSize: 15)
     public var fontDayTitlePhone: UIFont = .systemFont(ofSize: 11)
     public var fontDayTitle: UIFont {
-        switch UIDevice.current.userInterfaceIdiom {
+        switch Platform.currentInterface {
         case .phone:
             return fontDayTitlePhone
         default:
@@ -545,7 +545,7 @@ public struct ListViewStyle {
 }
 
 extension Style {
-    var checkStyle: Style {
+    var adaptiveStyle: Style {
         guard followInSystemTheme else { return self }
         
         var newStyle = self
@@ -606,7 +606,7 @@ extension Style {
             newStyle.month.colorWeekendDate = UIColor.useForStyle(dark: .systemGray2, white: newStyle.month.colorWeekendDate)
             newStyle.month.colorMoreTitle = UIColor.useForStyle(dark: .systemGray3, white: newStyle.month.colorMoreTitle)
             newStyle.month.colorEventTitle = UIColor.useForStyle(dark: .systemGray, white: newStyle.month.colorEventTitle)
-            if UIDevice.current.userInterfaceIdiom == .phone {
+            if Platform.currentInterface == .phone {
                 newStyle.month.colorSeparator = UIColor.useForStyle(dark: .systemGray4, white: newStyle.month.colorSeparator)
                 newStyle.month.colorBackgroundWeekendDate = UIColor.useForStyle(dark: .black,
                                                                                 white: newStyle.month.colorBackgroundWeekendDate)

@@ -31,6 +31,9 @@ final class DayView: UIView {
     var timelinePage = TimelinePageView(maxLimit: 0, pages: [], frame: .zero)
     
     private var topBackgroundView = UIView()
+    private var isAvailableEventViewer: Bool {
+        Platform.currentInterface != .phone
+    }
     
     init(parameters: Parameters, frame: CGRect) {
         self.parameters = parameters
@@ -58,7 +61,7 @@ final class DayView: UIView {
     }
     
     func reloadEventViewerIfNeeded() {
-        guard UIDevice.current.userInterfaceIdiom == .pad else { return }
+        guard isAvailableEventViewer else { return }
         
         var defaultFrame = timelinePage.frame
         if let defaultWidth = style.timeline.widthEventViewer {
@@ -160,7 +163,12 @@ extension DayView: TimelineDelegate {
 extension DayView: CalendarSettingProtocol {
     
     var style: Style {
-        parameters.style
+        get {
+            parameters.style
+        }
+        set {
+            parameters.style = newValue
+        }
     }
     
     func reloadFrame(_ frame: CGRect) {
@@ -175,7 +183,7 @@ extension DayView: CalendarSettingProtocol {
             timelineFrame.size.height = frame.height
         }
         
-        if UIDevice.current.userInterfaceIdiom == .pad {
+        if isAvailableEventViewer {
             if let defaultWidth = style.timeline.widthEventViewer {
                 timelineFrame.size.width = frame.width - defaultWidth
                 
@@ -214,7 +222,7 @@ extension DayView: CalendarSettingProtocol {
     }
     
     func updateStyle(_ style: Style) {
-        parameters.style = style
+        self.style = style
         scrollableWeekView.updateStyle(style)
         timelinePage.updateStyle(style)
         timelinePage.reloadPages()
@@ -265,7 +273,7 @@ extension DayView: CalendarSettingProtocol {
             timelineFrame.size.height -= scrollableWeekView.frame.height
         }
         
-        if UIDevice.current.userInterfaceIdiom != .phone {
+        if isAvailableEventViewer {
             if UIDevice.current.orientation.isPortrait {
                 timelineFrame.size.width = UIScreen.main.bounds.width * 0.5
             } else {

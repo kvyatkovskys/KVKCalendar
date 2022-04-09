@@ -169,7 +169,12 @@ final class MonthView: UIView {
 extension MonthView: CalendarSettingProtocol {
     
     var style: Style {
-        parameters.style
+        get {
+            parameters.style
+        }
+        set {
+            parameters.style = newValue
+        }
     }
     
     func reloadFrame(_ frame: CGRect) {
@@ -203,7 +208,7 @@ extension MonthView: CalendarSettingProtocol {
     }
     
     func updateStyle(_ style: Style) {
-        parameters.style = style
+        self.style = style
         weekHeaderView.updateStyle(style)
         weekHeaderView.setDate(parameters.monthData.date)
         setUI()

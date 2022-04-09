@@ -97,7 +97,12 @@ final class YearView: UIView {
 extension YearView: CalendarSettingProtocol {
     
     var style: Style {
-        data.style
+        get {
+            data.style
+        }
+        set {
+            data.style = newValue
+        }
     }
     
     func reloadFrame(_ frame: CGRect) {
@@ -123,7 +128,7 @@ extension YearView: CalendarSettingProtocol {
     }
     
     func updateStyle(_ style: Style) {
-        self.data.style = style
+        self.style = style
         setUI()
         scrollToDate(date: data.date, animated: false)
     }
@@ -232,7 +237,7 @@ extension YearView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
             height -= data.style.year.heightTitleHeader
         }
         
-        if UIDevice.current.userInterfaceIdiom == .pad {
+        if Platform.currentInterface != .phone {
             width = collectionView.frame.width / 4
             height /= 3
         } else {

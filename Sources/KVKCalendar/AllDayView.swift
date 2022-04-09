@@ -178,7 +178,12 @@ extension AllDayView: AllDayEventDelegate {
 extension AllDayView: CalendarSettingProtocol {
     
     var style: Style {
-        params.style
+        get {
+            params.style
+        }
+        set {
+            params.style = newValue
+        }
     }
     
     func reloadFrame(_ frame: CGRect) {
@@ -186,7 +191,7 @@ extension AllDayView: CalendarSettingProtocol {
     }
     
     func updateStyle(_ style: Style) {
-        params.style = style
+        self.style = style
         setUI()
     }
     

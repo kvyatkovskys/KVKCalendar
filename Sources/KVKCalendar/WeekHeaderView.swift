@@ -119,7 +119,12 @@ final class WeekHeaderView: UIView {
 extension WeekHeaderView: CalendarSettingProtocol {
     
     var style: Style {
-        parameters.style
+        get {
+            parameters.style
+        }
+        set {
+            parameters.style = newValue
+        }
     }
     
     var isFromYear: Bool {
@@ -148,7 +153,7 @@ extension WeekHeaderView: CalendarSettingProtocol {
     }
     
     func updateStyle(_ style: Style) {
-        parameters.style = style
+        self.style = style
         setUI()
     }
 }

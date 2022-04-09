@@ -82,7 +82,7 @@ final class MonthCell: KVKCollectionViewCell {
                 return
             }
             
-            if UIDevice.current.userInterfaceIdiom == .phone, UIDevice.current.orientation.isLandscape {
+            if Platform.currentInterface == .phone, UIDevice.current.orientation.isLandscape {
                 return
             }
             
@@ -147,7 +147,7 @@ final class MonthCell: KVKCollectionViewCell {
                     }
                     return
                 } else {
-                    if !event.isAllDay || UIDevice.current.userInterfaceIdiom == .phone {
+                    if !event.isAllDay || Platform.currentInterface == .phone {
                         label.attributedText = addIconBeforeLabel(eventList: [event],
                                                                   textAttributes: [.font: monthStyle.fontEventTitle,
                                                                                    .foregroundColor: monthStyle.colorEventTitle],
@@ -174,7 +174,7 @@ final class MonthCell: KVKCollectionViewCell {
                     label.addGestureRecognizer(tap)
                     label.tag = event.hash
                     
-                    if style.event.states.contains(.move) && UIDevice.current.userInterfaceIdiom != .phone && !event.isAllDay {
+                    if style.event.states.contains(.move) && Platform.currentInterface != .phone && !event.isAllDay {
                         label.addGestureRecognizer(longGesture)
                         label.addGestureRecognizer(panGesture)
                     }
@@ -205,7 +205,7 @@ final class MonthCell: KVKCollectionViewCell {
             }
 
             if !monthStyle.isHiddenSeparator {
-                switch UIDevice.current.userInterfaceIdiom {
+                switch Platform.currentInterface {
                 case .phone:
                     let topLineLayer = CALayer()
                     topLineLayer.name = "line_layer"
@@ -257,7 +257,7 @@ final class MonthCell: KVKCollectionViewCell {
         super.init(frame: frame)
         
         var dateFrame = frame
-        if UIDevice.current.userInterfaceIdiom == .pad {
+        if Platform.currentInterface != .phone {
             dateFrame.size = CGSize(width: 30, height: 30)
             dateFrame.origin.x = (frame.width - dateFrame.width) - offset
         } else {
@@ -284,7 +284,7 @@ final class MonthCell: KVKCollectionViewCell {
                                                y: dateLabel.frame.origin.y,
                                                width: 50,
                                                height: dateLabel.bounds.height))
-        if let date = day.date, date.day == 1, UIDevice.current.userInterfaceIdiom != .phone {
+        if let date = day.date, date.day == 1, Platform.currentInterface != .phone {
             monthLabel.textAlignment = .right
             monthLabel.textColor = dateLabel.textColor
             monthLabel.text = "\(date.titleForLocale(style.locale, formatter: monthStyle.shortInDayMonthFormatter))".capitalized
@@ -349,7 +349,7 @@ final class MonthCell: KVKCollectionViewCell {
         }
         
         if weekend {
-            switch UIDevice.current.userInterfaceIdiom {
+            switch Platform.currentInterface {
             case .phone where day.type == .empty:
                 view.backgroundColor = UIColor.clear
             default:
@@ -410,7 +410,7 @@ final class MonthCell: KVKCollectionViewCell {
     
     private func addIconBeforeLabel(eventList: [Event], textAttributes: [NSAttributedString.Key: Any], bulletAttributes: [NSAttributedString.Key: Any], timeAttributes: [NSAttributedString.Key: Any], bullet: String = "\u{2022}", indentation: CGFloat = 10, lineSpacing: CGFloat = 2, paragraphSpacing: CGFloat = 10) -> NSAttributedString {
         let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.alignment = UIDevice.current.userInterfaceIdiom == .pad ? .left : .center
+        paragraphStyle.alignment = Platform.currentInterface != .phone ? .left : .center
         paragraphStyle.tabStops = [NSTextTab(textAlignment: .left, location: indentation, options: [:])]
         paragraphStyle.defaultTabInterval = indentation
         paragraphStyle.lineSpacing = lineSpacing

@@ -211,8 +211,13 @@ extension CalendarView {
             reloadData()
         }
         
-        if let cacheView = currentViewCache as? CalendarSettingProtocol, cacheView.style != style {
-            cacheView.updateStyle(style)
+        if let cacheView = currentViewCache as? CalendarSettingProtocol {
+            if cacheView.style != style {
+                cacheView.updateStyle(style)
+            }
+            if currentViewCache?.frame != frame {
+                cacheView.reloadFrame(frame)
+            }
         }
     }
 }
@@ -309,12 +314,22 @@ extension CalendarView: DisplayDelegate {
 }
 
 extension CalendarView: CalendarSettingProtocol {
-    var style: Style {
-        parameters.style
+    public var style: Style {
+        get {
+            parameters.style
+        }
+        set {
+            parameters.style = newValue
+        }
     }
     
     public func reloadFrame(_ frame: CGRect) {
         self.frame = frame
+        
+        // to update style for miltiple windows on iPad and mac
+        if let updatedStyle = dataSource?.styleForCalendar(), style != updatedStyle {
+            updateStyle(updatedStyle)
+        }
         
         if let currentView = currentViewCache as? CalendarSettingProtocol {
             currentView.reloadFrame(frame)
@@ -322,7 +337,7 @@ extension CalendarView: CalendarSettingProtocol {
     }
     
     public func updateStyle(_ style: Style) {
-        parameters.style = style.checkStyle
+        self.style = style.adaptiveStyle
         
         if let currentView = currentViewCache as? CalendarSettingProtocol {
             currentView.updateStyle(self.style)

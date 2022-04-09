@@ -76,7 +76,7 @@ public final class CalendarView: UIView {
     }()
     
     public init(frame: CGRect, date: Date? = nil, style: Style = Style(), years: Int = 4) {
-        self.parameters = .init(type: style.defaultType ?? .day, style: style.checkStyle)
+        self.parameters = .init(type: style.defaultType ?? .day, style: style.adaptiveStyle)
         self.calendarData = CalendarData(date: date ?? Date(), years: years, style: style)
         self.dayData = DayData(data: calendarData, startDay: style.startWeekDay)
         self.weekData = WeekData(data: calendarData,

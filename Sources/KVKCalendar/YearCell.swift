@@ -20,7 +20,7 @@ final class YearCell: UICollectionViewCell {
     }()
     
     private var topHeight: CGFloat {
-        switch UIDevice.current.userInterfaceIdiom {
+        switch Platform.currentInterface {
         case .phone:
             return 15
         default:

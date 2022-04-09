@@ -278,7 +278,7 @@ extension TimelineView {
             allDayHeight *= 2
         } else if maxEvents > 4 {
             allDayHeight = style.allDay.maxHeight
-        } else if maxEvents == 2 && UIDevice.current.userInterfaceIdiom == .phone && paramaters.type == .week {
+        } else if maxEvents == 2 && Platform.currentInterface == .phone && paramaters.type == .week {
             allDayHeight *= 2
         }
         let yPoint: CGFloat
@@ -720,7 +720,12 @@ extension TimelineView: EventDelegate {
 extension TimelineView: CalendarSettingProtocol {
     
     var style: Style {
-        paramaters.style
+        get {
+            paramaters.style
+        }
+        set {
+            paramaters.style = newValue
+        }
     }
     
     func setUI() {
@@ -743,7 +748,7 @@ extension TimelineView: CalendarSettingProtocol {
     }
     
     func updateStyle(_ style: Style) {
-        paramaters.style = style
+        self.style = style
         currentLineView.updateStyle(style)
         setUI()
     }

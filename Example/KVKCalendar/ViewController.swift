@@ -31,19 +31,8 @@ final class ViewController: UIViewController {
         return button
     }()
     
-    private var style: Style = {
-        var style = Style()
-        style.timeline.isHiddenStubEvent = false
-        style.startWeekDay = .sunday
-        style.systemCalendars = ["Calendar1", "Calendar2", "Calendar3"]
-        if #available(iOS 13.0, *) {
-            style.event.iconFile = UIImage(systemName: "paperclip")
-        }
-        return style
-    }()
-    
     private lazy var calendarView: CalendarView = {
-        let calendar = CalendarView(frame: view.frame, date: selectDate, style: style)
+        let calendar = CalendarView(frame: view.frame, date: selectDate, style: createCalendarStyle())
         calendar.delegate = self
         calendar.dataSource = self
         return calendar
@@ -88,8 +77,8 @@ final class ViewController: UIViewController {
     }
     
     @objc private func reloadCalendarStyle() {
-        style.timeSystem = style.timeSystem == .twentyFour ? .twelve : .twentyFour
-        calendarView.updateStyle(style)
+        calendarView.style.timeSystem = calendarView.style.timeSystem == .twentyFour ? .twelve : .twentyFour
+        calendarView.updateStyle(calendarView.style)
         calendarView.reloadData()
     }
     
@@ -103,6 +92,17 @@ final class ViewController: UIViewController {
         let type = CalendarType.allCases[sender.selectedSegmentIndex]
         calendarView.set(type: type, date: selectDate)
         calendarView.reloadData()
+    }
+    
+    private func createCalendarStyle() -> Style {
+        var style = Style()
+        style.timeline.isHiddenStubEvent = false
+        style.startWeekDay = .sunday
+        style.systemCalendars = ["Calendar1", "Calendar2", "Calendar3"]
+        if #available(iOS 13.0, *) {
+            style.event.iconFile = UIImage(systemName: "paperclip")
+        }
+        return style
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -217,10 +217,18 @@ extension ViewController: CalendarDataSource {
         return events + mappedEvents
     }
     
+    func styleForCalendar() -> Style? {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            return createCalendarStyle()
+        }
+        
+        return nil
+    }
+    
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? {
         guard event.ID == "2" else { return nil }
         
-        return CustomViewEvent(style: style, event: event, frame: frame)
+        return CustomViewEvent(style: calendarView.style, event: event, frame: frame)
     }
     
     func dequeueCell<T>(dateParameter: DateParameter, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol? where T: UIScrollView {
@@ -257,7 +265,7 @@ extension ViewController: CalendarDataSource {
     func sizeForCell(_ date: Date?, type: CalendarType) -> CGSize? {
         guard type == .month && UIDevice.current.userInterfaceIdiom == .phone else { return nil }
         
-        switch style.month.scrollDirection {
+        switch calendarView.style.month.scrollDirection {
         case .vertical:
             return CGSize(width: view.bounds.width / 7, height: 70)
         case .horizontal:
@@ -303,7 +311,7 @@ extension ViewController {
             
             if item.id == "14" {
                 event.recurringType = .everyDay
-                var customeStyle = style.event
+                var customeStyle = calendarView.style.event
                 customeStyle.defaultHeight = 40
                 event.style = customeStyle
             }
@@ -317,7 +325,7 @@ extension ViewController {
     
     func timeFormatter(date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = style.timeSystem.format
+        formatter.dateFormat = calendarView.style.timeSystem.format
         return formatter.string(from: date)
     }
     

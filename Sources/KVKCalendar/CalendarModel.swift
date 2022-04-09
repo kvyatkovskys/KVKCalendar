@@ -286,7 +286,7 @@ public protocol EventProtocol {
 
 protocol CalendarSettingProtocol: AnyObject {
     
-    var style: Style { get }
+    var style: Style { get set }
     
     func reloadFrame(_ frame: CGRect)
     func updateStyle(_ style: Style)
@@ -309,6 +309,8 @@ public protocol CalendarDataSource: AnyObject {
     /// get events to display on view
     /// also this method returns a system events from iOS calendars if you set the property `systemCalendar` in style
     func eventsForCalendar(systemEvents: [EKEvent]) -> [Event]
+    
+    func styleForCalendar() -> Style?
     
     func willDisplayDate(_ date: Date?, events: [Event])
     
@@ -384,6 +386,8 @@ public extension CalendarDataSource {
     func dequeueMonthViewEvents(_ events: [Event], date: Date, frame: CGRect) -> UIView? { nil }
     
     func dequeueAllDayViewEvent(_ event: Event, date: Date, frame: CGRect) -> UIView? { nil }
+    
+    func styleForCalendar() -> Style? { nil }
 }
 
 // MARK: - Delegate protocol

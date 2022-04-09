@@ -189,7 +189,12 @@ final class ScrollableWeekView: UIView {
 extension ScrollableWeekView: CalendarSettingProtocol {
     
     var style: Style {
-        params.style
+        get {
+            params.style
+        }
+        set {
+            params.style = newValue
+        }
     }
     
     func setUI() {
@@ -219,7 +224,7 @@ extension ScrollableWeekView: CalendarSettingProtocol {
     }
     
     func updateStyle(_ style: Style) {
-        params.style = style
+        self.style = style
         setUI()
         scrollToDate(date, isAnimate: false)
     }
@@ -243,7 +248,7 @@ extension ScrollableWeekView: CalendarSettingProtocol {
         guard !style.headerScroll.isHiddenSubview else { return }
         
         let titleFrame: CGRect
-        switch UIDevice.current.userInterfaceIdiom {
+        switch Platform.currentInterface {
         case .phone:
             titleFrame = CGRect(origin: CGPoint(x: 5, y: frame.height),
                                 size: CGSize(width: frame.width - 10, height: style.headerScroll.heightSubviewHeader))
@@ -264,7 +269,7 @@ extension ScrollableWeekView: CalendarSettingProtocol {
         guard !style.headerScroll.isHiddenSubview else { return }
         
         frame.size.height = style.headerScroll.heightHeaderWeek
-        if UIDevice.current.userInterfaceIdiom != .phone {
+        if Platform.currentInterface != .phone {
             frame.origin.y = style.headerScroll.heightSubviewHeader
         }
     }
@@ -294,7 +299,7 @@ extension ScrollableWeekView: UICollectionViewDataSource {
         if let cell = dataSource?.dequeueCell(dateParameter: .init(date: day.date), type: type, view: collectionView, indexPath: indexPath) as? UICollectionViewCell {
             return cell
         } else {
-            switch UIDevice.current.userInterfaceIdiom {
+            switch Platform.currentInterface {
             case .phone:
                 return collectionView.kvkDequeueCell(indexPath: indexPath) { (cell: DayPhoneCell) in
                     cell.phoneStyle = style

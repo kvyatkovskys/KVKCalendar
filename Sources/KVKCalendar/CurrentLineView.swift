@@ -63,7 +63,12 @@ final class CurrentLineView: UIView {
 extension CurrentLineView: CalendarSettingProtocol {
     
     var style: Style {
-        parameters.style
+        get {
+            parameters.style
+        }
+        set {
+            parameters.style = newValue
+        }
     }
     
     func setUI() {
@@ -93,7 +98,7 @@ extension CurrentLineView: CalendarSettingProtocol {
     }
     
     func updateStyle(_ style: Style) {
-        parameters.style = style
+        self.style = style
         setUI()
         date = Date()
     }
