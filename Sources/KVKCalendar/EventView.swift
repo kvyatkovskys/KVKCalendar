@@ -44,6 +44,7 @@ final class EventView: EventViewGeneral {
         
         textFrame.size.height = textFrame.height
         textFrame.size.width = textFrame.width - pointX
+        textView.textContainerInset = style.event.textContainerInset
         textView.frame = textFrame
         textView.font = style.timeline.eventFont
         textView.text = event.title.timeline
@@ -87,6 +88,7 @@ final class EventView: EventViewGeneral {
         }
         
         button.menu = menu
+        addPointInteraction(on: button, delegate: self)
         addSubview(button)
     }
     

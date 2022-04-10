@@ -17,23 +17,7 @@ final class YearView: UIView {
     weak var delegate: DisplayDelegate?
     weak var dataSource: DisplayDataSource?
     
-    private lazy var layout: UICollectionViewFlowLayout = {
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = data.style.year.scrollDirection
-        
-        switch data.style.year.scrollDirection {
-        case .horizontal:
-            layout.minimumLineSpacing = 0
-            layout.minimumInteritemSpacing = 0
-        case .vertical:
-            layout.minimumLineSpacing = 0
-            layout.minimumInteritemSpacing = 5
-        @unknown default:
-            fatalError()
-        }
-        
-        return layout
-    }()
+    private var layout = UICollectionViewFlowLayout()
     
     private func scrollDirection(month: Int) -> UICollectionView.ScrollPosition {
         switch month {
@@ -113,7 +97,12 @@ final class YearView: UIView {
 extension YearView: CalendarSettingProtocol {
     
     var style: Style {
-        data.style
+        get {
+            data.style
+        }
+        set {
+            data.style = newValue
+        }
     }
     
     func reloadFrame(_ frame: CGRect) {
@@ -139,13 +128,26 @@ extension YearView: CalendarSettingProtocol {
     }
     
     func updateStyle(_ style: Style) {
-        self.data.style = style
+        self.style = style
         setUI()
-        scrollToDate(date: data.date, animated: false)
+        scrollToDate(date: data.date, animated: true)
     }
     
-    func setUI() {
-        subviews.forEach({ $0.removeFromSuperview() })
+    func setUI(reload: Bool = false) {
+        subviews.forEach { $0.removeFromSuperview() }
+        
+        layout.scrollDirection = data.style.year.scrollDirection
+        
+        switch data.style.year.scrollDirection {
+        case .horizontal:
+            layout.minimumLineSpacing = 0
+            layout.minimumInteritemSpacing = 0
+        case .vertical:
+            layout.minimumLineSpacing = 0
+            layout.minimumInteritemSpacing = 5
+        @unknown default:
+            fatalError()
+        }
         
         collectionView = nil
         collectionView = createCollectionView(frame: frame, style: data.style.year)
@@ -235,7 +237,7 @@ extension YearView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
             height -= data.style.year.heightTitleHeader
         }
         
-        if UIDevice.current.userInterfaceIdiom == .pad {
+        if Platform.currentInterface != .phone {
             width = collectionView.frame.width / 4
             height /= 3
         } else {

@@ -50,9 +50,9 @@ extension EventDateProtocol {
         guard let timeInterval = date?.timeIntervalSince1970, endDate > startDate else { return false }
         
         return event.start.day != event.end.day
-            && startDate...endDate ~= timeInterval
-            && event.start.year == date?.year
-            && event.start.month == date?.month
+        && (startDate...endDate).contains(timeInterval)
+        && event.start.year == date?.year
+        && event.start.month == date?.month
     }
 }
 

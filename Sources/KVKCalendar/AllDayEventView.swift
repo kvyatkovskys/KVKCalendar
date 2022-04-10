@@ -43,6 +43,10 @@ final class AllDayEventView: UIView {
         tag = event.hash
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapOnEvent))
         addGestureRecognizer(tap)
+        
+        if #available(iOS 13.4, *) {
+            addPointInteraction(on: self, delegate: self)
+        }
     }
     
     required init?(coder: NSCoder) {
