@@ -218,14 +218,6 @@ extension ViewController: CalendarDataSource {
         return events + mappedEvents
     }
     
-    func styleForCalendar() -> Style? {
-        if UIDevice.current.userInterfaceIdiom == .pad {
-            return createCalendarStyle()
-        }
-        
-        return nil
-    }
-    
     func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? {
         guard event.ID == "2" else { return nil }
         

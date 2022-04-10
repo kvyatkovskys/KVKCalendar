@@ -309,9 +309,7 @@ public protocol CalendarDataSource: AnyObject {
     /// get events to display on view
     /// also this method returns a system events from iOS calendars if you set the property `systemCalendar` in style
     func eventsForCalendar(systemEvents: [EKEvent]) -> [Event]
-    
-    func styleForCalendar() -> Style?
-    
+        
     func willDisplayDate(_ date: Date?, events: [Event])
     
     /// Use this method to add a custom event view
@@ -387,7 +385,6 @@ public extension CalendarDataSource {
     
     func dequeueAllDayViewEvent(_ event: Event, date: Date, frame: CGRect) -> UIView? { nil }
     
-    func styleForCalendar() -> Style? { nil }
 }
 
 // MARK: - Delegate protocol
