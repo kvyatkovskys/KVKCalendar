@@ -117,7 +117,7 @@ final class ScrollableWeekView: UIView {
     
     func setDate(_ date: Date, isDelay: Bool = true) {
         self.date = date
-        scrollToDate(date, isAnimate: isAnimate, isDelay: isDelay)
+        scrollToDate(date, animated: isAnimate, isDelay: isDelay)
         collectionView.reloadData()
     }
     
@@ -127,7 +127,7 @@ final class ScrollableWeekView: UIView {
         
         date = nextDate
         if needScrollToDate {
-            scrollToDate(date, isAnimate: true, isDelay: false)
+            scrollToDate(date, animated: true, isDelay: false)
         }
         
         collectionView.reloadData()
@@ -163,17 +163,17 @@ final class ScrollableWeekView: UIView {
         return collection
     }
     
-    private func scrollToDate(_ date: Date, isAnimate: Bool, isDelay: Bool = true) {
+    private func scrollToDate(_ date: Date, animated: Bool, isDelay: Bool = true) {
         guard let scrollDate = getScrollDate(date), let idx = getIdxByDate(scrollDate) else { return }
         
         if isDelay {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 self.collectionView.scrollToItem(at: IndexPath(row: 0, section: idx),
                                                  at: .left,
-                                                 animated: isAnimate)
+                                                 animated: animated)
             }
         } else {
-            collectionView.scrollToItem(at: IndexPath(row: 0, section: idx), at: .left, animated: isAnimate)
+            collectionView.scrollToItem(at: IndexPath(row: 0, section: idx), at: .left, animated: animated)
         }
         
         if !self.isAnimate {
@@ -226,7 +226,7 @@ extension ScrollableWeekView: CalendarSettingProtocol {
     func updateStyle(_ style: Style) {
         self.style = style
         setUI()
-        scrollToDate(date, isAnimate: false)
+        scrollToDate(date, animated: true)
     }
     
     private func setupViews(mainFrame: inout CGRect) {
