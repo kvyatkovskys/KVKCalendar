@@ -41,12 +41,12 @@ final class MonthView: UIView {
         setUI(reload: true)
     }
     
-    func setDate(_ date: Date, animated: Bool? = nil) {
+    func setDate(_ date: Date, animated: Bool = false) {
         updateHeaderView(date, frame: headerViewFrame)
         parameters.monthData.date = date
         parameters.monthData.selectedDates.removeAll()
         reload()
-        scrollToDate(date, animated: animated ?? false)
+        scrollToDate(date, animated: animated)
     }
     
     func reloadData(_ events: [Event]) {
@@ -96,8 +96,11 @@ final class MonthView: UIView {
     }
     
     private func scrollToDate(_ date: Date, animated: Bool) {
-        if let idx = parameters.monthData.data.months.firstIndex(where: { $0.date.month == date.month && $0.date.year == date.year }) {
+        if let idx = parameters.monthData.data.months.firstIndex(where: { $0.date.month == date.month && $0.date.year == date.year }), idx != parameters.monthData.selectedSection {
+            parameters.monthData.selectedSection = idx
             scrollToIndex(idx, animated: animated)
+        } else {
+            parameters.monthData.selectedSection = -1
         }
     }
     
@@ -107,20 +110,19 @@ final class MonthView: UIView {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
             if let attributes = self?.collectionView?.layoutAttributesForSupplementaryElement(ofKind: UICollectionView.elementKindSectionHeader, at: IndexPath(row: 0, section: idx)),
-               let inset = self?.collectionView?.contentInset
-            {
+               let inset = self?.collectionView?.contentInset {
+                let contentOffset: CGPoint
                 switch self?.style.month.scrollDirection {
                 case .vertical:
                     let offset = attributes.frame.origin.y - inset.top
-                    self?.collectionView?.setContentOffset(.init(x: 0, y: offset), animated: animated)
+                    contentOffset = CGPoint(x: 0, y: offset)
                 case .horizontal:
                     let offset = attributes.frame.origin.x - inset.left
-                    self?.collectionView?.setContentOffset(.init(x: offset, y: 0), animated: animated)
-                case .none:
-                    break
-                @unknown default:
-                    break
+                    contentOffset = CGPoint(x: offset, y: 0)
+                default:
+                    contentOffset = .zero
                 }
+                self?.collectionView?.setContentOffset(contentOffset, animated: animated)
             } else {
                 let scrollType: UICollectionView.ScrollPosition = self?.style.month.scrollDirection == .horizontal ? .left : .top
                 self?.collectionView?.scrollToItem(at: IndexPath(row: 0, section: idx), at: scrollType, animated: animated)

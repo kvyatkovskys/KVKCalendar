@@ -17,12 +17,12 @@ extension CalendarView {
     @available(*, deprecated, renamed: "CalendarDataSource.willDisplayEventViewer")
     public func addEventViewToDay(view: UIView) {}
     
-    public func set(type: CalendarType, date: Date? = nil) {
+    public func set(type: CalendarType, date: Date? = nil, animated: Bool = true) {
         parameters.type = type
         switchTypeCalendar(type: type)
         
         if let dt = date {
-            scrollTo(dt)
+            scrollTo(dt, animated: animated)
         }
     }
     
@@ -71,7 +71,7 @@ extension CalendarView {
         }
     }
     
-    public func scrollTo(_ date: Date, animated: Bool? = nil) {
+    public func scrollTo(_ date: Date, animated: Bool = true) {
         switch parameters.type {
         case .day:
             dayView.setDate(date)
