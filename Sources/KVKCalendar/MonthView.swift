@@ -38,7 +38,7 @@ final class MonthView: UIView {
     init(parameters: Parameters, frame: CGRect) {
         self.parameters = parameters
         super.init(frame: frame)
-        setUI()
+        setUI(reload: true)
     }
     
     func setDate(_ date: Date, animated: Bool? = nil) {
@@ -208,14 +208,14 @@ extension MonthView: CalendarSettingProtocol {
     }
     
     func updateStyle(_ style: Style) {
+        let reload = self.style != style
         self.style = style
-        weekHeaderView.updateStyle(style)
+        setUI(reload: reload)
         weekHeaderView.setDate(parameters.monthData.date)
-        setUI()
         scrollToDate(parameters.monthData.date, animated: false)
     }
     
-    func setUI() {
+    func setUI(reload: Bool = false) {
         subviews.forEach { $0.removeFromSuperview() }
         
         layout.scrollDirection = style.month.scrollDirection
@@ -232,12 +232,13 @@ extension MonthView: CalendarSettingProtocol {
         
         if let customHeaderView = dataSource?.willDisplayHeaderSubview(date: parameters.monthData.date,
                                                                        frame: headerViewFrame,
-                                                                       type: .month)
-        {
+                                                                       type: .month) {
             headerViewFrame = customHeaderView.frame
             addSubview(customHeaderView)
         } else {
-            weekHeaderView = setupWeekHeaderView(prepareFrame: headerViewFrame)
+            if reload {
+                weekHeaderView = setupWeekHeaderView(prepareFrame: headerViewFrame)
+            }
             addSubview(weekHeaderView)
         }
         

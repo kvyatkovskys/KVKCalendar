@@ -133,7 +133,7 @@ extension YearView: CalendarSettingProtocol {
         scrollToDate(date: data.date, animated: false)
     }
     
-    func setUI() {
+    func setUI(reload: Bool = false) {
         subviews.forEach { $0.removeFromSuperview() }
         
         layout.scrollDirection = data.style.year.scrollDirection

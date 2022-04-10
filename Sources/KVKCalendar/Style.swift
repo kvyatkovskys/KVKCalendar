@@ -216,9 +216,12 @@ public struct TimelineStyle {
     public var eventLayout: TimelineEventLayout = DefaultTimelineEventLayout()
     public var timeDividerColor: UIColor = .lightGray
     public var timeDividerFont: UIFont = .systemFont(ofSize: 10)
-    public var scale: Scale? = (1, 6)
+    public var scale: Scale? = Scale(min: 1, max: 6)
     
-    public typealias Scale = (min: CGFloat, max: CGFloat)
+    public struct Scale {
+        var min: CGFloat
+        var max: CGFloat
+    }
     
     public enum DividerType: Int {
         case mins5 = 12
@@ -688,16 +691,10 @@ extension YearStyle: Equatable {
         && compare(\.colorBackgroundSelectDate)
         && compare(\.colorSelectDate)
         && compare(\.colorWeekendDate)
-        && compare(\.weekFont)
         && compare(\.colorBackgroundWeekendDate)
-        && compare(\.scrollDirection)
-        && compare(\.isAnimateSelection)
-        && compare(\.isPagingEnabled)
-        && compare(\.weekDayAlignment)
-        && compare(\.titleDateAlignment)
-        && compare(\.colorBackground)
         && compare(\.weekFontPad)
         && compare(\.weekFontPhone)
+        && compare(\.weekFont)
         && compare(\.fontTitle)
         && compare(\.colorTitle)
         && compare(\.colorBackgroundHeader)
@@ -710,9 +707,14 @@ extension YearStyle: Equatable {
         && compare(\.fontDayTitle)
         && compare(\.colorDayTitle)
         && compare(\.selectCalendarType)
+        && compare(\.isAnimateSelection)
+        && compare(\.isPagingEnabled)
         && compare(\.isAutoSelectDateScrolling)
         && compare(\.weekDayAlignment)
         && compare(\.titleDateAlignment)
+        && compare(\.colorBackground)
+        && compare(\.scrollDirection)
+        && compare(\.weekDayAlignment)
     }
     
 }
@@ -753,6 +755,7 @@ extension MonthStyle: Equatable {
         && compare(\.colorBackgroundWeekendDate)
         && compare(\.colorBackgroundDate)
         && compare(\.scrollDirection)
+        && compare(\.selectCalendarType)
         && compare(\.isAnimateSelection)
         && compare(\.isPagingEnabled)
         && compare(\.isScrollEnabled)
@@ -765,10 +768,14 @@ extension MonthStyle: Equatable {
         && compare(\.titleHeaderAlignment)
         && compare(\.fontTitleHeader)
         && compare(\.colorTitleHeader)
+        && compare(\.colorTitleCurrentDate)
         && compare(\.showDatesForOtherMonths)
         && compare(\.colorBackground)
         && compare(\.selectionMode)
-        && compare(\.colorTitleCurrentDate)
+        && compare(\.showMonthNameInFirstDay)
+        && compare(\.isPrefetchingEnabled)
+        && compare(\.isHiddenSectionHeader)
+        && compare(\.heightSectionHeader)
     }
     
 }
@@ -800,7 +807,6 @@ extension HeaderScrollStyle: Equatable {
         && compare(\.heightHeaderWeek)
         && compare(\.heightSubviewHeader)
         && compare(\.colorBackground)
-        && compare(\.isHidden)
         && compare(\.isHiddenSubview)
         && compare(\.titleFormatter)
         && compare(\.weekdayFormatter)
@@ -852,6 +858,8 @@ extension WeekStyle: Equatable {
         && compare(\.colorWeekdayBackground)
         && compare(\.selectCalendarType)
         && compare(\.showVerticalDayDivider)
+        && compare(\.daysInOneWeek)
+        && compare(\.maxDays)
     }
     
 }
@@ -870,9 +878,9 @@ extension AllDayStyle: Equatable {
         && compare(\.textColor)
         && compare(\.offsetWidth)
         && compare(\.offsetHeight)
+        && compare(\.offsetX)
         && compare(\.height)
         && compare(\.maxHeight)
-        && compare(\.offsetX)
         && compare(\.fontTitle)
         && compare(\.isPinned)
         && compare(\.eventCorners)
@@ -894,8 +902,10 @@ extension TimelineStyle: Equatable {
         && compare(\.eventFont)
         && compare(\.offsetEvent)
         && compare(\.startHour)
+        && compare(\.scrollToHour)
         && compare(\.heightLine)
         && compare(\.movingMinuteLabelRoundUpTime)
+        && compare(\.minuteLabelRoundUpTime)
         && compare(\.widthLine)
         && compare(\.offsetLineLeft)
         && compare(\.offsetLineRight)
@@ -905,6 +915,7 @@ extension TimelineStyle: Equatable {
         && compare(\.offsetTimeX)
         && compare(\.offsetTimeY)
         && compare(\.timeColor)
+        && compare(\.timeAlignment)
         && compare(\.timeFont)
         && compare(\.widthEventViewer)
         && compare(\.showLineHourMode)
@@ -924,6 +935,18 @@ extension TimelineStyle: Equatable {
         && compare(\.isEnabledCreateNewEvent)
         && compare(\.maxLimitCachedPages)
         && compare(\.scrollDirections)
+        && compare(\.dividerType)
+        && compare(\.timeDividerColor)
+        && compare(\.timeDividerFont)
+        && compare(\.scale)
+    }
+    
+}
+
+extension TimelineStyle.Scale: Equatable {
+    
+    public static func == (lhs: TimelineStyle.Scale, rhs: TimelineStyle.Scale) -> Bool {
+        lhs.max == rhs.max && lhs.min == rhs.min
     }
     
 }
@@ -950,6 +973,9 @@ extension EventStyle: Equatable {
         && compare(\.delayForStartMove)
         && compare(\.states)
         && compare(\.defaultHeight)
+        && compare(\.showRecurringEventInPast)
+        && compare(\.textContainerInset)
+        && compare(\.defaultWidth)
     }
     
 }

@@ -106,6 +106,7 @@ final class ViewController: UIViewController {
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        calendarView.updateStyle(createCalendarStyle())
         loadEvents { [weak self] (events) in
             self?.events = events
             self?.calendarView.reloadData()

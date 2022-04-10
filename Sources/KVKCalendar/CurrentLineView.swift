@@ -71,7 +71,7 @@ extension CurrentLineView: CalendarSettingProtocol {
         }
     }
     
-    func setUI() {
+    func setUI(reload: Bool = false) {
         subviews.forEach({ $0.removeFromSuperview() })
         
         lineView.backgroundColor = style.timeline.currentLineHourColor

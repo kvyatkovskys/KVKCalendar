@@ -47,7 +47,7 @@ final class WeekView: UIView {
         self.parameters = parameters
         self.timelineScale = parameters.style.timeline.scale?.min ?? 1
         super.init(frame: frame)
-        setUI()
+        setUI(reload: true)
     }
     
     func setDate(_ date: Date) {
@@ -131,20 +131,21 @@ extension WeekView: CalendarSettingProtocol {
     }
     
     func updateStyle(_ style: Style) {
+        let reload = self.style != style
         self.style = style
-        scrollableWeekView.updateStyle(style)
-        timelinePage.updateStyle(style)
+        setUI(reload: reload)
         timelinePage.reloadPages()
-        setUI()
         reloadFrame(frame)
     }
     
-    func setUI() {
+    func setUI(reload: Bool) {
         subviews.forEach { $0.removeFromSuperview() }
         
-        topBackgroundView = setupTopBackgroundView()
-        scrollableWeekView = setupScrollableView()
-        timelinePage = setupTimelinePageView()
+        if reload {
+            topBackgroundView = setupTopBackgroundView()
+            scrollableWeekView = setupScrollableView()
+            timelinePage = setupTimelinePageView()
+        }
         addSubview(topBackgroundView)
         topBackgroundView.addSubview(scrollableWeekView)
         addSubview(timelinePage)

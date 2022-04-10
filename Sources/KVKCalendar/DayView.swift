@@ -39,7 +39,7 @@ final class DayView: UIView {
         self.parameters = parameters
         self.timelineScale = parameters.style.timeline.scale?.min ?? 1
         super.init(frame: frame)
-        setUI()
+        setUI(reload: true)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -222,27 +222,30 @@ extension DayView: CalendarSettingProtocol {
     }
     
     func updateStyle(_ style: Style) {
+        let reload = self.style != style
         self.style = style
-        scrollableWeekView.updateStyle(style)
-        timelinePage.updateStyle(style)
+        setUI(reload: reload)
         timelinePage.reloadPages()
-        setUI()
         reloadFrame(frame)
         reloadEventViewerIfNeeded()
     }
     
-    func setUI() {
+    func setUI(reload: Bool) {
         subviews.forEach { $0.removeFromSuperview() }
         
         if !parameters.style.headerScroll.isHidden {
-            topBackgroundView = setupTopBackgroundView()
-            scrollableWeekView = setupScrollableWeekView()
+            if reload {
+                topBackgroundView = setupTopBackgroundView()
+                scrollableWeekView = setupScrollableWeekView()
+            }
             
             addSubview(topBackgroundView)
             topBackgroundView.addSubview(scrollableWeekView)
         }
         
-        timelinePage = setupTimelinePageView()
+        if reload {
+            timelinePage = setupTimelinePageView()
+        }
         addSubview(timelinePage)
         timelinePage.isPagingEnabled = style.timeline.scrollDirections.contains(.horizontal)
     }

@@ -190,34 +190,26 @@ extension CalendarView {
     
     private func switchTypeCalendar(type: CalendarType) {
         parameters.type = type
-        currentViewCache?.removeFromSuperview()
+        viewCaches.removeValue(forKey: type)
+        subviews.forEach { $0.removeFromSuperview() }
         
         switch parameters.type {
         case .day:
             addSubview(dayView)
-            currentViewCache = dayView
+            viewCaches[type] = dayView
         case .week:
             addSubview(weekView)
-            currentViewCache = weekView
+            viewCaches[type] = weekView
         case .month:
             addSubview(monthView)
-            currentViewCache = monthView
+            viewCaches[type] = monthView
         case .year:
             addSubview(yearView)
-            currentViewCache = yearView
+            viewCaches[type] = yearView
         case .list:
             addSubview(listView)
-            currentViewCache = listView
+            viewCaches[type] = listView
             reloadData()
-        }
-        
-        if let cacheView = currentViewCache as? CalendarSettingProtocol {
-            if cacheView.style != style {
-                cacheView.updateStyle(style)
-            }
-            if currentViewCache?.frame != frame {
-                cacheView.reloadFrame(frame)
-            }
         }
     }
 }
@@ -314,6 +306,7 @@ extension CalendarView: DisplayDelegate {
 }
 
 extension CalendarView: CalendarSettingProtocol {
+    
     public var style: Style {
         get {
             parameters.style
@@ -326,27 +319,23 @@ extension CalendarView: CalendarSettingProtocol {
     public func reloadFrame(_ frame: CGRect) {
         self.frame = frame
         
-        // to update style for miltiple windows on iPad and mac
-        if let updatedStyle = dataSource?.styleForCalendar(), style != updatedStyle {
-            updateStyle(updatedStyle)
-        }
-        
-        if let currentView = currentViewCache as? CalendarSettingProtocol {
-            currentView.reloadFrame(frame)
+        viewCaches.values.forEach { (viewCache) in
+            if let currentView = viewCache as? CalendarSettingProtocol, viewCache.frame != frame {
+                currentView.reloadFrame(frame)
+            }
         }
     }
     
     public func updateStyle(_ style: Style) {
         self.style = style.adaptiveStyle
         
-        if let currentView = currentViewCache as? CalendarSettingProtocol {
-            currentView.updateStyle(self.style)
+        viewCaches.values.forEach { (viewCache) in
+            if let currentView = viewCache as? CalendarSettingProtocol, currentView.style != self.style {
+                currentView.updateStyle(self.style)
+            }
         }
     }
-    
-    func setUI() {
-        
-    }
+
 }
 
 #endif

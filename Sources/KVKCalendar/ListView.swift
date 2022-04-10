@@ -66,7 +66,7 @@ public final class ListView: UIView, CalendarSettingProtocol {
         setUI()
     }
     
-    func setUI() {
+    func setUI(reload: Bool = false) {
         subviews.forEach({ $0.removeFromSuperview() })
         
         backgroundColor = listStyle.backgroundColor

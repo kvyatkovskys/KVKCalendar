@@ -197,7 +197,7 @@ extension ScrollableWeekView: CalendarSettingProtocol {
         }
     }
     
-    func setUI() {
+    func setUI(relad: Bool = false) {
         subviews.forEach { $0.removeFromSuperview() }
         var newFrame = frame
         newFrame.origin.y = 0

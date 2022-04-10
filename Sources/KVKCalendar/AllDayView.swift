@@ -195,7 +195,7 @@ extension AllDayView: CalendarSettingProtocol {
         setUI()
     }
     
-    func setUI() {
+    func setUI(reload: Bool = false) {
         setupView()
         createEventViews()
     }

@@ -135,7 +135,7 @@ extension WeekHeaderView: CalendarSettingProtocol {
         self.date = date
     }
     
-    func setUI() {
+    func setUI(reload: Bool = false) {
         subviews.forEach { $0.removeFromSuperview() }
         addViews(frame: frame, isFromYear: isFromYear)
 
