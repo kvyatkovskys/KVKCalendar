@@ -88,6 +88,7 @@ final class EventView: EventViewGeneral {
         }
         
         button.menu = menu
+        addPointInteraction(on: button, delegate: self)
         addSubview(button)
     }
     

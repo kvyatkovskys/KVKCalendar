@@ -11,6 +11,7 @@ import UIKit
 
 @available(iOS 13.4, *)
 extension AllDayEventView: PointerInteractionProtocol {
+    
     func pointerInteraction(_ interaction: UIPointerInteraction, styleFor region: UIPointerRegion) -> UIPointerStyle? {
         var pointerStyle: UIPointerStyle?
 
@@ -20,6 +21,7 @@ extension AllDayEventView: PointerInteractionProtocol {
         }
         return pointerStyle
     }
+    
 }
 
 struct AllDayEvent {

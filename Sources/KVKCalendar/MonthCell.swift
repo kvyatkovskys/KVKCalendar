@@ -474,6 +474,7 @@ extension MonthCell: UIGestureRecognizerDelegate {
 
 @available(iOS 13.4, *)
 extension MonthCell: PointerInteractionProtocol {
+    
     func pointerInteraction(_ interaction: UIPointerInteraction, styleFor region: UIPointerRegion) -> UIPointerStyle? {
         var pointerStyle: UIPointerStyle?
         
@@ -483,6 +484,7 @@ extension MonthCell: PointerInteractionProtocol {
         }
         return pointerStyle
     }
+    
 }
 
 protocol MonthCellDelegate: AnyObject {
