@@ -17,12 +17,12 @@ extension CalendarView {
     @available(*, deprecated, renamed: "CalendarDataSource.willDisplayEventViewer")
     public func addEventViewToDay(view: UIView) {}
     
-    public func set(type: CalendarType, date: Date? = nil) {
+    public func set(type: CalendarType, date: Date? = nil, animated: Bool = true) {
         parameters.type = type
         switchTypeCalendar(type: type)
         
         if let dt = date {
-            scrollTo(dt)
+            scrollTo(dt, animated: animated)
         }
     }
     
@@ -71,7 +71,7 @@ extension CalendarView {
         }
     }
     
-    public func scrollTo(_ date: Date, animated: Bool? = nil) {
+    public func scrollTo(_ date: Date, animated: Bool = true) {
         switch parameters.type {
         case .day:
             dayView.setDate(date)
@@ -190,29 +190,26 @@ extension CalendarView {
     
     private func switchTypeCalendar(type: CalendarType) {
         parameters.type = type
-        currentViewCache?.removeFromSuperview()
+        viewCaches.removeValue(forKey: type)
+        subviews.forEach { $0.removeFromSuperview() }
         
         switch parameters.type {
         case .day:
             addSubview(dayView)
-            currentViewCache = dayView
+            viewCaches[type] = dayView
         case .week:
             addSubview(weekView)
-            currentViewCache = weekView
+            viewCaches[type] = weekView
         case .month:
             addSubview(monthView)
-            currentViewCache = monthView
+            viewCaches[type] = monthView
         case .year:
             addSubview(yearView)
-            currentViewCache = yearView
+            viewCaches[type] = yearView
         case .list:
             addSubview(listView)
-            currentViewCache = listView
+            viewCaches[type] = listView
             reloadData()
-        }
-        
-        if let cacheView = currentViewCache as? CalendarSettingProtocol, cacheView.style != style {
-            cacheView.updateStyle(style)
         }
     }
 }
@@ -255,6 +252,11 @@ extension CalendarView: DisplayDataSource {
     public func dequeueMonthViewEvents(_ events: [Event], date: Date, frame: CGRect) -> UIView? {
         dataSource?.dequeueMonthViewEvents(events, date: date, frame: frame)
     }
+    
+    public func dequeueAllDayViewEvent(_ event: Event, date: Date, frame: CGRect) -> UIView? {
+        dataSource?.dequeueAllDayViewEvent(event, date: date, frame: frame)
+    }
+
 }
 
 extension CalendarView: DisplayDelegate {
@@ -304,29 +306,36 @@ extension CalendarView: DisplayDelegate {
 }
 
 extension CalendarView: CalendarSettingProtocol {
-    var style: Style {
-        parameters.style
+    
+    public var style: Style {
+        get {
+            parameters.style
+        }
+        set {
+            parameters.style = newValue
+        }
     }
     
     public func reloadFrame(_ frame: CGRect) {
         self.frame = frame
         
-        if let currentView = currentViewCache as? CalendarSettingProtocol {
-            currentView.reloadFrame(frame)
+        viewCaches.values.forEach { (viewCache) in
+            if let currentView = viewCache as? CalendarSettingProtocol, viewCache.frame != frame {
+                currentView.reloadFrame(frame)
+            }
         }
     }
     
     public func updateStyle(_ style: Style) {
-        parameters.style = style.checkStyle
+        self.style = style.adaptiveStyle
         
-        if let currentView = currentViewCache as? CalendarSettingProtocol {
-            currentView.updateStyle(self.style)
+        viewCaches.values.forEach { (viewCache) in
+            if let currentView = viewCache as? CalendarSettingProtocol, currentView.style != self.style {
+                currentView.updateStyle(self.style)
+            }
         }
     }
-    
-    func setUI() {
-        
-    }
+
 }
 
 #endif

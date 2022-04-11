@@ -43,9 +43,13 @@ public extension TimelineEventLayoutContext {
             // calculate 'height' event
             if let defaultHeight = eventStyle?.defaultHeight {
                 newFrame.size.height = defaultHeight
-            } else if let globalDefaultHeight = style.event.defaultHeight {
-                newFrame.size.height = globalDefaultHeight
             } else if end.hour.hashValue == time.valueHash, end.day == date?.day {
+                // to avoid crash https://github.com/kvyatkovskys/KVKCalendar/issues/237
+                if start.hour == end.hour && start.minute == end.minute {
+                    newFrame.size.height = 30
+                    return
+                }
+                
                 var timeTemp = time
                 if time.tag == midnight, let newTime = timeLabels.first {
                     timeTemp = newTime
@@ -80,11 +84,11 @@ public extension TimelineEventLayoutContext {
             let start = event.start.timeIntervalSince1970
             let end = event.end.timeIntervalSince1970
             var crossEventNew = CrossEvent(eventTime: EventTime(start: start, end: end))
-            let endCalculated: TimeInterval = crossEventNew.eventTime.end - TimeInterval(style.timeline.offsetEvent)
+            let endCalculated = crossEventNew.eventTime.end - TimeInterval(style.timeline.offsetEvent)
             crossEventNew.events = events.filter { item in
                 let itemEnd = item.end.timeIntervalSince1970 - TimeInterval(style.timeline.offsetEvent)
                 let itemStart = item.start.timeIntervalSince1970
-                guard itemEnd > itemStart else { return false }
+                guard itemEnd > itemStart && endCalculated > start else { return false }
 
                 return (itemStart...itemEnd).contains(start)
                 || (itemStart...itemEnd).contains(endCalculated)

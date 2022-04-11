@@ -19,10 +19,8 @@ final class WeekHeaderView: UIView {
     private var parameters: Parameters
     private var days = [Date]()
     
-    private lazy var titleLabel: UILabel = {
+    private let titleLabel: UILabel = {
         let label = UILabel()
-        label.textAlignment = style.month.titleHeaderAlignment
-        label.font = style.month.fontTitleHeader
         label.tag = -999
         return label
     }()
@@ -121,31 +119,41 @@ final class WeekHeaderView: UIView {
 extension WeekHeaderView: CalendarSettingProtocol {
     
     var style: Style {
-        parameters.style
+        get {
+            parameters.style
+        }
+        set {
+            parameters.style = newValue
+        }
     }
     
     var isFromYear: Bool {
         parameters.isFromYear
     }
     
-    func setUI() {
-        subviews.forEach({ $0.removeFromSuperview() })
-        
+    func setDate(_ date: Date) {
+        self.date = date
+    }
+    
+    func setUI(reload: Bool = false) {
+        subviews.forEach { $0.removeFromSuperview() }
         addViews(frame: frame, isFromYear: isFromYear)
+
+        if !style.month.isHiddenTitleHeader && !isFromYear {
+            titleLabel.textAlignment = style.month.titleHeaderAlignment
+            titleLabel.font = style.month.fontTitleHeader
+        }
     }
     
     func reloadFrame(_ frame: CGRect) {
         self.frame.size.width = frame.width
         
-        titleLabel.removeFromSuperview()
-        days.forEach { (day) in
-            subviews.filter({ $0.tag == day.weekday }).forEach({ $0.removeFromSuperview() })
-        }
+        subviews.forEach { $0.removeFromSuperview() }
         addViews(frame: self.frame, isFromYear: isFromYear)
     }
     
     func updateStyle(_ style: Style) {
-        parameters.style = style
+        self.style = style
         setUI()
     }
 }

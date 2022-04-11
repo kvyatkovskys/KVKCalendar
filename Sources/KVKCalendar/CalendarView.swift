@@ -20,7 +20,7 @@ public final class CalendarView: UIView {
     public weak var delegate: CalendarDelegate?
     public weak var dataSource: CalendarDataSource? {
         didSet {
-            dayView.reloadEventViewer()
+            dayView.reloadEventViewerIfNeeded()
         }
     }
     public var selectedType: CalendarType {
@@ -36,23 +36,18 @@ public final class CalendarView: UIView {
     private var dayData: DayData
     private let listData: ListViewData
     
-    /// references the current visible View (to allow lazy loading of views)
-    // cannot be private unfortunately, because private only allows access to extensions that are in the same file...
-    internal lazy var currentViewCache: UIView? = nil
+    /// references the current visible Views
+    var viewCaches: [CalendarType: UIView] = [:]
     
     private(set) lazy var dayView: DayView = {
-        let day = DayView(parameters: .init(style: style, data: dayData), frame: frame)
-        day.dataSource = self
-        day.delegate = self
-        day.scrollHeaderDay.dataSource = self
+        let day = DayView(parameters: .init(style: style, data: dayData, delegate: self, dataSource: self), frame: frame)
+        day.scrollableWeekView.dataSource = self
         return day
     }()
     
     private(set) lazy var weekView: WeekView = {
-        let week = WeekView(parameters: .init(data: weekData, style: style), frame: frame)
-        week.delegate = self
-        week.dataSource = self
-        week.scrollHeaderDay.dataSource = self
+        let week = WeekView(parameters: .init(data: weekData, style: style, delegate: self, dataSource: self), frame: frame)
+        week.scrollableWeekView.dataSource = self
         return week
     }()
     
@@ -80,7 +75,7 @@ public final class CalendarView: UIView {
     }()
     
     public init(frame: CGRect, date: Date? = nil, style: Style = Style(), years: Int = 4) {
-        self.parameters = .init(type: style.defaultType ?? .day, style: style.checkStyle)
+        self.parameters = .init(type: style.defaultType ?? .day, style: style.adaptiveStyle)
         self.calendarData = CalendarData(date: date ?? Date(), years: years, style: style)
         self.dayData = DayData(data: calendarData, startDay: style.startWeekDay)
         self.weekData = WeekData(data: calendarData,

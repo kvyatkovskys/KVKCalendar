@@ -9,6 +9,41 @@
 
 import UIKit
 
+enum Platform: Int {
+    case phone, pad, mac, none
+    
+    static var currentDevice: Platform {
+        switch UIDevice.current.userInterfaceIdiom {
+        case .phone:
+            return .phone
+        case .pad:
+            return .pad
+        case .mac:
+            return .mac
+        default:
+            return .none
+        }
+    }
+    
+    static var currentInterface: Platform {
+        switch currentDevice {
+        case .pad:
+            if let vc = UIApplication.shared.windows.first(where: { $0.isKeyWindow })?.rootViewController {
+                if vc.view.bounds.width < 600 {
+                    return .phone
+                } else {
+                    return .pad
+                }
+            } else {
+                return .pad
+            }
+        default:
+            return currentDevice
+        }
+    }
+        
+}
+
 private enum AssociatedKeys {
     static var timer: UInt8 = 0
 }

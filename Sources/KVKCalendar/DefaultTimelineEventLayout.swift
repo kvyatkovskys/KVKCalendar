@@ -22,7 +22,8 @@ public struct DefaultTimelineEventLayout: TimelineEventLayout {
                                              style: event.style)
 
             // calculate 'width' and position 'x' event
-            if let crossEvent = crossEvents[event.start.timeIntervalSince1970] {
+            // checking events is not empty to avoid crash https://github.com/kvyatkovskys/KVKCalendar/issues/237
+            if let crossEvent = crossEvents[event.start.timeIntervalSince1970], !crossEvent.events.isEmpty {
                 var newOriginX = frame.origin.x
                 var newWidth = frame.width
                 newWidth /= CGFloat(crossEvent.events.count)
