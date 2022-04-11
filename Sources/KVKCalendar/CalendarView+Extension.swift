@@ -77,6 +77,10 @@ extension CalendarView {
             dayView.setDate(date)
         case .week:
             weekView.setDate(date)
+        case .threeDay:
+            weekView.setDate(date)
+        case .sevenDay:
+            weekView.setDate(date)
         case .month:
             monthView.setDate(date, animated: animated)
         case .year:
@@ -197,6 +201,12 @@ extension CalendarView {
         case .day:
             addSubview(dayView)
             viewCaches[type] = dayView
+        case .threeDay :
+            addSubview(weekView)
+            viewCaches[type] = weekView
+        case .sevenDay:
+            addSubview(weekView)
+            viewCaches[type] = weekView
         case .week:
             addSubview(weekView)
             viewCaches[type] = weekView

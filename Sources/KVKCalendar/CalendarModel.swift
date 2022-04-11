@@ -74,7 +74,7 @@ public enum TimeHourSystem: Int {
 }
 
 public enum CalendarType: String, CaseIterable {
-    case day, week, month, year, list
+    case day, week, threeDay, sevenDay, month, year, list
 }
 
 // MARK: Event model
