@@ -5,6 +5,8 @@
 //  Created by Sergei Kviatkovskii on 3/27/22.
 //
 
+#if os(iOS)
+
 import UIKit
 
 final class ScrollableWeekHeaderView: UIView {
@@ -59,3 +61,5 @@ final class ScrollableWeekHeaderView: UIView {
     }
     
 }
+
+#endif
