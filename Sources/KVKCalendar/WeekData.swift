@@ -22,11 +22,35 @@ final class WeekData: EventDateProtocol, ScrollableWeekProtocol {
         if maxDays != 7 {
             item = .sunday
         }
+        
         var tempDays = data.months.reduce([], { $0 + $1.days })
         let startIdx = tempDays.count > maxDays ? tempDays.count - maxDays : tempDays.count
         let endWeek = data.addEndEmptyDays(Array(tempDays[startIdx..<tempDays.count]), startDay: item)
+        
         tempDays.removeSubrange(startIdx..<tempDays.count)
-        self.days = data.addStartEmptyDays(tempDays, startDay: item) + endWeek
+        let defaultDays = data.addStartEmptyDays(tempDays, startDay: item) + endWeek
+        
+        var extensionDays:[Day] = []
+        
+        if maxDays != 7,
+            let indexOfInputDate = defaultDays.firstIndex(where: { $0.date?.isSameDay(otherDate: data.date) ?? false }),
+            let firstDate = defaultDays.first?.date
+        {
+            let extraBufferDays = (defaultDays.count - indexOfInputDate) % maxDays
+            if extraBufferDays > 0 {
+                var i = extraBufferDays
+                while (i > 0) {
+                    extensionDays.append(Day(type: .empty, date: firstDate.adding(.day, value: -1 * i), data: []))
+                    i -= 1
+                }
+            }
+        }
+        
+        if extensionDays.isEmpty {
+            self.days = defaultDays
+        } else {
+            self.days = extensionDays + defaultDays
+        }
         
         daysBySection = prepareDays(days, maxDayInWeek: maxDays)
     }
