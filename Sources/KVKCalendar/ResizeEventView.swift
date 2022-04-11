@@ -127,11 +127,12 @@ final class ResizeEventView: UIView {
         
         switch gesture.state {
         case .began:
-            UIImpactFeedbackGenerator().impactOccurred()
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
         case .changed:
             delegate?.didStart(gesture: gesture, type: type)
         case .cancelled, .failed, .ended:
             delegate?.didEnd(gesture: gesture, type: type)
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
         default:
             break
         }
@@ -144,6 +145,7 @@ final class ResizeEventView: UIView {
 
 @available(iOS 13.4, *)
 extension ResizeEventView: PointerInteractionProtocol {
+    
     func pointerInteraction(_ interaction: UIPointerInteraction, styleFor region: UIPointerRegion) -> UIPointerStyle? {
         var pointerStyle: UIPointerStyle?
         
@@ -155,8 +157,6 @@ extension ResizeEventView: PointerInteractionProtocol {
     }
     
     func pointerInteraction(_ interaction: UIPointerInteraction, regionFor request: UIPointerRegionRequest, defaultRegion: UIPointerRegion) -> UIPointerRegion? {
-        //let cursor =
-        print(request.location)
         if topView.frame.contains(request.location) {
             return UIPointerRegion(rect: topView.frame)
         } else if bottomView.frame.contains(request.location) {
@@ -165,6 +165,7 @@ extension ResizeEventView: PointerInteractionProtocol {
             return nil
         }
     }
+    
 }
 
 protocol ResizeEventViewDelegate: AnyObject {

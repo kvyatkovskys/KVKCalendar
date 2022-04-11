@@ -26,7 +26,12 @@ public final class ListView: UIView, CalendarSettingProtocol {
     }
     
     var style: Style {
-        params.style
+        get {
+            params.style
+        }
+        set {
+            params.style = newValue
+        }
     }
     
     private var params: Parameters
@@ -57,11 +62,11 @@ public final class ListView: UIView, CalendarSettingProtocol {
     }
     
     func updateStyle(_ style: Style) {
-        params.style = style
+        self.style = style
         setUI()
     }
     
-    func setUI() {
+    func setUI(reload: Bool = false) {
         subviews.forEach({ $0.removeFromSuperview() })
         
         backgroundColor = listStyle.backgroundColor

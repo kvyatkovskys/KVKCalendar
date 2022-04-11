@@ -286,13 +286,12 @@ public protocol EventProtocol {
 
 protocol CalendarSettingProtocol: AnyObject {
     
-    var style: Style { get }
+    var style: Style { get set }
     
     func reloadFrame(_ frame: CGRect)
     func updateStyle(_ style: Style)
     func reloadData(_ events: [Event])
     func setDate(_ date: Date)
-    func setUI()
     
 }
 
@@ -300,6 +299,7 @@ extension CalendarSettingProtocol {
     
     func reloadData(_ events: [Event]) {}
     func setDate(_ date: Date) {}
+    func setUI(reload: Bool = false) {}
     
 }
 
@@ -309,7 +309,7 @@ public protocol CalendarDataSource: AnyObject {
     /// get events to display on view
     /// also this method returns a system events from iOS calendars if you set the property `systemCalendar` in style
     func eventsForCalendar(systemEvents: [EKEvent]) -> [Event]
-    
+        
     func willDisplayDate(_ date: Date?, events: [Event])
     
     /// Use this method to add a custom event view
@@ -351,6 +351,8 @@ public protocol CalendarDataSource: AnyObject {
     func willDisplayEventOptionMenu(_ event: Event, type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)?
     
     func dequeueMonthViewEvents(_ events: [Event], date: Date, frame: CGRect) -> UIView?
+    
+    func dequeueAllDayViewEvent(_ event: Event, date: Date, frame: CGRect) -> UIView?
 }
 
 public extension CalendarDataSource {
@@ -380,6 +382,9 @@ public extension CalendarDataSource {
     func willDisplayEventOptionMenu(_ event: Event, type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)? { nil }
     
     func dequeueMonthViewEvents(_ events: [Event], date: Date, frame: CGRect) -> UIView? { nil }
+    
+    func dequeueAllDayViewEvent(_ event: Event, date: Date, frame: CGRect) -> UIView? { nil }
+    
 }
 
 // MARK: - Delegate protocol
@@ -513,5 +518,38 @@ extension UITableViewCell: KVKCalendarCellProtocol {}
 public protocol KVKCalendarHeaderProtocol: AnyObject {}
 
 extension UIView: KVKCalendarHeaderProtocol {}
+
+// MARK: - Scrollable Week settings
+
+protocol ScrollableWeekProtocol: AnyObject {
+    
+    var daysBySection: [[Day]] { get set }
+    
+}
+
+extension ScrollableWeekProtocol {
+    
+    func prepareDays(_ days: [Day], maxDayInWeek: Int) -> [[Day]] {
+        var daysBySection: [[Day]] = []
+        var idx = 0
+        var stop = false
+        
+        while !stop {
+            var endIdx = idx + maxDayInWeek
+            if endIdx > days.count {
+                endIdx = days.count
+            }
+            let items = Array(days[idx..<endIdx])
+            daysBySection.append(items)
+            idx += maxDayInWeek
+            if idx > days.count - 1 {
+                stop = true
+            }
+        }
+        
+        return daysBySection
+    }
+    
+}
 
 #endif

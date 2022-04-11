@@ -9,19 +9,26 @@
 
 import Foundation
 
-final class WeekData: EventDateProtocol {
+final class WeekData: EventDateProtocol, ScrollableWeekProtocol {
     let days: [Day]
     var date: Date
     var events: [Event] = []
     var recurringEvents: [Event] = []
+    var daysBySection: [[Day]] = []
     
     init(data: CalendarData, startDay: StartDayType, maxDays: Int) {
         self.date = data.date
+        var item = startDay
+        if maxDays != 7 {
+            item = .sunday
+        }
         var tempDays = data.months.reduce([], { $0 + $1.days })
         let startIdx = tempDays.count > maxDays ? tempDays.count - maxDays : tempDays.count
-        let endWeek = data.addEndEmptyDays(Array(tempDays[startIdx..<tempDays.count]), startDay: startDay)
+        let endWeek = data.addEndEmptyDays(Array(tempDays[startIdx..<tempDays.count]), startDay: item)
         tempDays.removeSubrange(startIdx..<tempDays.count)
-        self.days = data.addStartEmptyDays(tempDays, startDay: startDay) + endWeek
+        self.days = data.addStartEmptyDays(tempDays, startDay: item) + endWeek
+        
+        daysBySection = prepareDays(days, maxDayInWeek: maxDays)
     }
     
     func filterEvents(_ events: [Event], dates: [Date?]) -> [Event] {

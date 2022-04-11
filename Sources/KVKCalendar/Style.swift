@@ -32,7 +32,7 @@ public struct Style {
     public init(configureAsDefaultCalendar: Bool = true) {
         guard configureAsDefaultCalendar else { return }
         
-        if UIDevice.current.userInterfaceIdiom == .phone {
+        if Platform.currentInterface == .phone {
             timeline.currentLineHourWidth = 45
             timeline.offsetTimeX = 2
             timeline.offsetLineLeft = 2
@@ -62,13 +62,29 @@ public struct Style {
 public struct HeaderScrollStyle {
     public var titleDays: [String] = []
     public var heightHeaderWeek: CGFloat = 50
-    public var heightSubviewHeader: CGFloat = 30
+    
+    public var heightSubviewHeader: CGFloat = 30 {
+        didSet {
+            if heightSubviewHeader > 0 {
+                heightSubviewHeaderCached = heightSubviewHeader
+            }
+        }
+    }
+    private var heightSubviewHeaderCached: CGFloat = 30
     
     @available(swift, deprecated: 0.4.1, obsoleted: 0.4.2, renamed: "heightSubviewHeader")
     public var heightTitleDate: CGFloat = 30
     
     public var colorBackground: UIColor = gainsboro.withAlphaComponent(0.4)
-    public var isHiddenSubview: Bool = false
+    public var isHiddenSubview: Bool = false {
+        didSet {
+            if isHiddenSubview {
+                heightSubviewHeader = 0
+            } else {
+                heightSubviewHeader = heightSubviewHeaderCached
+            }
+        }
+    }
     
     @available(swift, deprecated: 0.4.1, obsoleted: 0.4.2, renamed: "isHiddenSubview")
     public var isHiddenTitleDate: Bool = false
@@ -94,8 +110,14 @@ public struct HeaderScrollStyle {
         return format
     }()
     
+    @available(swift, deprecated: 0.5.9, obsoleted: 0.6.0, renamed: "titleDateColor")
     public var colorTitleDate: UIColor = .black
+    public var titleDateColor: UIColor = .black
+        
+    @available(swift, deprecated: 0.5.9, obsoleted: 0.6.0, renamed: "titleDateColorCorner")
     public var colorTitleCornerDate: UIColor = .red
+    public var titleDateColorCorner: UIColor = .red
+    
     public var colorDate: UIColor = .black
     public var fontDate: UIFont = .systemFont(ofSize: 17)
     public var colorNameDay: UIColor = .black
@@ -118,6 +140,7 @@ public struct HeaderScrollStyle {
     public var colorNameEmptyDay: UIColor = gainsboro
     public var showDatesForOtherMonths: Bool = true
     public var isAnimateSelection: Bool = true
+    public var shouldTimelineTrackScroll: Bool = true
     
     var backgroundBlurStyle: UIBlurEffect.Style? = nil
 }
@@ -130,7 +153,12 @@ public struct TimelineStyle {
     public var offsetEvent: CGFloat = 3
     public var startHour: Int = 0
     public var scrollToHour: Int? = nil
-    public var onChangeRoundUpToNearest: Int = 1
+    public var movingMinuteLabelRoundUpTime: UInt = 15
+    var minuteLabelRoundUpTime: Int {
+        guard 1...60 ~= movingMinuteLabelRoundUpTime else { return 1 }
+        
+        return Int(movingMinuteLabelRoundUpTime)
+    }
     public var heightLine: CGFloat = {
 #if targetEnvironment(macCatalyst)
         return 1
@@ -188,9 +216,12 @@ public struct TimelineStyle {
     public var eventLayout: TimelineEventLayout = DefaultTimelineEventLayout()
     public var timeDividerColor: UIColor = .lightGray
     public var timeDividerFont: UIFont = .systemFont(ofSize: 10)
-    public var scale: Scale? = (1, 6)
+    public var scale: Scale? = Scale(min: 1, max: 6)
     
-    public typealias Scale = (min: CGFloat, max: CGFloat)
+    public struct Scale {
+        var min: CGFloat
+        var max: CGFloat
+    }
     
     public enum DividerType: Int {
         case mins5 = 12
@@ -262,13 +293,12 @@ public struct WeekStyle {
     public var colorWeekdayBackground: UIColor = .clear
     public var selectCalendarType: CalendarType = .day
     public var showVerticalDayDivider: Bool = true
-    /// work in progress
-    var daysInOneWeek: Int = 7
+    public var daysInOneWeek: UInt = 7
     
     var maxDays: Int {
         guard 2...6 ~= daysInOneWeek else { return 7 }
         
-        return daysInOneWeek
+        return Int(daysInOneWeek)
     }
 }
 
@@ -405,7 +435,7 @@ public struct YearStyle {
     public var weekFontPad: UIFont = .boldSystemFont(ofSize: 14)
     public var weekFontPhone: UIFont = .boldSystemFont(ofSize: 8)
     public var weekFont: UIFont {
-        switch UIDevice.current.userInterfaceIdiom {
+        switch Platform.currentInterface {
         case .phone:
             return weekFontPhone
         default:
@@ -422,7 +452,7 @@ public struct YearStyle {
     public var fontDayTitlePad: UIFont = .systemFont(ofSize: 15)
     public var fontDayTitlePhone: UIFont = .systemFont(ofSize: 11)
     public var fontDayTitle: UIFont {
-        switch UIDevice.current.userInterfaceIdiom {
+        switch Platform.currentInterface {
         case .phone:
             return fontDayTitlePhone
         default:
@@ -498,6 +528,7 @@ public struct EventStyle {
     public var states: Set<EventViewGeneral.EventViewState> = [.move, .resize]
     public var defaultHeight: CGFloat? = nil
     public var showRecurringEventInPast: Bool = false
+    public var textContainerInset: UIEdgeInsets = .zero
     
     var defaultWidth: CGFloat? = nil
 }
@@ -517,7 +548,7 @@ public struct ListViewStyle {
 }
 
 extension Style {
-    var checkStyle: Style {
+    var adaptiveStyle: Style {
         guard followInSystemTheme else { return self }
         
         var newStyle = self
@@ -529,9 +560,9 @@ extension Style {
             newStyle.headerScroll.colorNameEmptyDay = UIColor.useForStyle(dark: .systemGray6,
                                                                           white: newStyle.headerScroll.colorNameEmptyDay)
             newStyle.headerScroll.colorBackground = UIColor.useForStyle(dark: .black, white: newStyle.headerScroll.colorBackground)
-            newStyle.headerScroll.colorTitleDate = UIColor.useForStyle(dark: .white, white: newStyle.headerScroll.colorTitleDate)
-            newStyle.headerScroll.colorTitleCornerDate = UIColor.useForStyle(dark: .systemRed,
-                                                                             white: newStyle.headerScroll.colorTitleCornerDate)
+            newStyle.headerScroll.titleDateColor = UIColor.useForStyle(dark: .white, white: newStyle.headerScroll.titleDateColor)
+            newStyle.headerScroll.titleDateColorCorner = UIColor.useForStyle(dark: .systemRed,
+                                                                             white: newStyle.headerScroll.titleDateColorCorner)
             newStyle.headerScroll.colorDate = UIColor.useForStyle(dark: .white, white: newStyle.headerScroll.colorDate)
             newStyle.headerScroll.colorNameDay = UIColor.useForStyle(dark: .white, white: newStyle.headerScroll.colorNameDay)
             newStyle.headerScroll.colorCurrentDate = UIColor.useForStyle(dark: .systemGray6,
@@ -578,7 +609,7 @@ extension Style {
             newStyle.month.colorWeekendDate = UIColor.useForStyle(dark: .systemGray2, white: newStyle.month.colorWeekendDate)
             newStyle.month.colorMoreTitle = UIColor.useForStyle(dark: .systemGray3, white: newStyle.month.colorMoreTitle)
             newStyle.month.colorEventTitle = UIColor.useForStyle(dark: .systemGray, white: newStyle.month.colorEventTitle)
-            if UIDevice.current.userInterfaceIdiom == .phone {
+            if Platform.currentInterface == .phone {
                 newStyle.month.colorSeparator = UIColor.useForStyle(dark: .systemGray4, white: newStyle.month.colorSeparator)
                 newStyle.month.colorBackgroundWeekendDate = UIColor.useForStyle(dark: .black,
                                                                                 white: newStyle.month.colorBackgroundWeekendDate)
@@ -660,16 +691,10 @@ extension YearStyle: Equatable {
         && compare(\.colorBackgroundSelectDate)
         && compare(\.colorSelectDate)
         && compare(\.colorWeekendDate)
-        && compare(\.weekFont)
         && compare(\.colorBackgroundWeekendDate)
-        && compare(\.scrollDirection)
-        && compare(\.isAnimateSelection)
-        && compare(\.isPagingEnabled)
-        && compare(\.weekDayAlignment)
-        && compare(\.titleDateAlignment)
-        && compare(\.colorBackground)
         && compare(\.weekFontPad)
         && compare(\.weekFontPhone)
+        && compare(\.weekFont)
         && compare(\.fontTitle)
         && compare(\.colorTitle)
         && compare(\.colorBackgroundHeader)
@@ -682,9 +707,14 @@ extension YearStyle: Equatable {
         && compare(\.fontDayTitle)
         && compare(\.colorDayTitle)
         && compare(\.selectCalendarType)
+        && compare(\.isAnimateSelection)
+        && compare(\.isPagingEnabled)
         && compare(\.isAutoSelectDateScrolling)
         && compare(\.weekDayAlignment)
         && compare(\.titleDateAlignment)
+        && compare(\.colorBackground)
+        && compare(\.scrollDirection)
+        && compare(\.weekDayAlignment)
     }
     
 }
@@ -725,6 +755,7 @@ extension MonthStyle: Equatable {
         && compare(\.colorBackgroundWeekendDate)
         && compare(\.colorBackgroundDate)
         && compare(\.scrollDirection)
+        && compare(\.selectCalendarType)
         && compare(\.isAnimateSelection)
         && compare(\.isPagingEnabled)
         && compare(\.isScrollEnabled)
@@ -737,10 +768,14 @@ extension MonthStyle: Equatable {
         && compare(\.titleHeaderAlignment)
         && compare(\.fontTitleHeader)
         && compare(\.colorTitleHeader)
+        && compare(\.colorTitleCurrentDate)
         && compare(\.showDatesForOtherMonths)
         && compare(\.colorBackground)
         && compare(\.selectionMode)
-        && compare(\.colorTitleCurrentDate)
+        && compare(\.showMonthNameInFirstDay)
+        && compare(\.isPrefetchingEnabled)
+        && compare(\.isHiddenSectionHeader)
+        && compare(\.heightSectionHeader)
     }
     
 }
@@ -772,12 +807,11 @@ extension HeaderScrollStyle: Equatable {
         && compare(\.heightHeaderWeek)
         && compare(\.heightSubviewHeader)
         && compare(\.colorBackground)
-        && compare(\.isHidden)
         && compare(\.isHiddenSubview)
         && compare(\.titleFormatter)
         && compare(\.weekdayFormatter)
-        && compare(\.colorTitleDate)
-        && compare(\.colorTitleCornerDate)
+        && compare(\.titleDateColor)
+        && compare(\.titleDateColorCorner)
         && compare(\.colorDate)
         && compare(\.fontDate)
         && compare(\.colorNameDay)
@@ -800,6 +834,7 @@ extension HeaderScrollStyle: Equatable {
         && compare(\.colorNameEmptyDay)
         && compare(\.showDatesForOtherMonths)
         && compare(\.isAnimateSelection)
+        && compare(\.shouldTimelineTrackScroll)
     }
     
 }
@@ -823,6 +858,8 @@ extension WeekStyle: Equatable {
         && compare(\.colorWeekdayBackground)
         && compare(\.selectCalendarType)
         && compare(\.showVerticalDayDivider)
+        && compare(\.daysInOneWeek)
+        && compare(\.maxDays)
     }
     
 }
@@ -841,9 +878,9 @@ extension AllDayStyle: Equatable {
         && compare(\.textColor)
         && compare(\.offsetWidth)
         && compare(\.offsetHeight)
+        && compare(\.offsetX)
         && compare(\.height)
         && compare(\.maxHeight)
-        && compare(\.offsetX)
         && compare(\.fontTitle)
         && compare(\.isPinned)
         && compare(\.eventCorners)
@@ -865,8 +902,10 @@ extension TimelineStyle: Equatable {
         && compare(\.eventFont)
         && compare(\.offsetEvent)
         && compare(\.startHour)
+        && compare(\.scrollToHour)
         && compare(\.heightLine)
-        && compare(\.onChangeRoundUpToNearest)
+        && compare(\.movingMinuteLabelRoundUpTime)
+        && compare(\.minuteLabelRoundUpTime)
         && compare(\.widthLine)
         && compare(\.offsetLineLeft)
         && compare(\.offsetLineRight)
@@ -876,6 +915,7 @@ extension TimelineStyle: Equatable {
         && compare(\.offsetTimeX)
         && compare(\.offsetTimeY)
         && compare(\.timeColor)
+        && compare(\.timeAlignment)
         && compare(\.timeFont)
         && compare(\.widthEventViewer)
         && compare(\.showLineHourMode)
@@ -895,6 +935,18 @@ extension TimelineStyle: Equatable {
         && compare(\.isEnabledCreateNewEvent)
         && compare(\.maxLimitCachedPages)
         && compare(\.scrollDirections)
+        && compare(\.dividerType)
+        && compare(\.timeDividerColor)
+        && compare(\.timeDividerFont)
+        && compare(\.scale)
+    }
+    
+}
+
+extension TimelineStyle.Scale: Equatable {
+    
+    public static func == (lhs: TimelineStyle.Scale, rhs: TimelineStyle.Scale) -> Bool {
+        lhs.max == rhs.max && lhs.min == rhs.min
     }
     
 }
@@ -921,6 +973,9 @@ extension EventStyle: Equatable {
         && compare(\.delayForStartMove)
         && compare(\.states)
         && compare(\.defaultHeight)
+        && compare(\.showRecurringEventInPast)
+        && compare(\.textContainerInset)
+        && compare(\.defaultWidth)
     }
     
 }

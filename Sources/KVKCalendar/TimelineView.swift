@@ -183,6 +183,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             return
         }
 
+        currentLineView.reloadFrame(frame)
         let pointY = calculatePointYByMinute(date.minute, time: time)
         currentLineView.frame.origin.y = pointY - (currentLineView.frame.height * 0.5)
         scrollView.addSubview(currentLineView)

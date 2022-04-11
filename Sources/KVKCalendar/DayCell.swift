@@ -151,7 +151,8 @@ class DayCell: UICollectionViewCell {
 }
 
 @available(iOS 13.4, *)
-extension DayCell: PointerInteractionProtocol, UIPointerInteractionDelegate {
+extension DayCell: PointerInteractionProtocol {
+    
     func pointerInteraction(_ interaction: UIPointerInteraction, styleFor region: UIPointerRegion) -> UIPointerStyle? {
         var pointerStyle: UIPointerStyle?
         
@@ -161,6 +162,7 @@ extension DayCell: PointerInteractionProtocol, UIPointerInteractionDelegate {
         }
         return pointerStyle
     }
+    
 }
 
 #endif

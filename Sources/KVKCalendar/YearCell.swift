@@ -20,7 +20,7 @@ final class YearCell: UICollectionViewCell {
     }()
     
     private var topHeight: CGFloat {
-        switch UIDevice.current.userInterfaceIdiom {
+        switch Platform.currentInterface {
         case .phone:
             return 15
         default:
@@ -204,6 +204,7 @@ final class YearCell: UICollectionViewCell {
 
 @available(iOS 13.4, *)
 extension YearCell: PointerInteractionProtocol {
+    
     func pointerInteraction(_ interaction: UIPointerInteraction, styleFor region: UIPointerRegion) -> UIPointerStyle? {
         var pointerStyle: UIPointerStyle?
         
@@ -213,6 +214,7 @@ extension YearCell: PointerInteractionProtocol {
         }
         return pointerStyle
     }
+    
 }
 
 #endif
