@@ -83,6 +83,16 @@ final class WeekView: UIView {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    func updateDaysBySection(date: Date? = nil) {
+        parameters.data.updateDaysBySection(
+            data: CalendarData(date: date ?? Date(), years: 4, style: style),
+            startDay: style.startWeekDay,
+            maxDays: style.week.maxDays
+        )
+        
+        scrollableWeekView.updateWeeks(weeks: parameters.data.daysBySection)
+    }
 }
 
 extension WeekView {

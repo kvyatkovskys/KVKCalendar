@@ -10,7 +10,7 @@
 import Foundation
 
 final class WeekData: EventDateProtocol, ScrollableWeekProtocol {
-    let days: [Day]
+    var days: [Day]
     var date: Date
     var events: [Event] = []
     var recurringEvents: [Event] = []
@@ -18,6 +18,36 @@ final class WeekData: EventDateProtocol, ScrollableWeekProtocol {
     
     init(data: CalendarData, startDay: StartDayType, maxDays: Int) {
         self.date = data.date
+        self.days = WeekData.getDates(
+            data: data,
+            startDay: startDay,
+            maxDays: maxDays
+        )
+        
+        daysBySection = prepareDays(days, maxDayInWeek: maxDays)
+    }
+    
+    func filterEvents(_ events: [Event], dates: [Date?]) -> [Event] {
+        events.filter { (event) -> Bool in
+            dates.contains(where: {
+                compareStartDate($0, with: event)
+                || compareEndDate($0, with: event)
+            })
+        }
+    }
+    
+    func updateDaysBySection(data: CalendarData, startDay: StartDayType, maxDays: Int) {
+        self.date = data.date
+        self.days = WeekData.getDates(
+            data: data,
+            startDay: startDay,
+            maxDays: maxDays
+        )
+        
+        daysBySection = prepareDays(days, maxDayInWeek: maxDays)
+    }
+    
+    static func getDates(data: CalendarData, startDay: StartDayType, maxDays: Int) -> [Day] {
         var item = startDay
         if maxDays != 7 {
             item = .sunday
@@ -47,20 +77,9 @@ final class WeekData: EventDateProtocol, ScrollableWeekProtocol {
         }
         
         if extensionDays.isEmpty {
-            self.days = defaultDays
+            return defaultDays
         } else {
-            self.days = extensionDays + defaultDays
-        }
-        
-        daysBySection = prepareDays(days, maxDayInWeek: maxDays)
-    }
-    
-    func filterEvents(_ events: [Event], dates: [Date?]) -> [Event] {
-        events.filter { (event) -> Bool in
-            dates.contains(where: {
-                compareStartDate($0, with: event)
-                || compareEndDate($0, with: event)
-            })
+            return extensionDays + defaultDays
         }
     }
 }
