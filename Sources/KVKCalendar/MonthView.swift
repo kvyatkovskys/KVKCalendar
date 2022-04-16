@@ -38,7 +38,6 @@ final class MonthView: UIView {
     init(parameters: Parameters, frame: CGRect) {
         self.parameters = parameters
         super.init(frame: frame)
-        setUI(reload: true)
     }
     
     func setDate(_ date: Date, animated: Bool = false) {

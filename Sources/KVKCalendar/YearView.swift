@@ -33,7 +33,6 @@ final class YearView: UIView {
     init(data: YearData, frame: CGRect? = nil) {
         self.data = data
         super.init(frame: frame ?? .zero)
-        setUI()
     }
     
     func setDate(_ date: Date) {

@@ -55,7 +55,6 @@ public final class ListView: UIView, CalendarSettingProtocol {
         super.init(frame: frame ?? .zero)
         addSubview(tableView)
         setupConstraints()
-        setUI()
     }
     
     required init?(coder: NSCoder) {

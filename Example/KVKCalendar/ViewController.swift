@@ -111,7 +111,9 @@ final class ViewController: UIViewController {
         // to track changing oerintations and multiple windows and theme of device
         loadEvents { [weak self] (events) in
             self?.events = events
-            self?.calendarView.updateStyle(createCalendarStyle())
+            if let style = self?.createCalendarStyle() {
+                self?.calendarView.updateStyle(style)
+            }
             self?.calendarView.reloadData()
         }
     }

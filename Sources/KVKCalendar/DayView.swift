@@ -40,7 +40,6 @@ final class DayView: UIView {
         self.parameters = parameters
         self.timelineScale = parameters.style.timeline.scale?.min ?? 1
         super.init(frame: frame)
-        setUI(reload: true)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -170,6 +169,7 @@ extension DayView: CalendarSettingProtocol {
         }
         set {
             parameters.style = newValue
+            timelineScale = newValue.timeline.scale?.min ?? 1
         }
     }
     

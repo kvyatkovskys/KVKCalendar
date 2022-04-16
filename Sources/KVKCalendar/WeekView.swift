@@ -48,7 +48,6 @@ final class WeekView: UIView {
         self.parameters = parameters
         self.timelineScale = parameters.style.timeline.scale?.min ?? 1
         super.init(frame: frame)
-        setUI(reload: true)
     }
     
     func setDate(_ date: Date) {
