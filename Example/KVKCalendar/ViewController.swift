@@ -108,9 +108,12 @@ final class ViewController: UIViewController {
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        // to track changing oerintations and multiple windows
-        calendarView.updateStyle(createCalendarStyle())
-        calendarView.reloadData()
+        // to track changing oerintations and multiple windows and theme of device
+        loadEvents { [weak self] (events) in
+            self?.events = events
+            self?.calendarView.updateStyle(createCalendarStyle())
+            self?.calendarView.reloadData()
+        }
     }
 }
 

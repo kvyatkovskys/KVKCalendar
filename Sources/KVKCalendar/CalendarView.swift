@@ -95,6 +95,8 @@ public final class CalendarView: UIView {
         listView.dataSource = self
         listView.delegate = self
         
+        viewCaches = [.day: dayView, .week: weekView, .month: monthView, .year: yearView, .list: listView]
+        
         if let defaultType = style.defaultType {
             parameters.type = defaultType
         }

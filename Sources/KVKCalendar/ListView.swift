@@ -67,8 +67,16 @@ public final class ListView: UIView, CalendarSettingProtocol {
         
         let top = tableView.topAnchor.constraint(equalTo: topAnchor)
         let bottom = tableView.bottomAnchor.constraint(equalTo: bottomAnchor)
-        let left = tableView.leftAnchor.constraint(equalTo: leftAnchor)
-        let right = tableView.rightAnchor.constraint(equalTo: rightAnchor)
+        
+        let right:NSLayoutConstraint
+        let left: NSLayoutConstraint
+        if #available(iOS 11.0, *) {
+            left = tableView.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor)
+            right = tableView.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor)
+        } else {
+            left = tableView.leftAnchor.constraint(equalTo: leftAnchor)
+            right = tableView.rightAnchor.constraint(equalTo: rightAnchor)
+        }
         NSLayoutConstraint.activate([top, bottom, left, right])
     }
     

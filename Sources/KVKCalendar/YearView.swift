@@ -145,13 +145,21 @@ extension YearView: CalendarSettingProtocol {
         collectionView = createCollectionView(frame: frame, style: data.style.year)
         
         if let viewTemp = collectionView {
+            viewTemp.translatesAutoresizingMaskIntoConstraints = false
             addSubview(viewTemp)
             
-            viewTemp.translatesAutoresizingMaskIntoConstraints = false
             let top = viewTemp.topAnchor.constraint(equalTo: topAnchor)
             let bottom = viewTemp.bottomAnchor.constraint(equalTo: bottomAnchor)
-            let left = viewTemp.leftAnchor.constraint(equalTo: leftAnchor)
-            let right = viewTemp.rightAnchor.constraint(equalTo: rightAnchor)
+            
+            let right:NSLayoutConstraint
+            let left: NSLayoutConstraint
+            if #available(iOS 11.0, *) {
+                left = viewTemp.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor)
+                right = viewTemp.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor)
+            } else {
+                left = viewTemp.leftAnchor.constraint(equalTo: leftAnchor)
+                right = viewTemp.rightAnchor.constraint(equalTo: rightAnchor)
+            }
             NSLayoutConstraint.activate([top, bottom, left, right])
         }
     }

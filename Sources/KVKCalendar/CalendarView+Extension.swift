@@ -19,7 +19,7 @@ extension CalendarView {
     
     public func set(type: CalendarType, date: Date? = nil, animated: Bool = true) {
         parameters.type = type
-        switchTypeCalendar(type: type)
+        switchCalendarType(type)
         
         if let dt = date {
             scrollTo(dt, animated: animated)
@@ -188,30 +188,22 @@ extension CalendarView {
         }
     }
     
-    private func switchTypeCalendar(type: CalendarType) {
+    private func switchCalendarType(_ type: CalendarType) {
         parameters.type = type
-        if let viewCache = viewCaches.removeValue(forKey: type) {
-            deactivateConstraintsForView(viewCache)
-        }
         subviews.forEach { $0.removeFromSuperview() }
         
         switch parameters.type {
         case .day:
             addSubview(dayView)
-            viewCaches[type] = dayView
         case .week:
             addSubview(weekView)
-            viewCaches[type] = weekView
         case .month:
             addSubview(monthView)
-            viewCaches[type] = monthView
         case .year:
             addSubview(yearView)
-            viewCaches[type] = yearView
             setupConstraintsForView(yearView)
         case .list:
             addSubview(listView)
-            viewCaches[type] = listView
             setupConstraintsForView(listView)
             reloadData()
         }        

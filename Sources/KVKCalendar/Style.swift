@@ -141,6 +141,7 @@ public struct HeaderScrollStyle {
     public var showDatesForOtherMonths: Bool = true
     public var isAnimateSelection: Bool = true
     public var shouldTimelineTrackScroll: Bool = true
+    public var bottomLineColor: UIColor = gainsboro
     
     var backgroundBlurStyle: UIBlurEffect.Style? = nil
 }
@@ -576,6 +577,8 @@ extension Style {
                                                                                            white: newStyle.headerScroll.colorCurrentSelectDateForDarkStyle)
             newStyle.headerScroll.colorWeekendDate = UIColor.useForStyle(dark: .systemGray2,
                                                                          white: newStyle.headerScroll.colorWeekendDate)
+            newStyle.headerScroll.bottomLineColor = UIColor.useForStyle(dark: .systemGray2,
+                                                                        white: newStyle.headerScroll.bottomLineColor)
             
             // timeline
             newStyle.timeline.backgroundColor = UIColor.useForStyle(dark: .black, white: newStyle.timeline.backgroundColor)
@@ -835,6 +838,7 @@ extension HeaderScrollStyle: Equatable {
         && compare(\.showDatesForOtherMonths)
         && compare(\.isAnimateSelection)
         && compare(\.shouldTimelineTrackScroll)
+        && compare(\.bottomLineColor)
     }
     
 }

@@ -81,6 +81,7 @@ final class ScrollableWeekView: UIView {
     }()
     
     private var titleView: ScrollableWeekHeaderView?
+    private let bottomLineView = UIView()
     
     init(parameters: Parameters) {
         self.params = parameters
@@ -198,6 +199,8 @@ extension ScrollableWeekView: CalendarSettingProtocol {
     }
     
     func setUI(relad: Bool = false) {
+        bottomLineView.backgroundColor = params.style.headerScroll.bottomLineColor
+        
         subviews.forEach { $0.removeFromSuperview() }
         var newFrame = frame
         newFrame.origin.y = 0
@@ -206,6 +209,8 @@ extension ScrollableWeekView: CalendarSettingProtocol {
     
     func reloadFrame(_ frame: CGRect) {
         self.frame.size.width = frame.width - self.frame.origin.x
+        layoutIfNeeded()
+        
         var newFrame = self.frame
         newFrame.origin.y = 0
         
@@ -241,6 +246,15 @@ extension ScrollableWeekView: CalendarSettingProtocol {
             addSubview(collectionView)
             addTitleHeaderIfNeeded(frame: mainFrame)
         }
+        
+        addSubview(bottomLineView)
+        bottomLineView.translatesAutoresizingMaskIntoConstraints = false
+        
+        let left = bottomLineView.leftAnchor.constraint(equalTo: leftAnchor)
+        let right = bottomLineView.rightAnchor.constraint(equalTo: rightAnchor)
+        let bottom = bottomLineView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        let height = bottomLineView.heightAnchor.constraint(equalToConstant: 0.5)
+        NSLayoutConstraint.activate([left, right, bottom, height])
     }
     
     private func addTitleHeaderIfNeeded(frame: CGRect) {

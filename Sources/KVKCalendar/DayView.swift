@@ -227,7 +227,6 @@ extension DayView: CalendarSettingProtocol {
         let reload = self.style != style
         self.style = style
         setUI(reload: reload)
-        timelinePage.reloadPages()
         reloadFrame(frame)
     }
     
