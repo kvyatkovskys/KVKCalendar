@@ -30,9 +30,9 @@ final class YearView: UIView {
         }
     }
     
-    init(data: YearData, frame: CGRect) {
+    init(data: YearData, frame: CGRect? = nil) {
         self.data = data
-        super.init(frame: frame)
+        super.init(frame: frame ?? .zero)
         setUI()
     }
     
@@ -42,7 +42,7 @@ final class YearView: UIView {
         collectionView?.reloadData()
     }
     
-    private func createCollectionView(frame: CGRect, style: YearStyle)  -> UICollectionView {
+    private func createCollectionView(frame: CGRect, style: YearStyle) -> UICollectionView {
         if let customCollectionView = dataSource?.willDisplayCollectionView(frame: frame, type: .year) {
             if customCollectionView.delegate == nil {
                 customCollectionView.delegate = self
@@ -53,7 +53,7 @@ final class YearView: UIView {
             return customCollectionView
         }
         
-        let collection = UICollectionView(frame: frame, collectionViewLayout: layout)
+        let collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collection.backgroundColor = style.colorBackground
         collection.isPagingEnabled = style.isPagingEnabled
         collection.dataSource = self
@@ -107,15 +107,7 @@ extension YearView: CalendarSettingProtocol {
     
     func reloadFrame(_ frame: CGRect) {
         self.frame = frame
-        
-        collectionView?.removeFromSuperview()
-        collectionView = nil
-        collectionView = createCollectionView(frame: self.frame, style: data.style.year)
-        
-        if let viewTemp = collectionView {
-            addSubview(viewTemp)
-        }
-        
+        layoutIfNeeded()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             if let idx = self.data.sections.firstIndex(where: { $0.date.year == self.data.date.year }) {
                 self.collectionView?.scrollToItem(at: IndexPath(row: 0, section: idx),
@@ -154,6 +146,13 @@ extension YearView: CalendarSettingProtocol {
         
         if let viewTemp = collectionView {
             addSubview(viewTemp)
+            
+            viewTemp.translatesAutoresizingMaskIntoConstraints = false
+            let top = viewTemp.topAnchor.constraint(equalTo: topAnchor)
+            let bottom = viewTemp.bottomAnchor.constraint(equalTo: bottomAnchor)
+            let left = viewTemp.leftAnchor.constraint(equalTo: leftAnchor)
+            let right = viewTemp.rightAnchor.constraint(equalTo: rightAnchor)
+            NSLayoutConstraint.activate([top, bottom, left, right])
         }
     }
 }

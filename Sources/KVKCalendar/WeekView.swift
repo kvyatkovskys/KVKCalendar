@@ -15,8 +15,6 @@ final class WeekView: UIView {
         var visibleDates: [Date] = []
         var data: WeekData
         var style: Style
-        weak var delegate: DisplayDelegate?
-        weak var dataSource: DisplayDataSource?
     }
     
     private var parameters: Parameters
@@ -25,6 +23,9 @@ final class WeekView: UIView {
     private var isFullyWeek: Bool {
         style.week.maxDays == 7
     }
+    
+    weak var delegate: DisplayDelegate?
+    weak var dataSource: DisplayDataSource?
     
     var scrollableWeekView = ScrollableWeekView(parameters: .init(frame: .zero,
                                                                   weeks: [],
@@ -92,7 +93,7 @@ extension WeekView {
         if parameters.visibleDates != newDates {
             parameters.visibleDates = newDates
         }
-        parameters.delegate?.didSelectDates([date], type: type, frame: nil)
+        delegate?.didSelectDates([date], type: type, frame: nil)
     }
     
 }
@@ -158,9 +159,9 @@ extension WeekView: CalendarSettingProtocol {
         
         let view = TimelineView(parameters: .init(style: style, type: .week, scale: timelineScale), frame: viewFrame)
         view.delegate = self
-        view.dataSource = parameters.dataSource
+        view.dataSource = dataSource
         view.deselectEvent = { [weak self] (event) in
-            self?.parameters.delegate?.didDeselectEvent(event, animated: true)
+            self?.delegate?.didDeselectEvent(event, animated: true)
         }
         view.didChangeScale = { [weak self] (newScale) in
             if newScale != self?.timelineScale {
@@ -285,11 +286,11 @@ extension WeekView: CalendarSettingProtocol {
 extension WeekView: TimelineDelegate {
     
     func didDisplayEvents(_ events: [Event], dates: [Date?]) {
-        parameters.delegate?.didDisplayEvents(events, dates: dates, type: .week)
+        delegate?.didDisplayEvents(events, dates: dates, type: .week)
     }
     
     func didSelectEvent(_ event: Event, frame: CGRect?) {
-        parameters.delegate?.didSelectEvent(event, type: .week, frame: frame)
+        delegate?.didSelectEvent(event, type: .week, frame: frame)
     }
     
     func nextDate() {
@@ -322,7 +323,7 @@ extension WeekView: TimelineDelegate {
         endComponents.hour = endTime.hour
         endComponents.minute = endTime.minute
         let endDate = style.calendar.date(from: endComponents)
-        parameters.delegate?.didChangeEvent(event, start: startDate, end: endDate)
+        delegate?.didChangeEvent(event, start: startDate, end: endDate)
     }
     
     func didAddNewEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint) {
@@ -333,7 +334,7 @@ extension WeekView: TimelineDelegate {
         components.hour = hour
         components.minute = minute
         let newDate = style.calendar.date(from: components)
-        parameters.delegate?.didAddNewEvent(event, newDate)
+        delegate?.didAddNewEvent(event, newDate)
     }
     
     func didChangeEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint, newDay: Int?) {
@@ -366,7 +367,7 @@ extension WeekView: TimelineDelegate {
         endComponents.hour = hour + hourOffset
         endComponents.minute = minute + minuteOffset
         let endDate = style.calendar.date(from: endComponents)
-        parameters.delegate?.didChangeEvent(event, start: startDate, end: endDate)
+        delegate?.didChangeEvent(event, start: startDate, end: endDate)
     }
     
 }

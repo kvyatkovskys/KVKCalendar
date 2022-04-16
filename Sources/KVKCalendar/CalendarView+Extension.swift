@@ -190,7 +190,9 @@ extension CalendarView {
     
     private func switchTypeCalendar(type: CalendarType) {
         parameters.type = type
-        viewCaches.removeValue(forKey: type)
+        if let viewCache = viewCaches.removeValue(forKey: type) {
+            deactivateConstraintsForView(viewCache)
+        }
         subviews.forEach { $0.removeFromSuperview() }
         
         switch parameters.type {
@@ -206,11 +208,27 @@ extension CalendarView {
         case .year:
             addSubview(yearView)
             viewCaches[type] = yearView
+            setupConstraintsForView(yearView)
         case .list:
             addSubview(listView)
             viewCaches[type] = listView
+            setupConstraintsForView(listView)
             reloadData()
-        }
+        }        
+    }
+    
+    private func deactivateConstraintsForView(_ view: UIView) {
+        NSLayoutConstraint.deactivate(view.constraints)
+    }
+    
+    private func setupConstraintsForView(_ view: UIView) {
+        view.translatesAutoresizingMaskIntoConstraints = false
+        
+        let top = view.topAnchor.constraint(equalTo: topAnchor)
+        let bottom = view.bottomAnchor.constraint(equalTo: bottomAnchor)
+        let left = view.leftAnchor.constraint(equalTo: leftAnchor)
+        let right = view.rightAnchor.constraint(equalTo: rightAnchor)
+        NSLayoutConstraint.activate([top, bottom, left, right])
     }
 }
 

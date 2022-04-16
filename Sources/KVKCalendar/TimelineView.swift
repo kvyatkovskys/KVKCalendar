@@ -121,10 +121,6 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         stopTimer(timerKey)
     }
     
-    func deactivateConstraints() {
-        NSLayoutConstraint.deactivate(scrollView.constraints)
-    }
-    
     func setupConstraints() {
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         

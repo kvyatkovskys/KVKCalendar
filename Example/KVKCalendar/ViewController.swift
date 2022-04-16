@@ -32,7 +32,9 @@ final class ViewController: UIViewController {
     }()
     
     private lazy var calendarView: CalendarView = {
-        let calendar = CalendarView(frame: view.frame, date: selectDate, style: createCalendarStyle())
+        var frame = view.frame
+        frame.origin.y = 0
+        let calendar = CalendarView(frame: frame, date: selectDate, style: createCalendarStyle())
         calendar.delegate = self
         calendar.dataSource = self
         return calendar
@@ -69,8 +71,8 @@ final class ViewController: UIViewController {
         }
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
         var frame = view.frame
         frame.origin.y = 0
         calendarView.reloadFrame(frame)
@@ -106,11 +108,9 @@ final class ViewController: UIViewController {
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        // to track changing oerintations and multiple windows
         calendarView.updateStyle(createCalendarStyle())
-        loadEvents { [weak self] (events) in
-            self?.events = events
-            self?.calendarView.reloadData()
-        }
+        calendarView.reloadData()
     }
 }
 
