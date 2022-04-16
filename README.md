@@ -85,8 +85,9 @@ class ViewController: UIViewController {
         }
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        // to track changing frame when an user rotates device
         calendarView.reloadFrame(view.frame)
     }
 }
