@@ -11,7 +11,6 @@ import UIKit
 
 final class YearView: UIView {
     private var data: YearData
-    private var animated: Bool = false
     private var collectionView: UICollectionView?
     
     weak var delegate: DisplayDelegate?
@@ -35,13 +34,13 @@ final class YearView: UIView {
         super.init(frame: frame ?? .zero)
     }
     
-    func setDate(_ date: Date) {
+    func setDate(_ date: Date, animated: Bool) {
         data.date = date
         scrollToDate(date: date, animated: animated)
         collectionView?.reloadData()
     }
     
-    private func createCollectionView(frame: CGRect, style: YearStyle) -> UICollectionView {
+    private func createCollectionView(frame: CGRect, style: YearStyle) -> (view: UICollectionView, customView: Bool) {
         if let customCollectionView = dataSource?.willDisplayCollectionView(frame: frame, type: .year) {
             if customCollectionView.delegate == nil {
                 customCollectionView.delegate = self
@@ -49,7 +48,7 @@ final class YearView: UIView {
             if customCollectionView.dataSource == nil {
                 customCollectionView.dataSource = self
             }
-            return customCollectionView
+            return (customCollectionView, true)
         }
         
         let collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -59,7 +58,7 @@ final class YearView: UIView {
         collection.delegate = self
         collection.showsVerticalScrollIndicator = false
         collection.showsHorizontalScrollIndicator = false
-        return collection
+        return (collection, false)
     }
     
     private func scrollToDate(date: Date, animated: Bool) {
@@ -69,9 +68,6 @@ final class YearView: UIView {
                                                   at: self.scrollDirection(month: date.month),
                                                   animated: animated)
             }
-        }
-        if !self.animated {
-            self.animated = true
         }
     }
     
@@ -121,12 +117,11 @@ extension YearView: CalendarSettingProtocol {
     func updateStyle(_ style: Style) {
         self.style = style
         setUI()
-        scrollToDate(date: data.date, animated: true)
     }
     
     func setUI(reload: Bool = false) {
+        backgroundColor = data.style.year.colorBackground
         subviews.forEach { $0.removeFromSuperview() }
-        
         layout.scrollDirection = data.style.year.scrollDirection
         
         switch data.style.year.scrollDirection {
@@ -141,25 +136,20 @@ extension YearView: CalendarSettingProtocol {
         }
         
         collectionView = nil
-        collectionView = createCollectionView(frame: frame, style: data.style.year)
+        let result = createCollectionView(frame: frame, style: data.style.year)
+        collectionView = result.view
         
         if let viewTemp = collectionView {
-            viewTemp.translatesAutoresizingMaskIntoConstraints = false
             addSubview(viewTemp)
             
-            let top = viewTemp.topAnchor.constraint(equalTo: topAnchor)
-            let bottom = viewTemp.bottomAnchor.constraint(equalTo: bottomAnchor)
-            
-            let right:NSLayoutConstraint
-            let left: NSLayoutConstraint
-            if #available(iOS 11.0, *) {
-                left = viewTemp.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor)
-                right = viewTemp.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor)
-            } else {
-                left = viewTemp.leftAnchor.constraint(equalTo: leftAnchor)
-                right = viewTemp.rightAnchor.constraint(equalTo: rightAnchor)
+            if !result.customView {
+                viewTemp.translatesAutoresizingMaskIntoConstraints = false
+                let top = viewTemp.topAnchor.constraint(equalTo: topAnchor)
+                let bottom = viewTemp.bottomAnchor.constraint(equalTo: bottomAnchor)
+                let left = viewTemp.leftAnchor.constraint(equalTo: leftAnchor)
+                let right = viewTemp.rightAnchor.constraint(equalTo: rightAnchor)
+                NSLayoutConstraint.activate([top, bottom, left, right])
             }
-            NSLayoutConstraint.activate([top, bottom, left, right])
         }
     }
 }

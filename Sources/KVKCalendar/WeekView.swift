@@ -50,7 +50,7 @@ final class WeekView: UIView {
         super.init(frame: frame)
     }
     
-    func setDate(_ date: Date) {
+    func setDate(_ date: Date, animated: Bool) {
         parameters.data.date = date
         scrollableWeekView.setDate(date)
         parameters.visibleDates = getVisibleDatesFor(date: date)

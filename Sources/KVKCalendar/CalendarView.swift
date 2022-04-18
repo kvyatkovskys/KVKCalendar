@@ -34,8 +34,9 @@ public final class CalendarView: UIView {
     
     private(set) var calendarData: CalendarData
     private var weekData: WeekData
-    private let monthData: MonthData
+    private(set) var monthData: MonthData
     private var dayData: DayData
+    private(set) var yearData: YearData
     private let listData: ListViewData
     
     private(set) var dayView: DayView
@@ -45,32 +46,34 @@ public final class CalendarView: UIView {
     private(set) var listView: ListView
     
     public init(frame: CGRect, date: Date? = nil, style: Style = Style(), years: Int = 4) {
-        self.parameters = .init(type: style.defaultType ?? .day, style: style.adaptiveStyle)
-        self.calendarData = CalendarData(date: date ?? Date(), years: years, style: style)
+        let adaptiveStyle = style.adaptiveStyle
+        self.parameters = .init(type: style.defaultType ?? .day, style: adaptiveStyle)
+        self.calendarData = CalendarData(date: date ?? Date(), years: years, style: adaptiveStyle)
         
         // day view
-        self.dayData = DayData(data: calendarData, startDay: style.startWeekDay)
-        self.dayView = DayView(parameters: .init(style: style, data: dayData), frame: frame)
+        self.dayData = DayData(data: calendarData, startDay: adaptiveStyle.startWeekDay)
+        self.dayView = DayView(parameters: .init(style: adaptiveStyle, data: dayData), frame: frame)
         
         // week view
         self.weekData = WeekData(data: calendarData,
-                                 startDay: style.startWeekDay,
-                                 maxDays: style.week.maxDays)
-        self.weekView = WeekView(parameters: .init(data: weekData, style: style), frame: frame)
+                                 startDay: adaptiveStyle.startWeekDay,
+                                 maxDays: adaptiveStyle.week.maxDays)
+        self.weekView = WeekView(parameters: .init(data: weekData, style: adaptiveStyle), frame: frame)
         
         // month view
         self.monthData = MonthData(parameters: .init(data: calendarData,
-                                                     startDay: style.startWeekDay,
-                                                     calendar: style.calendar,
-                                                     style: style))
-        self.monthView = MonthView(parameters: .init(monthData: monthData, style: style), frame: frame)
+                                                     startDay: adaptiveStyle.startWeekDay,
+                                                     calendar: adaptiveStyle.calendar,
+                                                     style: adaptiveStyle))
+        self.monthView = MonthView(parameters: .init(monthData: monthData, style: adaptiveStyle), frame: frame)
         
         // year view
-        self.yearView = YearView(data: YearData(data: monthData.data, date: calendarData.date, style: style), frame: frame)
+        self.yearData = YearData(data: monthData.data, date: calendarData.date, style: adaptiveStyle)
+        self.yearView = YearView(data: yearData, frame: frame)
         
         // list view
         self.listData = ListViewData(data: calendarData)
-        let params = ListView.Parameters(style: style, data: listData)
+        let params = ListView.Parameters(style: adaptiveStyle, data: listData)
         self.listView = ListView(parameters: params, frame: frame)
         
         super.init(frame: frame)
@@ -97,11 +100,11 @@ public final class CalendarView: UIView {
         
         viewCaches = [.day: dayView, .week: weekView, .month: monthView, .year: yearView, .list: listView]
         
-        if let defaultType = style.defaultType {
+        if let defaultType = adaptiveStyle.defaultType {
             parameters.type = defaultType
         }
         set(type: parameters.type, date: date)
-        updateStyle(style)
+        reloadAllStyles(adaptiveStyle)
     }
     
     required init?(coder aDecoder: NSCoder) {

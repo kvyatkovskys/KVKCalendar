@@ -74,15 +74,15 @@ extension CalendarView {
     public func scrollTo(_ date: Date, animated: Bool = true) {
         switch parameters.type {
         case .day:
-            dayView.setDate(date)
+            dayView.setDate(date, animated: false)
         case .week:
-            weekView.setDate(date)
+            weekView.setDate(date, animated: false)
         case .month:
             monthView.setDate(date, animated: animated)
         case .year:
-            yearView.setDate(date)
+            yearView.setDate(date, animated: animated)
         case .list:
-            listView.setDate(date)
+            listView.setDate(date, animated: animated)
         }
     }
     
@@ -338,9 +338,21 @@ extension CalendarView: CalendarSettingProtocol {
     
     public func updateStyle(_ style: Style) {
         self.style = style.adaptiveStyle
+        reloadAllStyles(self.style)
         
+        switch parameters.type {
+        case .month:
+            monthView.setDate(monthData.date, animated: true)
+        case .year:
+            yearView.setDate(yearData.date, animated: true)
+        default:
+            break
+        }
+    }
+    
+    func reloadAllStyles(_ style: Style) {
         viewCaches.values.forEach { (viewCache) in
-            if let currentView = viewCache as? CalendarSettingProtocol, currentView.style != self.style {
+            if let currentView = viewCache as? CalendarSettingProtocol {
                 currentView.updateStyle(self.style)
             }
         }

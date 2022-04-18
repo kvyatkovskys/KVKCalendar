@@ -291,14 +291,14 @@ protocol CalendarSettingProtocol: AnyObject {
     func reloadFrame(_ frame: CGRect)
     func updateStyle(_ style: Style)
     func reloadData(_ events: [Event])
-    func setDate(_ date: Date)
+    func setDate(_ date: Date, animated: Bool)
     
 }
 
 extension CalendarSettingProtocol {
     
     func reloadData(_ events: [Event]) {}
-    func setDate(_ date: Date) {}
+    func setDate(_ date: Date, animated: Bool) {}
     func setUI(reload: Bool = false) {}
     
 }

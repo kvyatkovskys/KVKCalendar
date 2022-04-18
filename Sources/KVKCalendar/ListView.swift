@@ -66,16 +66,8 @@ public final class ListView: UIView, CalendarSettingProtocol {
         
         let top = tableView.topAnchor.constraint(equalTo: topAnchor)
         let bottom = tableView.bottomAnchor.constraint(equalTo: bottomAnchor)
-        
-        let right:NSLayoutConstraint
-        let left: NSLayoutConstraint
-        if #available(iOS 11.0, *) {
-            left = tableView.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor)
-            right = tableView.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor)
-        } else {
-            left = tableView.leftAnchor.constraint(equalTo: leftAnchor)
-            right = tableView.rightAnchor.constraint(equalTo: rightAnchor)
-        }
+        let left = tableView.leftAnchor.constraint(equalTo: leftAnchor)
+        let right = tableView.rightAnchor.constraint(equalTo: rightAnchor)
         NSLayoutConstraint.activate([top, bottom, left, right])
     }
     
@@ -104,17 +96,17 @@ public final class ListView: UIView, CalendarSettingProtocol {
         tableView.reloadData()
     }
     
-    func setDate(_ date: Date) {
+    func setDate(_ date: Date, animated: Bool) {
         params.data.date = date
         
         guard !params.data.isSkeletonVisible else { return }
         
         if let idx = params.data.sections.firstIndex(where: { $0.date.year == date.year && $0.date.month == date.month && $0.date.day == date.day }) {
-            tableView.scrollToRow(at: IndexPath(row: 0, section: idx), at: .top, animated: true)
+            tableView.scrollToRow(at: IndexPath(row: 0, section: idx), at: .top, animated: animated)
         } else if let idx = params.data.sections.firstIndex(where: { $0.date.year == date.year && $0.date.month == date.month }) {
-            tableView.scrollToRow(at: IndexPath(row: 0, section: idx), at: .top, animated: true)
+            tableView.scrollToRow(at: IndexPath(row: 0, section: idx), at: .top, animated: animated)
         } else if let idx = params.data.sections.firstIndex(where: { $0.date.year == date.year }) {
-            tableView.scrollToRow(at: IndexPath(row: 0, section: idx), at: .top, animated: true)
+            tableView.scrollToRow(at: IndexPath(row: 0, section: idx), at: .top, animated: animated)
         }
     }
     

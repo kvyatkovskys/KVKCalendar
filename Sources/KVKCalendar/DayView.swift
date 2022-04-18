@@ -46,7 +46,7 @@ final class DayView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setDate(_ date: Date) {
+    func setDate(_ date: Date, animated: Bool) {
         parameters.data.date = date
         scrollableWeekView.setDate(date)
     }
@@ -80,7 +80,7 @@ final class DayView: UIView {
             viewerFrame.origin.x = bounds.width - viewerFrame.width
         }
         guard let eventViewer = dataSource?.willDisplayEventViewer(date: parameters.data.date,
-                                                                              frame: viewerFrame) else { return nil }
+                                                                   frame: viewerFrame) else { return nil }
         
         eventViewer.tag = tagEventViewer
         addSubview(eventViewer)
