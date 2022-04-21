@@ -255,6 +255,7 @@ extension WeekView: CalendarSettingProtocol {
                                                          date: parameters.data.date,
                                                          type: .week,
                                                          style: style))
+        view.dataSource = dataSource
         view.didSelectDate = { [weak self] (date, type) in
             if let item = date {
                 self?.parameters.data.date = item
