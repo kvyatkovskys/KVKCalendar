@@ -346,6 +346,7 @@ extension DayView: CalendarSettingProtocol {
                                                         date: parameters.data.date,
                                                         type: .day,
                                                         style: style))
+        view.dataSource = parameters.dataSource
         view.didSelectDate = { [weak self] (date, type) in
             if let item = date {
                 self?.parameters.data.date = item
