@@ -18,7 +18,8 @@ final class WeekData: EventDateProtocol, ScrollableWeekProtocol {
     
     init(data: CalendarData, startDay: StartDayType, maxDays: Int) {
         self.date = data.date
-        self.days = WeekData.getDates(
+        self.days = []
+        self.days = self.getDates(
             data: data,
             startDay: startDay,
             maxDays: maxDays
@@ -38,7 +39,7 @@ final class WeekData: EventDateProtocol, ScrollableWeekProtocol {
     
     func updateDaysBySection(data: CalendarData, startDay: StartDayType, maxDays: Int) {
         self.date = data.date
-        self.days = WeekData.getDates(
+        self.days = self.getDates(
             data: data,
             startDay: startDay,
             maxDays: maxDays
@@ -47,7 +48,7 @@ final class WeekData: EventDateProtocol, ScrollableWeekProtocol {
         daysBySection = prepareDays(days, maxDayInWeek: maxDays)
     }
     
-    static func getDates(data: CalendarData, startDay: StartDayType, maxDays: Int) -> [Day] {
+    func getDates(data: CalendarData, startDay: StartDayType, maxDays: Int) -> [Day] {
         var item = startDay
         if maxDays != 7 {
             item = .sunday
@@ -70,7 +71,9 @@ final class WeekData: EventDateProtocol, ScrollableWeekProtocol {
             if extraBufferDays > 0 {
                 var i = extraBufferDays
                 while (i > 0) {
-                    extensionDays.append(Day(type: .empty, date: firstDate.adding(.day, value: -1 * i), data: []))
+                    if let newDate = firstDate.addingTo(.day, value: -1 * i) {
+                        extensionDays.append(Day(type: .empty, date: newDate, data: []))
+                    }
                     i -= 1
                 }
             }

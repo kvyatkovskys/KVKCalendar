@@ -153,7 +153,11 @@ public extension Date {
         }
     }
     
-    func adding(_ component: Calendar.Component, value: Int) -> Date {
-        return Calendar.current.date(byAdding: component, value: value, to: self)!
+    func addingTo(_ component: Calendar.Component, value: Int) -> Date? {
+        if let newDate = Calendar.current.date(byAdding: component, value: value, to: self) {
+            return newDate
+        }
+        
+        return nil
     }
 }
