@@ -322,11 +322,11 @@ public struct MonthStyle {
         format.dateFormat = "EE"
         return format
     }()
-    public var shortInDayMonthFormatter: DateFormatter {
+    public var shortInDayMonthFormatter: DateFormatter = {
         let format = DateFormatter()
         format.dateFormat = "MMM"
         return format
-    }
+    }()
     public var heightHeaderWeek: CGFloat = 25
     
     @available(swift, deprecated: 0.5.5, obsoleted: 0.5.6, renamed: "heightTitleHeader")
