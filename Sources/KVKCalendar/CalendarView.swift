@@ -110,6 +110,10 @@ public final class CalendarView: UIView {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    public func updateDaysBySectionInWeekView(date: Date? = nil) {
+        weekView.updateDaysBySection(date: date)
+    }
 }
 
 #endif

@@ -103,6 +103,10 @@ final class ScrollableWeekView: UIView {
         return weeks[idx]
     }
     
+    func updateWeeks(weeks: [[Day]]) {
+        params.weeks = weeks
+    }
+    
     func scrollHeaderByTransform(_ transform: CGAffineTransform) {
         guard !transform.isIdentity else {
             guard let scrollDate = getScrollDate(date), let idx = getIdxByDate(scrollDate) else { return }
