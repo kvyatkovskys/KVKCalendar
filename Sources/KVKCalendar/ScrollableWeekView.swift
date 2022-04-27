@@ -232,9 +232,9 @@ extension ScrollableWeekView: CalendarSettingProtocol {
         collectionView.reloadData()
     }
     
-    func updateStyle(_ style: Style) {
+    func updateStyle(_ style: Style, force: Bool) {
         self.style = style
-        setUI()
+        setUI(reload: force)
         scrollToDate(date, animated: true)
     }
     

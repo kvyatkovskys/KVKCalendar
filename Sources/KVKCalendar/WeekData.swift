@@ -10,7 +10,7 @@
 import Foundation
 
 final class WeekData: EventDateProtocol, ScrollableWeekProtocol {
-    var days: [Day]
+    var days: [Day] = []
     var date: Date
     var events: [Event] = []
     var recurringEvents: [Event] = []
@@ -18,12 +18,7 @@ final class WeekData: EventDateProtocol, ScrollableWeekProtocol {
     
     init(data: CalendarData, startDay: StartDayType, maxDays: Int) {
         self.date = data.date
-        self.days = []
-        self.days = self.getDates(
-            data: data,
-            startDay: startDay,
-            maxDays: maxDays
-        )
+        self.days = getDates(data: data, startDay: startDay, maxDays: maxDays)
         
         daysBySection = prepareDays(days, maxDayInWeek: maxDays)
     }
@@ -39,16 +34,11 @@ final class WeekData: EventDateProtocol, ScrollableWeekProtocol {
     
     func updateDaysBySection(data: CalendarData, startDay: StartDayType, maxDays: Int) {
         self.date = data.date
-        self.days = self.getDates(
-            data: data,
-            startDay: startDay,
-            maxDays: maxDays
-        )
-        
+        days = getDates(data: data, startDay: startDay, maxDays: maxDays)
         daysBySection = prepareDays(days, maxDayInWeek: maxDays)
     }
     
-    func getDates(data: CalendarData, startDay: StartDayType, maxDays: Int) -> [Day] {
+    private func getDates(data: CalendarData, startDay: StartDayType, maxDays: Int) -> [Day] {
         var item = startDay
         if maxDays != 7 {
             item = .sunday

@@ -223,10 +223,10 @@ extension DayView: CalendarSettingProtocol {
         timelinePage.reloadCacheControllers()
     }
     
-    func updateStyle(_ style: Style) {
+    func updateStyle(_ style: Style, force: Bool) {
         let reload = self.style != style
         self.style = style
-        setUI(reload: reload)
+        setUI(reload: reload || force)
         reloadFrame(frame)
     }
     
@@ -237,6 +237,7 @@ extension DayView: CalendarSettingProtocol {
             if reload {
                 topBackgroundView = setupTopBackgroundView()
                 scrollableWeekView = setupScrollableWeekView()
+                scrollableWeekView.updateStyle(style, force: reload)
             }
             
             addSubview(topBackgroundView)
@@ -245,6 +246,7 @@ extension DayView: CalendarSettingProtocol {
         
         if reload {
             timelinePage = setupTimelinePageView()
+            timelinePage.updateStyle(style, force: reload)
         }
         addSubview(timelinePage)
         timelinePage.isPagingEnabled = style.timeline.scrollDirections.contains(.horizontal)

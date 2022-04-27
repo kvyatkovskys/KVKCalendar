@@ -289,7 +289,7 @@ protocol CalendarSettingProtocol: AnyObject {
     var style: Style { get set }
     
     func reloadFrame(_ frame: CGRect)
-    func updateStyle(_ style: Style)
+    func updateStyle(_ style: Style, force: Bool)
     func reloadData(_ events: [Event])
     func setDate(_ date: Date, animated: Bool)
     

@@ -67,7 +67,7 @@ extension DividerView: CalendarSettingProtocol {
         setUI()
     }
     
-    func updateStyle(_ style: Style) {
+    func updateStyle(_ style: Style, force: Bool) {
         parameters.style = style
     }
     

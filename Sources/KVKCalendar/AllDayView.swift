@@ -190,9 +190,9 @@ extension AllDayView: CalendarSettingProtocol {
         
     }
     
-    func updateStyle(_ style: Style) {
+    func updateStyle(_ style: Style, force: Bool) {
         self.style = style
-        setUI()
+        setUI(reload: force)
     }
     
     func setUI(reload: Bool = false) {

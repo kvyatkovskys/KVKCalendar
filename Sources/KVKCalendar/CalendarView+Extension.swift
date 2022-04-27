@@ -315,7 +315,7 @@ extension CalendarView: DisplayDelegate {
     }
 }
 
-extension CalendarView: CalendarSettingProtocol {
+extension CalendarView {
     
     public var style: Style {
         get {
@@ -338,7 +338,7 @@ extension CalendarView: CalendarSettingProtocol {
     
     public func updateStyle(_ style: Style) {
         self.style = style.adaptiveStyle
-        reloadAllStyles(self.style)
+        reloadAllStyles(self.style, force: false)
         
         switch parameters.type {
         case .month:
@@ -350,10 +350,10 @@ extension CalendarView: CalendarSettingProtocol {
         }
     }
     
-    func reloadAllStyles(_ style: Style) {
+    func reloadAllStyles(_ style: Style, force: Bool) {
         viewCaches.values.forEach { (viewCache) in
             if let currentView = viewCache as? CalendarSettingProtocol {
-                currentView.updateStyle(self.style)
+                currentView.updateStyle(style, force: force)
             }
         }
     }

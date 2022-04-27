@@ -210,10 +210,10 @@ extension MonthView: CalendarSettingProtocol {
         }
     }
     
-    func updateStyle(_ style: Style) {
+    func updateStyle(_ style: Style, force: Bool) {
         let reload = self.style != style
         self.style = style
-        setUI(reload: reload)
+        setUI(reload: reload || force)
         weekHeaderView.setDate(parameters.monthData.date, animated: false)
         if reload {
             parameters.monthData.selectedSection = -1

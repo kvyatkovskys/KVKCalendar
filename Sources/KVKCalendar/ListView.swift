@@ -71,9 +71,9 @@ public final class ListView: UIView, CalendarSettingProtocol {
         NSLayoutConstraint.activate([top, bottom, left, right])
     }
     
-    func updateStyle(_ style: Style) {
+    func updateStyle(_ style: Style, force: Bool) {
         self.style = style
-        setUI()
+        setUI(reload: force)
     }
     
     func setUI(reload: Bool = false) {

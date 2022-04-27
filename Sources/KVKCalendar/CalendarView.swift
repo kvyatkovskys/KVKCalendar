@@ -104,7 +104,7 @@ public final class CalendarView: UIView {
             parameters.type = defaultType
         }
         set(type: parameters.type, date: date)
-        reloadAllStyles(adaptiveStyle)
+        reloadAllStyles(adaptiveStyle, force: true)
     }
     
     required init?(coder aDecoder: NSCoder) {

@@ -140,10 +140,10 @@ extension WeekView: CalendarSettingProtocol {
         timelinePage.reloadCacheControllers()
     }
     
-    func updateStyle(_ style: Style) {
+    func updateStyle(_ style: Style, force: Bool) {
         let reload = self.style != style
         self.style = style
-        setUI(reload: reload)
+        setUI(reload: reload || force)
         timelinePage.reloadPages()
         reloadFrame(frame)
     }
@@ -154,7 +154,9 @@ extension WeekView: CalendarSettingProtocol {
         if reload {
             topBackgroundView = setupTopBackgroundView()
             scrollableWeekView = setupScrollableView()
+            scrollableWeekView.updateStyle(style, force: reload)
             timelinePage = setupTimelinePageView()
+            timelinePage.updateStyle(style, force: reload)
         }
         addSubview(topBackgroundView)
         topBackgroundView.addSubview(scrollableWeekView)

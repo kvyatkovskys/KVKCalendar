@@ -152,9 +152,9 @@ extension WeekHeaderView: CalendarSettingProtocol {
         addViews(frame: self.frame, isFromYear: isFromYear)
     }
     
-    func updateStyle(_ style: Style) {
+    func updateStyle(_ style: Style, force: Bool) {
         self.style = style
-        setUI()
+        setUI(reload: force)
     }
 }
 

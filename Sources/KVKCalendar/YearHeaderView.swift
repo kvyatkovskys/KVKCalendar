@@ -55,7 +55,7 @@ extension YearHeaderView: CalendarSettingProtocol {
         style
     }
     
-    func setUI() {
+    func setUI(reload: Bool = false) {
         titleLabel.frame = CGRect(x: 20, y: 0, width: frame.width - 10, height: frame.height)
         addSubview(titleLabel)
     }
@@ -65,7 +65,7 @@ extension YearHeaderView: CalendarSettingProtocol {
         titleLabel.frame.size.width = frame.width
     }
     
-    func updateStyle(_ style: Style) {
+    func updateStyle(_ style: Style, force: Bool) {
         self.style = style
     }
 }
