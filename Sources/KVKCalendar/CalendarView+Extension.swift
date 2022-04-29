@@ -313,6 +313,10 @@ extension CalendarView: DisplayDelegate {
         newFrame.origin = .zero
         delegate?.didChangeViewerFrame(newFrame)
     }
+    
+    public func willSelectDate(_ date: Date, type: CalendarType) {
+        delegate?.willSelectDate(date, type: type)
+    }
 }
 
 extension CalendarView {
