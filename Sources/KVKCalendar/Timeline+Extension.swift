@@ -747,10 +747,10 @@ extension TimelineView: CalendarSettingProtocol {
         currentLineView.reloadFrame(frame)
     }
     
-    func updateStyle(_ style: Style) {
+    func updateStyle(_ style: Style, force: Bool) {
         self.style = style
-        currentLineView.updateStyle(style)
-        setUI()
+        currentLineView.updateStyle(style, force: force)
+        setUI(reload: force)
     }
 }
 

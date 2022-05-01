@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 @available(iOS 13.0, *)
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
@@ -19,7 +20,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
         window = UIWindow(windowScene: windowScene)
-        let navVC = UINavigationController(rootViewController: ViewController())
+        let navVC = UINavigationController(rootViewController: makeViewController())
         navVC.isNavigationBarHidden = false
         navVC.navigationBar.isTranslucent = false
         
@@ -32,6 +33,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         window?.rootViewController = navVC
         window?.makeKeyAndVisible()
+    }
+    
+    private func makeViewController() -> UIViewController {
+#if DEBUG_SwiftUI
+        return UIHostingController(rootView: ContentView())
+#else
+        return ViewController()
+#endif
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

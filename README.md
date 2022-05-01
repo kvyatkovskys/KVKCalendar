@@ -30,7 +30,7 @@ Please, use [Issues](https://github.com/kvyatkovskys/KVKCalendar/issues) only fo
 
 ## Requirements
 
-- iOS 10.0+, iPadOS 10.0+, MacOS 10.15+ (Supports Mac Catalyst)
+- iOS 10.0+, iPadOS 10.0+, MacOS 11.0+ (supports Mac Catalyst)
 - Swift 5.0+
 
 ## Installation
@@ -85,8 +85,9 @@ class ViewController: UIViewController {
         }
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        // to track changing frame when an user rotates device
         calendarView.reloadFrame(view.frame)
     }
 }

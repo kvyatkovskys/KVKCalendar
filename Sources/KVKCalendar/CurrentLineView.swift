@@ -51,7 +51,7 @@ final class CurrentLineView: UIView {
     init(parameters: Parameters, frame: CGRect) {
         self.parameters = parameters
         super.init(frame: frame)
-        
+        isUserInteractionEnabled = false
         setUI()
     }
     
@@ -97,9 +97,9 @@ extension CurrentLineView: CalendarSettingProtocol {
         isHidden = true
     }
     
-    func updateStyle(_ style: Style) {
+    func updateStyle(_ style: Style, force: Bool) {
         self.style = style
-        setUI()
+        setUI(reload: force)
         date = Date()
     }
     

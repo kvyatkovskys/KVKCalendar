@@ -78,7 +78,7 @@ final class ListViewCell: KVKTableViewCell {
         isUserInteractionEnabled = !skeletons
         txtLabel.isHidden = skeletons
         dotView.isHidden = skeletons
-        
+
         let stubLabelView = UIView(frame: CGRect(x: 30, y: 0, width: bounds.width - 60, height: bounds.height))
         let stubDotView = UIView(frame: CGRect(x: 10, y: (bounds.height / 2) - 18, width: 30, height: 30))
         if skeletons {

@@ -19,7 +19,7 @@ extension CalendarView {
     
     public func set(type: CalendarType, date: Date? = nil, animated: Bool = true) {
         parameters.type = type
-        switchTypeCalendar(type: type)
+        switchCalendarType(type)
         
         if let dt = date {
             scrollTo(dt, animated: animated)
@@ -74,15 +74,15 @@ extension CalendarView {
     public func scrollTo(_ date: Date, animated: Bool = true) {
         switch parameters.type {
         case .day:
-            dayView.setDate(date)
+            dayView.setDate(date, animated: false)
         case .week:
-            weekView.setDate(date)
+            weekView.setDate(date, animated: false)
         case .month:
             monthView.setDate(date, animated: animated)
         case .year:
-            yearView.setDate(date)
+            yearView.setDate(date, animated: animated)
         case .list:
-            listView.setDate(date)
+            listView.setDate(date, animated: animated)
         }
     }
     
@@ -188,29 +188,39 @@ extension CalendarView {
         }
     }
     
-    private func switchTypeCalendar(type: CalendarType) {
+    private func switchCalendarType(_ type: CalendarType) {
         parameters.type = type
-        viewCaches.removeValue(forKey: type)
         subviews.forEach { $0.removeFromSuperview() }
         
         switch parameters.type {
         case .day:
             addSubview(dayView)
-            viewCaches[type] = dayView
         case .week:
             addSubview(weekView)
-            viewCaches[type] = weekView
         case .month:
             addSubview(monthView)
-            viewCaches[type] = monthView
         case .year:
             addSubview(yearView)
-            viewCaches[type] = yearView
+            setupConstraintsForView(yearView)
         case .list:
             addSubview(listView)
-            viewCaches[type] = listView
+            setupConstraintsForView(listView)
             reloadData()
-        }
+        }        
+    }
+    
+    private func deactivateConstraintsForView(_ view: UIView) {
+        NSLayoutConstraint.deactivate(view.constraints)
+    }
+    
+    private func setupConstraintsForView(_ view: UIView) {
+        view.translatesAutoresizingMaskIntoConstraints = false
+        
+        let top = view.topAnchor.constraint(equalTo: topAnchor)
+        let bottom = view.bottomAnchor.constraint(equalTo: bottomAnchor)
+        let left = view.leftAnchor.constraint(equalTo: leftAnchor)
+        let right = view.rightAnchor.constraint(equalTo: rightAnchor)
+        NSLayoutConstraint.activate([top, bottom, left, right])
     }
 }
 
@@ -303,9 +313,13 @@ extension CalendarView: DisplayDelegate {
         newFrame.origin = .zero
         delegate?.didChangeViewerFrame(newFrame)
     }
+    
+    public func willSelectDate(_ date: Date, type: CalendarType) {
+        delegate?.willSelectDate(date, type: type)
+    }
 }
 
-extension CalendarView: CalendarSettingProtocol {
+extension CalendarView {
     
     public var style: Style {
         get {
@@ -328,10 +342,22 @@ extension CalendarView: CalendarSettingProtocol {
     
     public func updateStyle(_ style: Style) {
         self.style = style.adaptiveStyle
+        reloadAllStyles(self.style, force: false)
         
+        switch parameters.type {
+        case .month:
+            monthView.setDate(monthData.date, animated: true)
+        case .year:
+            yearView.setDate(yearData.date, animated: true)
+        default:
+            break
+        }
+    }
+    
+    func reloadAllStyles(_ style: Style, force: Bool) {
         viewCaches.values.forEach { (viewCache) in
-            if let currentView = viewCache as? CalendarSettingProtocol, currentView.style != self.style {
-                currentView.updateStyle(self.style)
+            if let currentView = viewCache as? CalendarSettingProtocol {
+                currentView.updateStyle(style, force: force)
             }
         }
     }

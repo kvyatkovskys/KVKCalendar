@@ -49,10 +49,15 @@ final class MonthHeaderView: UICollectionReusableView {
             } else {
                 offset = 0
             }
-            
-            dateLabel.frame = CGRect(origin: CGPoint(x: offset, y: 0),
-                                     size: CGSize(width: frame.width - offset, height: frame.height))
+
             addSubview(dateLabel)
+            dateLabel.translatesAutoresizingMaskIntoConstraints = false
+            
+            let top = dateLabel.topAnchor.constraint(equalTo: topAnchor)
+            let bottom = dateLabel.bottomAnchor.constraint(equalTo: bottomAnchor)
+            let right = dateLabel.rightAnchor.constraint(equalTo: rightAnchor)
+            let left = dateLabel.leftAnchor.constraint(lessThanOrEqualTo: leftAnchor, constant: offset)
+            NSLayoutConstraint.activate([top, left, right, bottom])
         }
     }
     

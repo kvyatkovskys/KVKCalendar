@@ -68,8 +68,8 @@ final class TimelinePageView: UIView {
         mainPageView.delegate = self
     }
     
-    func updateStyle(_ style: Style) {
-        pages.forEach { $0.value.updateStyle(style) }
+    func updateStyle(_ style: Style, force: Bool) {
+        pages.forEach { $0.value.updateStyle(style, force: force) }
     }
     
     func reloadPages(excludeCurrentPage: Bool = false) {

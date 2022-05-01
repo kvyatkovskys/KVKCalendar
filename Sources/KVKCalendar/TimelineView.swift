@@ -101,7 +101,6 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         super.init(frame: frame)
         
         addSubview(scrollView)
-        setUI()
         setupConstraints()
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(forceDeselectEvent))
@@ -119,10 +118,6 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     
     deinit {
         stopTimer(timerKey)
-    }
-    
-    func deactivateConstraints() {
-        NSLayoutConstraint.deactivate(scrollView.constraints)
     }
     
     func setupConstraints() {
