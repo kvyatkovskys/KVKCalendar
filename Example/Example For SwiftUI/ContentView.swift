@@ -7,11 +7,14 @@
 //
 
 import SwiftUI
+import KVKCalendar
 
 @available(iOS 13.0, *)
 struct ContentView: View {
+    @State var events: [Event] = []
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        CalendarDisplayView(events: $events)
     }
 }
 
