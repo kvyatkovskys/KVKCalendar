@@ -110,6 +110,10 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             let pinch = UIPinchGestureRecognizer(target: self, action: #selector(pinchZooming))
             addGestureRecognizer(pinch)
         }
+        
+        if let scrollToHourOnInit = style.timeline.scrollToHourOnInit {
+            scrollToHour(scrollToHourOnInit)
+        }
     }
     
     required init?(coder aDecoder: NSCoder) {

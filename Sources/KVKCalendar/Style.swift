@@ -154,6 +154,7 @@ public struct TimelineStyle {
     public var offsetEvent: CGFloat = 3
     public var startHour: Int = 0
     public var scrollToHour: Int? = nil
+    public var scrollToHourOnInit: Int? = nil
     public var movingMinuteLabelRoundUpTime: UInt = 15
     var minuteLabelRoundUpTime: Int {
         guard 1...60 ~= movingMinuteLabelRoundUpTime else { return 1 }
@@ -907,6 +908,7 @@ extension TimelineStyle: Equatable {
         && compare(\.offsetEvent)
         && compare(\.startHour)
         && compare(\.scrollToHour)
+        && compare(\.scrollToHourOnInit)
         && compare(\.heightLine)
         && compare(\.movingMinuteLabelRoundUpTime)
         && compare(\.minuteLabelRoundUpTime)
