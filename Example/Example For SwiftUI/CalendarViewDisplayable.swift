@@ -19,6 +19,7 @@ struct CalendarDisplayView: UIViewRepresentable, KVKCalendarSettings {
         createCalendarStyle()
     }
     var selectDate = Date()
+    var eventViewer = EventViewer()
 
     private var calendar = CalendarView(frame: .zero)
         
@@ -60,10 +61,34 @@ struct CalendarDisplayView: UIViewRepresentable, KVKCalendarSettings {
         init(_ view: CalendarDisplayView) {
             self.view = view
             super.init()
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(changedOerintation),
+                                                   name: UIDevice.orientationDidChangeNotification,
+                                                   object: nil)
         }
         
         func eventsForCalendar(systemEvents: [EKEvent]) -> [Event] {
             events
         }
+        
+        func willDisplayEventViewer(date: Date, frame: CGRect) -> UIView? {
+            view.eventViewer.frame = frame
+            view.eventViewer.reloadFrame(frame: frame)
+            return view.eventViewer
+        }
+        
+        func didChangeViewerFrame(_ frame: CGRect) {
+            view.eventViewer.reloadFrame(frame: frame)
+        }
+        
+        // MARK: Private
+        
+        @objc private func changedOerintation() {
+            var frame = UIScreen.main.bounds
+            frame.origin.y = 0
+            frame.size.height -= (view.topOffset + view.bottomOffset)
+            view.calendar.reloadFrame(frame)
+        }
+        
     }
 }

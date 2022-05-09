@@ -115,7 +115,6 @@
 				607FACD11AFB9204008FA782 /* Products */,
 				AD447977492396FFD74B0D2A /* Pods */,
 				C54D6CB6A4B0C45500427DE7 /* Frameworks */,
-				F9E6F70F281F0C13000AEADD /* KVKCalendar_Example_SwiftUI-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -168,6 +167,7 @@
 			isa = PBXGroup;
 			children = (
 				607FACEA1AFB9204008FA782 /* Info.plist */,
+				F9E6F70F281F0C13000AEADD /* KVKCalendar_Example_SwiftUI-Info.plist */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -743,7 +743,7 @@
 				CODE_SIGN_ENTITLEMENTS = KVKCalendar_Example.entitlements;
 				DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER = YES;
 				DEVELOPMENT_TEAM = "";
-				INFOPLIST_FILE = "KVKCalendar_Example copy-Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/KVKCalendar_Example_SwiftUI-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				"IPHONEOS_DEPLOYMENT_TARGET[sdk=macosx*]" = 14.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -765,7 +765,7 @@
 				CODE_SIGN_ENTITLEMENTS = KVKCalendar_Example.entitlements;
 				DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER = YES;
 				DEVELOPMENT_TEAM = "";
-				INFOPLIST_FILE = "KVKCalendar_Example copy-Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/KVKCalendar_Example_SwiftUI-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				"IPHONEOS_DEPLOYMENT_TARGET[sdk=macosx*]" = 14.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

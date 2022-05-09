@@ -752,6 +752,20 @@ extension TimelineView: CalendarSettingProtocol {
         currentLineView.updateStyle(style, force: force)
         setUI(reload: force)
     }
+    
+    func removeConstraints() {
+        NSLayoutConstraint.deactivate(scrollView.constraints)
+    }
+    
+    func setupConstraints() {
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        
+        let top = scrollView.topAnchor.constraint(equalTo: topAnchor)
+        let left = scrollView.leftAnchor.constraint(equalTo: leftAnchor)
+        let right = scrollView.rightAnchor.constraint(equalTo: rightAnchor)
+        let bottom = scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        NSLayoutConstraint.activate([top, left, right, bottom])
+    }
 }
 
 extension TimelineView: AllDayEventDelegate {

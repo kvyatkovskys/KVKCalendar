@@ -220,7 +220,7 @@ extension DayView: CalendarSettingProtocol {
                                           events: parameters.data.events,
                                           recurringEvents: parameters.data.recurringEvents,
                                           selectedDate: parameters.data.date)
-        timelinePage.reloadCacheControllers()
+        timelinePage.reloadCachedControllers()
     }
     
     func updateStyle(_ style: Style, force: Bool) {
@@ -246,6 +246,42 @@ extension DayView: CalendarSettingProtocol {
         
         if reload {
             timelinePage = setupTimelinePageView()
+            timelinePage.didSwitchTimelineView = { [weak self] (_, type) in
+                guard let self = self else { return }
+                
+                let newTimeline = self.createTimelineView(frame: self.timelinePage.bounds)
+                switch type {
+                case .next:
+                    self.nextDate()
+                    self.timelinePage.addNewTimelineView(newTimeline, to: .end)
+                case .previous:
+                    self.previousDate()
+                    self.timelinePage.addNewTimelineView(newTimeline, to: .begin)
+                }
+                
+                self.delegate?.didSelectDates([self.parameters.data.date], type: .day, frame: nil)
+            }
+            
+            timelinePage.willDisplayTimelineView = { [weak self] (timeline, type) in
+                guard let self = self else { return }
+                
+                let nextDate: Date?
+                switch type {
+                case .next:
+                    nextDate = self.style.calendar.date(byAdding: .day,
+                                                        value: 1,
+                                                        to: self.parameters.data.date)
+                case .previous:
+                    nextDate = self.style.calendar.date(byAdding: .day,
+                                                        value: -1,
+                                                        to: self.parameters.data.date)
+                }
+                
+                timeline.create(dates: [nextDate],
+                                events: self.parameters.data.events,
+                                recurringEvents: self.parameters.data.recurringEvents,
+                                selectedDate: self.parameters.data.date)
+            }
             timelinePage.updateStyle(style, force: reload)
         }
         addSubview(timelinePage)
@@ -293,45 +329,6 @@ extension DayView: CalendarSettingProtocol {
         let page = TimelinePageView(maxLimit: style.timeline.maxLimitCachedPages,
                                     pages: timelineViews,
                                     frame: timelineFrame)
-        
-        page.didSwitchTimelineView = { [weak self] (_, type) in
-            guard let self = self else { return }
-            
-            let newTimeline = self.createTimelineView(frame: timelineFrame)
-            
-            switch type {
-            case .next:
-                self.nextDate()
-                self.timelinePage.addNewTimelineView(newTimeline, to: .end)
-            case .previous:
-                self.previousDate()
-                self.timelinePage.addNewTimelineView(newTimeline, to: .begin)
-            }
-            
-            self.delegate?.didSelectDates([self.parameters.data.date], type: .day, frame: nil)
-        }
-        
-        page.willDisplayTimelineView = { [weak self] (timeline, type) in
-            guard let self = self else { return }
-            
-            let nextDate: Date?
-            switch type {
-            case .next:
-                nextDate = self.style.calendar.date(byAdding: .day,
-                                                    value: 1,
-                                                    to: self.parameters.data.date)
-            case .previous:
-                nextDate = self.style.calendar.date(byAdding: .day,
-                                                    value: -1,
-                                                    to: self.parameters.data.date)
-            }
-            
-            timeline.create(dates: [nextDate],
-                            events: self.parameters.data.events,
-                            recurringEvents: self.parameters.data.recurringEvents,
-                            selectedDate: self.parameters.data.date)
-        }
-        
         return page
     }
     
@@ -363,9 +360,7 @@ extension DayView: CalendarSettingProtocol {
             guard let self = self else { return }
             
             self.timelinePage.changePage(type)
-            let newTimeline = self.createTimelineView(frame: CGRect(origin: .zero,
-                                                                    size: self.timelinePage.bounds.size))
-            
+            let newTimeline = self.createTimelineView(frame: self.timelinePage.bounds)
             switch type {
             case .next:
                 self.timelinePage.addNewTimelineView(newTimeline, to: .end)

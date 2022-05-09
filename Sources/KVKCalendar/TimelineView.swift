@@ -120,16 +120,6 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         stopTimer(timerKey)
     }
     
-    func setupConstraints() {
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        
-        let top = scrollView.topAnchor.constraint(equalTo: topAnchor)
-        let left = scrollView.leftAnchor.constraint(equalTo: leftAnchor)
-        let right = scrollView.rightAnchor.constraint(equalTo: rightAnchor)
-        let bottom = scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
-        NSLayoutConstraint.activate([top, left, right, bottom])
-    }
-    
     private func setOffsetScrollView(offsetY: CGFloat) {
         switch paramaters.type {
         case .day:

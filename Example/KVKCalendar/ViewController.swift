@@ -17,6 +17,7 @@ final class ViewController: UIViewController, KVKCalendarSettings {
     var style: Style {
         createCalendarStyle()
     }
+    var eventViewer = EventViewer()
     
     private lazy var todayButton: UIBarButtonItem = {
         let button = UIBarButtonItem(title: "Today", style: .done, target: self, action: #selector(today))
@@ -103,7 +104,8 @@ final class ViewController: UIViewController, KVKCalendarSettings {
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        // to track changing oerintations and multiple windows and theme of device
+        // to track changing windows and theme of device
+        
         loadEvents(dateFormat: style.timeSystem.format) { [weak self] (events) in
             self?.events = events
             if let style = self?.style {

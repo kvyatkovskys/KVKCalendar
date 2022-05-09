@@ -14,6 +14,7 @@ protocol KVKCalendarSettings {
     var selectDate: Date { get set }
     var events: [Event] { get set }
     var style: Style { get }
+    var eventViewer: EventViewer { get set }
     
 }
 
@@ -21,18 +22,19 @@ extension KVKCalendarSettings {
     
     var topOffset: CGFloat {
         let barHeight = UIApplication.shared.statusBarHeight
-        let offset: CGFloat
-        
         if #available(iOS 11.0, *) {
-            offset = UIApplication.shared.activeWindow?.rootViewController?.view.safeAreaInsets.top ?? barHeight
+            return UIApplication.shared.activeWindow?.rootViewController?.view.safeAreaInsets.top ?? barHeight
         } else {
-            offset = barHeight
+            return barHeight
         }
-        return offset
     }
     
-    var eventViewer: EventViewer {
-        EventViewer()
+    var bottomOffset: CGFloat {
+        if #available(iOS 11.0, *) {
+            return UIApplication.shared.activeWindow?.rootViewController?.view.safeAreaInsets.bottom ?? 0
+        } else {
+            return 0
+        }
     }
     
     var defaultDate: String {
