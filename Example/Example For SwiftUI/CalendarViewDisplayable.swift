@@ -68,7 +68,11 @@ struct CalendarDisplayView: UIViewRepresentable, KVKCalendarSettings {
         }
         
         func eventsForCalendar(systemEvents: [EKEvent]) -> [Event] {
-            events
+            view.handleEvents(systemEvents: systemEvents)
+        }
+        
+        func willDisplayEventView(_ event: Event, frame: CGRect, date: Date?) -> EventViewGeneral? {
+            view.handleCustomEventView(event: event, style: view.calendar.style, frame: frame)
         }
         
         func willDisplayEventViewer(date: Date, frame: CGRect) -> UIView? {
@@ -77,8 +81,20 @@ struct CalendarDisplayView: UIViewRepresentable, KVKCalendarSettings {
             return view.eventViewer
         }
         
+        func didChangeEvent(_ event: Event, start: Date?, end: Date?) {
+            if let result = view.handleChangingEvent(event, start: start, end: end) {
+                events.replaceSubrange(result.range, with: result.events)
+            }
+        }
+        
         func didChangeViewerFrame(_ frame: CGRect) {
             view.eventViewer.reloadFrame(frame: frame)
+        }
+        
+        func didAddNewEvent(_ event: Event, _ date: Date?) {
+            if let newEvent = view.handleNewEvent(event, date: date) {
+                events.append(newEvent)
+            }
         }
         
         // MARK: Private
