@@ -40,7 +40,7 @@ struct CalendarDisplayView: UIViewRepresentable, KVKCalendarSettings {
     
     public init(events: Binding<[Event]>) {
         self._events = events
-        selectDate = onlyDateFormatter.date(from: defaultDate) ?? Date()
+        selectDate = defaultDate
         
         var frame = UIScreen.main.bounds
         frame.origin.y = 0

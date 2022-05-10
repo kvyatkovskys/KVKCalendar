@@ -10,7 +10,7 @@
 import UIKit
 
 final class TimelineLabel: UILabel {
-    var valueHash: Int?
+    var hashTime: Int = 0
     
     var time: TimeContainer = TimeContainer(minute: 0, hour: 0) {
         didSet {

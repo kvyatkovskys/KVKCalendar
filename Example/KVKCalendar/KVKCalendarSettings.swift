@@ -38,8 +38,12 @@ extension KVKCalendarSettings {
         }
     }
     
-    var defaultDate: String {
+    var defaultStringDate: String {
         "14.12.2022"
+    }
+    
+    var defaultDate: Date {
+        onlyDateFormatter.date(from: defaultStringDate) ?? Date()
     }
     
     var onlyDateFormatter: DateFormatter {

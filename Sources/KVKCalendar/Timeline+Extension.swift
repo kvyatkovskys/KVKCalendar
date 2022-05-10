@@ -305,7 +305,7 @@ extension TimelineView {
     }
     
     func getTimelineLabel(hour: Int) -> TimelineLabel? {
-        timeLabels.first(where: { $0.valueHash == hour.hashValue })
+        timeLabels.first(where: { $0.hashTime == hour })
     }
     
     func createTimesLabel(start: Int) -> [TimelineLabel] {
@@ -322,7 +322,7 @@ extension TimelineView {
             time.textColor = style.timeline.timeColor
             time.text = hour
             let hourTmp = TimeHourSystem.twentyFour.hours[idx]
-            time.valueHash = timeLabelFormatter.date(from: hourTmp)?.hour.hashValue
+            time.hashTime = timeLabelFormatter.date(from: hourTmp)?.hour ?? 0
             time.tag = idx - start
             times.append(time)
         }
@@ -397,7 +397,9 @@ extension TimelineView {
         let time = calculateChangingTime(pointY: point.y)
         var newEvent = Event(ID: Event.idForNewEvent)
         newEvent.title = TextEvent(timeline: style.event.textForNewEvent)
-        let newEventPreview = getEventView(style: style, event: newEvent, frame: CGRect(origin: point, size: eventPreviewSize))
+        let newEventPreview = getEventView(style: style,
+                                           event: newEvent,
+                                           frame: CGRect(origin: point, size: eventPreviewSize))
         newEventPreview.stateEvent = .move
         newEventPreview.delegate = self
         newEventPreview.editEvent(gesture: gesture)
@@ -457,8 +459,7 @@ extension TimelineView {
     func identityViews(duration: TimeInterval = 0.3,
                        delay: TimeInterval = 0.1,
                        _ views: [UIView],
-                       action: @escaping (() -> Void) = {})
-    {
+                       action: @escaping (() -> Void) = {}) {
         UIView.animate(withDuration: duration,
                        delay: delay,
                        usingSpringWithDamping: 0.8,

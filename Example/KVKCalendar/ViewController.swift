@@ -55,7 +55,7 @@ final class ViewController: UIViewController, KVKCalendarSettings {
         
     init() {
         super.init(nibName: nil, bundle: nil)
-        selectDate = onlyDateFormatter.date(from: defaultDate) ?? Date()
+        selectDate = defaultDate
     }
     
     required init?(coder: NSCoder) {

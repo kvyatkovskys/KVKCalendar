@@ -35,11 +35,16 @@ final class DayView: UIView {
     private var isAvailableEventViewer: Bool {
         Platform.currentInterface != .phone
     }
+    private var scrollToCurrentTimeOnlyOnInit: Bool?
     
     init(parameters: Parameters, frame: CGRect) {
         self.parameters = parameters
         self.timelineScale = parameters.style.timeline.scale?.min ?? 1
         super.init(frame: frame)
+        
+        if case .onlyOnInitForDate = parameters.style.timeline.scrollLineHourMode {
+            scrollToCurrentTimeOnlyOnInit = true
+        }
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -265,16 +270,16 @@ extension DayView: CalendarSettingProtocol {
             timelinePage.willDisplayTimelineView = { [weak self] (timeline, type) in
                 guard let self = self else { return }
                 
-                let nextDate: Date?
+                let nextDate: Date
                 switch type {
                 case .next:
                     nextDate = self.style.calendar.date(byAdding: .day,
                                                         value: 1,
-                                                        to: self.parameters.data.date)
+                                                        to: self.parameters.data.date) ?? self.parameters.data.date
                 case .previous:
                     nextDate = self.style.calendar.date(byAdding: .day,
                                                         value: -1,
-                                                        to: self.parameters.data.date)
+                                                        to: self.parameters.data.date) ?? self.parameters.data.date
                 }
                 
                 timeline.create(dates: [nextDate],
@@ -293,15 +298,20 @@ extension DayView: CalendarSettingProtocol {
         var viewFrame = frame
         viewFrame.origin = .zero
         
-        let view = TimelineView(parameters: .init(style: style, type: .day, scale: timelineScale), frame: viewFrame)
+        let view = TimelineView(parameters: .init(style: style, type: .day, scale: timelineScale,
+                                                  scrollToCurrentTimeOnlyOnInit: scrollToCurrentTimeOnlyOnInit),
+                                frame: viewFrame)
         view.delegate = self
         view.dataSource = dataSource
         view.deselectEvent = { [weak self] (event) in
             self?.delegate?.didDeselectEvent(event, animated: true)
         }
-        view.didChangeScale = { [weak self] (newScale) in
-            if newScale != self?.timelineScale {
-                self?.timelineScale = newScale
+        view.didChangeParameters = { [weak self] (params) in
+            if params.scale != self?.timelineScale {
+                self?.timelineScale = params.scale
+            }
+            if params.scrollToCurrentTimeOnlyOnInit != self?.scrollToCurrentTimeOnlyOnInit {
+                self?.scrollToCurrentTimeOnlyOnInit = params.scrollToCurrentTimeOnlyOnInit
             }
         }
         return view
