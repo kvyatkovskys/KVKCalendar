@@ -77,6 +77,14 @@ public enum CalendarType: String, CaseIterable {
     case day, week, month, year, list
 }
 
+extension CalendarType: Identifiable {
+    
+    public var id: CalendarType {
+        self
+    }
+    
+}
+
 // MARK: Event model
 
 @available(swift, deprecated: 0.4.1, obsoleted: 0.4.2, renamed: "Event.Color")

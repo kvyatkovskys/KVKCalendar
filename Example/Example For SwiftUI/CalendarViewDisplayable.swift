@@ -14,6 +14,7 @@ import EventKit
 struct CalendarDisplayView: UIViewRepresentable, KVKCalendarSettings {
     
     @Binding var events: [Event]
+    @Binding var type: CalendarType
     
     var style: Style {
         createCalendarStyle()
@@ -32,14 +33,16 @@ struct CalendarDisplayView: UIViewRepresentable, KVKCalendarSettings {
     
     func updateUIView(_ uiView: CalendarView, context: UIViewRepresentableContext<CalendarDisplayView>) {
         context.coordinator.events = events
+        context.coordinator.type = type
     }
     
     func makeCoordinator() -> CalendarDisplayView.Coordinator {
         Coordinator(self)
     }
     
-    public init(events: Binding<[Event]>) {
+    public init(events: Binding<[Event]>, type: Binding<CalendarType>) {
         self._events = events
+        self._type = type
         selectDate = defaultDate
         
         var frame = UIScreen.main.bounds
@@ -50,10 +53,17 @@ struct CalendarDisplayView: UIViewRepresentable, KVKCalendarSettings {
     
     // MARK: Calendar DataSource and Delegate
     class Coordinator: NSObject, CalendarDataSource, CalendarDelegate {
-        private let view: CalendarDisplayView
+        private var view: CalendarDisplayView
         
         var events: [Event] = [] {
             didSet {
+                view.calendar.reloadData()
+            }
+        }
+        
+        var type: CalendarType = .day {
+            didSet {
+                view.calendar.set(type: type, date: view.selectDate)
                 view.calendar.reloadData()
             }
         }
@@ -65,6 +75,12 @@ struct CalendarDisplayView: UIViewRepresentable, KVKCalendarSettings {
                                                    selector: #selector(changedOerintation),
                                                    name: UIDevice.orientationDidChangeNotification,
                                                    object: nil)
+            
+            DispatchQueue.main.asyncAfter(wallDeadline: .now() + 3) {
+                self.view.loadEvents(dateFormat: view.style.timeSystem.format) { [weak self] (events) in
+                    self?.view.events = events
+                }
+            }
         }
         
         func eventsForCalendar(systemEvents: [EKEvent]) -> [Event] {
@@ -95,6 +111,11 @@ struct CalendarDisplayView: UIViewRepresentable, KVKCalendarSettings {
             if let newEvent = view.handleNewEvent(event, date: date) {
                 events.append(newEvent)
             }
+        }
+        
+        func didSelectDates(_ dates: [Date], type: CalendarType, frame: CGRect?) {
+            view.selectDate = dates.first ?? Date()
+            view.calendar.reloadData()
         }
         
         // MARK: Private

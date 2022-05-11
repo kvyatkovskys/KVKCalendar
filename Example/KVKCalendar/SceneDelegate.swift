@@ -36,11 +36,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     
     private func makeViewController() -> UIViewController {
+        if #available(iOS 14.0, *) {
 #if DEBUG_SwiftUI
-        return UIHostingController(rootView: ContentView())
+            return UIHostingController(rootView: ContentView())
 #else
-        return ViewController()
+            return ViewController()
 #endif
+        } else {
+            return ViewController()
+        }
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
