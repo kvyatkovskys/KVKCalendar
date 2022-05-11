@@ -15,6 +15,7 @@ struct CalendarDisplayView: UIViewRepresentable, KVKCalendarSettings {
     
     @Binding var events: [Event]
     @Binding var type: CalendarType
+    @Binding var updatedDate: Date?
     
     var style: Style {
         createCalendarStyle()
@@ -34,15 +35,17 @@ struct CalendarDisplayView: UIViewRepresentable, KVKCalendarSettings {
     func updateUIView(_ uiView: CalendarView, context: UIViewRepresentableContext<CalendarDisplayView>) {
         context.coordinator.events = events
         context.coordinator.type = type
+        context.coordinator.updatedDate = updatedDate
     }
     
     func makeCoordinator() -> CalendarDisplayView.Coordinator {
         Coordinator(self)
     }
     
-    public init(events: Binding<[Event]>, type: Binding<CalendarType>) {
+    public init(events: Binding<[Event]>, type: Binding<CalendarType>, updatedDate: Binding<Date?>) {
         self._events = events
         self._type = type
+        self._updatedDate = updatedDate
         selectDate = defaultDate
         
         var frame = UIScreen.main.bounds
@@ -65,6 +68,16 @@ struct CalendarDisplayView: UIViewRepresentable, KVKCalendarSettings {
             didSet {
                 view.calendar.set(type: type, date: view.selectDate)
                 view.calendar.reloadData()
+            }
+        }
+        
+        var updatedDate: Date? = nil {
+            didSet {
+                if let date = updatedDate {
+                    view.selectDate = date
+                    view.calendar.scrollTo(date, animated: true)
+                    view.calendar.reloadData()
+                }
             }
         }
         

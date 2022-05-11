@@ -12,16 +12,19 @@ import KVKCalendar
 @available(iOS 14.0, *)
 struct ContentView: View {
     @State private var typeCalendar = CalendarType.day
-    @State var events: [Event] = []
+    @State private var events: [Event] = []
+    @State private var updatedDate: Date?
     
     var body: some View {
         NavigationView {
-            CalendarDisplayView(events: $events, type: $typeCalendar)
+            CalendarDisplayView(events: $events,
+                                type: $typeCalendar,
+                                updatedDate: $updatedDate)
                 .navigationBarTitle("", displayMode: .inline)
                 .edgesIgnoringSafeArea(.bottom)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
-                        HStack(alignment: .center) {
+                        HStack {
                             Picker("", selection: $typeCalendar, content: {
                                 ForEach(CalendarType.allCases,
                                         content: { type in
@@ -29,6 +32,15 @@ struct ContentView: View {
                                 })
                             })
                             .pickerStyle(SegmentedPickerStyle())
+                        }
+                    }
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button {
+                            updatedDate = Date()
+                        } label: {
+                            Text("Today")
+                                .font(.headline)
+                                .foregroundColor(.red)
                         }
                     }
                 }
