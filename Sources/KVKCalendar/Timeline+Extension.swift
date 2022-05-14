@@ -57,7 +57,7 @@ extension TimelineView: UIScrollViewDelegate {
             
             stack.top.subviews.filter { ($0 as? StubEventView)?.valueHash == eventView.event.hash }.forEach { $0.removeFromSuperview() }
             stack.bottom.subviews.filter { ($0 as? StubEventView)?.valueHash == eventView.event.hash }.forEach { $0.removeFromSuperview() }
-
+            
             // TODO: need fix
             // some recurring events are not displayed in top stack
             guard !visibleView(eventView.frame) else { return }
@@ -170,7 +170,7 @@ extension TimelineView {
             if let startHour = startTime.hour,
                let endHour = endTime.hour,
                let startMinute = startTime.minute,
-                let endMinute = endTime.minute
+               let endMinute = endTime.minute
             {
                 delegate?.didResizeEvent(event,
                                          startTime: ResizeTime(startHour, startMinute),
@@ -193,7 +193,7 @@ extension TimelineView {
         
         scrollView.subviews.filter { $0 is EventViewGeneral }.forEach{ $0.isUserInteractionEnabled = enable }
     }
-        
+    
     @objc func pinchZooming(gesture: UIPinchGestureRecognizer) {
         switch gesture.state {
         case .ended, .failed, .cancelled:
@@ -216,7 +216,7 @@ extension TimelineView {
                 return
             }
         }
-                
+        
         let yPoint = gesture.location(in: scrollView).y
         if let label = potentiallyCenteredLabel, let updatedLabel = timeLabels.first(where: { $0.tag >= label.tag }) {
             potentiallyCenteredLabel = updatedLabel
@@ -289,9 +289,9 @@ extension TimelineView {
         }
         
         let allDayView = AllDayView(parameters: .init(prepareEvents: events,
-                                                         type: paramaters.type,
-                                                         style: style,
-                                                         delegate: delegate),
+                                                      type: paramaters.type,
+                                                      style: style,
+                                                      delegate: delegate),
                                     frame: CGRect(x: 0, y: yPoint, width: bounds.width, height: allDayHeight),
                                     dataSource: dataSource)
         allDayView.tag = tagAllDayEventView
@@ -362,17 +362,17 @@ extension TimelineView {
             return acc + lines
         }
     }
-
+    
     func createVerticalLine(pointX: CGFloat, date: Date?) -> VerticalLineLayer {
         let frame = CGRect(x: pointX, y: 0, width: style.timeline.widthLine, height: scrollView.contentSize.height)
-
+        
         let line = VerticalLineLayer(date: date,
-                             frame: frame,
-                             tag: tagVerticalLine,
-                             start: CGPoint(x: pointX, y: 0),
-                             end: CGPoint(x: pointX, y: scrollView.contentSize.height),
-                             color: style.timeline.separatorLineColor,
-                             width: style.timeline.widthLine)
+                                     frame: frame,
+                                     tag: tagVerticalLine,
+                                     start: CGPoint(x: pointX, y: 0),
+                                     end: CGPoint(x: pointX, y: scrollView.contentSize.height),
+                                     color: style.timeline.separatorLineColor,
+                                     width: style.timeline.widthLine)
         line.isHidden = !style.week.showVerticalDayDivider
         return line
     }
@@ -496,7 +496,7 @@ extension TimelineView: ResizeEventViewDelegate {
             showChangingMinute(pointY: offset)
             eventResizePreview?.frame.size.height = location.y - (eventResizePreview?.frame.origin.y ?? 0)
             eventResizePreview?.endTime = movingMinuteLabel.time
-        }        
+        }
         eventResizePreview?.updateHeight()
     }
     
@@ -584,7 +584,7 @@ extension TimelineView: EventDelegate {
             shadowView.date = value.date
             scrollView.addSubview(shadowView)
         }
-    
+        
         eventPreview?.removeFromSuperview()
         eventPreview = nil
         
@@ -696,7 +696,7 @@ extension TimelineView: EventDelegate {
     
     func calculateChangingTime(pointY: CGFloat) -> (hour: Int?, minute: Int?) {
         guard let time = timeLabels.first(where: { $0.frame.origin.y >= pointY }) else { return (nil, nil) }
-
+        
         let firstY = time.frame.origin.y - (calculatedTimeY + style.timeline.heightTime)
         let percent = (pointY - firstY) / (calculatedTimeY + style.timeline.heightTime)
         let newMinute = Int(60.0 * percent)

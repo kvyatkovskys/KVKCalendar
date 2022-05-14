@@ -62,7 +62,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     private(set) var events = [Event]()
     private(set) var recurringEvents = [Event]()
     private(set) var dates = [Date]()
-    private(set) var selectedDate: Date?
+    private(set) var selectedDate: Date
     private(set) var eventLayout: TimelineEventLayout
     
     private(set) lazy var shadowView: ShadowDayView = {
@@ -100,6 +100,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         self.timeSystem = parameters.style.timeSystem
         self.availabilityHours = timeSystem.hours
         self.eventLayout = parameters.style.timeline.eventLayout
+        self.selectedDate = Date()
         super.init(frame: frame)
         
         addSubview(scrollView)
@@ -242,7 +243,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         self.dates = dates
         self.events = events
         self.recurringEvents = recurringEvents
-        self.selectedDate = selectedDate
+        self.selectedDate = selectedDate ?? Date()
         
         if style.allDay.isPinned {
             subviews.filter { $0.tag == tagAllDayEventView }.forEach { $0.removeFromSuperview() }

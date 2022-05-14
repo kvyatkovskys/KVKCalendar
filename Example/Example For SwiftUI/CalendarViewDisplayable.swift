@@ -71,7 +71,7 @@ struct CalendarDisplayView: UIViewRepresentable, KVKCalendarSettings {
             }
         }
         
-        var updatedDate: Date? = nil {
+        var updatedDate: Date? {
             didSet {
                 if let date = updatedDate {
                     view.selectDate = date
