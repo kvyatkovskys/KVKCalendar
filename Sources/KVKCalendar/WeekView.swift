@@ -158,8 +158,14 @@ extension WeekView: CalendarSettingProtocol {
         
         if reload {
             topBackgroundView = setupTopBackgroundView()
-            scrollableWeekView = setupScrollableView()
+            scrollableWeekView = setupScrollableWeekView()
             scrollableWeekView.updateStyle(style, force: reload)
+            
+            if !style.headerScroll.isHidden {
+                addSubview(topBackgroundView)
+                topBackgroundView.addSubview(scrollableWeekView)
+            }
+            
             timelinePage = setupTimelinePageView()
             timelinePage.didSwitchTimelineView = { [weak self] (timeline, type) in
                 guard let self = self else { return }
@@ -175,7 +181,7 @@ extension WeekView: CalendarSettingProtocol {
                     self.timelinePage.addNewTimelineView(newTimeline, to: .begin)
                 }
                 
-                self.didSelectDate(self.scrollableWeekView.date, type: .week)
+                self.didSelectDate(self.parameters.data.date, type: .week)
             }
             
             timelinePage.willDisplayTimelineView = { [weak self] (timeline, type) in
@@ -205,8 +211,6 @@ extension WeekView: CalendarSettingProtocol {
             timelinePage.updateStyle(style, force: reload)
         }
         
-        addSubview(topBackgroundView)
-        topBackgroundView.addSubview(scrollableWeekView)
         addSubview(timelinePage)
         timelinePage.isPagingEnabled = style.timeline.scrollDirections.contains(.horizontal)
     }
@@ -263,7 +267,7 @@ extension WeekView: CalendarSettingProtocol {
         return view
     }
     
-    private func setupScrollableView() -> ScrollableWeekView {
+    private func setupScrollableWeekView() -> ScrollableWeekView {
         let heightView: CGFloat
         if style.headerScroll.isHiddenSubview {
             heightView = style.headerScroll.heightHeaderWeek

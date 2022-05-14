@@ -238,18 +238,16 @@ extension DayView: CalendarSettingProtocol {
     func setUI(reload: Bool) {
         subviews.forEach { $0.removeFromSuperview() }
         
-        if !parameters.style.headerScroll.isHidden {
-            if reload {
-                topBackgroundView = setupTopBackgroundView()
-                scrollableWeekView = setupScrollableWeekView()
-                scrollableWeekView.updateStyle(style, force: reload)
+        if reload {
+            topBackgroundView = setupTopBackgroundView()
+            scrollableWeekView = setupScrollableWeekView()
+            scrollableWeekView.updateStyle(style, force: reload)
+            
+            if !parameters.style.headerScroll.isHidden {
+                addSubview(topBackgroundView)
+                topBackgroundView.addSubview(scrollableWeekView)
             }
             
-            addSubview(topBackgroundView)
-            topBackgroundView.addSubview(scrollableWeekView)
-        }
-        
-        if reload {
             timelinePage = setupTimelinePageView()
             timelinePage.didSwitchTimelineView = { [weak self] (_, type) in
                 guard let self = self else { return }
