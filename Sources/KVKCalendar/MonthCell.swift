@@ -73,7 +73,7 @@ final class MonthCell: KVKCollectionViewCell {
         
     var events: [Event] = [] {
         didSet {
-            contentView.subviews.filter({ $0.tag != defaultTagView }).forEach({ $0.removeFromSuperview() })
+            contentView.subviews.filter { $0.tag != defaultTagView }.forEach { $0.removeFromSuperview() }
             
             guard bounds.height > (dateLabel.bounds.height + 10) && day.type != .empty else {
                 if monthStyle.showDatesForOtherMonths {
@@ -82,9 +82,7 @@ final class MonthCell: KVKCollectionViewCell {
                 return
             }
             
-            if Platform.currentInterface == .phone, UIDevice.current.orientation.isLandscape {
-                return
-            }
+            if Platform.currentInterface == .phone && UIDevice.current.orientation.isLandscape { return }
             
             if monthStyle.showMonthNameInFirstDay {
                 showMonthName(day: day)
@@ -307,10 +305,7 @@ final class MonthCell: KVKCollectionViewCell {
         switch gesture.state {
         case .began:
             guard let idx = events.firstIndex(where: { $0.hash == gesture.view?.tag }),
-                  let view = gesture.view else
-            {
-                return
-            }
+                  let view = gesture.view else { return }
             
             let event = events[idx]
             let snapshotLabel = UILabel(frame: view.frame)
@@ -408,7 +403,14 @@ final class MonthCell: KVKCollectionViewCell {
         label.clipsToBounds = true
     }
     
-    private func addIconBeforeLabel(eventList: [Event], textAttributes: [NSAttributedString.Key: Any], bulletAttributes: [NSAttributedString.Key: Any], timeAttributes: [NSAttributedString.Key: Any], bullet: String = "\u{2022}", indentation: CGFloat = 10, lineSpacing: CGFloat = 2, paragraphSpacing: CGFloat = 10) -> NSAttributedString {
+    private func addIconBeforeLabel(eventList: [Event],
+                                    textAttributes: [NSAttributedString.Key: Any],
+                                    bulletAttributes: [NSAttributedString.Key: Any],
+                                    timeAttributes: [NSAttributedString.Key: Any],
+                                    bullet: String = "\u{2022}",
+                                    indentation: CGFloat = 10,
+                                    lineSpacing: CGFloat = 2,
+                                    paragraphSpacing: CGFloat = 10) -> NSAttributedString {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = Platform.currentInterface != .phone ? .left : .center
         paragraphStyle.tabStops = [NSTextTab(textAlignment: .left, location: indentation, options: [:])]
@@ -450,13 +452,12 @@ final class MonthCell: KVKCollectionViewCell {
     
     override func setSkeletons(_ skeletons: Bool,
                                insets: UIEdgeInsets = UIEdgeInsets(top: 4, left: 4, bottom: 4, right: 4),
-                               cornerRadius: CGFloat = 2)
-    {
+                               cornerRadius: CGFloat = 2) {
         dateLabel.isHidden = skeletons
         
         let stubView = UIView(frame: bounds)
         if skeletons {
-            contentView.subviews.filter({ $0.tag != defaultTagView }).forEach({ $0.removeFromSuperview() })
+            contentView.subviews.filter { $0.tag != defaultTagView }.forEach { $0.removeFromSuperview() }
             contentView.addSubview(stubView)
             stubView.setAsSkeleton(skeletons, cornerRadius: cornerRadius, insets: insets)
         } else {
@@ -467,9 +468,12 @@ final class MonthCell: KVKCollectionViewCell {
 }
 
 extension MonthCell: UIGestureRecognizerDelegate {
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+    
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                           shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
     }
+    
 }
 
 @available(iOS 13.4, *)
