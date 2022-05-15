@@ -133,7 +133,7 @@ final class MonthData: EventDateProtocol {
             let allDayEvents = filteredAllDayEvents.filter {
                 compareStartDate(day.date, with: $0)
                 || compareEndDate(day.date, with: $0)
-                || checkMultipleDate(day.date, with: $0, checkMonth: true)
+                || checkMultipleDate(day.date, with: $0)
             }
             
             let recurringEventByDate: [Event]

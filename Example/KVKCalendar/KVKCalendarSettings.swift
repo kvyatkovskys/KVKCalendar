@@ -168,6 +168,8 @@ extension KVKCalendarSettings {
         if #available(iOS 13.0, *) {
             style.event.iconFile = UIImage(systemName: "paperclip")
         }
+        style.timeline.scrollLineHourMode = .onlyOnInitForDate(defaultDate)
+        style.timeline.showLineHourMode = .always
         return style
     }
     
