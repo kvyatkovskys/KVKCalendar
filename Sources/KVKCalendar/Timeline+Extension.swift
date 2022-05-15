@@ -413,7 +413,7 @@ extension TimelineView {
             
             switch paramaters.type {
             case .day:
-                newEvent.start = selectedDate ?? Date()
+                newEvent.start = selectedDate
             case .week:
                 newEvent.start = shadowView.date ?? Date()
             default:
