@@ -14,19 +14,19 @@ public extension Date {
     }
     
     var isSunday: Bool {
-        return weekday == 1
+        weekday == 1
     }
     
     var isSaturday: Bool {
-        return weekday == 7
+        weekday == 7
     }
     
     var isWeekend: Bool {
-        return isSunday || isSaturday
+        isSunday || isSaturday
     }
     
     var isWeekday: Bool {
-        return !isWeekend
+        !isWeekend
     }
     
     var minute: Int {
@@ -159,5 +159,9 @@ public extension Date {
         }
         
         return nil
+    }
+    
+    func isEqual(_ date: Date) -> Bool {
+        date.year == year && date.month == month && date.day == day
     }
 }

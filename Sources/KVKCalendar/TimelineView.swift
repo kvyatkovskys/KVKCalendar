@@ -15,21 +15,23 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         var style: Style
         var type: CalendarType
         var scale: CGFloat = 1
+        var scrollToCurrentTimeOnlyOnInit: Bool?
     }
     
     weak var delegate: TimelineDelegate?
     weak var dataSource: DisplayDataSource?
     
     var deselectEvent: ((Event) -> Void)?
-    var didChangeScale: ((CGFloat) -> Void)?
+    var didChangeParameters: ((Parameters) -> Void)?
     
     var paramaters: Parameters {
         didSet {
             timeSystem = paramaters.style.timeSystem
             availabilityHours = timeSystem.hours
             
-            if oldValue.scale != paramaters.scale {
-                didChangeScale?(paramaters.scale)
+            if oldValue.scale != paramaters.scale
+                || oldValue.scrollToCurrentTimeOnlyOnInit != paramaters.scrollToCurrentTimeOnlyOnInit {
+                didChangeParameters?(paramaters)
             }
         }
     }
@@ -59,8 +61,8 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     private let timerKey = "CurrentHourTimerKey"
     private(set) var events = [Event]()
     private(set) var recurringEvents = [Event]()
-    private(set) var dates = [Date?]()
-    private(set) var selectedDate: Date?
+    private(set) var dates = [Date]()
+    private(set) var selectedDate: Date
     private(set) var eventLayout: TimelineEventLayout
     
     private(set) lazy var shadowView: ShadowDayView = {
@@ -98,6 +100,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         self.timeSystem = parameters.style.timeSystem
         self.availabilityHours = timeSystem.hours
         self.eventLayout = parameters.style.timeline.eventLayout
+        self.selectedDate = Date()
         super.init(frame: frame)
         
         addSubview(scrollView)
@@ -118,16 +121,6 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     
     deinit {
         stopTimer(timerKey)
-    }
-    
-    func setupConstraints() {
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        
-        let top = scrollView.topAnchor.constraint(equalTo: topAnchor)
-        let left = scrollView.leftAnchor.constraint(equalTo: leftAnchor)
-        let right = scrollView.rightAnchor.constraint(equalTo: rightAnchor)
-        let bottom = scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
-        NSLayoutConstraint.activate([top, left, right, bottom])
     }
     
     private func setOffsetScrollView(offsetY: CGFloat) {
@@ -210,7 +203,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     private func scrollToCurrentTime(_ startHour: Int) {
         guard style.timeline.scrollLineHourMode.scrollForDates(dates) else { return }
         
-        let date = Date().convertTimeZone(TimeZone.current, to: style.timezone)
+        let date = Date()
         guard let time = getTimelineLabel(hour: date.hour)else {
             scrollView.setContentOffset(.zero, animated: true)
             return
@@ -218,11 +211,22 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         
         var frame = scrollView.frame
         frame.origin.y = time.frame.origin.y - 10
-        scrollView.scrollRectToVisible(frame, animated: true)
+        
+        if let value = paramaters.scrollToCurrentTimeOnlyOnInit {
+            if value {
+                paramaters.scrollToCurrentTimeOnlyOnInit = false
+                // some delay to save a visible scrolling
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    self.scrollView.scrollRectToVisible(frame, animated: true)
+                }
+            }
+        } else {
+            scrollView.scrollRectToVisible(frame, animated: true)
+        }
     }
     
     private func scrollToHour(_ hour: Int) {
-        guard let time = getTimelineLabel(hour: hour) else {
+        guard let time = getTimelineLabel(hour: hour.hashValue) else {
             scrollView.setContentOffset(.zero, animated: true)
             return
         }
@@ -232,14 +236,14 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         scrollView.scrollRectToVisible(frame, animated: true)
     }
     
-    func create(dates: [Date?], events: [Event], recurringEvents: [Event], selectedDate: Date?) {
+    func create(dates: [Date], events: [Event], recurringEvents: [Event], selectedDate: Date?) {
         isResizableEventEnable = false
         delegate?.didDisplayEvents(events, dates: dates)
         
         self.dates = dates
         self.events = events
         self.recurringEvents = recurringEvents
-        self.selectedDate = selectedDate
+        self.selectedDate = selectedDate ?? Date()
         
         if style.allDay.isPinned {
             subviews.filter { $0.tag == tagAllDayEventView }.forEach { $0.removeFromSuperview() }
@@ -308,28 +312,29 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                 || checkMultipleDate(date, with: $0)
             }.compactMap { (oldEvent) -> Event in
                 var updatedEvent = oldEvent
-                updatedEvent.start = date ?? oldEvent.start
-                updatedEvent.end = date ?? oldEvent.end
+                updatedEvent.start = date
+                updatedEvent.end = date
                 return updatedEvent
             }
             
             let recurringEventsByDate: [Event]
-            if !recurringEvents.isEmpty, let dt = date {
+            if !recurringEvents.isEmpty {
                 recurringEventsByDate = recurringEvents.reduce([], { (acc, event) -> [Event] in
                     // TODO: need fix
                     // there's still a problem with the second recurring event when an event is created for severel dates
                     guard !eventsByDate.contains(where: { $0.ID == event.ID })
-                            && (dt.compare(event.start) == .orderedDescending
+                            && (date.compare(event.start) == .orderedDescending
                                 || style.event.showRecurringEventInPast) else { return acc }
                     
-                    guard let recurringEvent = event.updateDate(newDate: dt, calendar: style.calendar) else {
+                    guard let recurringEvent = event.updateDate(newDate: date, calendar: style.calendar) else {
                         return acc
                     }
                     
                     var result = [recurringEvent]
-                    let previousDate = style.calendar.date(byAdding: .day, value: -1, to: dt)
+                    let previousDate = style.calendar.date(byAdding: .day, value: -1, to: date)
                     if recurringEvent.start.day != recurringEvent.end.day,
-                       let recurringPrevEvent = event.updateDate(newDate: previousDate ?? dt, calendar: style.calendar) {
+                       let recurringPrevEvent = event.updateDate(newDate: previousDate ?? date,
+                                                                 calendar: style.calendar) {
                         result.append(recurringPrevEvent)
                     }
                     return acc + result
@@ -381,7 +386,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                 }
             }
             
-            if !style.timeline.isHiddenStubEvent, let day = date?.day {
+            if !style.timeline.isHiddenStubEvent {
                 let maxAllDayEventsFordDate = groupAllEvents.count
                 var allDayHeight = style.allDay.height
                 if 3...4 ~= maxAllDayEventsFordDate {
@@ -400,10 +405,10 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                                               width: widthPage - style.timeline.offsetEvent,
                                               height: style.event.heightStubView)
                 
-                let topStackView = createStackView(day: day, type: .top, frame: topStackFrame)
+                let topStackView = createStackView(day: date.day, type: .top, frame: topStackFrame)
                 topStackViews.append(topStackView)
                 addSubview(topStackView)
-                addSubview(createStackView(day: day, type: .bottom, frame: bottomStackFrame))
+                addSubview(createStackView(day: date.day, type: .bottom, frame: bottomStackFrame))
             }
         }
         

@@ -106,7 +106,7 @@ final class TimelinePageView: UIView {
         }
     }
     
-    func reloadCacheControllers() {
+    func reloadCachedControllers() {
         pages = pages.reduce([:], { (acc, item) -> [Int: TimelineView] in
             var accTemp = acc
             item.value.reloadFrame(CGRect(origin: .zero, size: bounds.size))

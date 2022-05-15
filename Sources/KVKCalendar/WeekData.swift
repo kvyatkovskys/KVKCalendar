@@ -23,11 +23,12 @@ final class WeekData: EventDateProtocol, ScrollableWeekProtocol {
         daysBySection = prepareDays(days, maxDayInWeek: maxDays)
     }
     
-    func filterEvents(_ events: [Event], dates: [Date?]) -> [Event] {
+    func filterEvents(_ events: [Event], dates: [Date]) -> [Event] {
         events.filter { (event) -> Bool in
             dates.contains(where: {
                 compareStartDate($0, with: event)
                 || compareEndDate($0, with: event)
+                || checkMultipleDate($0, with: event)
             })
         }
     }

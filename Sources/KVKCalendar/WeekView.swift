@@ -35,6 +35,7 @@ final class WeekView: UIView {
     var timelinePage = TimelinePageView(maxLimit: 0, pages: [], frame: .zero)
     
     private var topBackgroundView = UIView()
+    private var scrollToCurrentTimeOnlyOnInit: Bool?
     
     private lazy var titleInCornerLabel: UILabel = {
         let label = UILabel()
@@ -48,6 +49,10 @@ final class WeekView: UIView {
         self.parameters = parameters
         self.timelineScale = parameters.style.timeline.scale?.min ?? 1
         super.init(frame: frame)
+        
+        if case .onlyOnInitForDate = parameters.style.timeline.scrollLineHourMode {
+            scrollToCurrentTimeOnlyOnInit = true
+        }
     }
     
     func setDate(_ date: Date, animated: Bool) {
@@ -137,7 +142,7 @@ extension WeekView: CalendarSettingProtocol {
                                           events: parameters.data.events,
                                           recurringEvents: parameters.data.recurringEvents,
                                           selectedDate: parameters.data.date)
-        timelinePage.reloadCacheControllers()
+        timelinePage.reloadCachedControllers()
     }
     
     func updateStyle(_ style: Style, force: Bool) {
@@ -153,13 +158,59 @@ extension WeekView: CalendarSettingProtocol {
         
         if reload {
             topBackgroundView = setupTopBackgroundView()
-            scrollableWeekView = setupScrollableView()
+            scrollableWeekView = setupScrollableWeekView()
             scrollableWeekView.updateStyle(style, force: reload)
+            
+            if !style.headerScroll.isHidden {
+                addSubview(topBackgroundView)
+                topBackgroundView.addSubview(scrollableWeekView)
+            }
+            
             timelinePage = setupTimelinePageView()
+            timelinePage.didSwitchTimelineView = { [weak self] (timeline, type) in
+                guard let self = self else { return }
+                
+                let newTimeline = self.createTimelineView(frame: self.timelinePage.bounds)
+                
+                switch type {
+                case .next:
+                    self.nextDate()
+                    self.timelinePage.addNewTimelineView(newTimeline, to: .end)
+                case .previous:
+                    self.previousDate()
+                    self.timelinePage.addNewTimelineView(newTimeline, to: .begin)
+                }
+                
+                self.didSelectDate(self.parameters.data.date, type: .week)
+            }
+            
+            timelinePage.willDisplayTimelineView = { [weak self] (timeline, type) in
+                guard let self = self else { return }
+                
+                let nextDate: Date
+                switch type {
+                case .next:
+                    nextDate = self.parameters.style.calendar.date(byAdding: .day,
+                                                                   value: self.style.week.maxDays,
+                                                                   to: self.parameters.data.date) ?? self.parameters.data.date
+                case .previous:
+                    nextDate = self.parameters.style.calendar.date(byAdding: .day,
+                                                                   value: -self.style.week.maxDays,
+                                                                   to: self.parameters.data.date) ?? self.parameters.data.date
+                }
+                
+                if let offset = self.timelinePage.timelineView?.contentOffset {
+                    timeline.contentOffset = offset
+                }
+                
+                timeline.create(dates: self.getVisibleDatesFor(date: nextDate),
+                                events: self.parameters.data.events,
+                                recurringEvents: self.parameters.data.recurringEvents,
+                                selectedDate: self.parameters.data.date)
+            }
             timelinePage.updateStyle(style, force: reload)
         }
-        addSubview(topBackgroundView)
-        topBackgroundView.addSubview(scrollableWeekView)
+        
         addSubview(timelinePage)
         timelinePage.isPagingEnabled = style.timeline.scrollDirections.contains(.horizontal)
     }
@@ -168,15 +219,20 @@ extension WeekView: CalendarSettingProtocol {
         var viewFrame = frame
         viewFrame.origin = .zero
         
-        let view = TimelineView(parameters: .init(style: style, type: .week, scale: timelineScale), frame: viewFrame)
+        let view = TimelineView(parameters: .init(style: style, type: .week, scale: timelineScale,
+                                                  scrollToCurrentTimeOnlyOnInit: scrollToCurrentTimeOnlyOnInit),
+                                frame: viewFrame)
         view.delegate = self
         view.dataSource = dataSource
         view.deselectEvent = { [weak self] (event) in
             self?.delegate?.didDeselectEvent(event, animated: true)
         }
-        view.didChangeScale = { [weak self] (newScale) in
-            if newScale != self?.timelineScale {
-                self?.timelineScale = newScale
+        view.didChangeParameters = { [weak self] (params) in
+            if params.scale != self?.timelineScale {
+                self?.timelineScale = params.scale
+            }
+            if params.scrollToCurrentTimeOnlyOnInit != self?.scrollToCurrentTimeOnlyOnInit {
+                self?.scrollToCurrentTimeOnlyOnInit = params.scrollToCurrentTimeOnlyOnInit
             }
         }
         return view
@@ -196,49 +252,6 @@ extension WeekView: CalendarSettingProtocol {
         let page = TimelinePageView(maxLimit: style.timeline.maxLimitCachedPages,
                                     pages: timelineViews,
                                     frame: timelineFrame)
-        
-        page.didSwitchTimelineView = { [weak self] (timeline, type) in
-            guard let self = self else { return }
-            
-            let newTimeline = self.createTimelineView(frame: timelineFrame)
-            
-            switch type {
-            case .next:
-                self.nextDate()
-                self.timelinePage.addNewTimelineView(newTimeline, to: .end)
-            case .previous:
-                self.previousDate()
-                self.timelinePage.addNewTimelineView(newTimeline, to: .begin)
-            }
-            
-            self.didSelectDate(self.scrollableWeekView.date, type: .week)
-        }
-        
-        page.willDisplayTimelineView = { [weak self] (timeline, type) in
-            guard let self = self else { return }
-            
-            let nextDate: Date?
-            switch type {
-            case .next:
-                nextDate = self.parameters.style.calendar.date(byAdding: .day,
-                                                               value: self.style.week.maxDays,
-                                                               to: self.parameters.data.date)
-            case .previous:
-                nextDate = self.parameters.style.calendar.date(byAdding: .day,
-                                                               value: -self.style.week.maxDays,
-                                                               to: self.parameters.data.date)
-            }
-            
-            if let offset = self.timelinePage.timelineView?.contentOffset {
-                timeline.contentOffset = offset
-            }
-            
-            timeline.create(dates: self.getVisibleDatesFor(date: nextDate ?? self.parameters.data.date),
-                            events: self.parameters.data.events,
-                            recurringEvents: self.parameters.data.recurringEvents,
-                            selectedDate: self.parameters.data.date)
-        }
-        
         return page
     }
     
@@ -254,7 +267,7 @@ extension WeekView: CalendarSettingProtocol {
         return view
     }
     
-    private func setupScrollableView() -> ScrollableWeekView {
+    private func setupScrollableWeekView() -> ScrollableWeekView {
         let heightView: CGFloat
         if style.headerScroll.isHiddenSubview {
             heightView = style.headerScroll.heightHeaderWeek
@@ -281,8 +294,7 @@ extension WeekView: CalendarSettingProtocol {
             guard let self = self else { return }
             
             self.timelinePage.changePage(type)
-            let newTimeline = self.createTimelineView(frame: CGRect(origin: .zero, size: self.timelinePage.bounds.size))
-            
+            let newTimeline = self.createTimelineView(frame: self.timelinePage.bounds)
             switch type {
             case .next:
                 self.timelinePage.addNewTimelineView(newTimeline, to: .end)

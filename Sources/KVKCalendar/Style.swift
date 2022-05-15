@@ -246,34 +246,38 @@ public struct TimelineStyle {
     }
     
     public enum CurrentLineHourShowMode: Equatable {
-        case always, today, forDate(Date)
+        case always, today, forDate(Date), never
         
-        func showForDates(_ dates: [Date?]) -> Bool {
+        func showForDates(_ dates: [Date]) -> Bool {
             switch self {
             case .always:
                 return true
             case .today:
-                let todayDate = Date()
-                return dates.contains(where: { todayDate.year == $0?.year && todayDate.month == $0?.month && todayDate.day == $0?.day })
-            case let .forDate(customDate):
-                return dates.contains(where: { customDate.year == $0?.year && customDate.month == $0?.month && customDate.day == $0?.day })
+                let date = Date()
+                return dates.contains(where: { date.isEqual($0) })
+            case .forDate(let date):
+                return dates.contains(where: { date.isEqual($0) })
+            case .never:
+                return false
             }
         }
         
     }
     
     public enum CurrentLineHourScrollMode: Equatable {
-        case always, today, forDate(Date)
+        case always, today, forDate(Date), never, onlyOnInitForDate(Date)
         
-        func scrollForDates(_ dates: [Date?]) -> Bool {
+        func scrollForDates(_ dates: [Date]) -> Bool {
             switch self {
             case .always:
                 return true
             case .today:
-                let todayDate = Date()
-                return dates.contains(where: { todayDate.year == $0?.year && todayDate.month == $0?.month && todayDate.day == $0?.day })
-            case let .forDate(customDate):
-                return dates.contains(where: { customDate.year == $0?.year && customDate.month == $0?.month && customDate.day == $0?.day })
+                let date = Date()
+                return dates.contains(where: { date.isEqual($0) })
+            case .forDate(let date), .onlyOnInitForDate(let date):
+                return dates.contains(where: { date.isEqual($0) })
+            case .never:
+                return false
             }
         }
     }

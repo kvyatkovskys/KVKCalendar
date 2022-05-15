@@ -8,12 +8,14 @@
 
 import Foundation
 import KVKCalendar
+import EventKit
 
 protocol KVKCalendarSettings {
     
     var selectDate: Date { get set }
     var events: [Event] { get set }
     var style: Style { get }
+    var eventViewer: EventViewer { get set }
     
 }
 
@@ -21,28 +23,141 @@ extension KVKCalendarSettings {
     
     var topOffset: CGFloat {
         let barHeight = UIApplication.shared.statusBarHeight
-        let offset: CGFloat
-        
         if #available(iOS 11.0, *) {
-            offset = UIApplication.shared.activeWindow?.rootViewController?.view.safeAreaInsets.top ?? barHeight
+            return UIApplication.shared.activeWindow?.rootViewController?.view.safeAreaInsets.top ?? barHeight
         } else {
-            offset = barHeight
+            return barHeight
         }
-        return offset
     }
     
-    var eventViewer: EventViewer {
-        EventViewer()
+    var bottomOffset: CGFloat {
+        if #available(iOS 11.0, *) {
+            return UIApplication.shared.activeWindow?.rootViewController?.view.safeAreaInsets.bottom ?? 0
+        } else {
+            return 0
+        }
     }
     
-    var defaultDate: String {
+    var defaultStringDate: String {
         "14.12.2022"
+    }
+    
+    var defaultDate: Date {
+        onlyDateFormatter.date(from: defaultStringDate) ?? Date()
     }
     
     var onlyDateFormatter: DateFormatter {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd.MM.yyyy"
         return formatter
+    }
+    
+    func handleChangingEvent(_ event: Event, start: Date?, end: Date?) -> (range: Range<Int>, events: [Event])? {
+        var eventTemp = event
+        guard let startTemp = start, let endTemp = end else { return nil }
+        
+        let startTime = timeFormatter(date: startTemp, format: style.timeSystem.format)
+        let endTime = timeFormatter(date: endTemp, format: style.timeSystem.format)
+        eventTemp.start = startTemp
+        eventTemp.end = endTemp
+        eventTemp.title = TextEvent(timeline: "\(startTime) - \(endTime)\n new time",
+                                    month: "\(startTime) - \(endTime)\n new time",
+                                    list: "\(startTime) - \(endTime)\n new time")
+        
+        if let idx = events.firstIndex(where: { $0.compare(eventTemp) }) {
+           return (idx..<idx + 1, [eventTemp])
+        } else {
+            return nil
+        }
+    }
+    
+    func handleSizeCell(type: CalendarType, stye: Style, view: UIView) -> CGSize? {
+        guard type == .month && UIDevice.current.userInterfaceIdiom == .phone else { return nil }
+        
+        switch style.month.scrollDirection {
+        case .vertical:
+            return CGSize(width: view.bounds.width / 7, height: 70)
+        case .horizontal:
+            return nil
+        @unknown default:
+            return nil
+        }
+    }
+    
+    func handleCustomEventView(event: Event, style: Style, frame: CGRect) -> EventViewGeneral? {
+        guard event.ID == "2" else { return nil }
+        
+        return CustomViewEvent(style: style, event: event, frame: frame)
+    }
+    
+    @available(iOS 13.0, *)
+    func handleOptionMenu(type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)? {
+        guard type == .day else { return nil }
+        
+        let action = UIAction(title: "Test", attributes: .destructive) { _ in
+            print("test tap")
+        }
+        
+        return (UIMenu(title: "Test menu", children: [action]), nil)
+    }
+    
+    func handleNewEvent(_ event: Event, date: Date?) -> Event? {
+        var newEvent = event
+        
+        guard let start = date,
+              let end = Calendar.current.date(byAdding: .minute, value: 30, to: start) else { return nil }
+        
+        let startTime = timeFormatter(date: start, format: style.timeSystem.format)
+        let endTime = timeFormatter(date: end, format: style.timeSystem.format)
+        newEvent.start = start
+        newEvent.end = end
+        newEvent.ID = "\(events.count + 1)"
+        newEvent.title = TextEvent(timeline: "\(startTime) - \(endTime)\n new time",
+                                   month: "\(startTime) - \(endTime)\n new time",
+                                   list: "\(startTime) - \(endTime)\n new time")
+        return newEvent
+    }
+    
+    func handleCell<T>(dateParameter: DateParameter,
+                       type: CalendarType,
+                       view: T,
+                       indexPath: IndexPath) -> KVKCalendarCellProtocol? where T: UIScrollView {
+        switch type {
+        case .year where dateParameter.date?.month == Date().month:
+            let cell = (view as? UICollectionView)?.kvkDequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
+                cell.imageView.image = UIImage(named: "ic_stub")
+            }
+            return cell
+        case .day, .week, .month:
+            guard dateParameter.date?.day == Date().day && dateParameter.type != .empty else { return nil }
+            
+            let cell = (view as? UICollectionView)?.kvkDequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
+                cell.imageView.image = UIImage(named: "ic_stub")
+            }
+            return cell
+        case .list:
+            guard dateParameter.date?.day == 14 else { return nil }
+            
+            let cell = (view as? UITableView)?.kvkDequeueCell { (cell) in
+                cell.backgroundColor = .systemRed
+            }
+            return cell
+        default:
+            return nil
+        }
+    }
+    
+    func handleEvents(systemEvents: [EKEvent]) -> [Event] {
+        // if you want to get a system events, you need to set style.systemCalendars = ["test"]
+        let mappedEvents = systemEvents.compactMap { (event) -> Event in
+            let startTime = timeFormatter(date: event.startDate, format: style.timeSystem.format)
+            let endTime = timeFormatter(date: event.endDate, format: style.timeSystem.format)
+            event.title = "\(startTime) - \(endTime)\n\(event.title ?? "")"
+            
+            return Event(event: event)
+        }
+        
+        return events + mappedEvents
     }
     
     func createCalendarStyle() -> Style {
@@ -53,6 +168,8 @@ extension KVKCalendarSettings {
         if #available(iOS 13.0, *) {
             style.event.iconFile = UIImage(systemName: "paperclip")
         }
+        style.timeline.scrollLineHourMode = .onlyOnInitForDate(defaultDate)
+        style.timeline.showLineHourMode = .always
         return style
     }
     

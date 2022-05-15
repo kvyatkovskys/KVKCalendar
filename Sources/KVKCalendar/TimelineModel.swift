@@ -35,24 +35,33 @@ protocol EventDateProtocol: AnyObject {}
 
 extension EventDateProtocol {
     func compareStartDate(_ date: Date?, with event: Event) -> Bool {
-        event.start.year == date?.year && event.start.month == date?.month && event.start.day == date?.day
+        guard let dt = date else { return false }
+        
+        return event.start.isEqual(dt)
     }
     
     func compareEndDate(_ date: Date?, with event: Event) -> Bool {
-        event.end.year == date?.year && event.end.month == date?.month && event.end.day == date?.day
+        guard let dt = date else { return false }
+        
+        return event.end.isEqual(dt)
     }
     
-    func checkMultipleDate(_ date: Date?, with event: Event) -> Bool {
+    func checkMultipleDate(_ date: Date?, with event: Event, checkMonth: Bool = false) -> Bool {
         let startDate = event.start.timeIntervalSince1970
         let endDate = event.end.timeIntervalSince1970
         
         // workaround to fix crash https://github.com/kvyatkovskys/KVKCalendar/issues/191
         guard let timeInterval = date?.timeIntervalSince1970, endDate > startDate else { return false }
         
-        return event.start.day != event.end.day
+        let result = event.start.day != event.end.day
         && (startDate...endDate).contains(timeInterval)
         && event.start.year == date?.year
-        && event.start.month == date?.month
+        
+        if checkMonth {
+            return result && event.start.month == date?.month
+        } else {
+            return result
+        }
     }
 }
 
