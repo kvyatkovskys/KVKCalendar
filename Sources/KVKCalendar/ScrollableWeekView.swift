@@ -91,9 +91,7 @@ final class ScrollableWeekView: UIView {
     
     func getIdxByDate(_ date: Date) -> Int? {
         weeks.firstIndex(where: { week in
-            return week.firstIndex(where: { $0.date?.year == date.year
-                && $0.date?.month == date.month
-                && $0.date?.day == date.day }) != nil
+            week.firstIndex(where: { $0.date?.isEqual(date) ?? false }) != nil
         })
     }
     
@@ -101,10 +99,6 @@ final class ScrollableWeekView: UIView {
         guard let idx = getIdxByDate(date) else { return [] }
         
         return weeks[idx]
-    }
-    
-    func updateWeeks(weeks: [[Day]]) {
-        params.weeks = weeks
     }
     
     func scrollHeaderByTransform(_ transform: CGAffineTransform) {

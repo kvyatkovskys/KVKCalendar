@@ -89,8 +89,10 @@ final class ViewController: UIViewController, KVKCalendarSettings {
     }
     
     @objc private func reloadCalendarStyle() {
-        calendarView.style.timeSystem = calendarView.style.timeSystem == .twentyFour ? .twelve : .twentyFour
-        calendarView.updateStyle(calendarView.style)
+        var updatedStyle = calendarView.style
+        updatedStyle.timeSystem = calendarView.style.timeSystem == .twentyFour ? .twelve : .twentyFour
+        updatedStyle.week.daysInOneWeek = 3
+        calendarView.updateStyle(updatedStyle)
         calendarView.reloadData()
     }
     

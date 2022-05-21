@@ -89,15 +89,14 @@ final class WeekView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func updateDaysBySection(date: Date? = nil) {
-        parameters.data.updateDaysBySection(
-            data: CalendarData(date: date ?? Date(), years: 4, style: style),
-            startDay: style.startWeekDay,
-            maxDays: style.week.maxDays
-        )
-        
-        scrollableWeekView.updateWeeks(weeks: parameters.data.daysBySection)
+    func reloadDays(data: CalendarData, style: Style) {
+        parameters.data.reloadData(data, startDay: style.startWeekDay, maxDays: style.week.maxDays)
     }
+    
+    func reloadVisibleDates() {
+        parameters.visibleDates = getVisibleDatesFor(date: parameters.data.date)
+    }
+    
 }
 
 extension WeekView {
@@ -187,23 +186,23 @@ extension WeekView: CalendarSettingProtocol {
             timelinePage.willDisplayTimelineView = { [weak self] (timeline, type) in
                 guard let self = self else { return }
                 
-                let nextDate: Date
+                let nextDate: Date?
                 switch type {
                 case .next:
                     nextDate = self.parameters.style.calendar.date(byAdding: .day,
                                                                    value: self.style.week.maxDays,
-                                                                   to: self.parameters.data.date) ?? self.parameters.data.date
+                                                                   to: self.parameters.data.date)
                 case .previous:
                     nextDate = self.parameters.style.calendar.date(byAdding: .day,
                                                                    value: -self.style.week.maxDays,
-                                                                   to: self.parameters.data.date) ?? self.parameters.data.date
+                                                                   to: self.parameters.data.date)
                 }
                 
                 if let offset = self.timelinePage.timelineView?.contentOffset {
                     timeline.contentOffset = offset
                 }
                 
-                timeline.create(dates: self.getVisibleDatesFor(date: nextDate),
+                timeline.create(dates: self.getVisibleDatesFor(date: nextDate ?? self.parameters.data.date),
                                 events: self.parameters.data.events,
                                 recurringEvents: self.parameters.data.recurringEvents,
                                 selectedDate: self.parameters.data.date)
@@ -219,7 +218,9 @@ extension WeekView: CalendarSettingProtocol {
         var viewFrame = frame
         viewFrame.origin = .zero
         
-        let view = TimelineView(parameters: .init(style: style, type: .week, scale: timelineScale,
+        let view = TimelineView(parameters: .init(style: style,
+                                                  type: .week,
+                                                  scale: timelineScale,
                                                   scrollToCurrentTimeOnlyOnInit: scrollToCurrentTimeOnlyOnInit),
                                 frame: viewFrame)
         view.delegate = self

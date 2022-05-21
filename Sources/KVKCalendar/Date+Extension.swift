@@ -146,11 +146,7 @@ public extension Date {
         
     func isSameDay(otherDate: Date) -> Bool {
         let diff = Calendar.current.dateComponents([.day], from: self, to: otherDate)
-        if diff.day == 0 {
-            return true
-        } else {
-            return false
-        }
+        return diff.day == 0
     }
     
     func addingTo(_ component: Calendar.Component, value: Int) -> Date? {

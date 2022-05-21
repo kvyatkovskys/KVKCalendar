@@ -340,9 +340,22 @@ extension CalendarView {
         }
     }
     
+    @available(swift, deprecated: 0.6.5, obsoleted: 0.6.6, message: "Is no longer used.")
+    public func updateDaysBySectionInWeekView(date: Date? = nil) {}
+    
     public func updateStyle(_ style: Style) {
+        let updateDaysInWeek = self.style.week.daysInOneWeek != style.week.daysInOneWeek
         self.style = style.adaptiveStyle
+        
+        if updateDaysInWeek {
+            weekView.reloadDays(data: calendarData, style: self.style)
+        }
+        
         reloadAllStyles(self.style, force: false)
+        
+        if updateDaysInWeek {
+            weekView.reloadVisibleDates()
+        }
         
         switch parameters.type {
         case .month:
