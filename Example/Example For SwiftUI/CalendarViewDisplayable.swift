@@ -28,7 +28,6 @@ struct CalendarDisplayView: UIViewRepresentable, KVKCalendarSettings {
     func makeUIView(context: UIViewRepresentableContext<CalendarDisplayView>) -> CalendarView {
         calendar.dataSource = context.coordinator
         calendar.delegate = context.coordinator
-        calendar.reloadData()
         return calendar
     }
     
@@ -75,7 +74,6 @@ struct CalendarDisplayView: UIViewRepresentable, KVKCalendarSettings {
             didSet {
                 if let date = updatedDate {
                     view.selectDate = date
-                    view.calendar.scrollTo(date, animated: true)
                     view.calendar.reloadData()
                 }
             }
@@ -127,8 +125,7 @@ struct CalendarDisplayView: UIViewRepresentable, KVKCalendarSettings {
         }
         
         func didSelectDates(_ dates: [Date], type: CalendarType, frame: CGRect?) {
-            view.selectDate = dates.first ?? Date()
-            view.calendar.reloadData()
+            updatedDate = dates.first ?? Date()
         }
         
         // MARK: Private
