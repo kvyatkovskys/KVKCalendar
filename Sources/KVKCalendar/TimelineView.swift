@@ -79,6 +79,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         label.textColor = style.timeline.movingMinutesColor
         label.textAlignment = .right
         label.font = style.timeline.timeFont
+        label.isHidden = !isDisplayedMovingTime
         return label
     }()
     
@@ -155,18 +156,22 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             self.currentLineView.valueHash = nextDate.minute.hashValue
             self.currentLineView.date = nextDate
             
-            if let timeNext = self.getTimelineLabel(hour: nextDate.hour + 1) {
-                timeNext.isHidden = self.currentLineView.frame.intersects(timeNext.frame)
+            if self.isDisplayedTimes {
+                if let timeNext = self.getTimelineLabel(hour: nextDate.hour + 1) {
+                    timeNext.isHidden = self.currentLineView.frame.intersects(timeNext.frame)
+                }
+                time.isHidden = time.frame.intersects(self.currentLineView.frame)
             }
-            time.isHidden = time.frame.intersects(self.currentLineView.frame)
         }
         
         startTimer(timerKey, repeats: true, addToRunLoop: true, action: action)
     }
     
     private func showCurrentLineHour() {
+        currentLineView.isHidden = !isDisplayedCurrentTime
         let date = Date().convertTimeZone(TimeZone.current, to: style.timezone)
-        guard style.timeline.showLineHourMode.showForDates(dates), let time = getTimelineLabel(hour: date.hour) else {
+        guard style.timeline.showLineHourMode.showForDates(dates),
+              let time = getTimelineLabel(hour: date.hour) else {
             stopTimer(timerKey)
             return
         }
@@ -177,10 +182,12 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         scrollView.addSubview(currentLineView)
         movingCurrentLineHour()
         
-        if let timeNext = getTimelineLabel(hour: date.hour + 1) {
-            timeNext.isHidden = currentLineView.frame.intersects(timeNext.frame)
+        if self.isDisplayedTimes {
+            if let timeNext = getTimelineLabel(hour: date.hour + 1) {
+                timeNext.isHidden = currentLineView.frame.intersects(timeNext.frame)
+            }
+            time.isHidden = currentLineView.frame.intersects(time.frame)
         }
-        time.isHidden = currentLineView.frame.intersects(time.frame)
     }
     
     private func calculatePointYByMinute(_ minute: Int, time: TimelineLabel) -> CGFloat {
@@ -275,13 +282,13 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         // add time label to timeline
         timeLabels = createTimesLabel(start: startHour)
         // add separator line
-        let lines = createHorizontalLines(times: timeLabels)
+        let horizontalLines = createHorizontalLines(times: timeLabels)
         
         // calculate all height by time label minus the last offset
         let heightAllTimes = timeLabels.reduce(0, { $0 + ($1.frame.height + calculatedTimeY) }) - calculatedTimeY
         scrollView.contentSize = CGSize(width: frame.width, height: heightAllTimes)
         timeLabels.forEach { scrollView.addSubview($0) }
-        lines.forEach { scrollView.addSubview($0) }
+        horizontalLines.forEach { scrollView.addSubview($0) }
         
         let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
         let widthPage = (frame.width - leftOffset) / CGFloat(dates.count)
@@ -356,6 +363,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             
             do {
                 let context = TimelineEventLayoutContext(style: style,
+                                                         type: paramaters.type,
                                                          pageFrame: .init(x: pointX, y: 0,
                                                                           width: widthPage, height: heightPage),
                                                          startHour: startHour,

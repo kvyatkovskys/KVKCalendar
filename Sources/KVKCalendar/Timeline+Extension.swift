@@ -15,6 +15,22 @@ extension TimelineView {
         style.timeline.offsetTimeY * paramaters.scale
     }
     
+    var isDisplayedHorizontalLines: Bool {
+        style.week.viewMode == .default || paramaters.type == .day
+    }
+    
+    var isDisplayedTimes: Bool {
+        isDisplayedHorizontalLines
+    }
+    
+    var isDisplayedCurrentTime: Bool {
+        isDisplayedHorizontalLines
+    }
+    
+    var isDisplayedMovingTime: Bool {
+        isDisplayedHorizontalLines
+    }
+    
 }
 
 extension TimelineView: UIScrollViewDelegate {
@@ -128,6 +144,7 @@ extension TimelineView: UIScrollViewDelegate {
 }
 
 extension TimelineView {
+    
     var bottomStabStackOffsetY: CGFloat {
         UIApplication.shared.isAvailableBottomHomeIndicator ? 30 : 5
     }
@@ -139,6 +156,7 @@ extension TimelineView {
     var scrollableEventViews: [UIView] {
         getAllScrollableEvents()
     }
+    
 }
 
 extension TimelineView {
@@ -308,7 +326,7 @@ extension TimelineView {
         timeLabels.first(where: { $0.hashTime == hour })
     }
     
-    func createTimesLabel(start: Int) -> [TimelineLabel] {
+    func createTimesLabel(start: Int) -> [TimelineLabel] {        
         var times = [TimelineLabel]()
         for (idx, hour) in availabilityHours.enumerated() where idx >= start {
             let yTime = (calculatedTimeY + style.timeline.heightTime) * CGFloat(idx - start)
@@ -324,13 +342,14 @@ extension TimelineView {
             let hourTmp = TimeHourSystem.twentyFour.hours[idx]
             time.hashTime = timeLabelFormatter.date(from: hourTmp)?.hour ?? 0
             time.tag = idx - start
+            time.isHidden = !isDisplayedTimes
             times.append(time)
         }
         return times
     }
     
     func createHorizontalLines(times: [TimelineLabel]) -> [UIView] {
-        return times.enumerated().reduce([]) { acc, item -> [UIView] in
+        times.enumerated().reduce([]) { acc, item -> [UIView] in
             let time = item.element
             let idx = item.offset
             
@@ -342,6 +361,7 @@ extension TimelineView {
             let line = UIView(frame: lineFrame)
             line.backgroundColor = style.timeline.separatorLineColor
             line.tag = idx
+            line.isHidden = !isDisplayedHorizontalLines
             
             var lines = [line]
             if let dividerType = style.timeline.dividerType {

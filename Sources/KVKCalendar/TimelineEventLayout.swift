@@ -11,6 +11,7 @@ import UIKit
 
 public struct TimelineEventLayoutContext {
     public let style: Style
+    let type: CalendarType
     let pageFrame: CGRect
     let startHour: Int
     let timeLabels: [TimelineLabel]
