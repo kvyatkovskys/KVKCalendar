@@ -744,7 +744,7 @@ extension TimelineView: CalendarSettingProtocol {
     
     func reloadFrame(_ frame: CGRect) {
         self.frame.size = frame.size
-        scrollView.frame.size = frame.size
+        setupConstraints()
         currentLineView.reloadFrame(frame)
     }
     

@@ -103,7 +103,6 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         self.selectedDate = Date()
         super.init(frame: frame)
         
-        scrollView.frame = CGRect(origin: .zero, size: frame.size)
         addSubview(scrollView)
         setupConstraints()
         
