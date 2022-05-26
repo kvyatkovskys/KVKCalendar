@@ -540,7 +540,8 @@ public struct EventStyle {
     public var showRecurringEventInPast: Bool = false
     public var textContainerInset: UIEdgeInsets = .zero
     
-    var defaultWidth: CGFloat? = nil
+    /// work only together with the `Week.viewMode = .list` property
+    public var defaultWidth: CGFloat? = nil
 }
 
 // MARK: List View Style

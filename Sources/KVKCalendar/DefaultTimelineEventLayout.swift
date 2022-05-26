@@ -60,12 +60,19 @@ public struct DefaultTimelineEventLayout: TimelineEventLayout {
             events.enumerated().forEach { (idx, event) in
                 var frame = context.pageFrame
                 frame.size.height = event.style?.defaultHeight ?? context.style.event.defaultHeight ?? 50
+                
                 if idx == 0 {
                     frame.origin.y = context.style.timeline.offsetEvent
                 } else {
                     frame.origin.y = (rects.last?.origin.y ?? 0) + ((rects.last?.height ?? frame.height) + context.style.timeline.offsetEvent)
                 }
-                frame.size.width -= context.style.timeline.offsetEvent
+                
+                if let defaultWidth = event.style?.defaultWidth ?? context.style.event.defaultWidth {
+                    frame.size.width = defaultWidth - context.style.timeline.offsetEvent
+                } else {
+                    frame.size.width -= context.style.timeline.offsetEvent
+                }
+                
                 rects.append(frame)
             }
         }
