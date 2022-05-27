@@ -347,10 +347,8 @@ extension CalendarView {
             updatedData = CalendarData(date: dt, years: 4, style: style)
         }
         weekView.reloadDays(data: updatedData, style: style)
-        if let currentView = viewCaches[.week] as? CalendarSettingProtocol {
-            currentView.updateStyle(style, force: false)
-        }
         weekView.reloadVisibleDates()
+        weekView.updateScrollableWeeks()
     }
     
     public func updateStyle(_ style: Style) {

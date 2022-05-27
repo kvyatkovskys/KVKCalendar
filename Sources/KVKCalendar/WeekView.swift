@@ -97,6 +97,9 @@ final class WeekView: UIView {
         parameters.visibleDates = getVisibleDatesFor(date: parameters.data.date)
     }
     
+    func updateScrollableWeeks() {
+        scrollableWeekView.updateWeeks(weeks: parameters.data.daysBySection)
+    }
 }
 
 extension WeekView {
