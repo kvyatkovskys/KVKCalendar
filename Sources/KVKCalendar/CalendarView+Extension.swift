@@ -347,8 +347,8 @@ extension CalendarView {
             updatedData = CalendarData(date: dt, years: 4, style: style)
         }
         weekView.reloadDays(data: updatedData, style: style)
-        weekView.reloadVisibleDates()
         weekView.updateScrollableWeeks()
+        weekView.reloadVisibleDates()
     }
     
     public func updateStyle(_ style: Style) {
