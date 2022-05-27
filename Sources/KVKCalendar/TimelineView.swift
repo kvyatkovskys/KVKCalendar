@@ -136,7 +136,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     }
     
     private func movingCurrentLineHour() {
-        guard !isValidTimer(timerKey) else { return }
+        guard !isValidTimer(timerKey) && isDisplayedCurrentTime else { return }
         
         let action = { [weak self] in
             guard let self = self else { return }
@@ -208,7 +208,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     }
     
     private func scrollToCurrentTime(_ startHour: Int) {
-        guard style.timeline.scrollLineHourMode.scrollForDates(dates) else { return }
+        guard style.timeline.scrollLineHourMode.scrollForDates(dates) && isDisplayedCurrentTime else { return }
         
         let date = Date()
         guard let time = getTimelineLabel(hour: date.hour)else {
