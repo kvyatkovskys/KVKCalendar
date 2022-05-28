@@ -124,11 +124,11 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         stopTimer(timerKey)
     }
     
-    private func setOffsetScrollView(offsetY: CGFloat) {
+    private func setOffsetScrollView(offsetY: CGFloat, force: Bool = false) {
         switch paramaters.type {
         case .day:
             scrollView.contentInset = UIEdgeInsets(top: offsetY, left: 0, bottom: 0, right: 0)
-        case .week where scrollView.contentInset.top < offsetY:
+        case .week where scrollView.contentInset.top < offsetY || force:
             scrollView.contentInset = UIEdgeInsets(top: offsetY, left: 0, bottom: 0, right: 0)
         default:
             break
@@ -255,7 +255,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         if style.allDay.isPinned {
             subviews.filter { $0.tag == tagAllDayEventView }.forEach { $0.removeFromSuperview() }
         }
-        subviews.filter { $0.tag == tagStubEvent || $0.tag == tagVerticalLine }.forEach { $0.removeFromSuperview() }
+        subviews.filter { $0.tag == tagStubEvent }.forEach { $0.removeFromSuperview() }
         scrollView.subviews.forEach { $0.removeFromSuperview() }
         layer.sublayers?.filter { $0.name == "\(tagVerticalLine)" }.forEach { $0.removeFromSuperlayer() }
         
@@ -394,7 +394,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                 }
             }
             
-            if !style.timeline.isHiddenStubEvent {
+            if !style.timeline.isHiddenStubEvent && !groupAllEvents.isEmpty {
                 let maxAllDayEventsFordDate = groupAllEvents.count
                 var allDayHeight = style.allDay.height
                 if 3...4 ~= maxAllDayEventsFordDate {
@@ -426,8 +426,9 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             topStackViews.forEach {
                 $0.frame.origin.y = offsetY + 5
             }
-            
             setOffsetScrollView(offsetY: offsetY)
+        } else {
+            setOffsetScrollView(offsetY: 0, force: true)
         }
         
         if !forceDisableScrollToCurrentTime {
