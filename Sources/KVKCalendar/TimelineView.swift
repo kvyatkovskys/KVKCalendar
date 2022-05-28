@@ -243,14 +243,14 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         scrollView.scrollRectToVisible(frame, animated: true)
     }
     
-    func create(dates: [Date], events: [Event], recurringEvents: [Event], selectedDate: Date?) {
+    func create(dates: [Date], events: [Event], recurringEvents: [Event], selectedDate: Date) {
         isResizableEventEnable = false
         delegate?.didDisplayEvents(events, dates: dates)
         
         self.dates = dates
         self.events = events
         self.recurringEvents = recurringEvents
-        self.selectedDate = selectedDate ?? Date()
+        self.selectedDate = selectedDate
         
         if style.allDay.isPinned {
             subviews.filter { $0.tag == tagAllDayEventView }.forEach { $0.removeFromSuperview() }
