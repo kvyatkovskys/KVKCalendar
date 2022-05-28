@@ -414,7 +414,7 @@ extension TimelineView {
         
         var point = gesture.location(in: scrollView)
         point.y = (point.y - eventPreviewYOffset) - style.timeline.offsetEvent - 6
-        let time = calculateChangingTime(pointY: point.y)
+        let time = movingMinuteLabel.time
         var newEvent = Event(ID: Event.idForNewEvent)
         newEvent.title = TextEvent(timeline: style.event.textForNewEvent)
         let newEventPreview = getEventView(style: style,
@@ -429,7 +429,6 @@ extension TimelineView {
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
         case .ended, .failed, .cancelled:
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
-            guard let minute = time.minute, let hour = time.hour else { return }
             
             switch paramaters.type {
             case .day:
@@ -441,7 +440,10 @@ extension TimelineView {
             }
             
             newEvent.end = style.calendar.date(byAdding: .minute, value: 15, to: newEvent.start) ?? Date()
-            delegate?.didAddNewEvent(newEvent, minute: minute, hour: hour, point: point)
+            delegate?.didAddNewEvent(newEvent,
+                                     minute: time.minute,
+                                     hour: time.hour,
+                                     point: point)
         default:
             break
         }
@@ -649,8 +651,8 @@ extension TimelineView: EventDelegate {
         guard scrollView.frame.width >= (location.x + 30), (location.x - 10) >= leftOffset else { return }
         
         location.y = (location.y - eventPreviewYOffset) - style.timeline.offsetEvent - 6
-        let startTime = calculateChangingTime(pointY: location.y)
-        if let minute = startTime.minute, let hour = startTime.hour, !event.isNew {
+        let startTime = movingMinuteLabel.time
+        if !event.isNew {
             var newDayEvent: Int?
             var updatedEvent = event
             
@@ -661,7 +663,11 @@ extension TimelineView: EventDelegate {
                     updatedEvent = event.updateDate(newDate: newDate, calendar: style.calendar) ?? event
                 }
             }
-            delegate?.didChangeEvent(updatedEvent, minute: minute, hour: hour, point: location, newDay: newDayEvent)
+            delegate?.didChangeEvent(updatedEvent,
+                                     minute: startTime.minute,
+                                     hour: startTime.hour,
+                                     point: location,
+                                     newDay: newDayEvent)
         }
         
         shadowView.removeFromSuperview()
@@ -714,7 +720,7 @@ extension TimelineView: EventDelegate {
         }
     }
     
-    func calculateChangingTime(pointY: CGFloat) -> (hour: Int?, minute: Int?) {
+    private func calculateChangingTime(pointY: CGFloat) -> (hour: Int?, minute: Int?) {
         guard let time = timeLabels.first(where: { $0.frame.origin.y >= pointY }) else { return (nil, nil) }
         
         let firstY = time.frame.origin.y - (calculatedTimeY + style.timeline.heightTime)
@@ -734,7 +740,9 @@ extension TimelineView: EventDelegate {
         }
         guard let line = lines.first(where: { $0.lineFrame.origin.x...($0.lineFrame.origin.x + width) ~= pointX }) else { return nil }
         
-        return (CGRect(origin: line.lineFrame.origin, size: CGSize(width: width, height: line.lineFrame.height)), line.date)
+        return (CGRect(origin: line.lineFrame.origin,
+                       size: CGSize(width: width, height: scrollView.contentSize.height)),
+                line.date)
     }
 }
 

@@ -283,10 +283,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         timeLabels = createTimesLabel(start: startHour)
         // add separator line
         let horizontalLines = createHorizontalLines(times: timeLabels)
-        
         // calculate all height by time label minus the last offset
-        let heightAllTimes = timeLabels.reduce(0, { $0 + ($1.frame.height + calculatedTimeY) }) - calculatedTimeY
-        scrollView.contentSize = CGSize(width: frame.width, height: heightAllTimes)
         timeLabels.forEach { scrollView.addSubview($0) }
         horizontalLines.forEach { scrollView.addSubview($0) }
         
@@ -295,6 +292,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         let heightPage = scrollView.contentSize.height
         var allDayEvents = [AllDayView.PrepareEvents]()
         var topStackViews = [StubStackView]()
+        var allHeightEvents = [CGFloat]()
         
         // horror 👹
         dates.enumerated().forEach { (idx, date) in
@@ -389,6 +387,9 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                         }
                     }()
                     
+                    if !isDisplayedTimes {
+                        allHeightEvents.append(view.bounds.height + style.timeline.offsetEvent)
+                    }
                     view.delegate = self
                     scrollView.addSubview(view)
                 }
@@ -429,6 +430,17 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             setOffsetScrollView(offsetY: offsetY)
         } else {
             setOffsetScrollView(offsetY: 0, force: true)
+        }
+        
+        if !isDisplayedTimes {
+            var allHeight = allHeightEvents.reduce(0, { $0 + $1 })
+            if frame.height > allHeight {
+                allHeight = frame.height
+            }
+            scrollView.contentSize = CGSize(width: frame.width, height: allHeight)
+        } else {
+            let heightAllTimes = timeLabels.reduce(0, { $0 + ($1.frame.height + calculatedTimeY) }) - calculatedTimeY
+            scrollView.contentSize = CGSize(width: frame.width, height: heightAllTimes)
         }
         
         if !forceDisableScrollToCurrentTime {

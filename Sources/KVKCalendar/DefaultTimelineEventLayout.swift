@@ -32,7 +32,7 @@ public struct DefaultTimelineEventLayout: TimelineEventLayout {
                                                  style: event.style)
 
                 // calculate 'width' and position 'x' event
-                // checking events is not empty to avoid crash https://github.com/kvyatkovskys/KVKCalendar/issues/237
+                // check events are not empty to avoid crash https://github.com/kvyatkovskys/KVKCalendar/issues/237
                 if let crossEvent = crossEvents[event.start.timeIntervalSince1970], !crossEvent.events.isEmpty {
                     var newX = frame.origin.x
                     var newWidth = frame.width
@@ -57,15 +57,10 @@ public struct DefaultTimelineEventLayout: TimelineEventLayout {
                 rects.append(frame)
             }
         case .list:
-            events.enumerated().forEach { (idx, event) in
+            events.forEach { (event) in
                 var frame = context.pageFrame
                 frame.size.height = event.style?.defaultHeight ?? context.style.event.defaultHeight ?? 50
-                
-                if idx == 0 {
-                    frame.origin.y = context.style.timeline.offsetEvent
-                } else {
-                    frame.origin.y = (rects.last?.origin.y ?? 0) + ((rects.last?.height ?? frame.height) + context.style.timeline.offsetEvent)
-                }
+                frame.origin.y = (rects.last?.origin.y ?? 0) + ((rects.last?.height ?? 0) + context.style.timeline.offsetEvent)
                 
                 if let defaultWidth = event.style?.defaultWidth ?? context.style.event.defaultWidth {
                     frame.size.width = defaultWidth - context.style.timeline.offsetEvent
