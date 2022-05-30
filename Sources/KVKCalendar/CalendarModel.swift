@@ -10,9 +10,16 @@
 import UIKit
 import EventKit
 
+@available(swift, deprecated: 0.6.5, obsoleted: 0.6.6, renamed: "CellParameter")
 public struct DateParameter {
     public var date: Date?
     public var type: DayType?
+}
+
+public struct CellParameter {
+    public var date: Date?
+    public var type: DayType? = .empty
+    public var events: [Event] = []
 }
 
 public enum TimeHourSystem: Int {
@@ -350,7 +357,7 @@ public protocol CalendarDataSource: AnyObject {
     func dequeueListCell(date: Date?, tableView: UITableView, indexPath: IndexPath) -> UITableViewCell?
     
     /// Use this method to add a custom day cell
-    func dequeueCell<T: UIScrollView>(dateParameter: DateParameter, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol?
+    func dequeueCell<T: UIScrollView>(parameter: CellParameter, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol?
     
     /// Use this method to add a header view
     func dequeueHeader<T: UIScrollView>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarHeaderProtocol?
@@ -382,7 +389,7 @@ public extension CalendarDataSource {
 
     func dequeueListCell(date: Date?, tableView: UITableView, indexPath: IndexPath) -> UITableViewCell? { nil }
     
-    func dequeueCell<T: UIScrollView>(dateParameter: DateParameter, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol? { nil }
+    func dequeueCell<T: UIScrollView>(parameter: CellParameter, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol? { nil }
     
     func dequeueHeader<T: UIScrollView>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarHeaderProtocol? { nil }
     

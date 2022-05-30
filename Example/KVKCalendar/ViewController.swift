@@ -10,7 +10,7 @@ import UIKit
 import KVKCalendar
 import EventKit
 
-final class ViewController: UIViewController, KVKCalendarSettings {
+final class ViewController: UIViewController, KVKCalendarSettings, UIPopoverPresentationControllerDelegate {
     
     var events = [Event]() {
         didSet {
@@ -190,8 +190,9 @@ extension ViewController: CalendarDataSource {
         handleCustomEventView(event: event, style: style, frame: frame)
     }
     
-    func dequeueCell<T>(dateParameter: DateParameter, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol? where T: UIScrollView {
-        handleCell(dateParameter: dateParameter, type: type, view: view, indexPath: indexPath)
+    func dequeueCell<T>(parameter: CellParameter, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol? where T: UIScrollView {
+        print(parameter.events)
+        return handleCell(parameter: parameter, type: type, view: view, indexPath: indexPath)
     }
     
     func willDisplayEventViewer(date: Date, frame: CGRect) -> UIView? {
@@ -203,5 +204,3 @@ extension ViewController: CalendarDataSource {
         handleSizeCell(type: type, stye: calendarView.style, view: view)
     }
 }
-
-extension ViewController: UIPopoverPresentationControllerDelegate { }

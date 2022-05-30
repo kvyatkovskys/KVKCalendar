@@ -339,11 +339,10 @@ extension MonthView: UICollectionViewDataSource, UICollectionViewDataSourcePrefe
         let item = getActualCachedDay(indexPath: indexPath)
         guard let day = item.day else { return UICollectionViewCell() }
         
-        if let cell = dataSource?.dequeueCell(dateParameter: .init(date: day.date, type: day.type),
+        if let cell = dataSource?.dequeueCell(parameter: .init(date: day.date, type: day.type, events: day.events),
                                               type: .month,
                                               view: collectionView,
-                                              indexPath: item.indexPath) as? UICollectionViewCell
-        {
+                                              indexPath: item.indexPath) as? UICollectionViewCell {
             return cell
         } else {
             return collectionView.kvkDequeueCell(indexPath: item.indexPath) { (cell: MonthCell) in

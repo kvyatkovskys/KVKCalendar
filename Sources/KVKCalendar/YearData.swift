@@ -22,11 +22,11 @@ final class YearData {
     let rowsInPage = 3
     let columnsInPage = 4
     var middleRowInPage: Int {
-        return (rowsInPage * columnsInPage) / 2
+        (rowsInPage * columnsInPage) / 2
     }
 
     var itemsInPage: Int {
-        return columnsInPage * rowsInPage
+        columnsInPage * rowsInPage
     }
     
     init(data: CalendarData, date: Date, style: Style) {

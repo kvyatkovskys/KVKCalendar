@@ -167,7 +167,7 @@ extension YearView: UICollectionViewDataSource {
         let index = getIndexForDirection(data.style.year.scrollDirection, indexPath: indexPath)
         let month = data.sections[index.section].months[index.row]
         
-        if let cell = dataSource?.dequeueCell(dateParameter: .init(date: month.date), type: .year, view: collectionView, indexPath: index) as? UICollectionViewCell {
+        if let cell = dataSource?.dequeueCell(parameter: .init(date: month.date, type: nil), type: .year, view: collectionView, indexPath: index) as? UICollectionViewCell {
             return cell
         } else {
             return collectionView.kvkDequeueCell(indexPath: index) { (cell: YearCell) in
