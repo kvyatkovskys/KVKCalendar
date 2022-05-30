@@ -65,7 +65,7 @@ public extension Date {
         return component.year ?? 0
     }
     
-    var startOfDay: Date? {
+    var startOfDay: Date {
         var gregorian = Calendar(identifier: .gregorian)
         gregorian.timeZone = TimeZone.current
         return gregorian.startOfDay(for: self)
@@ -77,7 +77,7 @@ public extension Date {
         var components = DateComponents()
         components.day = 1
         components.second = -1
-        return gregorian.date(byAdding: components, to: startOfDay ?? self)
+        return gregorian.date(byAdding: components, to: startOfDay)
     }
     
     var startMondayOfWeek: Date? {
