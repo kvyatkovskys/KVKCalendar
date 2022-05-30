@@ -168,7 +168,7 @@ extension ViewController: CalendarDelegate {
 extension ViewController: CalendarDataSource {
     
     func dequeueAllDayViewEvent(_ event: Event, date: Date, frame: CGRect) -> UIView? {
-        if date.day == 11 {
+        if date.kvkDay == 11 {
             let view = UIView(frame: frame)
             view.backgroundColor = .systemRed
             return view

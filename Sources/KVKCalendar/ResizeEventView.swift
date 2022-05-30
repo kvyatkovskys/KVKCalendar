@@ -74,8 +74,8 @@ final class ResizeEventView: UIView {
         self.event = event
         self.originalFrameEventView = frame
         self.style = style
-        self.startTime = TimeContainer(minute: event.start.minute, hour: event.start.hour)
-        self.endTime = TimeContainer(minute: event.end.minute, hour: event.end.hour)
+        self.startTime = TimeContainer(minute: event.start.kvkMinute, hour: event.start.kvkHour)
+        self.endTime = TimeContainer(minute: event.end.kvkMinute, hour: event.end.kvkHour)
         
         var newFrame = frame
         newFrame.origin.y -= mainYOffset

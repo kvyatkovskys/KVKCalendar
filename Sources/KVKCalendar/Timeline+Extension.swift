@@ -69,7 +69,7 @@ extension TimelineView: UIScrollViewDelegate {
         
         let stubEvents = events + eventsAllDay
         stubEvents.forEach { (eventView) in
-            guard let stack = getStubStackView(day: eventView.event.start.day) else { return }
+            guard let stack = getStubStackView(day: eventView.event.start.kvkDay) else { return }
             
             stack.top.subviews.filter { ($0 as? StubEventView)?.valueHash == eventView.event.hash }.forEach { $0.removeFromSuperview() }
             stack.bottom.subviews.filter { ($0 as? StubEventView)?.valueHash == eventView.event.hash }.forEach { $0.removeFromSuperview() }
@@ -176,13 +176,13 @@ extension TimelineView {
             if let time = eventResizePreview?.startTime {
                 startTime = (time.hour, time.minute)
             } else {
-                startTime = (eventResizePreview?.event.start.hour, eventResizePreview?.event.start.minute)
+                startTime = (eventResizePreview?.event.start.kvkHour, eventResizePreview?.event.start.kvkMinute)
             }
             
             if let time = eventResizePreview?.endTime {
                 endTime = (time.hour, time.minute)
             } else {
-                endTime = (eventResizePreview?.event.end.hour, eventResizePreview?.event.end.minute)
+                endTime = (eventResizePreview?.event.end.kvkHour, eventResizePreview?.event.end.kvkMinute)
             }
             
             if let startHour = startTime.hour,
@@ -340,7 +340,7 @@ extension TimelineView {
             time.textColor = style.timeline.timeColor
             time.text = hour
             let hourTmp = TimeHourSystem.twentyFour.hours[idx]
-            time.hashTime = timeLabelFormatter.date(from: hourTmp)?.hour ?? 0
+            time.hashTime = timeLabelFormatter.date(from: hourTmp)?.kvkHour ?? 0
             time.tag = idx - start
             time.isHidden = !isDisplayedTimes
             times.append(time)
@@ -657,7 +657,7 @@ extension TimelineView: EventDelegate {
             var updatedEvent = event
             
             if paramaters.type == .week, let newDate = shadowView.date {
-                newDayEvent = newDate.day
+                newDayEvent = newDate.kvkDay
                 
                 if event.recurringType != .none {
                     updatedEvent = event.updateDate(newDate: newDate, calendar: style.calendar) ?? event

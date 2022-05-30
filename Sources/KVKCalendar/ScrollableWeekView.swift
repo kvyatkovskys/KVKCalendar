@@ -295,7 +295,7 @@ extension ScrollableWeekView: CalendarSettingProtocol {
             return date
         }
         
-        return style.startWeekDay == .sunday ? date.startSundayOfWeek : date.startMondayOfWeek
+        return style.startWeekDay == .sunday ? date.kvkStartSundayOfWeek : date.kvkStartMondayOfWeek
     }
 }
 

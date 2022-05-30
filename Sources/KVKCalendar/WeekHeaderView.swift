@@ -48,7 +48,7 @@ final class WeekHeaderView: UIView {
     }
     
     private func addViews(frame: CGRect, isFromYear: Bool) {
-        let startWeekDate = style.startWeekDay == .sunday ? Date().startSundayOfWeek : Date().startMondayOfWeek
+        let startWeekDate = style.startWeekDay == .sunday ? Date().kvkStartSundayOfWeek : Date().kvkStartMondayOfWeek
         if days.isEmpty {
             days = Array(0..<7).compactMap({ getOffsetDate(offset: $0, to: startWeekDate) })
         }
@@ -92,13 +92,13 @@ final class WeekHeaderView: UIView {
                 label.backgroundColor = .clear
             }
 
-            if !style.headerScroll.titleDays.isEmpty, let title = style.headerScroll.titleDays[safe: value.weekday - 1] {
+            if !style.headerScroll.titleDays.isEmpty, let title = style.headerScroll.titleDays[safe: value.kvkWeekday - 1] {
                 label.text = title
             } else {
                 let weekdayFormatter = isFromYear ? style.year.weekdayFormatter : style.month.weekdayFormatter
                 label.text = value.titleForLocale(style.locale, formatter: weekdayFormatter).capitalized
             }
-            label.tag = value.weekday
+            label.tag = value.kvkWeekday
             addSubview(label)
         }
     }
@@ -107,7 +107,7 @@ final class WeekHeaderView: UIView {
         if let date = date, !style.month.isHiddenTitleHeader, !isFromYear {
             titleLabel.text = date.titleForLocale(style.locale, formatter: style.month.titleFormatter)
             
-            if Date().year == date.year && Date().month == date.month {
+            if Date().kvkYear == date.kvkYear && Date().kvkMonth == date.kvkMonth {
                 titleLabel.textColor = style.month.colorTitleCurrentDate
             } else {
                 titleLabel.textColor = style.month.colorTitleHeader

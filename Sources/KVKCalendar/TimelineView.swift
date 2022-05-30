@@ -142,22 +142,22 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             guard let self = self else { return }
             
             let nextDate = Date().convertTimeZone(TimeZone.current, to: self.style.timezone)
-            guard self.currentLineView.valueHash != nextDate.minute.hashValue,
-                  let time = self.getTimelineLabel(hour: nextDate.hour) else { return }
+            guard self.currentLineView.valueHash != nextDate.kvkMinute.hashValue,
+                  let time = self.getTimelineLabel(hour: nextDate.kvkHour) else { return }
             
             var pointY = time.frame.origin.y
             if !self.subviews.filter({ $0.tag == self.tagAllDayEventView }).isEmpty, self.style.allDay.isPinned {
                 pointY -= self.style.allDay.height
             }
             
-            pointY = self.calculatePointYByMinute(nextDate.minute, time: time)
+            pointY = self.calculatePointYByMinute(nextDate.kvkMinute, time: time)
             
             self.currentLineView.frame.origin.y = pointY - (self.currentLineView.frame.height * 0.5)
-            self.currentLineView.valueHash = nextDate.minute.hashValue
+            self.currentLineView.valueHash = nextDate.kvkMinute.hashValue
             self.currentLineView.date = nextDate
             
             if self.isDisplayedTimes {
-                if let timeNext = self.getTimelineLabel(hour: nextDate.hour + 1) {
+                if let timeNext = self.getTimelineLabel(hour: nextDate.kvkHour + 1) {
                     timeNext.isHidden = self.currentLineView.frame.intersects(timeNext.frame)
                 }
                 time.isHidden = time.frame.intersects(self.currentLineView.frame)
@@ -171,19 +171,19 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         currentLineView.isHidden = !isDisplayedCurrentTime
         let date = Date().convertTimeZone(TimeZone.current, to: style.timezone)
         guard style.timeline.showLineHourMode.showForDates(dates),
-              let time = getTimelineLabel(hour: date.hour) else {
+              let time = getTimelineLabel(hour: date.kvkMinute) else {
             stopTimer(timerKey)
             return
         }
 
         currentLineView.reloadFrame(frame)
-        let pointY = calculatePointYByMinute(date.minute, time: time)
+        let pointY = calculatePointYByMinute(date.kvkMinute, time: time)
         currentLineView.frame.origin.y = pointY - (currentLineView.frame.height * 0.5)
         scrollView.addSubview(currentLineView)
         movingCurrentLineHour()
         
         if self.isDisplayedTimes {
-            if let timeNext = getTimelineLabel(hour: date.hour + 1) {
+            if let timeNext = getTimelineLabel(hour: date.kvkHour + 1) {
                 timeNext.isHidden = currentLineView.frame.intersects(timeNext.frame)
             }
             time.isHidden = currentLineView.frame.intersects(time.frame)
@@ -211,7 +211,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         guard style.timeline.scrollLineHourMode.scrollForDates(dates) && isDisplayedCurrentTime else { return }
         
         let date = Date()
-        guard let time = getTimelineLabel(hour: date.hour)else {
+        guard let time = getTimelineLabel(hour: date.kvkHour)else {
             scrollView.setContentOffset(.zero, animated: true)
             return
         }
@@ -270,12 +270,12 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             startHour = style.timeline.startHour
         } else {
             if dates.count > 1 {
-                startHour = filteredEvents.sorted(by: { $0.start.hour < $1.start.hour })
-                    .first?.start.hour ?? style.timeline.startHour
+                startHour = filteredEvents.sorted(by: { $0.start.kvkHour < $1.start.kvkHour })
+                    .first?.start.kvkHour ?? style.timeline.startHour
             } else {
                 startHour = filteredEvents.filter { compareStartDate(selectedDate, with: $0) }
-                .sorted(by: { $0.start.hour < $1.start.hour })
-                .first?.start.hour ?? style.timeline.startHour
+                .sorted(by: { $0.start.kvkHour < $1.start.kvkHour })
+                .first?.start.kvkHour ?? style.timeline.startHour
             }
         }
         
@@ -337,7 +337,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                     
                     var result = [recurringEvent]
                     let previousDate = style.calendar.date(byAdding: .day, value: -1, to: date)
-                    if recurringEvent.start.day != recurringEvent.end.day,
+                    if recurringEvent.start.kvkDay != recurringEvent.end.kvkDay,
                        let recurringPrevEvent = event.updateDate(newDate: previousDate ?? date,
                                                                  calendar: style.calendar) {
                         result.append(recurringPrevEvent)
@@ -414,10 +414,10 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                                               width: widthPage - style.timeline.offsetEvent,
                                               height: style.event.heightStubView)
                 
-                let topStackView = createStackView(day: date.day, type: .top, frame: topStackFrame)
+                let topStackView = createStackView(day: date.kvkDay, type: .top, frame: topStackFrame)
                 topStackViews.append(topStackView)
                 addSubview(topStackView)
-                addSubview(createStackView(day: date.day, type: .bottom, frame: bottomStackFrame))
+                addSubview(createStackView(day: date.kvkDay, type: .bottom, frame: bottomStackFrame))
             }
         }
         

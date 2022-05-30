@@ -22,7 +22,7 @@ final class CurrentLineView: UIView {
         label.textAlignment = .center
         label.adjustsFontSizeToFitWidth = true
         label.minimumScaleFactor = 0.6
-        label.hashTime = Date().minute
+        label.hashTime = Date().kvkMinute
         return label
     }()
     
@@ -44,7 +44,7 @@ final class CurrentLineView: UIView {
                 isHidden = false
             }
             timeLabel.text = formatter.string(from: date)
-            timeLabel.hashTime = date.minute
+            timeLabel.hashTime = date.kvkMinute
         }
     }
     

@@ -124,7 +124,7 @@ final class MonthCell: KVKCollectionViewCell {
                     label.minimumScaleFactor = 0.95
                     label.textAlignment = .center
                     let tap = UITapGestureRecognizer(target: self, action: #selector(tapOnMore))
-                    label.tag = event.start.day
+                    label.tag = event.start.kvkDay
                     label.addGestureRecognizer(tap)
                     label.textColor = monthStyle.colorMoreTitle
                     
@@ -189,13 +189,13 @@ final class MonthCell: KVKCollectionViewCell {
             switch day.type {
             case .empty:
                 if let tempDate = day.date, monthStyle.showDatesForOtherMonths {
-                    dateLabel.text = "\(tempDate.day)"
+                    dateLabel.text = "\(tempDate.kvkDay)"
                     dateLabel.textColor = monthStyle.colorNameEmptyDay
                 } else {
                     dateLabel.text = nil
                 }
             default:
-                if let tempDay = day.date?.day {
+                if let tempDay = day.date?.kvkDay {
                     dateLabel.text = "\(tempDay)"
                 } else {
                     dateLabel.text = nil
@@ -242,7 +242,7 @@ final class MonthCell: KVKCollectionViewCell {
     }
     
     @objc private func tapOnMore(gesture: UITapGestureRecognizer) {
-        if let idx = events.firstIndex(where: { $0.start.day == gesture.view?.tag }) {
+        if let idx = events.firstIndex(where: { $0.start.kvkDay == gesture.view?.tag }) {
             let location = gesture.location(in: superview)
             let newFrame = CGRect(x: location.x, y: location.y,
                                   width: gesture.view?.frame.width ?? 0,
@@ -282,7 +282,7 @@ final class MonthCell: KVKCollectionViewCell {
                                                y: dateLabel.frame.origin.y,
                                                width: 50,
                                                height: dateLabel.bounds.height))
-        if let date = day.date, date.day == 1, Platform.currentInterface != .phone {
+        if let date = day.date, date.kvkDay == 1, Platform.currentInterface != .phone {
             monthLabel.textAlignment = .right
             monthLabel.textColor = dateLabel.textColor
             monthLabel.text = "\(date.titleForLocale(style.locale, formatter: monthStyle.shortInDayMonthFormatter))".capitalized
@@ -359,8 +359,8 @@ final class MonthCell: KVKCollectionViewCell {
         
         guard day.type != .empty else { return }
         
-        guard date?.year == nowDate.year else {
-            if date?.year == selectDate.year && date?.month == selectDate.month && date?.day == selectDate.day {
+        guard date?.kvkYear == nowDate.kvkYear else {
+            if date?.isEqual(selectDate) == true {
                 label.textColor = monthStyle.colorSelectDate
                 label.backgroundColor = monthStyle.colorBackgroundSelectDate
                 label.layer.cornerRadius = label.frame.height / 2
@@ -369,8 +369,8 @@ final class MonthCell: KVKCollectionViewCell {
             return
         }
         
-        guard date?.month == nowDate.month else {
-            if selectDate.day == date?.day && selectDate.month == date?.month {
+        guard date?.kvkMonth == nowDate.kvkMonth else {
+            if selectDate.kvkDay == date?.kvkDay && selectDate.kvkMonth == date?.kvkMonth {
                 label.textColor = monthStyle.colorSelectDate
                 label.backgroundColor = monthStyle.colorBackgroundSelectDate
                 label.layer.cornerRadius = label.frame.height / 2
@@ -379,8 +379,8 @@ final class MonthCell: KVKCollectionViewCell {
             return
         }
         
-        guard date?.day == nowDate.day else {
-            if selectDate.day == date?.day && date?.month == selectDate.month {
+        guard date?.kvkDay == nowDate.kvkDay else {
+            if selectDate.kvkDay == date?.kvkDay && date?.kvkMonth == selectDate.kvkMonth {
                 label.textColor = monthStyle.colorSelectDate
                 label.backgroundColor = monthStyle.colorBackgroundSelectDate
                 label.layer.cornerRadius = label.frame.height / 2
@@ -389,8 +389,8 @@ final class MonthCell: KVKCollectionViewCell {
             return
         }
         
-        guard selectDate.day == date?.day && selectDate.month == date?.month else {
-            if date?.day == nowDate.day {
+        guard selectDate.kvkDay == date?.kvkDay && selectDate.kvkMonth == date?.kvkMonth else {
+            if date?.kvkDay == nowDate.kvkDay {
                 label.textColor = monthStyle.colorTitleCurrentDate
                 label.backgroundColor = .clear
             }

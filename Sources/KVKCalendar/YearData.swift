@@ -36,7 +36,7 @@ final class YearData {
         self.sections = data.months.reduce([], { (acc, month) -> [YearSection] in
             var accTemp = acc
             
-            guard let idx = accTemp.firstIndex(where: { $0.date.year == month.date.year }) else {
+            guard let idx = accTemp.firstIndex(where: { $0.date.kvkYear == month.date.kvkYear }) else {
                 return accTemp + [YearSection(date: month.date, months: [month])]
             }
             

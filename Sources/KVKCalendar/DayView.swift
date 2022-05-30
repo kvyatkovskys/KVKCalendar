@@ -113,17 +113,17 @@ extension DayView: TimelineDelegate {
     
     func didResizeEvent(_ event: Event, startTime: ResizeTime, endTime: ResizeTime) {
         var startComponents = DateComponents()
-        startComponents.year = event.start.year
-        startComponents.month = event.start.month
-        startComponents.day = event.start.day
+        startComponents.year = event.start.kvkYear
+        startComponents.month = event.start.kvkMonth
+        startComponents.day = event.start.kvkDay
         startComponents.hour = startTime.hour
         startComponents.minute = startTime.minute
         let startDate = style.calendar.date(from: startComponents)
         
         var endComponents = DateComponents()
-        endComponents.year = event.end.year
-        endComponents.month = event.end.month
-        endComponents.day = event.end.day
+        endComponents.year = event.end.kvkYear
+        endComponents.month = event.end.kvkMonth
+        endComponents.day = event.end.kvkDay
         endComponents.hour = endTime.hour
         endComponents.minute = endTime.minute
         let endDate = style.calendar.date(from: endComponents)
@@ -133,9 +133,9 @@ extension DayView: TimelineDelegate {
     
     func didAddNewEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint) {
         var components = DateComponents()
-        components.year = parameters.data.date.year
-        components.month = parameters.data.date.month
-        components.day = parameters.data.date.day
+        components.year = parameters.data.date.kvkYear
+        components.month = parameters.data.date.kvkMonth
+        components.day = parameters.data.date.kvkDay
         components.hour = hour
         components.minute = minute
         let date = style.calendar.date(from: components)
@@ -144,19 +144,19 @@ extension DayView: TimelineDelegate {
     
     func didChangeEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint, newDay: Int?) {
         var startComponents = DateComponents()
-        startComponents.year = event.start.year
-        startComponents.month = event.start.month
-        startComponents.day = event.start.day
+        startComponents.year = event.start.kvkYear
+        startComponents.month = event.start.kvkMonth
+        startComponents.day = event.start.kvkDay
         startComponents.hour = hour
         startComponents.minute = minute
         let startDate = style.calendar.date(from: startComponents)
         
-        let hourOffset = event.end.hour - event.start.hour
-        let minuteOffset = event.end.minute - event.start.minute
+        let hourOffset = event.end.kvkHour - event.start.kvkHour
+        let minuteOffset = event.end.kvkMinute - event.start.kvkMinute
         var endComponents = DateComponents()
-        endComponents.year = event.end.year
-        endComponents.month = event.end.month
-        endComponents.day = event.end.day
+        endComponents.year = event.end.kvkYear
+        endComponents.month = event.end.kvkMonth
+        endComponents.day = event.end.kvkDay
         endComponents.hour = hour + hourOffset
         endComponents.minute = minute + minuteOffset
         let endDate = style.calendar.date(from: endComponents)
