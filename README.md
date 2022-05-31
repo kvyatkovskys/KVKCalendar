@@ -18,8 +18,10 @@
 - [x] Custom date cell
 - [x] Custom header view and collection view
 - [x] Custom calendar localization
+- [x] Event list mode for weekly viewing
 - [x] Ability to set a divider line (day/week)
-- [x] UIMenu supports in event view (iOS/Mac Catalyst 14.0 and above)
+- [x] [Supporting Multiple Windows on iPad](https://developer.apple.com/design/human-interface-guidelines/ios/system-capabilities/multitasking/)
+- [x] UIMenu supports in event view (iOS and Mac Catalyst 14.0+)
 - [x] [Ability to configure the frame for viewing events](https://github.com/kvyatkovskys/KVKCalendar/pull/198)
 
 ## Need Help?
@@ -196,7 +198,6 @@ struct CalendarDisplayView: UIViewRepresentable {
     func makeUIView(context: UIViewRepresentableContext<CalendarDisplayView>) -> CalendarView {
         calendar.dataSource = context.coordinator
         calendar.delegate = context.coordinator
-        calendar.reloadData()
         return calendar
     }
     
