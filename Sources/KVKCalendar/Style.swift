@@ -219,6 +219,10 @@ public struct TimelineStyle {
     public var timeDividerFont: UIFont = .systemFont(ofSize: 10)
     public var scale: Scale? = Scale(min: 1, max: 6)
     
+    public enum ViewMode: Int {
+        case `default`, list
+    }
+    
     public struct Scale {
         var min: CGFloat
         var max: CGFloat
@@ -299,6 +303,7 @@ public struct WeekStyle {
     public var selectCalendarType: CalendarType = .day
     public var showVerticalDayDivider: Bool = true
     public var daysInOneWeek: UInt = 7
+    public var viewMode: TimelineStyle.ViewMode = .default
     
     var maxDays: Int {
         guard 2...6 ~= daysInOneWeek else { return 7 }
@@ -535,7 +540,8 @@ public struct EventStyle {
     public var showRecurringEventInPast: Bool = false
     public var textContainerInset: UIEdgeInsets = .zero
     
-    var defaultWidth: CGFloat? = nil
+    /// work only together with the `Week.viewMode = .list` property
+    public var defaultWidth: CGFloat? = nil
 }
 
 // MARK: List View Style

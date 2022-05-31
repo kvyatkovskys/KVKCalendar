@@ -63,9 +63,9 @@ final class YearView: UIView {
     
     private func scrollToDate(date: Date, animated: Bool) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            if let idx = self.data.sections.firstIndex(where: { $0.date.year == date.year }) {
+            if let idx = self.data.sections.firstIndex(where: { $0.date.kvkYear == date.kvkYear }) {
                 self.collectionView?.scrollToItem(at: IndexPath(row: 0, section: idx),
-                                                  at: self.scrollDirection(month: date.month),
+                                                  at: self.scrollDirection(month: date.kvkMonth),
                                                   animated: animated)
             }
         }
@@ -104,9 +104,9 @@ extension YearView: CalendarSettingProtocol {
         self.frame = frame
         layoutIfNeeded()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            if let idx = self.data.sections.firstIndex(where: { $0.date.year == self.data.date.year }) {
+            if let idx = self.data.sections.firstIndex(where: { $0.date.kvkYear == self.data.date.kvkYear }) {
                 self.collectionView?.scrollToItem(at: IndexPath(row: 0, section: idx),
-                                                  at: self.scrollDirection(month: self.data.date.month),
+                                                  at: self.scrollDirection(month: self.data.date.kvkMonth),
                                                   animated: false)
             }
         }
@@ -167,7 +167,7 @@ extension YearView: UICollectionViewDataSource {
         let index = getIndexForDirection(data.style.year.scrollDirection, indexPath: indexPath)
         let month = data.sections[index.section].months[index.row]
         
-        if let cell = dataSource?.dequeueCell(dateParameter: .init(date: month.date), type: .year, view: collectionView, indexPath: index) as? UICollectionViewCell {
+        if let cell = dataSource?.dequeueCell(parameter: .init(date: month.date, type: nil), type: .year, view: collectionView, indexPath: index) as? UICollectionViewCell {
             return cell
         } else {
             return collectionView.kvkDequeueCell(indexPath: index) { (cell: YearCell) in
@@ -209,7 +209,7 @@ extension YearView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
         let date = data.sections[index.section].months[index.row].date
         let formatter = DateFormatter()
         formatter.dateFormat = "dd.MM.yyyy"
-        let newDate = formatter.date(from: "\(data.date.day).\(date.month).\(date.year)")
+        let newDate = formatter.date(from: "\(data.date.kvkDay).\(date.kvkMonth).\(date.kvkYear)")
         data.date = newDate ?? Date()
         collectionView.reloadData()
         

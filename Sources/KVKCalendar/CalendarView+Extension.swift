@@ -225,8 +225,8 @@ extension CalendarView {
 }
 
 extension CalendarView: DisplayDataSource {
-    public func dequeueCell<T>(dateParameter: DateParameter, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol? where T : UIScrollView {
-        dataSource?.dequeueCell(dateParameter: dateParameter, type: type, view: view, indexPath: indexPath)
+    public func dequeueCell<T>(parameter: CellParameter, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol? where T : UIScrollView {
+        dataSource?.dequeueCell(parameter: parameter, type: type, view: view, indexPath: indexPath)
     }
     
     public func dequeueHeader<T>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarHeaderProtocol? where T : UIScrollView {
@@ -340,9 +340,30 @@ extension CalendarView {
         }
     }
     
+    @available(swift, deprecated: 0.6.5, message: "Is no longer used.")
+    public func updateDaysBySectionInWeekView(date: Date? = nil) {
+        var updatedData = calendarData
+        if let dt = date {
+            updatedData = CalendarData(date: dt, years: 4, style: style)
+        }
+        weekView.reloadDays(data: updatedData, style: style)
+        weekView.updateScrollableWeeks()
+        weekView.reloadVisibleDates()
+    }
+    
     public func updateStyle(_ style: Style) {
+        let updateDaysInWeek = self.style.week.daysInOneWeek != style.week.daysInOneWeek
         self.style = style.adaptiveStyle
+        
+        if updateDaysInWeek {
+            weekView.reloadDays(data: calendarData, style: self.style)
+        }
+        
         reloadAllStyles(self.style, force: false)
+        
+        if updateDaysInWeek {
+            weekView.reloadVisibleDates()
+        }
         
         switch parameters.type {
         case .month:

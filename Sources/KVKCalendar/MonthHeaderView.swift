@@ -25,7 +25,7 @@ final class MonthHeaderView: UICollectionReusableView {
             
             dateLabel.font = style.month.fontTitleHeader
             dateLabel.text = date.titleForLocale(style.locale, formatter: style.month.shortInDayMonthFormatter).capitalized
-            if Date().month == date.month {
+            if Date().kvkMonth == date.kvkMonth {
                 dateLabel.textColor = style.month.colorTitleCurrentDate
             } else {
                 dateLabel.textColor = style.month.colorTitleHeader
@@ -37,10 +37,10 @@ final class MonthHeaderView: UICollectionReusableView {
                 if date.isSunday {
                     value = 6
                 } else {
-                    value = CGFloat(date.weekday - 2)
+                    value = CGFloat(date.kvkWeekday - 2)
                 }
             case .sunday:
-                value = CGFloat(date.weekday - 1)
+                value = CGFloat(date.kvkWeekday - 1)
             }
             
             let offset: CGFloat

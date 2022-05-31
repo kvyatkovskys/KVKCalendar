@@ -53,12 +53,12 @@ extension EventDateProtocol {
         // workaround to fix crash https://github.com/kvyatkovskys/KVKCalendar/issues/191
         guard let timeInterval = date?.timeIntervalSince1970, endDate > startDate else { return false }
         
-        let result = event.start.day != event.end.day
+        let result = event.start.kvkDay != event.end.kvkDay
         && (startDate...endDate).contains(timeInterval)
-        && event.start.year == date?.year
+        && event.start.kvkYear == date?.kvkYear
         
         if checkMonth {
-            return result && event.start.month == date?.month
+            return result && event.start.kvkMonth == date?.kvkMonth
         } else {
             return result
         }

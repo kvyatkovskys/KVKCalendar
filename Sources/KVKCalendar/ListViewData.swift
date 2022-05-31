@@ -45,7 +45,7 @@ public final class ListViewData {
         sections = events.reduce([], { (acc, event) -> [SectionListView] in
             var accTemp = acc
             
-            guard let idx = accTemp.firstIndex(where: { $0.date.year == event.start.year && $0.date.month == event.start.month && $0.date.day == event.start.day }) else {
+            guard let idx = accTemp.firstIndex(where: { $0.date.isEqual(event.start) }) else {
                 accTemp += [SectionListView(date: event.start, events: [event])]
                 accTemp = accTemp.sorted(by: { $0.date < $1.date })
                 return accTemp

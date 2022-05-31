@@ -77,7 +77,7 @@ final class MonthData: EventDateProtocol {
     }
     
     private func compareDate(day: Day, date: Date?) -> Bool {
-        day.date?.year == date?.year && day.date?.month == date?.month
+        day.date?.kvkYear == date?.kvkYear && day.date?.kvkMonth == date?.kvkMonth
     }
     
     func getDay(indexPath: IndexPath) -> DayOfMonth {
@@ -90,7 +90,7 @@ final class MonthData: EventDateProtocol {
     
     func updateSelectedDates(_ dates: Set<Date>, date: Date, calendar: Calendar) -> Set<Date> {
         // works only in the same month
-        if selectedDates.contains(where: { $0.month != date.month || $0.year != date.year }) {
+        if selectedDates.contains(where: { $0.kvkMonth != date.kvkMonth || $0.kvkYear != date.kvkYear }) {
             return [date]
         }
         
@@ -99,7 +99,7 @@ final class MonthData: EventDateProtocol {
             selectedDates.removeAll()
             selectedDates.insert(date)
         } else if let lastDate = selectedDates.max(by: { $0 < $1 }) {
-            let offset = date.day - lastDate.day
+            let offset = date.kvkDay - lastDate.kvkDay
             if offset >= 1 {
                 let dates = (1...offset).compactMap({ calendar.date(byAdding: .day, value: $0, to: lastDate) })
                 selectedDates.formUnion(dates)
@@ -118,7 +118,7 @@ final class MonthData: EventDateProtocol {
     
     func reloadEventsInDays(events: [Event], date: Date) -> (events: [Event], dates: [Date?]) {
         let recurringEvents = events.filter({ $0.recurringType != .none })
-        guard let idxSection = data.months.firstIndex(where: { $0.date.month == date.month && $0.date.year == date.year }) else {
+        guard let idxSection = data.months.firstIndex(where: { $0.date.kvkMonth == date.kvkMonth && $0.date.kvkYear == date.kvkYear }) else {
             return ([], [])
         }
         
@@ -153,7 +153,7 @@ final class MonthData: EventDateProtocol {
                 recurringEventByDate = []
             }
             
-            let sortedEvents = (filteredEventsByDay + recurringEventByDate).sorted(by: { $0.start.hour < $1.start.hour })
+            let sortedEvents = (filteredEventsByDay + recurringEventByDate).sorted(by: { $0.start.kvkHour < $1.start.kvkHour })
             newDay.events = allDayEvents + sortedEvents.sorted(by: { $0.isAllDay && !$1.isAllDay })
             displayableEvents += newDay.events
             return acc + [newDay]

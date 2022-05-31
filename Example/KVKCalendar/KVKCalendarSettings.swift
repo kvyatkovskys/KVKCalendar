@@ -118,25 +118,25 @@ extension KVKCalendarSettings {
         return newEvent
     }
     
-    func handleCell<T>(dateParameter: DateParameter,
+    func handleCell<T>(parameter: CellParameter,
                        type: CalendarType,
                        view: T,
                        indexPath: IndexPath) -> KVKCalendarCellProtocol? where T: UIScrollView {
         switch type {
-        case .year where dateParameter.date?.month == Date().month:
+        case .year where parameter.date?.kvkMonth == Date().kvkMonth:
             let cell = (view as? UICollectionView)?.kvkDequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
                 cell.imageView.image = UIImage(named: "ic_stub")
             }
             return cell
         case .day, .week, .month:
-            guard dateParameter.date?.day == Date().day && dateParameter.type != .empty else { return nil }
+            guard parameter.date?.kvkDay == Date().kvkDay && parameter.type != .empty else { return nil }
             
             let cell = (view as? UICollectionView)?.kvkDequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
                 cell.imageView.image = UIImage(named: "ic_stub")
             }
             return cell
         case .list:
-            guard dateParameter.date?.day == 14 else { return nil }
+            guard parameter.date?.kvkDay == 14 else { return nil }
             
             let cell = (view as? UITableView)?.kvkDequeueCell { (cell) in
                 cell.backgroundColor = .systemRed

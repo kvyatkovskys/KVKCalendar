@@ -64,7 +64,7 @@ extension CalendarTimer {
     }
     
     func isValidTimer(_ key: String = "Timer") -> Bool {
-        return timers[key]?.isValid == true
+        timers[key]?.isValid == true
     }
     
     func startTimer(_ key: String = "Timer", interval: TimeInterval = 1, repeats: Bool = false, addToRunLoop: Bool = false, action: @escaping () -> Void) {

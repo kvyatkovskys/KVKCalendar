@@ -183,15 +183,15 @@ open class EventViewGeneral: UIView, CalendarTimer {
 
 extension EventViewGeneral {
     var isAvailableResize: Bool {
-        return states.contains(.resize)
+        states.contains(.resize)
     }
     
     var isAvailableMove: Bool {
-        return states.contains(.move)
+        states.contains(.move)
     }
     
     var isAvailableOnlyMove: Bool {
-        return states.contains(.move) && states.count == 1
+        states.contains(.move) && states.count == 1
     }
 }
 

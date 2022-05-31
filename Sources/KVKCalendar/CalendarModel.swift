@@ -10,9 +10,16 @@
 import UIKit
 import EventKit
 
+@available(swift, deprecated: 0.6.5, obsoleted: 0.6.6, renamed: "CellParameter")
 public struct DateParameter {
     public var date: Date?
     public var type: DayType?
+}
+
+public struct CellParameter {
+    public var date: Date?
+    public var type: DayType? = .empty
+    public var events: [Event] = []
 }
 
 public enum TimeHourSystem: Int {
@@ -240,35 +247,35 @@ extension Event: EventProtocol {
 extension Event {
     func updateDate(newDate: Date, calendar: Calendar = Calendar.current) -> Event? {
         var startComponents = DateComponents()
-        startComponents.year = newDate.year
-        startComponents.month = newDate.month
-        startComponents.hour = start.hour
-        startComponents.minute = start.minute
+        startComponents.year = newDate.kvkYear
+        startComponents.month = newDate.kvkMonth
+        startComponents.hour = start.kvkHour
+        startComponents.minute = start.kvkMinute
         
         var endComponents = DateComponents()
-        endComponents.year = newDate.year
-        endComponents.month = newDate.month
-        endComponents.hour = end.hour
-        endComponents.minute = end.minute
+        endComponents.year = newDate.kvkYear
+        endComponents.month = newDate.kvkMonth
+        endComponents.hour = end.kvkHour
+        endComponents.minute = end.kvkMinute
         
-        let newDay = newDate.day
+        let newDay = newDate.kvkDay
         switch recurringType {
         case .everyDay:
             startComponents.day = newDay
-        case .everyWeek where newDate.weekday == start.weekday:
+        case .everyWeek where newDate.kvkWeekday == start.kvkWeekday:
             startComponents.day = newDay
-            startComponents.weekday = newDate.weekday
-            endComponents.weekday = newDate.weekday
-        case .everyMonth where newDate.month != start.month && newDate.day == start.day:
+            startComponents.weekday = newDate.kvkWeekday
+            endComponents.weekday = newDate.kvkWeekday
+        case .everyMonth where newDate.kvkMonth != start.kvkMonth && newDate.kvkDay == start.kvkDay:
             startComponents.day = newDay
-        case .everyYear where newDate.year != start.year && newDate.month == start.month && newDate.day == start.day:
+        case .everyYear where newDate.kvkYear != start.kvkYear && newDate.kvkMonth == start.kvkMonth && newDate.kvkDay == start.kvkDay:
             startComponents.day = newDay
         default:
             return nil
         }
         
-        let offsetDay = end.day - start.day
-        if start.day == end.day {
+        let offsetDay = end.kvkDay - start.kvkDay
+        if start.kvkDay == end.kvkDay {
             endComponents.day = newDay
         } else {
             endComponents.day = newDay + offsetDay
@@ -350,7 +357,7 @@ public protocol CalendarDataSource: AnyObject {
     func dequeueListCell(date: Date?, tableView: UITableView, indexPath: IndexPath) -> UITableViewCell?
     
     /// Use this method to add a custom day cell
-    func dequeueCell<T: UIScrollView>(dateParameter: DateParameter, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol?
+    func dequeueCell<T: UIScrollView>(parameter: CellParameter, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol?
     
     /// Use this method to add a header view
     func dequeueHeader<T: UIScrollView>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarHeaderProtocol?
@@ -382,7 +389,7 @@ public extension CalendarDataSource {
 
     func dequeueListCell(date: Date?, tableView: UITableView, indexPath: IndexPath) -> UITableViewCell? { nil }
     
-    func dequeueCell<T: UIScrollView>(dateParameter: DateParameter, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol? { nil }
+    func dequeueCell<T: UIScrollView>(parameter: CellParameter, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol? { nil }
     
     func dequeueHeader<T: UIScrollView>(date: Date?, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarHeaderProtocol? { nil }
     

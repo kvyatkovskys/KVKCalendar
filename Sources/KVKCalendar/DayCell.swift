@@ -58,7 +58,7 @@ class DayCell: UICollectionViewCell {
                 return
             }
             
-            guard let tempDay = day.date?.day else {
+            guard let tempDay = day.date?.kvkDay else {
                 titleLabel.text = nil
                 dateLabel.text = nil
                 return
@@ -72,7 +72,7 @@ class DayCell: UICollectionViewCell {
                 return
             }
             
-            if !style.headerScroll.titleDays.isEmpty, let title = style.headerScroll.titleDays[safe: day.date?.weekday ?? 0] {
+            if !style.headerScroll.titleDays.isEmpty, let title = style.headerScroll.titleDays[safe: day.date?.kvkWeekday ?? 0] {
                 titleLabel.text = title
             } else {
                 titleLabel.text = day.date?.titleForLocale(style.locale, formatter: style.headerScroll.weekdayFormatter).capitalized
@@ -86,15 +86,17 @@ class DayCell: UICollectionViewCell {
             guard day.type != .empty else { return }
             
             let nowDate = Date()
-            guard nowDate.month != day.date?.month else {
+            guard nowDate.kvkMonth != day.date?.kvkMonth else {
                 // remove the selection if the current date (for the day) does not match the selected one
-                if selectDate.day != nowDate.day, day.date?.day == nowDate.day, day.date?.year == nowDate.year {
+                if selectDate.kvkDay != nowDate.kvkDay, day.date?.kvkDay == nowDate.kvkDay, day.date?.kvkYear == nowDate.kvkYear {
                     dateLabel.textColor = style.headerScroll.colorBackgroundCurrentDate
                     dotView.backgroundColor = .clear
                     isSelected = false
                 }
                 // mark the selected date, which is not the same as the current one
-                if day.date?.month == selectDate.month, day.date?.day == selectDate.day, selectDate.day != nowDate.day {
+                if day.date?.kvkMonth == selectDate.kvkMonth
+                    && day.date?.kvkDay == selectDate.kvkDay
+                    && selectDate.kvkDay != nowDate.kvkDay {
                     dateLabel.textColor = style.headerScroll.colorSelectDate
                     dotView.backgroundColor = style.headerScroll.colorBackgroundSelectDate
                     isSelected = true
@@ -102,7 +104,7 @@ class DayCell: UICollectionViewCell {
                 return
             }
             
-            guard day.date?.month == selectDate.month, day.date?.day == selectDate.day else {
+            guard day.date?.kvkMonth == selectDate.kvkMonth && day.date?.kvkDay == selectDate.kvkDay else {
                 populateCell(day)
                 return
             }
@@ -139,7 +141,7 @@ class DayCell: UICollectionViewCell {
     
     private func populateDay(date: Date?, colorText: UIColor) {
         let nowDate = Date()
-        if date?.month == nowDate.month, date?.day == nowDate.day, date?.year == nowDate.year {
+        if date?.isEqual(nowDate) == true {
             dateLabel.textColor = UIScreen.isDarkMode ? style.headerScroll.colorCurrentSelectDateForDarkStyle : style.headerScroll.colorCurrentDate
             dotView.backgroundColor = style.headerScroll.colorBackgroundCurrentDate
         } else {

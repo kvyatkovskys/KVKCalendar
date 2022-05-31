@@ -79,6 +79,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         label.textColor = style.timeline.movingMinutesColor
         label.textAlignment = .right
         label.font = style.timeline.timeFont
+        label.isHidden = !isDisplayedMovingTime
         return label
     }()
     
@@ -123,11 +124,11 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         stopTimer(timerKey)
     }
     
-    private func setOffsetScrollView(offsetY: CGFloat) {
+    private func setOffsetScrollView(offsetY: CGFloat, force: Bool = false) {
         switch paramaters.type {
         case .day:
             scrollView.contentInset = UIEdgeInsets(top: offsetY, left: 0, bottom: 0, right: 0)
-        case .week where scrollView.contentInset.top < offsetY:
+        case .week where scrollView.contentInset.top < offsetY || force:
             scrollView.contentInset = UIEdgeInsets(top: offsetY, left: 0, bottom: 0, right: 0)
         default:
             break
@@ -135,52 +136,58 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     }
     
     private func movingCurrentLineHour() {
-        guard !isValidTimer(timerKey) else { return }
+        guard !isValidTimer(timerKey) && isDisplayedCurrentTime else { return }
         
         let action = { [weak self] in
             guard let self = self else { return }
             
             let nextDate = Date().convertTimeZone(TimeZone.current, to: self.style.timezone)
-            guard self.currentLineView.valueHash != nextDate.minute.hashValue,
-                  let time = self.getTimelineLabel(hour: nextDate.hour) else { return }
+            guard self.currentLineView.valueHash != nextDate.kvkMinute.hashValue,
+                  let time = self.getTimelineLabel(hour: nextDate.kvkHour) else { return }
             
             var pointY = time.frame.origin.y
             if !self.subviews.filter({ $0.tag == self.tagAllDayEventView }).isEmpty, self.style.allDay.isPinned {
                 pointY -= self.style.allDay.height
             }
             
-            pointY = self.calculatePointYByMinute(nextDate.minute, time: time)
+            pointY = self.calculatePointYByMinute(nextDate.kvkMinute, time: time)
             
             self.currentLineView.frame.origin.y = pointY - (self.currentLineView.frame.height * 0.5)
-            self.currentLineView.valueHash = nextDate.minute.hashValue
+            self.currentLineView.valueHash = nextDate.kvkMinute.hashValue
             self.currentLineView.date = nextDate
             
-            if let timeNext = self.getTimelineLabel(hour: nextDate.hour + 1) {
-                timeNext.isHidden = self.currentLineView.frame.intersects(timeNext.frame)
+            if self.isDisplayedTimes {
+                if let timeNext = self.getTimelineLabel(hour: nextDate.kvkHour + 1) {
+                    timeNext.isHidden = self.currentLineView.frame.intersects(timeNext.frame)
+                }
+                time.isHidden = time.frame.intersects(self.currentLineView.frame)
             }
-            time.isHidden = time.frame.intersects(self.currentLineView.frame)
         }
         
         startTimer(timerKey, repeats: true, addToRunLoop: true, action: action)
     }
     
     private func showCurrentLineHour() {
+        currentLineView.isHidden = !isDisplayedCurrentTime
         let date = Date().convertTimeZone(TimeZone.current, to: style.timezone)
-        guard style.timeline.showLineHourMode.showForDates(dates), let time = getTimelineLabel(hour: date.hour) else {
+        guard style.timeline.showLineHourMode.showForDates(dates),
+              let time = getTimelineLabel(hour: date.kvkMinute) else {
             stopTimer(timerKey)
             return
         }
 
         currentLineView.reloadFrame(frame)
-        let pointY = calculatePointYByMinute(date.minute, time: time)
+        let pointY = calculatePointYByMinute(date.kvkMinute, time: time)
         currentLineView.frame.origin.y = pointY - (currentLineView.frame.height * 0.5)
         scrollView.addSubview(currentLineView)
         movingCurrentLineHour()
         
-        if let timeNext = getTimelineLabel(hour: date.hour + 1) {
-            timeNext.isHidden = currentLineView.frame.intersects(timeNext.frame)
+        if self.isDisplayedTimes {
+            if let timeNext = getTimelineLabel(hour: date.kvkHour + 1) {
+                timeNext.isHidden = currentLineView.frame.intersects(timeNext.frame)
+            }
+            time.isHidden = currentLineView.frame.intersects(time.frame)
         }
-        time.isHidden = currentLineView.frame.intersects(time.frame)
     }
     
     private func calculatePointYByMinute(_ minute: Int, time: TimelineLabel) -> CGFloat {
@@ -201,10 +208,10 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     }
     
     private func scrollToCurrentTime(_ startHour: Int) {
-        guard style.timeline.scrollLineHourMode.scrollForDates(dates) else { return }
+        guard style.timeline.scrollLineHourMode.scrollForDates(dates) && isDisplayedCurrentTime else { return }
         
         let date = Date()
-        guard let time = getTimelineLabel(hour: date.hour)else {
+        guard let time = getTimelineLabel(hour: date.kvkHour)else {
             scrollView.setContentOffset(.zero, animated: true)
             return
         }
@@ -236,19 +243,19 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         scrollView.scrollRectToVisible(frame, animated: true)
     }
     
-    func create(dates: [Date], events: [Event], recurringEvents: [Event], selectedDate: Date?) {
+    func create(dates: [Date], events: [Event], recurringEvents: [Event], selectedDate: Date) {
         isResizableEventEnable = false
         delegate?.didDisplayEvents(events, dates: dates)
         
         self.dates = dates
         self.events = events
         self.recurringEvents = recurringEvents
-        self.selectedDate = selectedDate ?? Date()
+        self.selectedDate = selectedDate
         
         if style.allDay.isPinned {
             subviews.filter { $0.tag == tagAllDayEventView }.forEach { $0.removeFromSuperview() }
         }
-        subviews.filter { $0.tag == tagStubEvent || $0.tag == tagVerticalLine }.forEach { $0.removeFromSuperview() }
+        subviews.filter { $0.tag == tagStubEvent }.forEach { $0.removeFromSuperview() }
         scrollView.subviews.forEach { $0.removeFromSuperview() }
         layer.sublayers?.filter { $0.name == "\(tagVerticalLine)" }.forEach { $0.removeFromSuperlayer() }
         
@@ -263,31 +270,29 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             startHour = style.timeline.startHour
         } else {
             if dates.count > 1 {
-                startHour = filteredEvents.sorted(by: { $0.start.hour < $1.start.hour })
-                    .first?.start.hour ?? style.timeline.startHour
+                startHour = filteredEvents.sorted(by: { $0.start.kvkHour < $1.start.kvkHour })
+                    .first?.start.kvkHour ?? style.timeline.startHour
             } else {
                 startHour = filteredEvents.filter { compareStartDate(selectedDate, with: $0) }
-                .sorted(by: { $0.start.hour < $1.start.hour })
-                .first?.start.hour ?? style.timeline.startHour
+                .sorted(by: { $0.start.kvkHour < $1.start.kvkHour })
+                .first?.start.kvkHour ?? style.timeline.startHour
             }
         }
         
         // add time label to timeline
         timeLabels = createTimesLabel(start: startHour)
         // add separator line
-        let lines = createHorizontalLines(times: timeLabels)
-        
+        let horizontalLines = createHorizontalLines(times: timeLabels)
         // calculate all height by time label minus the last offset
-        let heightAllTimes = timeLabels.reduce(0, { $0 + ($1.frame.height + calculatedTimeY) }) - calculatedTimeY
-        scrollView.contentSize = CGSize(width: frame.width, height: heightAllTimes)
         timeLabels.forEach { scrollView.addSubview($0) }
-        lines.forEach { scrollView.addSubview($0) }
+        horizontalLines.forEach { scrollView.addSubview($0) }
         
         let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
         let widthPage = (frame.width - leftOffset) / CGFloat(dates.count)
         let heightPage = scrollView.contentSize.height
         var allDayEvents = [AllDayView.PrepareEvents]()
         var topStackViews = [StubStackView]()
+        var allHeightEvents = [CGFloat]()
         
         // horror 👹
         dates.enumerated().forEach { (idx, date) in
@@ -332,7 +337,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                     
                     var result = [recurringEvent]
                     let previousDate = style.calendar.date(byAdding: .day, value: -1, to: date)
-                    if recurringEvent.start.day != recurringEvent.end.day,
+                    if recurringEvent.start.kvkDay != recurringEvent.end.kvkDay,
                        let recurringPrevEvent = event.updateDate(newDate: previousDate ?? date,
                                                                  calendar: style.calendar) {
                         result.append(recurringPrevEvent)
@@ -356,6 +361,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             
             do {
                 let context = TimelineEventLayoutContext(style: style,
+                                                         type: paramaters.type,
                                                          pageFrame: .init(x: pointX, y: 0,
                                                                           width: widthPage, height: heightPage),
                                                          startHour: startHour,
@@ -381,12 +387,15 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                         }
                     }()
                     
+                    if !isDisplayedTimes {
+                        allHeightEvents.append(view.bounds.height + style.timeline.offsetEvent)
+                    }
                     view.delegate = self
                     scrollView.addSubview(view)
                 }
             }
             
-            if !style.timeline.isHiddenStubEvent {
+            if !style.timeline.isHiddenStubEvent && !groupAllEvents.isEmpty {
                 let maxAllDayEventsFordDate = groupAllEvents.count
                 var allDayHeight = style.allDay.height
                 if 3...4 ~= maxAllDayEventsFordDate {
@@ -405,10 +414,10 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                                               width: widthPage - style.timeline.offsetEvent,
                                               height: style.event.heightStubView)
                 
-                let topStackView = createStackView(day: date.day, type: .top, frame: topStackFrame)
+                let topStackView = createStackView(day: date.kvkDay, type: .top, frame: topStackFrame)
                 topStackViews.append(topStackView)
                 addSubview(topStackView)
-                addSubview(createStackView(day: date.day, type: .bottom, frame: bottomStackFrame))
+                addSubview(createStackView(day: date.kvkDay, type: .bottom, frame: bottomStackFrame))
             }
         }
         
@@ -418,8 +427,20 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             topStackViews.forEach {
                 $0.frame.origin.y = offsetY + 5
             }
-            
             setOffsetScrollView(offsetY: offsetY)
+        } else {
+            setOffsetScrollView(offsetY: 0, force: true)
+        }
+        
+        if !isDisplayedTimes {
+            var allHeight = allHeightEvents.reduce(0, { $0 + $1 })
+            if frame.height > allHeight {
+                allHeight = frame.height
+            }
+            scrollView.contentSize = CGSize(width: frame.width, height: allHeight)
+        } else {
+            let heightAllTimes = timeLabels.reduce(0, { $0 + ($1.frame.height + calculatedTimeY) }) - calculatedTimeY
+            scrollView.contentSize = CGSize(width: frame.width, height: heightAllTimes)
         }
         
         if !forceDisableScrollToCurrentTime {

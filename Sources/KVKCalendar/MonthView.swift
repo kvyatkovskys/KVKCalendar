@@ -95,7 +95,7 @@ final class MonthView: UIView {
     }
     
     private func scrollToDate(_ date: Date, animated: Bool) {
-        if let idx = parameters.monthData.data.months.firstIndex(where: { $0.date.month == date.month && $0.date.year == date.year }), idx != parameters.monthData.selectedSection {
+        if let idx = parameters.monthData.data.months.firstIndex(where: { $0.date.kvkMonth == date.kvkMonth && $0.date.kvkYear == date.kvkYear }), idx != parameters.monthData.selectedSection {
             parameters.monthData.selectedSection = idx
             scrollToIndex(idx, animated: animated)
         } else {
@@ -152,9 +152,9 @@ final class MonthView: UIView {
             let index = getActualCachedDay(indexPath: indexPath).indexPath
             return parameters.monthData.data.months[index.section].days[index.row]
         }
-        guard let newMoveDate = days.filter({ $0.date?.day == parameters.monthData.date.day }).first?.date else {
-            let sorted = days.sorted(by: { ($0.date?.day ?? 0) < ($1.date?.day ?? 0) })
-            if let lastDate = sorted.last?.date, lastDate.day < parameters.monthData.date.day {
+        guard let newMoveDate = days.filter({ $0.date?.kvkDay == parameters.monthData.date.kvkDay }).first?.date else {
+            let sorted = days.sorted(by: { ($0.date?.kvkDay ?? 0) < ($1.date?.kvkDay ?? 0) })
+            if let lastDate = sorted.last?.date, lastDate.kvkDay < parameters.monthData.date.kvkDay {
                 return lastDate
             }
             return nil
@@ -205,7 +205,7 @@ extension MonthView: CalendarSettingProtocol {
         
         reload()
         
-        if let idx = parameters.monthData.data.months.firstIndex(where: { $0.date.month == parameters.monthData.date.month && $0.date.year == parameters.monthData.date.year }) {
+        if let idx = parameters.monthData.data.months.firstIndex(where: { $0.date.kvkMonth == parameters.monthData.date.kvkMonth && $0.date.kvkYear == parameters.monthData.date.kvkYear }) {
             scrollToIndex(idx, animated: false)
         }
     }
@@ -339,11 +339,10 @@ extension MonthView: UICollectionViewDataSource, UICollectionViewDataSourcePrefe
         let item = getActualCachedDay(indexPath: indexPath)
         guard let day = item.day else { return UICollectionViewCell() }
         
-        if let cell = dataSource?.dequeueCell(dateParameter: .init(date: day.date, type: day.type),
+        if let cell = dataSource?.dequeueCell(parameter: .init(date: day.date, type: day.type, events: day.events),
                                               type: .month,
                                               view: collectionView,
-                                              indexPath: item.indexPath) as? UICollectionViewCell
-        {
+                                              indexPath: item.indexPath) as? UICollectionViewCell {
             return cell
         } else {
             return collectionView.kvkDequeueCell(indexPath: item.indexPath) { (cell: MonthCell) in
@@ -387,9 +386,9 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
             weekHeaderView.date = month.date
             
             guard style.month.autoSelectionDateWhenScrolling,
-                  let newDate = month.days.first(where: { $0.date?.year == month.date.year
-                      && $0.date?.month == month.date.month
-                      && $0.date?.day == parameters.monthData.date.day })?.date,
+                  let newDate = month.days.first(where: { $0.date?.kvkYear == month.date.kvkYear
+                      && $0.date?.kvkMonth == month.date.kvkMonth
+                      && $0.date?.kvkDay == parameters.monthData.date.kvkDay })?.date,
                   parameters.monthData.date != newDate
             else {
                 return
@@ -419,13 +418,13 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         guard style.month.autoSelectionDateWhenScrolling else { return }
         
         let newDate: Date
-        if let date = month.days.first(where: { $0.date?.year == month.date.year
-            && $0.date?.month == month.date.month
-            && $0.date?.day == parameters.monthData.date.day })?.date {
+        if let date = month.days.first(where: { $0.date?.kvkYear == month.date.kvkYear
+            && $0.date?.kvkMonth == month.date.kvkMonth
+            && $0.date?.kvkDay == parameters.monthData.date.kvkDay })?.date {
             newDate = date
-        } else if let date = month.days.first(where: { $0.date?.year == month.date.year
-            && $0.date?.month == month.date.month
-            && $0.date?.day == (parameters.monthData.date.day - 1) })?.date {
+        } else if let date = month.days.first(where: { $0.date?.kvkYear == month.date.kvkYear
+            && $0.date?.kvkMonth == month.date.kvkMonth
+            && $0.date?.kvkDay == (parameters.monthData.date.kvkDay - 1) })?.date {
             newDate = date
         } else {
             newDate = Date()
@@ -580,19 +579,19 @@ extension MonthView: MonthCellDelegate {
         let newDate = day.date ?? event.start
         
         var startComponents = DateComponents()
-        startComponents.year = newDate.year
-        startComponents.month = newDate.month
-        startComponents.day = newDate.day
-        startComponents.hour = event.start.hour
-        startComponents.minute = event.start.minute
+        startComponents.year = newDate.kvkYear
+        startComponents.month = newDate.kvkMonth
+        startComponents.day = newDate.kvkDay
+        startComponents.hour = event.start.kvkHour
+        startComponents.minute = event.start.kvkMinute
         let startDate = style.calendar.date(from: startComponents)
         
         var endComponents = DateComponents()
-        endComponents.year = newDate.year
-        endComponents.month = newDate.month
-        endComponents.day = newDate.day
-        endComponents.hour = event.end.hour
-        endComponents.minute = event.end.minute
+        endComponents.year = newDate.kvkYear
+        endComponents.month = newDate.kvkMonth
+        endComponents.day = newDate.kvkDay
+        endComponents.hour = event.end.kvkHour
+        endComponents.minute = event.end.kvkMinute
         let endDate = style.calendar.date(from: endComponents)
         
         delegate?.didChangeEvent(event, start: startDate, end: endDate)

@@ -82,20 +82,22 @@ final class WeekView: UIView {
             return date
         }
         
-        return style.startWeekDay == .sunday ? date.startSundayOfWeek : date.startMondayOfWeek
+        return style.startWeekDay == .sunday ? date.kvkStartSundayOfWeek : date.kvkStartMondayOfWeek
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func updateDaysBySection(date: Date? = nil) {
-        parameters.data.updateDaysBySection(
-            data: CalendarData(date: date ?? Date(), years: 4, style: style),
-            startDay: style.startWeekDay,
-            maxDays: style.week.maxDays
-        )
-        
+    func reloadDays(data: CalendarData, style: Style) {
+        parameters.data.reloadData(data, startDay: style.startWeekDay, maxDays: style.week.maxDays)
+    }
+    
+    func reloadVisibleDates() {
+        parameters.visibleDates = getVisibleDatesFor(date: parameters.data.date)
+    }
+    
+    func updateScrollableWeeks() {
         scrollableWeekView.updateWeeks(weeks: parameters.data.daysBySection)
     }
 }
@@ -187,23 +189,23 @@ extension WeekView: CalendarSettingProtocol {
             timelinePage.willDisplayTimelineView = { [weak self] (timeline, type) in
                 guard let self = self else { return }
                 
-                let nextDate: Date
+                let nextDate: Date?
                 switch type {
                 case .next:
                     nextDate = self.parameters.style.calendar.date(byAdding: .day,
                                                                    value: self.style.week.maxDays,
-                                                                   to: self.parameters.data.date) ?? self.parameters.data.date
+                                                                   to: self.parameters.data.date)
                 case .previous:
                     nextDate = self.parameters.style.calendar.date(byAdding: .day,
                                                                    value: -self.style.week.maxDays,
-                                                                   to: self.parameters.data.date) ?? self.parameters.data.date
+                                                                   to: self.parameters.data.date)
                 }
                 
                 if let offset = self.timelinePage.timelineView?.contentOffset {
                     timeline.contentOffset = offset
                 }
                 
-                timeline.create(dates: self.getVisibleDatesFor(date: nextDate),
+                timeline.create(dates: self.getVisibleDatesFor(date: nextDate ?? self.parameters.data.date),
                                 events: self.parameters.data.events,
                                 recurringEvents: self.parameters.data.recurringEvents,
                                 selectedDate: self.parameters.data.date)
@@ -219,7 +221,9 @@ extension WeekView: CalendarSettingProtocol {
         var viewFrame = frame
         viewFrame.origin = .zero
         
-        let view = TimelineView(parameters: .init(style: style, type: .week, scale: timelineScale,
+        let view = TimelineView(parameters: .init(style: style,
+                                                  type: .week,
+                                                  scale: timelineScale,
                                                   scrollToCurrentTimeOnlyOnInit: scrollToCurrentTimeOnlyOnInit),
                                 frame: viewFrame)
         view.delegate = self
@@ -333,17 +337,17 @@ extension WeekView: TimelineDelegate {
     
     func didResizeEvent(_ event: Event, startTime: ResizeTime, endTime: ResizeTime) {
         var startComponents = DateComponents()
-        startComponents.year = event.start.year
-        startComponents.month = event.start.month
-        startComponents.day = event.start.day
+        startComponents.year = event.start.kvkYear
+        startComponents.month = event.start.kvkMonth
+        startComponents.day = event.start.kvkDay
         startComponents.hour = startTime.hour
         startComponents.minute = startTime.minute
         let startDate = style.calendar.date(from: startComponents)
         
         var endComponents = DateComponents()
-        endComponents.year = event.end.year
-        endComponents.month = event.end.month
-        endComponents.day = event.end.day
+        endComponents.year = event.end.kvkYear
+        endComponents.month = event.end.kvkMonth
+        endComponents.day = event.end.kvkDay
         endComponents.hour = endTime.hour
         endComponents.minute = endTime.minute
         let endDate = style.calendar.date(from: endComponents)
@@ -352,9 +356,9 @@ extension WeekView: TimelineDelegate {
     
     func didAddNewEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint) {
         var components = DateComponents()
-        components.year = event.start.year
-        components.month = event.start.month
-        components.day = event.start.day
+        components.year = event.start.kvkYear
+        components.month = event.start.kvkMonth
+        components.day = event.start.kvkDay
         components.hour = hour
         components.minute = minute
         let newDate = style.calendar.date(from: components)
@@ -362,28 +366,28 @@ extension WeekView: TimelineDelegate {
     }
     
     func didChangeEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint, newDay: Int?) {
-        var day = event.start.day
+        var day = event.start.kvkDay
         if let newDayEvent = newDay {
             day = newDayEvent
-        } else if let newDate = scrollableWeekView.getDateByPointX(point.x), day != newDate.day {
-            day = newDate.day
+        } else if let newDate = scrollableWeekView.getDateByPointX(point.x), day != newDate.kvkDay {
+            day = newDate.kvkDay
         }
         
         var startComponents = DateComponents()
-        startComponents.year = event.start.year
-        startComponents.month = event.start.month
+        startComponents.year = event.start.kvkYear
+        startComponents.month = event.start.kvkMonth
         startComponents.day = day
         startComponents.hour = hour
         startComponents.minute = minute
         let startDate = style.calendar.date(from: startComponents)
         
-        let hourOffset = event.end.hour - event.start.hour
-        let minuteOffset = event.end.minute - event.start.minute
+        let hourOffset = event.end.kvkHour - event.start.kvkHour
+        let minuteOffset = event.end.kvkMinute - event.start.kvkMinute
         var endComponents = DateComponents()
-        endComponents.year = event.end.year
-        endComponents.month = event.end.month
-        if event.end.day != event.start.day {
-            let offset = event.end.day - event.start.day
+        endComponents.year = event.end.kvkYear
+        endComponents.month = event.end.kvkMonth
+        if event.end.kvkDay != event.start.kvkDay {
+            let offset = event.end.kvkDay - event.start.kvkDay
             endComponents.day = day + offset
         } else {
             endComponents.day = day

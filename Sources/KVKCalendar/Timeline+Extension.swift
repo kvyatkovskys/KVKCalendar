@@ -15,6 +15,22 @@ extension TimelineView {
         style.timeline.offsetTimeY * paramaters.scale
     }
     
+    var isDisplayedHorizontalLines: Bool {
+        style.week.viewMode == .default || paramaters.type == .day
+    }
+    
+    var isDisplayedTimes: Bool {
+        isDisplayedHorizontalLines
+    }
+    
+    var isDisplayedCurrentTime: Bool {
+        isDisplayedHorizontalLines
+    }
+    
+    var isDisplayedMovingTime: Bool {
+        isDisplayedHorizontalLines
+    }
+    
 }
 
 extension TimelineView: UIScrollViewDelegate {
@@ -53,7 +69,7 @@ extension TimelineView: UIScrollViewDelegate {
         
         let stubEvents = events + eventsAllDay
         stubEvents.forEach { (eventView) in
-            guard let stack = getStubStackView(day: eventView.event.start.day) else { return }
+            guard let stack = getStubStackView(day: eventView.event.start.kvkDay) else { return }
             
             stack.top.subviews.filter { ($0 as? StubEventView)?.valueHash == eventView.event.hash }.forEach { $0.removeFromSuperview() }
             stack.bottom.subviews.filter { ($0 as? StubEventView)?.valueHash == eventView.event.hash }.forEach { $0.removeFromSuperview() }
@@ -128,6 +144,7 @@ extension TimelineView: UIScrollViewDelegate {
 }
 
 extension TimelineView {
+    
     var bottomStabStackOffsetY: CGFloat {
         UIApplication.shared.isAvailableBottomHomeIndicator ? 30 : 5
     }
@@ -139,6 +156,7 @@ extension TimelineView {
     var scrollableEventViews: [UIView] {
         getAllScrollableEvents()
     }
+    
 }
 
 extension TimelineView {
@@ -158,13 +176,13 @@ extension TimelineView {
             if let time = eventResizePreview?.startTime {
                 startTime = (time.hour, time.minute)
             } else {
-                startTime = (eventResizePreview?.event.start.hour, eventResizePreview?.event.start.minute)
+                startTime = (eventResizePreview?.event.start.kvkHour, eventResizePreview?.event.start.kvkMinute)
             }
             
             if let time = eventResizePreview?.endTime {
                 endTime = (time.hour, time.minute)
             } else {
-                endTime = (eventResizePreview?.event.end.hour, eventResizePreview?.event.end.minute)
+                endTime = (eventResizePreview?.event.end.kvkHour, eventResizePreview?.event.end.kvkMinute)
             }
             
             if let startHour = startTime.hour,
@@ -308,7 +326,7 @@ extension TimelineView {
         timeLabels.first(where: { $0.hashTime == hour })
     }
     
-    func createTimesLabel(start: Int) -> [TimelineLabel] {
+    func createTimesLabel(start: Int) -> [TimelineLabel] {        
         var times = [TimelineLabel]()
         for (idx, hour) in availabilityHours.enumerated() where idx >= start {
             let yTime = (calculatedTimeY + style.timeline.heightTime) * CGFloat(idx - start)
@@ -322,15 +340,16 @@ extension TimelineView {
             time.textColor = style.timeline.timeColor
             time.text = hour
             let hourTmp = TimeHourSystem.twentyFour.hours[idx]
-            time.hashTime = timeLabelFormatter.date(from: hourTmp)?.hour ?? 0
+            time.hashTime = timeLabelFormatter.date(from: hourTmp)?.kvkHour ?? 0
             time.tag = idx - start
+            time.isHidden = !isDisplayedTimes
             times.append(time)
         }
         return times
     }
     
     func createHorizontalLines(times: [TimelineLabel]) -> [UIView] {
-        return times.enumerated().reduce([]) { acc, item -> [UIView] in
+        times.enumerated().reduce([]) { acc, item -> [UIView] in
             let time = item.element
             let idx = item.offset
             
@@ -342,6 +361,7 @@ extension TimelineView {
             let line = UIView(frame: lineFrame)
             line.backgroundColor = style.timeline.separatorLineColor
             line.tag = idx
+            line.isHidden = !isDisplayedHorizontalLines
             
             var lines = [line]
             if let dividerType = style.timeline.dividerType {
@@ -394,7 +414,7 @@ extension TimelineView {
         
         var point = gesture.location(in: scrollView)
         point.y = (point.y - eventPreviewYOffset) - style.timeline.offsetEvent - 6
-        let time = calculateChangingTime(pointY: point.y)
+        let time = movingMinuteLabel.time
         var newEvent = Event(ID: Event.idForNewEvent)
         newEvent.title = TextEvent(timeline: style.event.textForNewEvent)
         let newEventPreview = getEventView(style: style,
@@ -409,7 +429,6 @@ extension TimelineView {
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
         case .ended, .failed, .cancelled:
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
-            guard let minute = time.minute, let hour = time.hour else { return }
             
             switch paramaters.type {
             case .day:
@@ -421,7 +440,10 @@ extension TimelineView {
             }
             
             newEvent.end = style.calendar.date(byAdding: .minute, value: 15, to: newEvent.start) ?? Date()
-            delegate?.didAddNewEvent(newEvent, minute: minute, hour: hour, point: point)
+            delegate?.didAddNewEvent(newEvent,
+                                     minute: time.minute,
+                                     hour: time.hour,
+                                     point: point)
         default:
             break
         }
@@ -629,19 +651,23 @@ extension TimelineView: EventDelegate {
         guard scrollView.frame.width >= (location.x + 30), (location.x - 10) >= leftOffset else { return }
         
         location.y = (location.y - eventPreviewYOffset) - style.timeline.offsetEvent - 6
-        let startTime = calculateChangingTime(pointY: location.y)
-        if let minute = startTime.minute, let hour = startTime.hour, !event.isNew {
+        let startTime = movingMinuteLabel.time
+        if !event.isNew {
             var newDayEvent: Int?
             var updatedEvent = event
             
             if paramaters.type == .week, let newDate = shadowView.date {
-                newDayEvent = newDate.day
+                newDayEvent = newDate.kvkDay
                 
                 if event.recurringType != .none {
                     updatedEvent = event.updateDate(newDate: newDate, calendar: style.calendar) ?? event
                 }
             }
-            delegate?.didChangeEvent(updatedEvent, minute: minute, hour: hour, point: location, newDay: newDayEvent)
+            delegate?.didChangeEvent(updatedEvent,
+                                     minute: startTime.minute,
+                                     hour: startTime.hour,
+                                     point: location,
+                                     newDay: newDayEvent)
         }
         
         shadowView.removeFromSuperview()
@@ -694,7 +720,7 @@ extension TimelineView: EventDelegate {
         }
     }
     
-    func calculateChangingTime(pointY: CGFloat) -> (hour: Int?, minute: Int?) {
+    private func calculateChangingTime(pointY: CGFloat) -> (hour: Int?, minute: Int?) {
         guard let time = timeLabels.first(where: { $0.frame.origin.y >= pointY }) else { return (nil, nil) }
         
         let firstY = time.frame.origin.y - (calculatedTimeY + style.timeline.heightTime)
@@ -714,7 +740,9 @@ extension TimelineView: EventDelegate {
         }
         guard let line = lines.first(where: { $0.lineFrame.origin.x...($0.lineFrame.origin.x + width) ~= pointX }) else { return nil }
         
-        return (CGRect(origin: line.lineFrame.origin, size: CGSize(width: width, height: line.lineFrame.height)), line.date)
+        return (CGRect(origin: line.lineFrame.origin,
+                       size: CGSize(width: width, height: scrollView.contentSize.height)),
+                line.date)
     }
 }
 
@@ -744,7 +772,7 @@ extension TimelineView: CalendarSettingProtocol {
     
     func reloadFrame(_ frame: CGRect) {
         self.frame.size = frame.size
-        layoutIfNeeded()
+        setupConstraints()
         currentLineView.reloadFrame(frame)
     }
     

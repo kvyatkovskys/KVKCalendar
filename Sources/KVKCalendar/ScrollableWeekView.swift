@@ -89,11 +89,13 @@ final class ScrollableWeekView: UIView {
         setUI()
     }
     
+    func updateWeeks(weeks: [[Day]]) {
+        params.weeks = weeks
+    }
+    
     func getIdxByDate(_ date: Date) -> Int? {
         weeks.firstIndex(where: { week in
-            return week.firstIndex(where: { $0.date?.year == date.year
-                && $0.date?.month == date.month
-                && $0.date?.day == date.day }) != nil
+            week.firstIndex(where: { $0.date?.isEqual(date) ?? false }) != nil
         })
     }
     
@@ -101,10 +103,6 @@ final class ScrollableWeekView: UIView {
         guard let idx = getIdxByDate(date) else { return [] }
         
         return weeks[idx]
-    }
-    
-    func updateWeeks(weeks: [[Day]]) {
-        params.weeks = weeks
     }
     
     func scrollHeaderByTransform(_ transform: CGAffineTransform) {
@@ -297,7 +295,7 @@ extension ScrollableWeekView: CalendarSettingProtocol {
             return date
         }
         
-        return style.startWeekDay == .sunday ? date.startSundayOfWeek : date.startMondayOfWeek
+        return style.startWeekDay == .sunday ? date.kvkStartSundayOfWeek : date.kvkStartMondayOfWeek
     }
 }
 
@@ -314,7 +312,7 @@ extension ScrollableWeekView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let day = weeks[indexPath.section][indexPath.row]
         
-        if let cell = dataSource?.dequeueCell(dateParameter: .init(date: day.date), type: type, view: collectionView, indexPath: indexPath) as? UICollectionViewCell {
+        if let cell = dataSource?.dequeueCell(parameter: .init(date: day.date, type: day.type, events: day.events), type: type, view: collectionView, indexPath: indexPath) as? UICollectionViewCell {
             return cell
         } else {
             switch Platform.currentInterface {

@@ -18,9 +18,7 @@ final class WeekData: EventDateProtocol, ScrollableWeekProtocol {
     
     init(data: CalendarData, startDay: StartDayType, maxDays: Int) {
         self.date = data.date
-        self.days = getDates(data: data, startDay: startDay, maxDays: maxDays)
-        
-        daysBySection = prepareDays(days, maxDayInWeek: maxDays)
+        reloadData(data, startDay: startDay, maxDays: maxDays)
     }
     
     func filterEvents(_ events: [Event], dates: [Date]) -> [Event] {
@@ -33,8 +31,7 @@ final class WeekData: EventDateProtocol, ScrollableWeekProtocol {
         }
     }
     
-    func updateDaysBySection(data: CalendarData, startDay: StartDayType, maxDays: Int) {
-        self.date = data.date
+    func reloadData(_ data: CalendarData, startDay: StartDayType, maxDays: Int) {
         days = getDates(data: data, startDay: startDay, maxDays: maxDays)
         daysBySection = prepareDays(days, maxDayInWeek: maxDays)
     }
@@ -51,13 +48,11 @@ final class WeekData: EventDateProtocol, ScrollableWeekProtocol {
         
         tempDays.removeSubrange(startIdx..<tempDays.count)
         let defaultDays = data.addStartEmptyDays(tempDays, startDay: item) + endWeek
-        
-        var extensionDays:[Day] = []
+        var extensionDays: [Day] = []
         
         if maxDays != 7,
-            let indexOfInputDate = defaultDays.firstIndex(where: { $0.date?.isSameDay(otherDate: data.date) ?? false }),
-            let firstDate = defaultDays.first?.date
-        {
+           let indexOfInputDate = defaultDays.firstIndex(where: { $0.date?.isSameDay(otherDate: data.date) ?? false }),
+           let firstDate = defaultDays.first?.date {
             let extraBufferDays = (defaultDays.count - indexOfInputDate) % maxDays
             if extraBufferDays > 0 {
                 var i = extraBufferDays

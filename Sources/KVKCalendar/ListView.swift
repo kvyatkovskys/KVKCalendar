@@ -101,11 +101,11 @@ public final class ListView: UIView, CalendarSettingProtocol {
         
         guard !params.data.isSkeletonVisible else { return }
         
-        if let idx = params.data.sections.firstIndex(where: { $0.date.year == date.year && $0.date.month == date.month && $0.date.day == date.day }) {
+        if let idx = params.data.sections.firstIndex(where: { $0.date.isEqual(date) }) {
             tableView.scrollToRow(at: IndexPath(row: 0, section: idx), at: .top, animated: animated)
-        } else if let idx = params.data.sections.firstIndex(where: { $0.date.year == date.year && $0.date.month == date.month }) {
+        } else if let idx = params.data.sections.firstIndex(where: { $0.date.kvkYear == date.kvkYear && $0.date.kvkMonth == date.kvkMonth }) {
             tableView.scrollToRow(at: IndexPath(row: 0, section: idx), at: .top, animated: animated)
-        } else if let idx = params.data.sections.firstIndex(where: { $0.date.year == date.year }) {
+        } else if let idx = params.data.sections.firstIndex(where: { $0.date.kvkYear == date.kvkYear }) {
             tableView.scrollToRow(at: IndexPath(row: 0, section: idx), at: .top, animated: animated)
         }
     }
@@ -130,7 +130,7 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
         }
         
         let event = params.data.event(indexPath: indexPath)
-        if let cell = dataSource?.dequeueCell(dateParameter: .init(date: event.start), type: .list, view: tableView, indexPath: indexPath) as? UITableViewCell {
+        if let cell = dataSource?.dequeueCell(parameter: .init(date: event.start, events: [event]), type: .list, view: tableView, indexPath: indexPath) as? UITableViewCell {
             return cell
         } else {
             return tableView.kvkDequeueCell(indexPath: indexPath) { (cell: ListViewCell) in
