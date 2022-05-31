@@ -91,7 +91,6 @@ final class ViewController: UIViewController, KVKCalendarSettings, UIPopoverPres
     @objc private func reloadCalendarStyle() {
         var updatedStyle = calendarView.style
         updatedStyle.timeSystem = calendarView.style.timeSystem == .twentyFour ? .twelve : .twentyFour
-        updatedStyle.week.daysInOneWeek = 3
         calendarView.updateStyle(updatedStyle)
         calendarView.reloadData()
     }
