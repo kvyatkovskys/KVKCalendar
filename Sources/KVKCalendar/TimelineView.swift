@@ -423,10 +423,19 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         
         if let maxAllDayEvents = allDayEvents.max(by: { $0.events.count < $1.events.count })?.events.count,
            let allDayView = createAllDayEvents(events: allDayEvents, maxEvents: maxAllDayEvents) {
-            let offsetY = allDayView.frame.origin.y + allDayView.frame.height
-            topStackViews.forEach {
-                $0.frame.origin.y = offsetY + 5
+            let offsetY: CGFloat
+            
+            if style.allDay.isPinned {
+                offsetY = allDayView.frame.origin.y + allDayView.frame.height
+                addSubview(allDayView)
+                topStackViews.forEach {
+                    $0.frame.origin.y = offsetY + 5
+                }
+            } else {
+                offsetY = allDayView.frame.height
+                scrollView.addSubview(allDayView)
             }
+            
             setOffsetScrollView(offsetY: offsetY)
         } else {
             setOffsetScrollView(offsetY: 0, force: true)

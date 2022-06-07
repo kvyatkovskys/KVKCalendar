@@ -313,12 +313,6 @@ extension TimelineView {
                                     frame: CGRect(x: 0, y: yPoint, width: bounds.width, height: allDayHeight),
                                     dataSource: dataSource)
         allDayView.tag = tagAllDayEventView
-        if style.allDay.isPinned {
-            addSubview(allDayView)
-        } else {
-            scrollView.addSubview(allDayView)
-        }
-        
         return allDayView
     }
     
