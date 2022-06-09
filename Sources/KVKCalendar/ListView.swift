@@ -54,14 +54,13 @@ public final class ListView: UIView, CalendarSettingProtocol {
         self.params = parameters
         super.init(frame: frame ?? .zero)
         addSubview(tableView)
-        setupConstraints()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func setupConstraints() {
+    func setupConstraints() {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         
         let top = tableView.topAnchor.constraint(equalTo: topAnchor)

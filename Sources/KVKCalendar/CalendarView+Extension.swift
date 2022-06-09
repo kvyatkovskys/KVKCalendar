@@ -204,6 +204,7 @@ extension CalendarView {
             setupConstraintsForView(yearView)
         case .list:
             addSubview(listView)
+            listView.setupConstraints()
             setupConstraintsForView(listView)
             reloadData()
         }        
