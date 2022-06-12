@@ -148,9 +148,15 @@ final class ScrollableWeekView: UIView {
     private func createCollectionView(frame: CGRect, isScrollEnabled: Bool) -> UICollectionView {
         let offsetX: CGFloat
         
+        func calculateOffsetX() -> CGFloat {
+            style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft + style.timeline.offsetAdditionalTimeX
+        }
+        
         switch type {
         case .week:
-            offsetX = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
+            offsetX = calculateOffsetX()
+        case .day where style.timeline.additionalTimeZones.isEmpty:
+            offsetX = calculateOffsetX()
         default:
             offsetX = 0
         }
@@ -247,6 +253,13 @@ extension ScrollableWeekView: CalendarSettingProtocol {
                                                   isScrollEnabled: style.headerScroll.isScrollEnabled)
             addSubview(collectionView)
             addTitleHeaderIfNeeded(frame: mainFrame)
+            
+            if let cornerHeader = dataSource?.dequeueCornerHeader(date: date,
+                                                                  frame: CGRect(x: 0, y: 0,
+                                                                                width: mainFrame.origin.y,
+                                                                                height: bounds.height)) {
+                addSubview(cornerHeader)
+            }
         }
         
         addSubview(bottomLineView)

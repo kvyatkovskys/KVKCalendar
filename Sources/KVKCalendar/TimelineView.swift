@@ -27,7 +27,6 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     var paramaters: Parameters {
         didSet {
             timeSystem = paramaters.style.timeSystem
-            availabilityHours = timeSystem.hours
             
             if oldValue.scale != paramaters.scale
                 || oldValue.scrollToCurrentTimeOnlyOnInit != paramaters.scrollToCurrentTimeOnlyOnInit {
@@ -56,8 +55,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     private(set) var tagAllDayEventView = -70
     private(set) var tagStubEvent = -80
     private(set) var timeLabels = [TimelineLabel]()
-    private(set) var availabilityHours: [String]
-    private var timeSystem: TimeHourSystem
+    private(set) var timeSystem: TimeHourSystem
     private let timerKey = "CurrentHourTimerKey"
     private(set) var events = [Event]()
     private(set) var recurringEvents = [Event]()
@@ -99,7 +97,6 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     init(parameters: Parameters, frame: CGRect) {
         self.paramaters = parameters
         self.timeSystem = parameters.style.timeSystem
-        self.availabilityHours = timeSystem.hours
         self.eventLayout = parameters.style.timeline.eventLayout
         self.selectedDate = Date()
         super.init(frame: frame)
@@ -280,14 +277,14 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         }
         
         // add time label to timeline
-        timeLabels = createTimesLabel(start: startHour)
+        timeLabels = createTimesLabel(start: startHour).times
         // add separator line
         let horizontalLines = createHorizontalLines(times: timeLabels)
         // calculate all height by time label minus the last offset
         timeLabels.forEach { scrollView.addSubview($0) }
         horizontalLines.forEach { scrollView.addSubview($0) }
         
-        let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
+        let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft + style.timeline.offsetAdditionalTimeX
         let widthPage = (frame.width - leftOffset) / CGFloat(dates.count)
         let heightPage = scrollView.contentSize.height
         var allDayEvents = [AllDayView.PrepareEvents]()

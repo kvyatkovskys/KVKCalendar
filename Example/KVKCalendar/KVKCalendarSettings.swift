@@ -170,6 +170,7 @@ extension KVKCalendarSettings {
         }
         style.timeline.scrollLineHourMode = .onlyOnInitForDate(defaultDate)
         style.timeline.showLineHourMode = .always
+        style.timeline.offsetAdditionalTimeX = 50
         return style
     }
     

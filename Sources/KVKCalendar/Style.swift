@@ -180,6 +180,7 @@ public struct TimelineStyle {
     public var widthTime: CGFloat = 40
     public var heightTime: CGFloat = 20
     public var offsetTimeX: CGFloat = 10
+    public var offsetAdditionalTimeX: CGFloat = 0
     public var offsetTimeY: CGFloat = 25
     public var timeColor: UIColor = .systemGray
     public var timeAlignment: NSTextAlignment = .center
@@ -218,6 +219,7 @@ public struct TimelineStyle {
     public var timeDividerColor: UIColor = .lightGray
     public var timeDividerFont: UIFont = .systemFont(ofSize: 10)
     public var scale: Scale? = Scale(min: 1, max: 6)
+    public var additionalTimeZones: [TimeZone] = []
     
     public enum ViewMode: Int {
         case `default`, list

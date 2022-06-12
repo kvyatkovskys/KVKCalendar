@@ -320,26 +320,31 @@ extension TimelineView {
         timeLabels.first(where: { $0.hashTime == hour })
     }
     
-    func createTimesLabel(start: Int) -> [TimelineLabel] {        
+    func createTimesLabel(start: Int) -> (times: [TimelineLabel], items: [UILabel]) {
         var times = [TimelineLabel]()
-        for (idx, hour) in availabilityHours.enumerated() where idx >= start {
+        for (idx, txtHour) in timeSystem.hours.enumerated() where idx >= start {
             let yTime = (calculatedTimeY + style.timeline.heightTime) * CGFloat(idx - start)
-            
-            let time = TimelineLabel(frame: CGRect(x: style.timeline.offsetTimeX,
+            let time = TimelineLabel(frame: CGRect(x: style.timeline.offsetTimeX + style.timeline.offsetAdditionalTimeX,
                                                    y: yTime,
                                                    width: style.timeline.widthTime,
                                                    height: style.timeline.heightTime))
             time.font = style.timeline.timeFont
             time.textAlignment = style.timeline.timeAlignment
             time.textColor = style.timeline.timeColor
-            time.text = hour
+            time.text = txtHour
             let hourTmp = TimeHourSystem.twentyFour.hours[idx]
-            time.hashTime = timeLabelFormatter.date(from: hourTmp)?.kvkHour ?? 0
+            let hour = timeLabelFormatter.date(from: hourTmp)?.kvkHour ?? 0
+            time.hashTime = hour
+            print(time.hashTime)
             time.tag = idx - start
             time.isHidden = !isDisplayedTimes
             times.append(time)
+            
+            if let items = dataSource?.dequeueTimeLabel(hour: hour, frame: time.frame) {
+                print(items)
+            }
         }
-        return times
+        return (times, [])
     }
     
     func createHorizontalLines(times: [TimelineLabel]) -> [UIView] {
@@ -347,7 +352,7 @@ extension TimelineView {
             let time = item.element
             let idx = item.offset
             
-            let xLine = time.frame.width + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
+            let xLine = time.frame.width + style.timeline.offsetTimeX + style.timeline.offsetLineLeft + style.timeline.offsetAdditionalTimeX
             let lineFrame = CGRect(x: xLine,
                                    y: time.center.y,
                                    width: frame.width - xLine,
@@ -641,7 +646,7 @@ extension TimelineView: EventDelegate {
         movingMinuteLabel.removeFromSuperview()
         
         var location = gesture.location(in: scrollView)
-        let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
+        let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft + style.timeline.offsetAdditionalTimeX
         guard scrollView.frame.width >= (location.x + 30), (location.x - 10) >= leftOffset else { return }
         
         location.y = (location.y - eventPreviewYOffset) - style.timeline.offsetEvent - 6
@@ -670,7 +675,7 @@ extension TimelineView: EventDelegate {
     
     func didChangeMovingEvent(_ event: Event, gesture: UILongPressGestureRecognizer) {
         let location = gesture.location(in: scrollView)
-        let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
+        let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft + style.timeline.offsetAdditionalTimeX
         guard scrollView.frame.width >= (location.x + 20), (location.x - 20) >= leftOffset else { return }
         
         var offset = contentOffset
@@ -704,7 +709,8 @@ extension TimelineView: EventDelegate {
         let time = calculateChangingTime(pointY: pointTempY)
         
         if let minute = time.minute, 0...59 ~= minute {
-            movingMinuteLabel.frame = CGRect(x: style.timeline.offsetTimeX, y: (pointY - offset) - style.timeline.heightTime,
+            movingMinuteLabel.frame = CGRect(x: style.timeline.offsetTimeX + style.timeline.offsetAdditionalTimeX,
+                                             y: (pointY - offset) - style.timeline.heightTime,
                                              width: style.timeline.widthTime, height: style.timeline.heightTime)
             scrollView.addSubview(movingMinuteLabel)
             let roundedMinute = minute.roundToNearest(style.timeline.minuteLabelRoundUpTime)

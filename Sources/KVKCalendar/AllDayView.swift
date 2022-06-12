@@ -82,7 +82,7 @@ final class AllDayView: UIView {
         titleLabel.removeFromSuperview()
         scrollView.removeFromSuperview()
         
-        let widthTitle = params.style.timeline.widthTime + params.style.timeline.offsetTimeX + params.style.timeline.offsetLineLeft
+        let widthTitle = params.style.timeline.widthTime + params.style.timeline.offsetTimeX + params.style.timeline.offsetLineLeft + params.style.timeline.offsetAdditionalTimeX
         titleLabel.frame = CGRect(x: params.style.allDay.offsetX, y: 0,
                                   width: widthTitle - params.style.allDay.offsetX,
                                   height: params.style.allDay.height)
@@ -100,9 +100,11 @@ final class AllDayView: UIView {
         
         switch params.type {
         case .day:
-            scrollView.contentSize = CGSize(width: scrollFrame.width, height: (maxItems / 2).rounded(.up) * params.style.allDay.height)
+            scrollView.contentSize = CGSize(width: scrollFrame.width,
+                                            height: (maxItems / 2).rounded(.up) * params.style.allDay.height)
         case .week:
-            scrollView.contentSize = CGSize(width: scrollFrame.width, height: maxItems * params.style.allDay.height)
+            scrollView.contentSize = CGSize(width: scrollFrame.width,
+                                            height: maxItems * params.style.allDay.height)
         default:
             break
         }

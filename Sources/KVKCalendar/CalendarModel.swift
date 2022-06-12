@@ -365,12 +365,21 @@ public protocol CalendarDataSource: AnyObject {
     @available(iOS 14.0, *)
     func willDisplayEventOptionMenu(_ event: Event, type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)?
     
+    /// Use this method to create a custom content view
     func dequeueMonthViewEvents(_ events: [Event], date: Date, frame: CGRect) -> UIView?
     
+    /// Use this method to create a custom all day event
     func dequeueAllDayViewEvent(_ event: Event, date: Date, frame: CGRect) -> UIView?
+    
+    func dequeueTimeLabel(hour: Int, frame: CGRect) -> [UILabel]
+    
+    func dequeueCornerHeader(date: Date, frame: CGRect) -> UIView?
+    
+    func dequeueAllDayCornerHeader(date: Date, frame: CGRect) -> UIView?
 }
 
 public extension CalendarDataSource {
+    
     func willDisplayHeaderView(date: Date?, frame: CGRect, type: CalendarType) -> UIView? { nil }
     
     func willDisplayEventViewer(date: Date, frame: CGRect) -> UIView? { nil }
@@ -399,6 +408,12 @@ public extension CalendarDataSource {
     func dequeueMonthViewEvents(_ events: [Event], date: Date, frame: CGRect) -> UIView? { nil }
     
     func dequeueAllDayViewEvent(_ event: Event, date: Date, frame: CGRect) -> UIView? { nil }
+    
+    func dequeueTimeLabel(hour: Int, frame: CGRect) -> [UILabel] { [] }
+    
+    func dequeueCornerHeader(date: Date, frame: CGRect) -> UIView? { nil }
+    
+    func dequeueAllDayCornerHeader(date: Date, frame: CGRect) -> UIView? { nil }
     
 }
 
