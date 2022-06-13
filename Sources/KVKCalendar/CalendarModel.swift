@@ -220,6 +220,30 @@ public extension Event {
     
     enum RecurringType: Int {
         case everyDay, everyWeek, everyMonth, everyYear, none
+        
+        var shift: Int {
+            switch self {
+            case .everyDay, .everyMonth, .everyYear:
+                return 1
+            case .everyWeek:
+                return 7
+            case .none:
+                return 0
+            }
+        }
+        
+        var component: Calendar.Component {
+            switch self {
+            case .everyDay, .everyWeek:
+                return .day
+            case .everyMonth:
+                return .month
+            case .everyYear:
+                return .year
+            case .none:
+                return .nanosecond
+            }
+        }
     }
     
     struct Color {
@@ -266,7 +290,7 @@ extension Event {
             startComponents.day = newDay
             startComponents.weekday = newDate.kvkWeekday
             endComponents.weekday = newDate.kvkWeekday
-        case .everyMonth where newDate.kvkMonth != start.kvkMonth && newDate.kvkDay == start.kvkDay:
+        case .everyMonth where (newDate.kvkYear != start.kvkYear || newDate.kvkMonth != start.kvkMonth) && newDate.kvkDay == start.kvkDay:
             startComponents.day = newDay
         case .everyYear where newDate.kvkYear != start.kvkYear && newDate.kvkMonth == start.kvkMonth && newDate.kvkDay == start.kvkDay:
             startComponents.day = newDay

@@ -136,22 +136,11 @@ final class MonthData: EventDateProtocol {
                 || checkMultipleDate(day.date, with: $0)
             }
             
-            let recurringEventByDate: [Event]
-            if !recurringEvents.isEmpty, let date = day.date {
-                recurringEventByDate = recurringEvents.reduce([], { (acc, event) -> [Event] in
-                    guard !filteredEventsByDay.contains(where: { $0.ID == event.ID })
-                            && (date.compare(event.start) == .orderedDescending
-                                || showRecurringEventInPast) else { return acc }
-                    
-                    guard let recurringEvent = event.updateDate(newDate: date, calendar: calendar) else {
-                        return acc
-                    }
-                    
-                    return acc + [recurringEvent]
-                })
-            } else {
-                recurringEventByDate = []
-            }
+            let recurringEventByDate = mapRecurringEvents(recurringEvents,
+                                                          filteredEventsByDay: filteredEventsByDay,
+                                                          date: day.date,
+                                                          showRecurringEventInPast: showRecurringEventInPast,
+                                                          calendar: calendar)
             
             let sortedEvents = (filteredEventsByDay + recurringEventByDate).sorted(by: { $0.start.kvkHour < $1.start.kvkHour })
             newDay.events = allDayEvents + sortedEvents.sorted(by: { $0.isAllDay && !$1.isAllDay })
