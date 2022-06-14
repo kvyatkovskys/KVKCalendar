@@ -117,7 +117,7 @@ final class MonthData: EventDateProtocol {
     }
     
     func reloadEventsInDays(events: [Event], date: Date) -> (events: [Event], dates: [Date?]) {
-        let recurringEvents = events.filter({ $0.recurringType != .none })
+        let recurringEvents = events.filter { $0.recurringType != .none } 
         guard let idxSection = data.months.firstIndex(where: { $0.date.kvkMonth == date.kvkMonth && $0.date.kvkYear == date.kvkYear }) else {
             return ([], [])
         }
@@ -125,9 +125,7 @@ final class MonthData: EventDateProtocol {
         let days = data.months[idxSection].days
         var displayableEvents = [Event]()
         let updatedDays = days.reduce([], { (acc, day) -> [Day] in
-            var newDay = day
-            guard newDay.events.isEmpty else { return acc + [day] }
-            
+            var newDay = day            
             let filteredEventsByDay = events.filter { compareStartDate(day.date, with: $0) && !$0.isAllDay }
             let filteredAllDayEvents = events.filter { $0.isAllDay }
             let allDayEvents = filteredAllDayEvents.filter {

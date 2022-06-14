@@ -335,13 +335,12 @@ extension TimelineView {
             let hourTmp = TimeHourSystem.twentyFour.hours[idx]
             let hour = timeLabelFormatter.date(from: hourTmp)?.kvkHour ?? 0
             time.hashTime = hour
-            print(time.hashTime)
             time.tag = idx - start
             time.isHidden = !isDisplayedTimes
             times.append(time)
             
             if let items = dataSource?.dequeueTimeLabel(hour: hour, frame: time.frame) {
-                print(items)
+                
             }
         }
         return (times, [])
