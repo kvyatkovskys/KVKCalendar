@@ -81,6 +81,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         return label
     }()
     
+    // need to recalculate X
     private(set) lazy var currentLineView: CurrentLineView = {
         let view = CurrentLineView(parameters: .init(style: style),
                                    frame: CGRect(x: 0, y: 0, width: scrollView.frame.width, height: 15))
@@ -277,14 +278,16 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         }
         
         // add time label to timeline
-        timeLabels = createTimesLabel(start: startHour).times
+        let labels = createTimesLabel(start: startHour)
+        timeLabels = labels.times
         // add separator line
         let horizontalLines = createHorizontalLines(times: timeLabels)
         // calculate all height by time label minus the last offset
         timeLabels.forEach { scrollView.addSubview($0) }
+        labels.items.forEach { scrollView.addSubview($0) }
         horizontalLines.forEach { scrollView.addSubview($0) }
         
-        let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft + style.timeline.offsetAdditionalTimeX
+        let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft + style.timeline.cornerHeaderWidth
         let widthPage = (frame.width - leftOffset) / CGFloat(dates.count)
         let heightPage = scrollView.contentSize.height
         var allDayEvents = [AllDayView.PrepareEvents]()

@@ -19,6 +19,7 @@ final class AllDayView: UIView {
     }
     
     struct Parameters {
+        let date: Date
         let prepareEvents: [PrepareEvents]
         let type: CalendarType
         var style: Style
@@ -28,6 +29,7 @@ final class AllDayView: UIView {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
+        label.tag = 123
         return label
     }()
     
@@ -46,6 +48,7 @@ final class AllDayView: UIView {
         self.linePoints = parameters.prepareEvents.compactMap({ CGPoint(x: $0.xOffset, y: 0) })
         self.dataSource = dataSource
         super.init(frame: frame)
+        scrollView.tag = 123
         setUI()
     }
     
@@ -79,10 +82,9 @@ final class AllDayView: UIView {
     
     private func setupView() {
         backgroundColor = params.style.allDay.backgroundColor
-        titleLabel.removeFromSuperview()
-        scrollView.removeFromSuperview()
+        subviews.filter { $0.tag == 123 }.forEach { $0.removeFromSuperview() }
         
-        let widthTitle = params.style.timeline.widthTime + params.style.timeline.offsetTimeX + params.style.timeline.offsetLineLeft + params.style.timeline.offsetAdditionalTimeX
+        let widthTitle = style.timeline.allLeftOffset
         titleLabel.frame = CGRect(x: params.style.allDay.offsetX, y: 0,
                                   width: widthTitle - params.style.allDay.offsetX,
                                   height: params.style.allDay.height)
@@ -90,7 +92,7 @@ final class AllDayView: UIView {
         titleLabel.textColor = params.style.allDay.titleColor
         titleLabel.textAlignment = params.style.allDay.titleAlignment
         titleLabel.text = params.style.allDay.titleText
-        
+                
         let x = titleLabel.frame.width + titleLabel.frame.origin.x
         let scrollFrame = CGRect(origin: CGPoint(x: x, y: 0),
                                  size: CGSize(width: bounds.size.width - x, height: bounds.size.height))
@@ -109,7 +111,13 @@ final class AllDayView: UIView {
             break
         }
         
-        addSubview(titleLabel)
+        if let customHeaderCorderView = dataSource?.dequeueAllDayCornerHeader(date: params.date,
+                                                                              frame: CGRect(origin: frame.origin, size: CGSize(width: titleLabel.frame.width, height: frame.height))) {
+            customHeaderCorderView.tag = 123
+            addSubview(customHeaderCorderView)
+        } else {
+            addSubview(titleLabel)
+        }
         addSubview(scrollView)
     }
     
@@ -154,7 +162,7 @@ final class AllDayView: UIView {
         if let customView = dataSource?.dequeueAllDayViewEvent(event, date: event.start, frame: frame) {
             return customView
         } else {
-            let eventView = AllDayEventView(style: params.style.allDay, event: event,  frame: frame)
+            let eventView = AllDayEventView(style: params.style.allDay, event: event, frame: frame)
             eventView.delegate = self
             return eventView
         }

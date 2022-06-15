@@ -145,23 +145,9 @@ final class ScrollableWeekView: UIView {
         return day.date
     }
     
-    private func createCollectionView(frame: CGRect, isScrollEnabled: Bool) -> UICollectionView {
-        let offsetX: CGFloat
-        
-        func calculateOffsetX() -> CGFloat {
-            style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft + style.timeline.offsetAdditionalTimeX
-        }
-        
-        switch type {
-        case .week:
-            offsetX = calculateOffsetX()
-        case .day where style.timeline.additionalTimeZones.isEmpty:
-            offsetX = calculateOffsetX()
-        default:
-            offsetX = 0
-        }
-        
-        let newFrame = CGRect(x: offsetX, y: frame.origin.y, width: frame.width - offsetX, height: frame.height)
+    private func createCollectionView(frame: CGRect, isScrollEnabled: Bool) -> UICollectionView {        
+        let newFrame = CGRect(x: style.timeline.allLeftOffset, y: frame.origin.y,
+                              width: frame.width - style.timeline.allLeftOffset, height: frame.height)
         let collection = UICollectionView(frame: newFrame, collectionViewLayout: layout)
         collection.isPagingEnabled = true
         collection.showsHorizontalScrollIndicator = false
@@ -252,11 +238,11 @@ extension ScrollableWeekView: CalendarSettingProtocol {
             collectionView = createCollectionView(frame: mainFrame,
                                                   isScrollEnabled: style.headerScroll.isScrollEnabled)
             addSubview(collectionView)
-            addTitleHeaderIfNeeded(frame: mainFrame)
+            addTitleHeaderIfNeeded(frame: collectionView.frame)
             
             if let cornerHeader = dataSource?.dequeueCornerHeader(date: date,
                                                                   frame: CGRect(x: 0, y: 0,
-                                                                                width: mainFrame.origin.y,
+                                                                                width: collectionView.frame.origin.x,
                                                                                 height: bounds.height)) {
                 addSubview(cornerHeader)
             }
@@ -279,10 +265,10 @@ extension ScrollableWeekView: CalendarSettingProtocol {
         let titleFrame: CGRect
         switch Platform.currentInterface {
         case .phone:
-            titleFrame = CGRect(origin: CGPoint(x: 5, y: frame.height),
+            titleFrame = CGRect(origin: CGPoint(x: frame.origin.x, y: frame.height),
                                 size: CGSize(width: frame.width - 10, height: style.headerScroll.heightSubviewHeader))
         default:
-            titleFrame = CGRect(origin: CGPoint(x: 5, y: 0),
+            titleFrame = CGRect(origin: CGPoint(x: frame.origin.x, y: 0),
                                 size: CGSize(width: frame.width - 10, height: style.headerScroll.heightSubviewHeader))
         }
         

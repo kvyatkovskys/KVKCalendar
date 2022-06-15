@@ -306,7 +306,8 @@ extension TimelineView {
             yPoint = -allDayHeight
         }
         
-        let allDayView = AllDayView(parameters: .init(prepareEvents: events,
+        let allDayView = AllDayView(parameters: .init(date: selectedDate,
+                                                      prepareEvents: events,
                                                       type: paramaters.type,
                                                       style: style,
                                                       delegate: delegate),
@@ -322,9 +323,10 @@ extension TimelineView {
     
     func createTimesLabel(start: Int) -> (times: [TimelineLabel], items: [UILabel]) {
         var times = [TimelineLabel]()
+        var otherTimes = [UILabel]()
         for (idx, txtHour) in timeSystem.hours.enumerated() where idx >= start {
             let yTime = (calculatedTimeY + style.timeline.heightTime) * CGFloat(idx - start)
-            let time = TimelineLabel(frame: CGRect(x: style.timeline.offsetTimeX + style.timeline.offsetAdditionalTimeX,
+            let time = TimelineLabel(frame: CGRect(x: style.timeline.offsetTimeX + style.timeline.cornerHeaderWidth,
                                                    y: yTime,
                                                    width: style.timeline.widthTime,
                                                    height: style.timeline.heightTime))
@@ -340,10 +342,10 @@ extension TimelineView {
             times.append(time)
             
             if let items = dataSource?.dequeueTimeLabel(hour: hour, frame: time.frame) {
-                
+                otherTimes += items
             }
         }
-        return (times, [])
+        return (times, otherTimes)
     }
     
     func createHorizontalLines(times: [TimelineLabel]) -> [UIView] {
@@ -351,7 +353,7 @@ extension TimelineView {
             let time = item.element
             let idx = item.offset
             
-            let xLine = time.frame.width + style.timeline.offsetTimeX + style.timeline.offsetLineLeft + style.timeline.offsetAdditionalTimeX
+            let xLine = time.frame.width + style.timeline.offsetTimeX + style.timeline.offsetLineLeft + style.timeline.cornerHeaderWidth
             let lineFrame = CGRect(x: xLine,
                                    y: time.center.y,
                                    width: frame.width - xLine,
@@ -645,7 +647,7 @@ extension TimelineView: EventDelegate {
         movingMinuteLabel.removeFromSuperview()
         
         var location = gesture.location(in: scrollView)
-        let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft + style.timeline.offsetAdditionalTimeX
+        let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft + style.timeline.cornerHeaderWidth
         guard scrollView.frame.width >= (location.x + 30), (location.x - 10) >= leftOffset else { return }
         
         location.y = (location.y - eventPreviewYOffset) - style.timeline.offsetEvent - 6
@@ -674,7 +676,7 @@ extension TimelineView: EventDelegate {
     
     func didChangeMovingEvent(_ event: Event, gesture: UILongPressGestureRecognizer) {
         let location = gesture.location(in: scrollView)
-        let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft + style.timeline.offsetAdditionalTimeX
+        let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft + style.timeline.cornerHeaderWidth
         guard scrollView.frame.width >= (location.x + 20), (location.x - 20) >= leftOffset else { return }
         
         var offset = contentOffset
@@ -708,7 +710,7 @@ extension TimelineView: EventDelegate {
         let time = calculateChangingTime(pointY: pointTempY)
         
         if let minute = time.minute, 0...59 ~= minute {
-            movingMinuteLabel.frame = CGRect(x: style.timeline.offsetTimeX + style.timeline.offsetAdditionalTimeX,
+            movingMinuteLabel.frame = CGRect(x: style.timeline.offsetTimeX + style.timeline.cornerHeaderWidth,
                                              y: (pointY - offset) - style.timeline.heightTime,
                                              width: style.timeline.widthTime, height: style.timeline.heightTime)
             scrollView.addSubview(movingMinuteLabel)
