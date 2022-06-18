@@ -188,8 +188,7 @@ extension TimelineView {
             if let startHour = startTime.hour,
                let endHour = endTime.hour,
                let startMinute = startTime.minute,
-               let endMinute = endTime.minute
-            {
+               let endMinute = endTime.minute {
                 delegate?.didResizeEvent(event,
                                          startTime: ResizeTime(startHour, startMinute),
                                          endTime: ResizeTime(endHour, endMinute))
@@ -759,9 +758,11 @@ extension TimelineView: CalendarSettingProtocol {
     }
     
     func setUI(reload: Bool = false) {
+        currentLineView.frame.origin.x = style.timeline.cornerHeaderWidth
+        
         scrollView.backgroundColor = style.timeline.backgroundColor
         scrollView.isScrollEnabled = style.timeline.scrollDirections.contains(.vertical)
-        gestureRecognizers?.forEach({ $0.removeTarget(self, action: #selector(addNewEvent)) })
+        gestureRecognizers?.forEach { $0.removeTarget(self, action: #selector(addNewEvent)) }
         
         if style.timeline.isEnabledCreateNewEvent {
             // long tap to create a new event preview

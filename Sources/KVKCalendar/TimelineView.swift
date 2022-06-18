@@ -169,7 +169,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         currentLineView.isHidden = !isDisplayedCurrentTime
         let date = Date().convertTimeZone(TimeZone.current, to: style.timezone)
         guard style.timeline.showLineHourMode.showForDates(dates),
-              let time = getTimelineLabel(hour: date.kvkMinute) else {
+              let time = getTimelineLabel(hour: date.kvkHour) else {
             stopTimer(timerKey)
             return
         }
@@ -231,7 +231,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     }
     
     private func scrollToHour(_ hour: Int) {
-        guard let time = getTimelineLabel(hour: hour.hashValue) else {
+        guard let time = getTimelineLabel(hour: hour) else {
             scrollView.setContentOffset(.zero, animated: true)
             return
         }
