@@ -338,10 +338,12 @@ extension TimelineView {
             time.hashTime = hour
             time.tag = idx - start
             time.isHidden = !isDisplayedTimes
-            times.append(time)
             
-            if let items = dataSource?.dequeueTimeLabel(hour: hour, frame: time.frame) {
-                otherTimes += items
+            if let item = dataSource?.dequeueTimeLabel(time) {
+                otherTimes += item.others
+                times.append(item.current)
+            } else {
+                times.append(time)
             }
         }
         return (times, otherTimes)
@@ -758,7 +760,7 @@ extension TimelineView: CalendarSettingProtocol {
     }
     
     func setUI(reload: Bool = false) {
-        currentLineView.frame.origin.x = style.timeline.cornerHeaderWidth
+        currentLineView.frame.origin.x = timeLabels.first?.frame.origin.x ?? style.timeline.cornerHeaderWidth
         
         scrollView.backgroundColor = style.timeline.backgroundColor
         scrollView.isScrollEnabled = style.timeline.scrollDirections.contains(.vertical)

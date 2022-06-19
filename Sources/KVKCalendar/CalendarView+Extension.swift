@@ -268,8 +268,8 @@ extension CalendarView: DisplayDataSource {
         dataSource?.dequeueAllDayViewEvent(event, date: date, frame: frame)
     }
     
-    public func dequeueTimeLabel(hour: Int, frame: CGRect) -> [UILabel] {
-        dataSource?.dequeueTimeLabel(hour: hour, frame: frame) ?? []
+    public func dequeueTimeLabel(_ label: TimelineLabel) -> (current: TimelineLabel, others: [UILabel])? {
+        dataSource?.dequeueTimeLabel(label)
     }
     
     public func dequeueAllDayCornerHeader(date: Date, frame: CGRect) -> UIView? {

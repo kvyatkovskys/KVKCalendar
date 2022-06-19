@@ -395,7 +395,7 @@ public protocol CalendarDataSource: AnyObject {
     /// Use this method to create a custom all day event
     func dequeueAllDayViewEvent(_ event: Event, date: Date, frame: CGRect) -> UIView?
     
-    func dequeueTimeLabel(hour: Int, frame: CGRect) -> [UILabel]
+    func dequeueTimeLabel(_ label: TimelineLabel) -> (current: TimelineLabel, others: [UILabel])?
     
     func dequeueCornerHeader(date: Date, frame: CGRect) -> UIView?
     
@@ -433,7 +433,7 @@ public extension CalendarDataSource {
     
     func dequeueAllDayViewEvent(_ event: Event, date: Date, frame: CGRect) -> UIView? { nil }
     
-    func dequeueTimeLabel(hour: Int, frame: CGRect) -> [UILabel] { [] }
+    func dequeueTimeLabel(_ label: TimelineLabel) -> (current: TimelineLabel, others: [UILabel])? { nil }
     
     func dequeueCornerHeader(date: Date, frame: CGRect) -> UIView? { nil }
     

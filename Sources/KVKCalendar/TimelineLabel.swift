@@ -9,8 +9,9 @@
 
 import UIKit
 
-final class TimelineLabel: UILabel {
-    var hashTime: Int = 0
+public class TimelineLabel: UILabel {
+    
+    public var hashTime: Int = 0
     
     var time: TimeContainer = TimeContainer(minute: 0, hour: 0) {
         didSet {
