@@ -233,13 +233,17 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     }
     
     private func scrollToHour(_ hour: Int) {
-        guard let time = getTimelineLabel(hour: hour.hashValue) else {
+        guard let time = getTimelineLabel(hour: hour) else {
             scrollView.setContentOffset(.zero, animated: true)
             return
         }
         
         var frame = scrollView.frame
-        frame.origin.y = time.frame.origin.y - 10
+        if style.allDay.isPinned {
+            frame.origin.y = time.frame.origin.y - 60
+        } else {
+            frame.origin.y = time.frame.origin.y - 10
+        }
         scrollView.scrollRectToVisible(frame, animated: true)
     }
     
