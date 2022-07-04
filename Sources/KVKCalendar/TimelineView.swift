@@ -180,7 +180,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         scrollView.addSubview(currentLineView)
         movingCurrentLineHour()
         
-        if self.isDisplayedTimes {
+        if isDisplayedTimes {
             if let timeNext = getTimelineLabel(hour: date.kvkHour + 1) {
                 timeNext.isHidden = currentLineView.frame.intersects(timeNext.frame)
             }
@@ -194,7 +194,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             let minutePercent = 59.0 / CGFloat(minute)
             let newY = (calculatedTimeY + time.frame.height) / minutePercent
             let summY = (CGFloat(time.tag) * (calculatedTimeY + time.frame.height)) + (time.frame.height / 2)
-            if time.tag == 0 {
+            if time.hashTime == 0 {
                 pointY = newY + (time.frame.height / 2)
             } else {
                 pointY = summY + newY
@@ -237,7 +237,11 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         }
         
         var frame = scrollView.frame
-        frame.origin.y = time.frame.origin.y - 10
+        if style.allDay.isPinned {
+            frame.origin.y = time.frame.origin.y - 60
+        } else {
+            frame.origin.y = time.frame.origin.y - 10
+        }
         scrollView.scrollRectToVisible(frame, animated: true)
     }
     
