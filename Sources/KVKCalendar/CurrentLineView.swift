@@ -84,13 +84,16 @@ extension CurrentLineView: CalendarSettingProtocol {
         timeLabel.textColor = style.timeline.currentLineHourColor
         timeLabel.font = style.timeline.currentLineHourFont
                 
-        timeLabel.frame = CGRect(x: 2, y: 0, width: style.timeline.currentLineHourWidth - 5, height: frame.height)
-        dotView.frame = CGRect(origin: CGPoint(x: style.timeline.currentLineHourWidth - (style.timeline.currentLineHourDotSize.width * 0.5),
-                                               y: (frame.height * 0.5) - 2),
-                               size: style.timeline.currentLineHourDotSize)
-        lineView.frame = CGRect(x: style.timeline.currentLineHourWidth,
+        timeLabel.frame = CGRect(x: 0, y: 0,
+                                 width: style.timeline.currentLineHourWidth - 5,
+                                 height: frame.height)
+        dotView.frame = CGRect(x: style.timeline.allLeftOffset - (style.timeline.currentLineHourDotSize.width * 0.5) - frame.origin.x,
+                               y: (frame.height * 0.5) - 2,
+                               width: style.timeline.currentLineHourDotSize.width,
+                               height: style.timeline.currentLineHourDotSize.height)
+        lineView.frame = CGRect(x: dotView.frame.origin.x,
                                 y: frame.height * 0.5,
-                                width: frame.width - style.timeline.currentLineHourWidth,
+                                width: frame.width - frame.origin.x,
                                 height: style.timeline.currentLineHourHeight)
         [timeLabel, lineView, dotView].forEach({ addSubview($0) })
         dotView.setRoundCorners(radius: style.timeline.currentLineHourDotCornersRadius)
@@ -105,8 +108,7 @@ extension CurrentLineView: CalendarSettingProtocol {
     
     func reloadFrame(_ frame: CGRect) {
         self.frame.size.width = frame.width
-        lineView.frame.origin.x = style.timeline.currentLineHourWidth
-        lineView.frame.size.width = frame.width - style.timeline.currentLineHourWidth
+        self.frame.origin.x = frame.origin.x
     }
 }
 

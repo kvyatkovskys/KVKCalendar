@@ -777,11 +777,12 @@ extension TimelineView: CalendarSettingProtocol {
     func reloadFrame(_ frame: CGRect) {
         self.frame.size = frame.size
         setupConstraints()
-        currentLineView.reloadFrame(frame)
+        currentLineView.reloadFrame(calculatedCurrentLineViewFrame)
     }
     
     func updateStyle(_ style: Style, force: Bool) {
         self.style = style
+        currentLineView.reloadFrame(calculatedCurrentLineViewFrame)
         currentLineView.updateStyle(style, force: force)
         setUI(reload: force)
     }

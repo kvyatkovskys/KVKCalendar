@@ -47,6 +47,13 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         return formatter
     }()
     
+    var calculatedCurrentLineViewFrame: CGRect {
+        var currentLineFrame = frame
+        currentLineFrame.origin = timeLabels.first?.frame.origin ?? CGPoint(x: style.timeline.currentLineHourWidth,
+                                                                            y: 0)
+        return currentLineFrame
+    }
+    
     private(set) var tagCurrentHourLine = -10
     private(set) var tagEventPagePreview = -20
     private(set) var tagVerticalLine = -30
@@ -174,7 +181,8 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             return
         }
 
-        currentLineView.reloadFrame(frame)
+        currentLineView.reloadFrame(calculatedCurrentLineViewFrame)
+        currentLineView.updateStyle(style, force: true)
         let pointY = calculatePointYByMinute(date.kvkMinute, time: time)
         currentLineView.frame.origin.y = pointY - (currentLineView.frame.height * 0.5)
         scrollView.addSubview(currentLineView)
