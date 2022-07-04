@@ -171,7 +171,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         currentLineView.isHidden = !isDisplayedCurrentTime
         let date = Date().convertTimeZone(TimeZone.current, to: style.timezone)
         guard style.timeline.showLineHourMode.showForDates(dates),
-              let time = getTimelineLabel(hour: date.kvkMinute) else {
+              let time = getTimelineLabel(hour: date.kvkHour) else {
             stopTimer(timerKey)
             return
         }
@@ -182,7 +182,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         scrollView.addSubview(currentLineView)
         movingCurrentLineHour()
         
-        if self.isDisplayedTimes {
+        if isDisplayedTimes {
             if let timeNext = getTimelineLabel(hour: date.kvkHour + 1) {
                 timeNext.isHidden = currentLineView.frame.intersects(timeNext.frame)
             }
@@ -196,7 +196,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             let minutePercent = 59.0 / CGFloat(minute)
             let newY = (calculatedTimeY + time.frame.height) / minutePercent
             let summY = (CGFloat(time.tag) * (calculatedTimeY + time.frame.height)) + (time.frame.height / 2)
-            if time.tag == 0 {
+            if time.hashTime == 0 {
                 pointY = newY + (time.frame.height / 2)
             } else {
                 pointY = summY + newY
@@ -233,13 +233,17 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     }
     
     private func scrollToHour(_ hour: Int) {
-        guard let time = getTimelineLabel(hour: hour.hashValue) else {
+        guard let time = getTimelineLabel(hour: hour) else {
             scrollView.setContentOffset(.zero, animated: true)
             return
         }
         
         var frame = scrollView.frame
-        frame.origin.y = time.frame.origin.y - 10
+        if style.allDay.isPinned {
+            frame.origin.y = time.frame.origin.y - 60
+        } else {
+            frame.origin.y = time.frame.origin.y - 10
+        }
         scrollView.scrollRectToVisible(frame, animated: true)
     }
     
