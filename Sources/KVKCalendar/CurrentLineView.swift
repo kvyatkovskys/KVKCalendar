@@ -83,9 +83,16 @@ extension CurrentLineView: CalendarSettingProtocol {
         
         timeLabel.textColor = style.timeline.currentLineHourColor
         timeLabel.font = style.timeline.currentLineHourFont
-                
+
+        let widthOffset: CGFloat
+#if targetEnvironment(macCatalyst)
+        widthOffset = 20
+#else
+        widthOffset = 5
+#endif
+
         timeLabel.frame = CGRect(x: 0, y: 0,
-                                 width: style.timeline.currentLineHourWidth - 5,
+                                 width: style.timeline.currentLineHourWidth - widthOffset,
                                  height: frame.height)
         dotView.frame = CGRect(x: style.timeline.allLeftOffset - (style.timeline.currentLineHourDotSize.width * 0.5) - frame.origin.x,
                                y: (frame.height * 0.5) - 2,
