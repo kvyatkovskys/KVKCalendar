@@ -163,7 +163,6 @@ extension KVKCalendarSettings {
         }
         style.timeline.scrollLineHourMode = .onlyOnInitForDate(defaultDate)
         style.timeline.showLineHourMode = .always
-        style.timeline.offsetAdditionalTimeX = 50
         return style
     }
     
@@ -215,9 +214,9 @@ extension KVKCalendarSettings {
                 customeStyle.defaultHeight = 40
                 event.style = customeStyle
             }
-//            if item.id == "40" {
-//                event.recurringType = .everyYear
-//            }
+            if item.id == "40" {
+                event.recurringType = .everyYear
+            }
             return event
         })
         completion(events)
