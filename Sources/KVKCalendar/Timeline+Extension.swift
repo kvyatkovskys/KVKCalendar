@@ -648,8 +648,8 @@ extension TimelineView: EventDelegate {
         movingMinuteLabel.removeFromSuperview()
         
         var location = gesture.location(in: scrollView)
-        let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft + style.timeline.cornerHeaderWidth
-        guard scrollView.frame.width >= (location.x + 30), (location.x - 10) >= leftOffset else { return }
+        guard scrollView.frame.width >= (location.x + 30) &&
+                (location.x - 10) >= style.timeline.allLeftOffset else { return }
         
         location.y = (location.y - eventPreviewYOffset) - style.timeline.offsetEvent - 6
         let startTime = movingMinuteLabel.time
@@ -677,8 +677,8 @@ extension TimelineView: EventDelegate {
     
     func didChangeMovingEvent(_ event: Event, gesture: UILongPressGestureRecognizer) {
         let location = gesture.location(in: scrollView)
-        let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft + style.timeline.cornerHeaderWidth
-        guard scrollView.frame.width >= (location.x + 20), (location.x - 20) >= leftOffset else { return }
+        guard scrollView.frame.width >= (location.x + 20) &&
+                (location.x - 20) >= style.timeline.allLeftOffset else { return }
         
         var offset = contentOffset
         if (location.y - 80) < scrollView.contentOffset.y, (location.y - eventPreviewSize.height) >= 0 {
