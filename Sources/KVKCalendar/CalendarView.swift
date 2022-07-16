@@ -72,7 +72,7 @@ public final class CalendarView: UIView {
         self.yearView = YearView(data: yearData, frame: frame)
         
         // list view
-        self.listData = ListViewData(data: calendarData)
+        self.listData = ListViewData(data: calendarData, style: adaptiveStyle)
         let params = ListView.Parameters(style: adaptiveStyle, data: listData)
         self.listView = ListView(parameters: params, frame: frame)
         

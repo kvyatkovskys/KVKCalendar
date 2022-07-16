@@ -34,6 +34,29 @@ extension TimelineDelegate {
 protocol EventDateProtocol: AnyObject {}
 
 extension EventDateProtocol {
+    
+    func mapRecurringEvents(_ recurringEvents: [Event],
+                            filteredEventsByDay: [Event],
+                            date: Date?,
+                            showRecurringEventInPast: Bool,
+                            calendar: Calendar) -> [Event] {
+        if !recurringEvents.isEmpty, let date = date {
+            return recurringEvents.reduce([], { (acc, event) -> [Event] in
+                guard !filteredEventsByDay.contains(where: { $0.ID == event.ID })
+                        && (date.compare(event.start) == .orderedDescending
+                            || showRecurringEventInPast) else { return acc }
+                
+                guard let recurringEvent = event.updateDate(newDate: date, calendar: calendar) else {
+                    return acc
+                }
+                
+                return acc + [recurringEvent]
+            })
+        } else {
+            return []
+        }
+    }
+    
     func compareStartDate(_ date: Date?, with event: Event) -> Bool {
         guard let dt = date else { return false }
         

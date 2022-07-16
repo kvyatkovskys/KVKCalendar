@@ -56,7 +56,11 @@ final class MonthView: UIView {
     }
     
     func showSkeletonVisible(_ visible: Bool) {
-        collectionView?.isScrollEnabled = !visible
+        if visible {
+            collectionView?.isScrollEnabled = false
+        } else {
+            collectionView?.isScrollEnabled = style.month.isScrollEnabled
+        }
         parameters.monthData.isSkeletonVisible = visible
         reload(force: false)
     }

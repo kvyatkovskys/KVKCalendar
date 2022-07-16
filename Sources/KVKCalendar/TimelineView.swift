@@ -27,7 +27,6 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     var paramaters: Parameters {
         didSet {
             timeSystem = paramaters.style.timeSystem
-            availabilityHours = timeSystem.hours
             
             if oldValue.scale != paramaters.scale
                 || oldValue.scrollToCurrentTimeOnlyOnInit != paramaters.scrollToCurrentTimeOnlyOnInit {
@@ -48,6 +47,13 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         return formatter
     }()
     
+    var calculatedCurrentLineViewFrame: CGRect {
+        var currentLineFrame = frame
+        currentLineFrame.origin = timeLabels.first?.frame.origin ?? CGPoint(x: style.timeline.currentLineHourWidth,
+                                                                            y: 0)
+        return currentLineFrame
+    }
+    
     private(set) var tagCurrentHourLine = -10
     private(set) var tagEventPagePreview = -20
     private(set) var tagVerticalLine = -30
@@ -56,8 +62,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     private(set) var tagAllDayEventView = -70
     private(set) var tagStubEvent = -80
     private(set) var timeLabels = [TimelineLabel]()
-    private(set) var availabilityHours: [String]
-    private var timeSystem: TimeHourSystem
+    private(set) var timeSystem: TimeHourSystem
     private let timerKey = "CurrentHourTimerKey"
     private(set) var events = [Event]()
     private(set) var recurringEvents = [Event]()
@@ -99,7 +104,6 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     init(parameters: Parameters, frame: CGRect) {
         self.paramaters = parameters
         self.timeSystem = parameters.style.timeSystem
-        self.availabilityHours = timeSystem.hours
         self.eventLayout = parameters.style.timeline.eventLayout
         self.selectedDate = Date()
         super.init(frame: frame)
@@ -176,7 +180,8 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             return
         }
 
-        currentLineView.reloadFrame(frame)
+        currentLineView.reloadFrame(calculatedCurrentLineViewFrame)
+        currentLineView.updateStyle(style, force: true)
         let pointY = calculatePointYByMinute(date.kvkMinute, time: time)
         currentLineView.frame.origin.y = pointY - (currentLineView.frame.height * 0.5)
         scrollView.addSubview(currentLineView)
@@ -284,14 +289,16 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         }
         
         // add time label to timeline
-        timeLabels = createTimesLabel(start: startHour)
+        let labels = createTimesLabel(start: startHour)
+        timeLabels = labels.times
         // add separator line
         let horizontalLines = createHorizontalLines(times: timeLabels)
         // calculate all height by time label minus the last offset
         timeLabels.forEach { scrollView.addSubview($0) }
+        labels.items.forEach { scrollView.addSubview($0) }
         horizontalLines.forEach { scrollView.addSubview($0) }
         
-        let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
+        let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft + style.timeline.cornerHeaderWidth
         let widthPage = (frame.width - leftOffset) / CGFloat(dates.count)
         let heightPage = scrollView.contentSize.height
         var allDayEvents = [AllDayView.PrepareEvents]()
@@ -427,10 +434,19 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         
         if let maxAllDayEvents = allDayEvents.max(by: { $0.events.count < $1.events.count })?.events.count,
            let allDayView = createAllDayEvents(events: allDayEvents, maxEvents: maxAllDayEvents) {
-            let offsetY = allDayView.frame.origin.y + allDayView.frame.height
-            topStackViews.forEach {
-                $0.frame.origin.y = offsetY + 5
+            let offsetY: CGFloat
+            
+            if style.allDay.isPinned {
+                offsetY = allDayView.frame.origin.y + allDayView.frame.height
+                addSubview(allDayView)
+                topStackViews.forEach {
+                    $0.frame.origin.y = offsetY + 5
+                }
+            } else {
+                offsetY = allDayView.frame.height
+                scrollView.addSubview(allDayView)
             }
+            
             setOffsetScrollView(offsetY: offsetY)
         } else {
             setOffsetScrollView(offsetY: 0, force: true)

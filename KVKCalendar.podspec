@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'KVKCalendar'
-  s.version          = '0.6.7'
+  s.version          = '0.6.8'
   s.summary          = 'A most fully customization calendar for Apple platforms.'
   
   s.description      = <<-DESC

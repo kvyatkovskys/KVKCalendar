@@ -72,12 +72,12 @@ extension DividerView: CalendarSettingProtocol {
     }
     
     func setUI() {
-        timeLabel.frame = CGRect(x: style.timeline.offsetTimeX,
+        timeLabel.frame = CGRect(x: style.timeline.offsetTimeX + style.timeline.cornerHeaderWidth,
                                  y: 0,
                                  width: style.timeline.widthTime,
                                  height: style.timeline.heightTime)
         
-        let xLine = timeLabel.bounds.width + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
+        let xLine = timeLabel.bounds.width + style.timeline.offsetTimeX + style.timeline.offsetLineLeft + style.timeline.cornerHeaderWidth
         lineView.frame = CGRect(x: xLine,
                                 y: timeLabel.center.y,
                                 width: bounds.width - xLine,

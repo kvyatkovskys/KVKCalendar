@@ -220,6 +220,30 @@ public extension Event {
     
     enum RecurringType: Int {
         case everyDay, everyWeek, everyMonth, everyYear, none
+        
+        var shift: Int {
+            switch self {
+            case .everyDay, .everyMonth, .everyYear:
+                return 1
+            case .everyWeek:
+                return 7
+            case .none:
+                return 0
+            }
+        }
+        
+        var component: Calendar.Component {
+            switch self {
+            case .everyDay, .everyWeek:
+                return .day
+            case .everyMonth:
+                return .month
+            case .everyYear:
+                return .year
+            case .none:
+                return .nanosecond
+            }
+        }
     }
     
     struct Color {
@@ -266,7 +290,7 @@ extension Event {
             startComponents.day = newDay
             startComponents.weekday = newDate.kvkWeekday
             endComponents.weekday = newDate.kvkWeekday
-        case .everyMonth where newDate.kvkMonth != start.kvkMonth && newDate.kvkDay == start.kvkDay:
+        case .everyMonth where (newDate.kvkYear != start.kvkYear || newDate.kvkMonth != start.kvkMonth) && newDate.kvkDay == start.kvkDay:
             startComponents.day = newDay
         case .everyYear where newDate.kvkYear != start.kvkYear && newDate.kvkMonth == start.kvkMonth && newDate.kvkDay == start.kvkDay:
             startComponents.day = newDay
@@ -365,12 +389,21 @@ public protocol CalendarDataSource: AnyObject {
     @available(iOS 14.0, *)
     func willDisplayEventOptionMenu(_ event: Event, type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)?
     
+    /// Use this method to create a custom content view
     func dequeueMonthViewEvents(_ events: [Event], date: Date, frame: CGRect) -> UIView?
     
+    /// Use this method to create a custom all day event
     func dequeueAllDayViewEvent(_ event: Event, date: Date, frame: CGRect) -> UIView?
+    
+    func dequeueTimeLabel(_ label: TimelineLabel) -> (current: TimelineLabel, others: [UILabel])?
+    
+    func dequeueCornerHeader(date: Date, frame: CGRect) -> UIView?
+    
+    func dequeueAllDayCornerHeader(date: Date, frame: CGRect) -> UIView?
 }
 
 public extension CalendarDataSource {
+    
     func willDisplayHeaderView(date: Date?, frame: CGRect, type: CalendarType) -> UIView? { nil }
     
     func willDisplayEventViewer(date: Date, frame: CGRect) -> UIView? { nil }
@@ -399,6 +432,12 @@ public extension CalendarDataSource {
     func dequeueMonthViewEvents(_ events: [Event], date: Date, frame: CGRect) -> UIView? { nil }
     
     func dequeueAllDayViewEvent(_ event: Event, date: Date, frame: CGRect) -> UIView? { nil }
+    
+    func dequeueTimeLabel(_ label: TimelineLabel) -> (current: TimelineLabel, others: [UILabel])? { nil }
+    
+    func dequeueCornerHeader(date: Date, frame: CGRect) -> UIView? { nil }
+    
+    func dequeueAllDayCornerHeader(date: Date, frame: CGRect) -> UIView? { nil }
     
 }
 
