@@ -80,7 +80,7 @@ final class ScrollableWeekView: UIView {
         return layout
     }()
     
-    private var titleView: ScrollableWeekHeaderView?
+    private var titleView: ScrollableWeekHeaderTitleView?
     private let bottomLineView = UIView()
     
     init(parameters: Parameters) {
@@ -145,9 +145,14 @@ final class ScrollableWeekView: UIView {
         return day.date
     }
     
-    private func createCollectionView(frame: CGRect, isScrollEnabled: Bool) -> UICollectionView {        
-        let newFrame = CGRect(x: style.timeline.allLeftOffset, y: frame.origin.y,
-                              width: frame.width - style.timeline.allLeftOffset, height: frame.height)
+    private func createCollectionView(frame: CGRect, isScrollEnabled: Bool) -> UICollectionView {
+        let x: CGFloat
+        if type == .day {
+            x = 0
+        } else {
+            x = style.timeline.allLeftOffset
+        }
+        let newFrame = CGRect(x: x, y: frame.origin.y, width: frame.width - x, height: frame.height)
         let collection = UICollectionView(frame: newFrame, collectionViewLayout: layout)
         collection.isPagingEnabled = true
         collection.showsHorizontalScrollIndicator = false
@@ -245,6 +250,8 @@ extension ScrollableWeekView: CalendarSettingProtocol {
                                                                                 width: collectionView.frame.origin.x,
                                                                                 height: bounds.height)) {
                 addSubview(cornerHeader)
+            } else if Platform.currentInterface != .phone {
+                titleView?.frame.origin.x = 10
             }
         }
         
@@ -268,11 +275,11 @@ extension ScrollableWeekView: CalendarSettingProtocol {
             titleFrame = CGRect(origin: CGPoint(x: frame.origin.x, y: frame.height),
                                 size: CGSize(width: frame.width - 10, height: style.headerScroll.heightSubviewHeader))
         default:
-            titleFrame = CGRect(origin: CGPoint(x: frame.origin.x, y: 0),
+            titleFrame = CGRect(origin: CGPoint(x: frame.origin.x + 10, y: 0),
                                 size: CGSize(width: frame.width - 10, height: style.headerScroll.heightSubviewHeader))
         }
         
-        titleView = ScrollableWeekHeaderView(frame: titleFrame)
+        titleView = ScrollableWeekHeaderTitleView(frame: titleFrame)
         titleView?.style = style
         titleView?.date = date
         if let view = titleView {

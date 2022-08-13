@@ -65,7 +65,7 @@
 		F902B98C26A4AAC30004EB05 /* DividerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F902B98B26A4AAC20004EB05 /* DividerView.swift */; };
 		F921AE5E2656EAFD007669C6 /* AllDayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F921AE5D2656EAFD007669C6 /* AllDayView.swift */; };
 		F9230C3E26586394000DD757 /* AllDayEventView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9230C3D26586394000DD757 /* AllDayEventView.swift */; };
-		F9258BCA28037DED00750B5C /* ScrollableWeekHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9258BC928037DED00750B5C /* ScrollableWeekHeaderView.swift */; };
+		F9258BCA28037DED00750B5C /* ScrollableWeekHeaderTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9258BC928037DED00750B5C /* ScrollableWeekHeaderTitleView.swift */; };
 		F92966B427773E0B00A0617F /* MonthHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F92966B327773E0B00A0617F /* MonthHeaderView.swift */; };
 		F9535B33272DE8CC008AAC56 /* KVKTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9535B32272DE8CC008AAC56 /* KVKTableViewCell.swift */; };
 		F9535B35272DE9F5008AAC56 /* KVKTableViewHeaderFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9535B34272DE9F5008AAC56 /* KVKTableViewHeaderFooterView.swift */; };
@@ -172,7 +172,7 @@
 		F902B98B26A4AAC20004EB05 /* DividerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DividerView.swift; path = Sources/KVKCalendar/DividerView.swift; sourceTree = "<group>"; };
 		F921AE5D2656EAFD007669C6 /* AllDayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AllDayView.swift; path = Sources/KVKCalendar/AllDayView.swift; sourceTree = "<group>"; };
 		F9230C3D26586394000DD757 /* AllDayEventView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AllDayEventView.swift; path = Sources/KVKCalendar/AllDayEventView.swift; sourceTree = "<group>"; };
-		F9258BC928037DED00750B5C /* ScrollableWeekHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScrollableWeekHeaderView.swift; path = Sources/KVKCalendar/ScrollableWeekHeaderView.swift; sourceTree = "<group>"; };
+		F9258BC928037DED00750B5C /* ScrollableWeekHeaderTitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScrollableWeekHeaderTitleView.swift; path = Sources/KVKCalendar/ScrollableWeekHeaderTitleView.swift; sourceTree = "<group>"; };
 		F92966B327773E0B00A0617F /* MonthHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MonthHeaderView.swift; path = Sources/KVKCalendar/MonthHeaderView.swift; sourceTree = "<group>"; };
 		F9535B32272DE8CC008AAC56 /* KVKTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = KVKTableViewCell.swift; path = Sources/KVKCalendar/KVKTableViewCell.swift; sourceTree = "<group>"; };
 		F9535B34272DE9F5008AAC56 /* KVKTableViewHeaderFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = KVKTableViewHeaderFooterView.swift; path = Sources/KVKCalendar/KVKTableViewHeaderFooterView.swift; sourceTree = "<group>"; };
@@ -321,7 +321,7 @@
 				F92966B327773E0B00A0617F /* MonthHeaderView.swift */,
 				A09F113E4975793648F12FDC38102325 /* ResizeEventView.swift */,
 				F9D21F7B27FB787D00B1E6D1 /* ScrollableWeekView.swift */,
-				F9258BC928037DED00750B5C /* ScrollableWeekHeaderView.swift */,
+				F9258BC928037DED00750B5C /* ScrollableWeekHeaderTitleView.swift */,
 				68F3F3C241A7A9D06CEE389D078C4101 /* ShadowDayView.swift */,
 				7692433655FAF139DE62DFA36F5714C2 /* StubEventView.swift */,
 				31E06B9CF4650E81EA8DC557AE26BA59 /* StubStackView.swift */,
@@ -543,7 +543,7 @@
 				F921AE5E2656EAFD007669C6 /* AllDayView.swift in Sources */,
 				E7166AB631A1F363BEC98DB2BB114360 /* CalendarModel.swift in Sources */,
 				71F3B422C4D8488E7E4ADD2E2A52C94D /* CalendarView+Extension.swift in Sources */,
-				F9258BCA28037DED00750B5C /* ScrollableWeekHeaderView.swift in Sources */,
+				F9258BCA28037DED00750B5C /* ScrollableWeekHeaderTitleView.swift in Sources */,
 				17BEAAC59928F37A39C7E34B5D385C0B /* CalendarView.swift in Sources */,
 				DE29FAA9F97EB2995F905ABC8B0B5944 /* CurrentLineView.swift in Sources */,
 				039DBEBA9DBEC27BC9CC0E0E64D8E0F1 /* Date+Extension.swift in Sources */,
