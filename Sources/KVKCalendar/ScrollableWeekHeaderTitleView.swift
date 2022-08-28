@@ -9,7 +9,7 @@
 
 import UIKit
 
-final class ScrollableWeekHeaderView: UIView {
+final class ScrollableWeekHeaderTitleView: UIView {
         
     var style: Style? {
         didSet {
