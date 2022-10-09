@@ -396,25 +396,33 @@ extension MonthView: UICollectionViewDataSource, UICollectionViewDataSourcePrefe
 
 extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard let objectView = collectionView else { return }
+        
+        let center = convert(objectView.center, to: objectView)
+        guard let index = objectView.indexPathForItem(at: center) else { return }
+        
+        let month = parameters.monthData.data.months[index.section]
+        weekHeaderView.date = month.date
+    }
+    
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        if !style.month.isPagingEnabled, let visibleItems = collectionView?.indexPathsForVisibleItems.sorted(by: { $0.row < $1.row }) {
-            let middleIndex = visibleItems[visibleItems.count / 2]
-            let month = parameters.monthData.data.months[middleIndex.section]
-            weekHeaderView.date = month.date
-            
-            guard style.month.autoSelectionDateWhenScrolling,
-                  let newDate = month.days.first(where: { $0.date?.kvkYear == month.date.kvkYear
-                      && $0.date?.kvkMonth == month.date.kvkMonth
-                      && $0.date?.kvkDay == parameters.monthData.date.kvkDay })?.date,
-                  parameters.monthData.date != newDate
-            else {
-                return
-            }
-            
-            parameters.monthData.date = newDate
-            willSelectDate?(newDate)
-            reload()
-        }
+        guard !style.month.isPagingEnabled, let objectView = collectionView else { return }
+
+        let center = convert(objectView.center, to: objectView)
+        guard let index = objectView.indexPathForItem(at: center) else { return }
+
+        let month = parameters.monthData.data.months[index.section]
+        guard style.month.autoSelectionDateWhenScrolling,
+              let newDate = month.days.first(where: { $0.date?.kvkYear == month.date.kvkYear
+                  && $0.date?.kvkMonth == month.date.kvkMonth
+                  && $0.date?.kvkDay == parameters.monthData.date.kvkDay })?.date,
+              parameters.monthData.date != newDate
+        else { return }
+
+        parameters.monthData.date = newDate
+        willSelectDate?(newDate)
+        reload()
     }
     
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
