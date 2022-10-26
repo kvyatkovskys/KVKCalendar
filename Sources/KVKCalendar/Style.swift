@@ -478,7 +478,11 @@ public struct YearStyle {
     public var selectCalendarType: CalendarType = .month
     public var isAnimateSelection: Bool = false
     public var isPagingEnabled: Bool = true
+    
+    @available(swift, deprecated: 0.6.9, obsoleted: 0.6.10, renamed: "autoSelectionDateWhenScrolling")
     public var isAutoSelectDateScrolling: Bool = true
+    public var autoSelectionDateWhenScrolling: Bool = true
+    
     public var weekDayAlignment: NSTextAlignment = .center
     public var titleDateAlignment: NSTextAlignment = .left
     public var colorBackground: UIColor = .white
@@ -727,7 +731,7 @@ extension YearStyle: Equatable {
         && compare(\.selectCalendarType)
         && compare(\.isAnimateSelection)
         && compare(\.isPagingEnabled)
-        && compare(\.isAutoSelectDateScrolling)
+        && compare(\.autoSelectionDateWhenScrolling)
         && compare(\.weekDayAlignment)
         && compare(\.titleDateAlignment)
         && compare(\.colorBackground)

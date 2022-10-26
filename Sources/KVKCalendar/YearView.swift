@@ -197,7 +197,7 @@ extension YearView: UICollectionViewDataSource {
 
 extension YearView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        guard data.style.year.isAutoSelectDateScrolling else { return }
+        guard data.style.year.autoSelectionDateWhenScrolling else { return }
         
         let cells = collectionView?.indexPathsForVisibleItems ?? []
         let dates = cells.compactMap { data.sections[$0.section].months[$0.row].date }
