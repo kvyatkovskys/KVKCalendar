@@ -82,7 +82,7 @@ final class MonthCell: KVKCollectionViewCell {
                 return
             }
             
-            if Platform.currentInterface == .phone && UIDevice.current.orientation.isLandscape { return }
+            if Platform.currentInterface == .phone && UIApplication.shared.orientation.isLandscape { return }
             
             if monthStyle.showMonthNameInFirstDay {
                 showMonthName(day: day)
