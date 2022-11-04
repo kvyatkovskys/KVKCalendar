@@ -25,7 +25,7 @@ final class MonthHeaderView: UICollectionReusableView {
             
             dateLabel.font = style.month.fontTitleHeader
             dateLabel.text = date.titleForLocale(style.locale, formatter: style.month.shortInDayMonthFormatter).capitalized
-            if Date().kvkMonth == date.kvkMonth {
+            if Date().kvkMonth == date.kvkMonth && Date().kvkYear == date.kvkYear {
                 dateLabel.textColor = style.month.colorTitleCurrentDate
             } else {
                 dateLabel.textColor = style.month.colorTitleHeader
