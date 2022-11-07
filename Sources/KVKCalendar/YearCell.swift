@@ -160,7 +160,7 @@ final class YearCell: UICollectionViewCell {
         }
         
         guard date?.kvkYear == nowDate.kvkYear else {
-            if date?.isEqual(selectDate) == true {
+            if date?.kvkIsEqual(selectDate) == true {
                 label.textColor = style.year.colorSelectDate
                 label.backgroundColor = style.year.colorBackgroundSelectDate
                 label.layer.cornerRadius = label.frame.height / 2

@@ -145,7 +145,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         let action = { [weak self] in
             guard let self = self else { return }
             
-            let nextDate = Date().convertTimeZone(TimeZone.current, to: self.style.timezone)
+            let nextDate = Date().kvkConvertTimeZone(TimeZone.current, to: self.style.timezone)
             guard self.currentLineView.valueHash != nextDate.kvkMinute.hashValue,
                   let time = self.getTimelineLabel(hour: nextDate.kvkHour) else { return }
             
@@ -173,7 +173,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     
     private func showCurrentLineHour() {
         currentLineView.isHidden = !isDisplayedCurrentTime
-        let date = Date().convertTimeZone(TimeZone.current, to: style.timezone)
+        let date = Date().kvkConvertTimeZone(TimeZone.current, to: style.timezone)
         guard style.timeline.showLineHourMode.showForDates(dates),
               let time = getTimelineLabel(hour: date.kvkHour) else {
             stopTimer(timerKey)

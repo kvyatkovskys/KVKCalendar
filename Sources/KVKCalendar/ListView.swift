@@ -100,7 +100,7 @@ public final class ListView: UIView, CalendarSettingProtocol {
         
         guard !params.data.isSkeletonVisible else { return }
         
-        if let idx = params.data.sections.firstIndex(where: { $0.date.isEqual(date) }) {
+        if let idx = params.data.sections.firstIndex(where: { $0.date.kvkIsEqual(date) }) {
             tableView.scrollToRow(at: IndexPath(row: 0, section: idx), at: .top, animated: animated)
         } else if let idx = params.data.sections.firstIndex(where: { $0.date.kvkYear == date.kvkYear && $0.date.kvkMonth == date.kvkMonth }) {
             tableView.scrollToRow(at: IndexPath(row: 0, section: idx), at: .top, animated: animated)

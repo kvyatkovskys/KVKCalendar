@@ -60,13 +60,13 @@ extension EventDateProtocol {
     func compareStartDate(_ date: Date?, with event: Event) -> Bool {
         guard let dt = date else { return false }
         
-        return event.start.isEqual(dt)
+        return event.start.kvkIsEqual(dt)
     }
     
     func compareEndDate(_ date: Date?, with event: Event) -> Bool {
         guard let dt = date else { return false }
         
-        return event.end.isEqual(dt)
+        return event.end.kvkIsEqual(dt)
     }
     
     func checkMultipleDate(_ date: Date?, with event: Event, checkMonth: Bool = false) -> Bool {

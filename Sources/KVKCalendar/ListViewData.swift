@@ -55,7 +55,7 @@ public final class ListViewData: EventDateProtocol {
             if let date = lastDate, let calendar = style?.calendar {
                 let recurringSections = addRecurringEvent(event, lastDate: date, calendar: calendar)
                 recurringSections.forEach { (recurringSection) in
-                    if let idx = accTemp.firstIndex(where: { $0.date.isEqual(recurringSection.date) }) {
+                    if let idx = accTemp.firstIndex(where: { $0.date.kvkIsEqual(recurringSection.date) }) {
                         accTemp[idx].events += recurringSection.events
                         accTemp[idx].events = accTemp[idx].events.sorted(by: { $0.start < $1.start })
                     } else {

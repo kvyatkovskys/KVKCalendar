@@ -116,6 +116,23 @@ final class MonthData: EventDateProtocol {
         return selectedDates
     }
     
+    func findNextDateInMonth(_ month: Month) -> Date {
+        if let date = month.days.first(where: { $0.date?.kvkYear == month.date.kvkYear
+            && $0.date?.kvkMonth == month.date.kvkMonth
+            && $0.date?.kvkDay == date.kvkDay })?.date {
+            return date
+        } else if let date = month.days.first(where: { $0.date?.kvkYear == month.date.kvkYear
+            && $0.date?.kvkMonth == month.date.kvkMonth
+            && $0.date?.kvkDay == (date.kvkDay - 1) })?.date {
+            return date
+        } else if month.date.kvkIsFebruary {
+            // check for only February
+            return month.days.last(where: { $0.type != .empty })?.date ?? Date()
+        } else {
+            return Date()
+        }
+    }
+    
     func reloadEventsInDays(events: [Event], date: Date) -> (events: [Event], dates: [Date?]) {
         let recurringEvents = events.filter { $0.recurringType != .none } 
         guard let idxSection = data.months.firstIndex(where: { $0.date.kvkMonth == date.kvkMonth && $0.date.kvkYear == date.kvkYear }) else {
