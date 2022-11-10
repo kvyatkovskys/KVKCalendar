@@ -51,13 +51,13 @@ final class WeekData: EventDateProtocol, ScrollableWeekProtocol {
         var extensionDays: [Day] = []
         
         if maxDays != 7,
-           let indexOfInputDate = defaultDays.firstIndex(where: { $0.date?.isSameDay(otherDate: data.date) ?? false }),
+           let indexOfInputDate = defaultDays.firstIndex(where: { $0.date?.kvkIsSameDay(otherDate: data.date) ?? false }),
            let firstDate = defaultDays.first?.date {
             let extraBufferDays = (defaultDays.count - indexOfInputDate) % maxDays
             if extraBufferDays > 0 {
                 var i = extraBufferDays
                 while (i > 0) {
-                    if let newDate = firstDate.addingTo(.day, value: -1 * i) {
+                    if let newDate = firstDate.kvkAddingTo(.day, value: -1 * i) {
                         extensionDays.append(Day(type: .empty, date: newDate, data: []))
                     }
                     i -= 1

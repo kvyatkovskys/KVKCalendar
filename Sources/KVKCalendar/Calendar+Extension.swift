@@ -99,6 +99,15 @@ extension UIScrollView {
 
 extension UIApplication {
     
+    var orientation: UIInterfaceOrientation {
+        if #available(iOS 13.0, *) {
+            return UIApplication.shared.windows.first?.windowScene?.interfaceOrientation ?? .unknown
+        } else {
+            let value = UIDevice.current.orientation
+            return UIInterfaceOrientation(rawValue: value.rawValue) ?? .unknown
+        }
+    }
+    
     var isAvailableBottomHomeIndicator: Bool {
         if #available(iOS 15.0, *) {
             if let keyWindow = UIApplication.shared.connectedScenes

@@ -413,12 +413,9 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         guard let index = objectView.indexPathForItem(at: center) else { return }
 
         let month = parameters.monthData.data.months[index.section]
-        guard style.month.autoSelectionDateWhenScrolling,
-              let newDate = month.days.first(where: { $0.date?.kvkYear == month.date.kvkYear
-                  && $0.date?.kvkMonth == month.date.kvkMonth
-                  && $0.date?.kvkDay == parameters.monthData.date.kvkDay })?.date,
-              parameters.monthData.date != newDate
-        else { return }
+        guard style.month.autoSelectionDateWhenScrolling else { return }
+        let newDate = parameters.monthData.findNextDateInMonth(month)
+        guard parameters.monthData.date != newDate else { return }
 
         parameters.monthData.date = newDate
         willSelectDate?(newDate)
@@ -441,20 +438,7 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         let month = parameters.monthData.data.months[visibleIndex]
         weekHeaderView.date = month.date
         guard style.month.autoSelectionDateWhenScrolling else { return }
-        
-        let newDate: Date
-        if let date = month.days.first(where: { $0.date?.kvkYear == month.date.kvkYear
-            && $0.date?.kvkMonth == month.date.kvkMonth
-            && $0.date?.kvkDay == parameters.monthData.date.kvkDay })?.date {
-            newDate = date
-        } else if let date = month.days.first(where: { $0.date?.kvkYear == month.date.kvkYear
-            && $0.date?.kvkMonth == month.date.kvkMonth
-            && $0.date?.kvkDay == (parameters.monthData.date.kvkDay - 1) })?.date {
-            newDate = date
-        } else {
-            newDate = Date()
-        }
-        
+        let newDate = parameters.monthData.findNextDateInMonth(month)
         guard parameters.monthData.date != newDate else { return }
         
         parameters.monthData.date = newDate
@@ -519,8 +503,7 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         let month = parameters.monthData.data.months[indexPath.section]
         let index = IndexPath(row: 0, section: indexPath.section)
         
-        if let headerView = dataSource?.dequeueHeader(date: month.date, type: .month, view: collectionView, indexPath: index) as? UICollectionReusableView
-        {
+        if let headerView = dataSource?.dequeueHeader(date: month.date, type: .month, view: collectionView, indexPath: index) as? UICollectionReusableView {
             return headerView
         } else {
             return collectionView.kvkDequeueView(indexPath: index) { (headerView: MonthHeaderView) in

@@ -141,7 +141,7 @@ class DayCell: UICollectionViewCell {
     
     private func populateDay(date: Date?, colorText: UIColor) {
         let nowDate = Date()
-        if date?.isEqual(nowDate) == true {
+        if date?.kvkIsEqual(nowDate) == true {
             dateLabel.textColor = UIScreen.isDarkMode ? style.headerScroll.colorCurrentSelectDateForDarkStyle : style.headerScroll.colorCurrentDate
             dotView.backgroundColor = style.headerScroll.colorBackgroundCurrentDate
         } else {

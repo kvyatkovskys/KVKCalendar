@@ -136,7 +136,7 @@ public extension Date {
         return Date(timeInterval: seconds, since: self)
     }
     
-    func convertTimeZone(_ initTimeZone: TimeZone, to timeZone: TimeZone) -> Date {
+    func kvkConvertTimeZone(_ initTimeZone: TimeZone, to timeZone: TimeZone) -> Date {
         let value = TimeInterval(timeZone.secondsFromGMT() - initTimeZone.secondsFromGMT())
         var components = DateComponents()
         components.second = Int(value)
@@ -144,12 +144,12 @@ public extension Date {
         return date ?? self
     }
         
-    func isSameDay(otherDate: Date) -> Bool {
+    func kvkIsSameDay(otherDate: Date) -> Bool {
         let diff = Calendar.current.dateComponents([.day], from: self, to: otherDate)
         return diff.day == 0
     }
     
-    func addingTo(_ component: Calendar.Component, value: Int) -> Date? {
+    func kvkAddingTo(_ component: Calendar.Component, value: Int) -> Date? {
         if let newDate = Calendar.current.date(byAdding: component, value: value, to: self) {
             return newDate
         }
@@ -157,7 +157,11 @@ public extension Date {
         return nil
     }
     
-    func isEqual(_ date: Date) -> Bool {
+    func kvkIsEqual(_ date: Date) -> Bool {
         date.kvkYear == kvkYear && date.kvkMonth == kvkMonth && date.kvkDay == kvkDay
+    }
+    
+    var kvkIsFebruary: Bool {
+        kvkMonth == 2
     }
 }

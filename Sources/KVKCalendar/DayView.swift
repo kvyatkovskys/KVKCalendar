@@ -78,7 +78,7 @@ final class DayView: UIView {
     @discardableResult private func updateEventViewer(frame: CGRect) -> CGRect? {
         var viewerFrame = frame
         // hard reset the width when we change the orientation
-        if UIDevice.current.orientation.isPortrait {
+        if UIApplication.shared.orientation.isPortrait {
             viewerFrame.size.width = bounds.width * 0.5
             viewerFrame.origin.x = viewerFrame.width
         } else {
@@ -324,7 +324,7 @@ extension DayView: CalendarSettingProtocol {
         }
         
         if isAvailableEventViewer {
-            if UIDevice.current.orientation.isPortrait {
+            if UIApplication.shared.orientation.isPortrait {
                 timelineFrame.size.width = UIScreen.main.bounds.width * 0.5
             } else {
                 timelineFrame.size.width -= style.timeline.widthEventViewer ?? 0

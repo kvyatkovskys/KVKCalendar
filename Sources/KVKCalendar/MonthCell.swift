@@ -82,7 +82,7 @@ final class MonthCell: KVKCollectionViewCell {
                 return
             }
             
-            if Platform.currentInterface == .phone && UIDevice.current.orientation.isLandscape { return }
+            if Platform.currentInterface == .phone && UIApplication.shared.orientation.isLandscape { return }
             
             if monthStyle.showMonthNameInFirstDay {
                 showMonthName(day: day)
@@ -360,7 +360,7 @@ final class MonthCell: KVKCollectionViewCell {
         guard day.type != .empty else { return }
         
         guard date?.kvkYear == nowDate.kvkYear else {
-            if date?.isEqual(selectDate) == true {
+            if date?.kvkIsEqual(selectDate) == true {
                 label.textColor = monthStyle.colorSelectDate
                 label.backgroundColor = monthStyle.colorBackgroundSelectDate
                 label.layer.cornerRadius = label.frame.height / 2

@@ -263,9 +263,9 @@ public struct TimelineStyle {
                 return true
             case .today:
                 let date = Date()
-                return dates.contains(where: { date.isEqual($0) })
+                return dates.contains(where: { date.kvkIsEqual($0) })
             case .forDate(let date):
-                return dates.contains(where: { date.isEqual($0) })
+                return dates.contains(where: { date.kvkIsEqual($0) })
             case .never:
                 return false
             }
@@ -282,9 +282,9 @@ public struct TimelineStyle {
                 return true
             case .today:
                 let date = Date()
-                return dates.contains(where: { date.isEqual($0) })
+                return dates.contains(where: { date.kvkIsEqual($0) })
             case .forDate(let date), .onlyOnInitForDate(let date):
-                return dates.contains(where: { date.isEqual($0) })
+                return dates.contains(where: { date.kvkIsEqual($0) })
             case .never:
                 return false
             }
