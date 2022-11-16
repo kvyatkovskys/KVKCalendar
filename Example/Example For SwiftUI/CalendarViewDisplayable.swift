@@ -16,6 +16,7 @@ struct CalendarDisplayView: UIViewRepresentable, KVKCalendarSettings {
     @Binding var events: [Event]
     @Binding var type: CalendarType
     @Binding var updatedDate: Date?
+    @Binding var orientation: UIInterfaceOrientation
     
     var style: Style {
         createCalendarStyle()
@@ -35,26 +36,31 @@ struct CalendarDisplayView: UIViewRepresentable, KVKCalendarSettings {
         context.coordinator.events = events
         context.coordinator.type = type
         context.coordinator.updatedDate = updatedDate
+        context.coordinator.orientation = orientation
     }
     
     func makeCoordinator() -> CalendarDisplayView.Coordinator {
         Coordinator(self)
     }
     
-    public init(events: Binding<[Event]>, type: Binding<CalendarType>, updatedDate: Binding<Date?>) {
+    public init(events: Binding<[Event]>,
+                type: Binding<CalendarType>,
+                updatedDate: Binding<Date?>,
+                orientation: Binding<UIInterfaceOrientation>) {
         self._events = events
         self._type = type
         self._updatedDate = updatedDate
+        self._orientation = orientation
         selectDate = defaultDate
         
         var frame = UIScreen.main.bounds
         frame.origin.y = 0
-        frame.size.height -= topOffset
+        frame.size.height -= (topOffset + bottomOffset)
         calendar = CalendarView(frame: frame, date: selectDate, style: style)
     }
     
     // MARK: Calendar DataSource and Delegate
-    class Coordinator: NSObject, CalendarDataSource, CalendarDelegate {
+    final class Coordinator: NSObject, CalendarDataSource, CalendarDelegate {
         private var view: CalendarDisplayView
         
         var events: [Event] = [] {
@@ -79,13 +85,18 @@ struct CalendarDisplayView: UIViewRepresentable, KVKCalendarSettings {
             }
         }
         
+        var orientation: UIInterfaceOrientation = .unknown {
+            didSet {
+                var frame = UIScreen.main.bounds
+                frame.origin.y = 0
+                frame.size.height -= (view.topOffset + view.bottomOffset)
+                view.calendar.reloadFrame(frame)
+            }
+        }
+        
         init(_ view: CalendarDisplayView) {
             self.view = view
             super.init()
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(changedOerintation),
-                                                   name: UIDevice.orientationDidChangeNotification,
-                                                   object: nil)
             
             DispatchQueue.main.asyncAfter(wallDeadline: .now() + 3) {
                 self.view.loadEvents(dateFormat: view.style.timeSystem.format) { [weak self] (events) in
@@ -126,15 +137,6 @@ struct CalendarDisplayView: UIViewRepresentable, KVKCalendarSettings {
         
         func didSelectDates(_ dates: [Date], type: CalendarType, frame: CGRect?) {
             updatedDate = dates.first ?? Date()
-        }
-        
-        // MARK: Private
-        
-        @objc private func changedOerintation() {
-            var frame = UIScreen.main.bounds
-            frame.origin.y = 0
-            frame.size.height -= (view.topOffset + view.bottomOffset)
-            view.calendar.reloadFrame(frame)
         }
         
     }
