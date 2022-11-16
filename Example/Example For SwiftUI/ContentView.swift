@@ -33,15 +33,10 @@ struct ContentView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 HStack {
-                    Picker("", selection: $typeCalendar, content: {
-                        ForEach(CalendarType.allCases,
-                                content: { type in
-                            Text(type.rawValue.capitalized)
-                        })
-                    })
-                    .pickerStyle(SegmentedPickerStyle())
-                    
-                    Spacer(minLength: 20)
+                    ItemsMenu<CalendarType>(type: $typeCalendar,
+                                            items: CalendarType.allCases,
+                                            showCheckmark: true,
+                                            showDropDownIcon: true)
                     
                     Button {
                         updatedDate = Date()

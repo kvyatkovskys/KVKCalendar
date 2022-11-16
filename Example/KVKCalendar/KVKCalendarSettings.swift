@@ -21,20 +21,20 @@ protocol KVKCalendarSettings {
 
 extension KVKCalendarSettings {
     
-    var topOffset: CGFloat {
-        let barHeight = UIApplication.shared.statusBarHeight
-        if #available(iOS 11.0, *) {
-            return UIApplication.shared.activeWindow?.rootViewController?.view.safeAreaInsets.top ?? barHeight
-        } else {
-            return barHeight
+    var screenOffset: UIEdgeInsets {
+        var oldInsets: UIEdgeInsets {
+            let barHeight = UIApplication.shared.statusBarHeight
+            return UIEdgeInsets(top: barHeight, left: 0, bottom: 0, right: 0)
         }
-    }
-    
-    var bottomOffset: CGFloat {
+        
         if #available(iOS 11.0, *) {
-            return UIApplication.shared.activeWindow?.rootViewController?.view.safeAreaInsets.bottom ?? 0
+            if let insets = UIApplication.shared.activeWindow?.rootViewController?.view.safeAreaInsets {
+                return insets
+            } else {
+                return oldInsets
+            }
         } else {
-            return 0
+            return oldInsets
         }
     }
     

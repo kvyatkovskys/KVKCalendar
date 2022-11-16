@@ -80,8 +80,13 @@ public enum TimeHourSystem: Int {
     }
 }
 
-public enum CalendarType: String, CaseIterable {
+public enum CalendarType: String, CaseIterable, ItemsMenuProxy {
     case day, week, month, year, list
+    
+    public var title: String {
+        rawValue.capitalized
+    }
+
 }
 
 extension CalendarType: Identifiable {

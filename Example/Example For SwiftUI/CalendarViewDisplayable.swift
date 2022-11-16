@@ -55,7 +55,8 @@ struct CalendarDisplayView: UIViewRepresentable, KVKCalendarSettings {
         
         var frame = UIScreen.main.bounds
         frame.origin.y = 0
-        frame.size.height -= (topOffset + bottomOffset)
+        frame.size.height -= (screenOffset.top + screenOffset.bottom)
+        frame.size.width -= (screenOffset.right + screenOffset.left)
         calendar = CalendarView(frame: frame, date: selectDate, style: style)
     }
     
@@ -89,7 +90,8 @@ struct CalendarDisplayView: UIViewRepresentable, KVKCalendarSettings {
             didSet {
                 var frame = UIScreen.main.bounds
                 frame.origin.y = 0
-                frame.size.height -= (view.topOffset + view.bottomOffset)
+                frame.size.height -= (view.screenOffset.top + view.screenOffset.bottom)
+                frame.size.width -= (view.screenOffset.left + view.screenOffset.right)
                 view.calendar.reloadFrame(frame)
             }
         }
