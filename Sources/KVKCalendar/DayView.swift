@@ -199,7 +199,7 @@ extension DayView: CalendarSettingProtocol {
                     var viewerFrame = timelineFrame
                     
                     let width: CGFloat
-                    if UIDevice.current.orientation.isPortrait {
+                    if UIApplication.shared.orientation.isPortrait {
                         width = frame.width * 0.5
                         timelineFrame.size.width = frame.width - width
                     } else {
