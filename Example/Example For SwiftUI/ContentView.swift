@@ -17,7 +17,7 @@ struct ContentView: View {
     @State private var orientation: UIInterfaceOrientation = .unknown
     
     var body: some View {
-        kvkHadnleNavigationView(calendarView)
+        kvkHandleNavigationView(calendarView)
     }
     
     private var calendarView: some View {

@@ -29,7 +29,7 @@ public extension View {
         modifier(DeviceRotationViewModifier(action: action))
     }
     
-    func kvkHadnleNavigationView(_ view: some View) -> some View {
+    func kvkHandleNavigationView(_ view: some View) -> some View {
         if #available(iOS 16.0, *) {
             return NavigationStack {
                 view
