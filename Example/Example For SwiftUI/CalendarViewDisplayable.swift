@@ -75,6 +75,7 @@ struct CalendarViewDisplayable: UIViewRepresentable, KVKCalendarSettings, KVKCal
         
         var type: CalendarType = .day {
             didSet {
+                guard oldValue != type else { return }
                 view.calendar.set(type: type, date: view.selectDate)
                 view.calendar.reloadData()
             }
@@ -82,7 +83,8 @@ struct CalendarViewDisplayable: UIViewRepresentable, KVKCalendarSettings, KVKCal
         
         var updatedDate: Date? {
             didSet {
-                if let date = updatedDate {
+                if let date = updatedDate, oldValue != date {
+                    view.calendar.scrollTo(date, animated: true)
                     view.selectDate = date
                     view.calendar.reloadData()
                 }

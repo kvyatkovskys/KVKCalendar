@@ -94,8 +94,9 @@ public struct ItemsMenu<T: ItemsMenuProxy>: View {
                 if showDropDownIcon {
                     Image(systemName: "chevron.down")
                         .resizable()
-                        .frame(width: 15, height: 10)
+                        .frame(width: 12, height: 7)
                         .foregroundColor(color)
+                        .padding(EdgeInsets(top: 5, leading: 0, bottom: 0, trailing: 0))
                 }
             }
         }
