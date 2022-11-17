@@ -304,6 +304,10 @@ extension UIApplication {
         }
     }
     
+    var windowSize: CGSize {
+        windows.last?.bounds.size ?? UIScreen.main.bounds.size
+    }
+    
     var screenOffset: UIEdgeInsets {
         var oldInsets: UIEdgeInsets {
             let barHeight = UIApplication.shared.statusBarHeight
