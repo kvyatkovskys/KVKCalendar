@@ -182,26 +182,27 @@ func dequeueCell<T>(parameter: CellParameter, type: CalendarType, view: T, index
 ## Usage for SwiftUI
 
 Add a new `SwiftUI` file and import `KVKCalendar`.
-Create a struct `CalendarDisplayView` and declare the protocol `UIViewRepresentable` for connection `UIKit` with `SwiftUI`.
+Create a struct `CalendarViewDisplayable` and declare the protocol `UIViewRepresentable` for connection `UIKit` with `SwiftUI`.
 
 ```swift
 import SwiftUI
 import KVKCalendar
 
-struct CalendarDisplayView: UIViewRepresentable {
-    @Binding var events: [Event]
+struct CalendarViewDisplayable: UIViewRepresentable {
 
-    private var calendar: CalendarView = {
-        return CalendarView(frame: frame, style: style)
-    }()
+    @Binding var events: [Event]
+    var selectDate = Date()
+    var style = Style()
+    
+    private var calendar = KVKalendarView(frame: .zero)
         
-    func makeUIView(context: UIViewRepresentableContext<CalendarDisplayView>) -> CalendarView {
+    func makeUIView(context: UIViewRepresentableContext<CalendarViewDisplayable>) -> KVKCalendarView {
         calendar.dataSource = context.coordinator
         calendar.delegate = context.coordinator
         return calendar
     }
     
-    func updateUIView(_ uiView: CalendarView, context: UIViewRepresentableContext<CalendarDisplayView>) {
+    func updateUIView(_ uiView: KVKCalendarView, context: UIViewRepresentableContext<CalendarViewDisplayable>) {
         context.coordinator.events = events
     }
     
@@ -210,32 +211,34 @@ struct CalendarDisplayView: UIViewRepresentable {
     }
     
     public init(events: Binding<[Event]>) {
-        self._events = events
+        _events = events
+        calendar = KVKCalendarView(frame: frame, date: selectDate, style: style)
     }
     
     // MARK: Calendar DataSource and Delegate
     class Coordinator: NSObject, CalendarDataSource, CalendarDelegate {
-        private let view: CalendarDisplayView
+        private let view: CalendarViewDisplayable
         
         var events: [Event] = [] {
             didSet {
+                view.events = events
                 view.calendar.reloadData()
             }
         }
         
-        init(_ view: CalendarDisplayView) {
+        init(_ view: CalendarViewDisplayable) {
             self.view = view
             super.init()
         }
         
         func eventsForCalendar(systemEvents: [EKEvent]) -> [Event] {
-            return events
+            events
         }
     }
 }
 ```
 
-Create a new `SwiftUI` file and add `CalendarDisplayView` to `body`.
+Create a new `SwiftUI` file and add `CalendarViewDisplayable` to `body`.
 
 ```swift
 import SwiftUI
@@ -244,8 +247,8 @@ struct CalendarContentView: View {
     @State var events: [Event] = []
 
     var body: some View {
-        NavigationView {
-            CalendarDisplayView(events: $events)
+        NavigationStack {
+            CalendarViewDisplayable(events: $events)
         }
     }
 }
