@@ -11,8 +11,8 @@ import KVKCalendar
 import EventKit
 
 @available(iOS 13.0, *)
-struct CalendarDisplayView: UIViewRepresentable, KVKCalendarSettings {
-    
+struct CalendarViewDisplayable: UIViewRepresentable, KVKCalendarSettings, KVKCalendarDataModel {
+        
     @Binding var events: [Event]
     @Binding var type: CalendarType
     @Binding var updatedDate: Date?
@@ -24,22 +24,22 @@ struct CalendarDisplayView: UIViewRepresentable, KVKCalendarSettings {
     var selectDate = Date()
     var eventViewer = EventViewer()
 
-    private var calendar = CalendarView(frame: .zero)
+    private var calendar = KVKCalendarView(frame: .zero)
         
-    func makeUIView(context: UIViewRepresentableContext<CalendarDisplayView>) -> CalendarView {
+    func makeUIView(context: UIViewRepresentableContext<CalendarViewDisplayable>) -> KVKCalendarView {
         calendar.dataSource = context.coordinator
         calendar.delegate = context.coordinator
         return calendar
     }
     
-    func updateUIView(_ uiView: CalendarView, context: UIViewRepresentableContext<CalendarDisplayView>) {
+    func updateUIView(_ uiView: KVKCalendarView, context: UIViewRepresentableContext<CalendarViewDisplayable>) {
         context.coordinator.events = events
         context.coordinator.type = type
         context.coordinator.updatedDate = updatedDate
         context.coordinator.orientation = orientation
     }
     
-    func makeCoordinator() -> CalendarDisplayView.Coordinator {
+    func makeCoordinator() -> CalendarViewDisplayable.Coordinator {
         Coordinator(self)
     }
     
@@ -47,25 +47,28 @@ struct CalendarDisplayView: UIViewRepresentable, KVKCalendarSettings {
                 type: Binding<CalendarType>,
                 updatedDate: Binding<Date?>,
                 orientation: Binding<UIInterfaceOrientation>) {
-        self._events = events
-        self._type = type
-        self._updatedDate = updatedDate
-        self._orientation = orientation
+        _events = events
+        _type = type
+        _updatedDate = updatedDate
+        _orientation = orientation
         selectDate = defaultDate
         
+        let offset = UIApplication.shared.screenOffset
         var frame = UIScreen.main.bounds
         frame.origin.y = 0
-        frame.size.height -= (screenOffset.top + screenOffset.bottom)
-        frame.size.width -= (screenOffset.right + screenOffset.left)
-        calendar = CalendarView(frame: frame, date: selectDate, style: style)
+        frame.size.height -= (offset.top + offset.bottom)
+        frame.size.width -= (offset.right + offset.left)
+        calendar = KVKCalendarView(frame: frame, date: selectDate, style: style)
     }
     
     // MARK: Calendar DataSource and Delegate
     final class Coordinator: NSObject, CalendarDataSource, CalendarDelegate {
-        private var view: CalendarDisplayView
+        
+        private var view: CalendarViewDisplayable
         
         var events: [Event] = [] {
             didSet {
+                view.events = events
                 view.calendar.reloadData()
             }
         }
@@ -88,23 +91,20 @@ struct CalendarDisplayView: UIViewRepresentable, KVKCalendarSettings {
         
         var orientation: UIInterfaceOrientation = .unknown {
             didSet {
+                guard oldValue != orientation else { return }
+                
+                let offset = UIApplication.shared.screenOffset
                 var frame = UIScreen.main.bounds
                 frame.origin.y = 0
-                frame.size.height -= (view.screenOffset.top + view.screenOffset.bottom)
-                frame.size.width -= (view.screenOffset.left + view.screenOffset.right)
+                frame.size.height -= (offset.top + offset.bottom)
+                frame.size.width -= (offset.left + offset.right)
                 view.calendar.reloadFrame(frame)
             }
         }
-        
-        init(_ view: CalendarDisplayView) {
+                
+        init(_ view: CalendarViewDisplayable) {
             self.view = view
             super.init()
-            
-            DispatchQueue.main.asyncAfter(wallDeadline: .now() + 3) {
-                self.view.loadEvents(dateFormat: view.style.timeSystem.format) { [weak self] (events) in
-                    self?.view.events = events
-                }
-            }
         }
         
         func eventsForCalendar(systemEvents: [EKEvent]) -> [Event] {

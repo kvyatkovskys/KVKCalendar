@@ -10,47 +10,16 @@ import Foundation
 import KVKCalendar
 import EventKit
 
-protocol KVKCalendarSettings {
+protocol KVKCalendarDataModel {
     
-    var selectDate: Date { get set }
     var events: [Event] { get set }
     var style: Style { get }
-    var eventViewer: EventViewer { get set }
     
 }
 
-extension KVKCalendarSettings {
-    
-    var screenOffset: UIEdgeInsets {
-        var oldInsets: UIEdgeInsets {
-            let barHeight = UIApplication.shared.statusBarHeight
-            return UIEdgeInsets(top: barHeight, left: 0, bottom: 0, right: 0)
-        }
-        
-        if #available(iOS 11.0, *) {
-            if let insets = UIApplication.shared.activeWindow?.rootViewController?.view.safeAreaInsets {
-                return insets
-            } else {
-                return oldInsets
-            }
-        } else {
-            return oldInsets
-        }
-    }
-    
-    var defaultStringDate: String {
-        "14.12.2022"
-    }
-    
-    var defaultDate: Date {
-        onlyDateFormatter.date(from: defaultStringDate) ?? Date()
-    }
-    
-    var onlyDateFormatter: DateFormatter {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd.MM.yyyy"
-        return formatter
-    }
+protocol KVKCalendarSettings {}
+
+extension KVKCalendarSettings where Self: KVKCalendarDataModel {
     
     func handleChangingEvent(_ event: Event, start: Date?, end: Date?) -> (range: Range<Int>, events: [Event])? {
         var eventTemp = event
@@ -84,23 +53,6 @@ extension KVKCalendarSettings {
         }
     }
     
-    func handleCustomEventView(event: Event, style: Style, frame: CGRect) -> EventViewGeneral? {
-        guard event.ID == "2" else { return nil }
-        
-        return CustomViewEvent(style: style, event: event, frame: frame)
-    }
-    
-    @available(iOS 13.0, *)
-    func handleOptionMenu(type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)? {
-        guard type == .day else { return nil }
-        
-        let action = UIAction(title: "Test", attributes: .destructive) { _ in
-            print("test tap")
-        }
-        
-        return (UIMenu(title: "Test menu", children: [action]), nil)
-    }
-    
     func handleNewEvent(_ event: Event, date: Date?) -> Event? {
         var newEvent = event
         
@@ -118,28 +70,6 @@ extension KVKCalendarSettings {
         return newEvent
     }
     
-    func handleCell<T>(parameter: CellParameter,
-                       type: CalendarType,
-                       view: T,
-                       indexPath: IndexPath) -> KVKCalendarCellProtocol? where T: UIScrollView {
-        switch type {
-        case .year where parameter.date?.kvkMonth == Date().kvkMonth:
-            let cell = (view as? UICollectionView)?.kvkDequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
-                cell.imageView.image = UIImage(named: "ic_stub")
-            }
-            return cell
-        case .day, .week, .month:
-            guard parameter.date?.kvkDay == Date().kvkDay && parameter.type != .empty else { return nil }
-            
-            let cell = (view as? UICollectionView)?.kvkDequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
-                cell.imageView.image = UIImage(named: "ic_stub")
-            }
-            return cell
-        default:
-            return nil
-        }
-    }
-    
     func handleEvents(systemEvents: [EKEvent]) -> [Event] {
         // if you want to get a system events, you need to set style.systemCalendars = ["test"]
         let mappedEvents = systemEvents.compactMap { (event) -> Event in
@@ -151,31 +81,6 @@ extension KVKCalendarSettings {
         }
         
         return events + mappedEvents
-    }
-    
-    func createCalendarStyle() -> Style {
-        var style = Style()
-        style.timeline.isHiddenStubEvent = false
-        style.startWeekDay = .sunday
-        style.systemCalendars = ["Calendar1", "Calendar2", "Calendar3"]
-        if #available(iOS 13.0, *) {
-            style.event.iconFile = UIImage(systemName: "paperclip")
-        }
-        style.timeline.scrollLineHourMode = .onlyOnInitForDate(defaultDate)
-        style.timeline.showLineHourMode = .always
-        return style
-    }
-    
-    func timeFormatter(date: Date, format: String) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = format
-        return formatter.string(from: date)
-    }
-    
-    func formatter(date: String) -> Date {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-        return formatter.date(from: date) ?? Date()
     }
     
     func loadEvents(dateFormat: String, completion: ([Event]) -> Void) {
@@ -220,6 +125,88 @@ extension KVKCalendarSettings {
             return event
         })
         completion(events)
+    }
+    
+}
+
+extension KVKCalendarSettings {
+    
+    var defaultStringDate: String {
+        "14.12.2022"
+    }
+    
+    var defaultDate: Date {
+        onlyDateFormatter.date(from: defaultStringDate) ?? Date()
+    }
+    
+    var onlyDateFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd.MM.yyyy"
+        return formatter
+    }
+    
+    func handleCustomEventView(event: Event, style: Style, frame: CGRect) -> EventViewGeneral? {
+        guard event.ID == "2" else { return nil }
+        
+        return CustomViewEvent(style: style, event: event, frame: frame)
+    }
+    
+    @available(iOS 13.0, *)
+    func handleOptionMenu(type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)? {
+        guard type == .day else { return nil }
+        
+        let action = UIAction(title: "Test", attributes: .destructive) { _ in
+            print("test tap")
+        }
+        
+        return (UIMenu(title: "Test menu", children: [action]), nil)
+    }
+    
+    func handleCell<T>(parameter: CellParameter,
+                       type: CalendarType,
+                       view: T,
+                       indexPath: IndexPath) -> KVKCalendarCellProtocol? where T: UIScrollView {
+        switch type {
+        case .year where parameter.date?.kvkMonth == Date().kvkMonth:
+            let cell = (view as? UICollectionView)?.kvkDequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
+                cell.imageView.image = UIImage(named: "ic_stub")
+            }
+            return cell
+        case .day, .week, .month:
+            guard parameter.date?.kvkDay == Date().kvkDay && parameter.type != .empty else { return nil }
+            
+            let cell = (view as? UICollectionView)?.kvkDequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
+                cell.imageView.image = UIImage(named: "ic_stub")
+            }
+            return cell
+        default:
+            return nil
+        }
+    }
+    
+    func createCalendarStyle() -> Style {
+        var style = Style()
+        style.timeline.isHiddenStubEvent = false
+        style.startWeekDay = .sunday
+        style.systemCalendars = ["Calendar1", "Calendar2", "Calendar3"]
+        if #available(iOS 13.0, *) {
+            style.event.iconFile = UIImage(systemName: "paperclip")
+        }
+        style.timeline.scrollLineHourMode = .onlyOnInitForDate(defaultDate)
+        style.timeline.showLineHourMode = .always
+        return style
+    }
+    
+    func timeFormatter(date: Date, format: String) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = format
+        return formatter.string(from: date)
+    }
+    
+    func formatter(date: String) -> Date {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        return formatter.date(from: date) ?? Date()
     }
     
 }
@@ -314,6 +301,23 @@ extension UIApplication {
             return activeWindow?.windowScene?.statusBarManager?.statusBarFrame.height ?? 24
         } else {
             return statusBarFrame.height
+        }
+    }
+    
+    var screenOffset: UIEdgeInsets {
+        var oldInsets: UIEdgeInsets {
+            let barHeight = UIApplication.shared.statusBarHeight
+            return UIEdgeInsets(top: barHeight, left: 0, bottom: 0, right: 0)
+        }
+        
+        if #available(iOS 11.0, *) {
+            if let insets = UIApplication.shared.activeWindow?.rootViewController?.view.safeAreaInsets {
+                return insets
+            } else {
+                return oldInsets
+            }
+        } else {
+            return oldInsets
         }
     }
     

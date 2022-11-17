@@ -10,7 +10,7 @@
 import UIKit
 import EventKit
 
-extension CalendarView {
+extension KVKCalendarView {
     // MARK: Public methods
     
     /// **DEPRECATED**
@@ -225,7 +225,7 @@ extension CalendarView {
     }
 }
 
-extension CalendarView: DisplayDataSource {
+extension KVKCalendarView: DisplayDataSource {
     public func dequeueCell<T>(parameter: CellParameter, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol? where T : UIScrollView {
         dataSource?.dequeueCell(parameter: parameter, type: type, view: view, indexPath: indexPath)
     }
@@ -282,7 +282,7 @@ extension CalendarView: DisplayDataSource {
     
 }
 
-extension CalendarView: DisplayDelegate {
+extension KVKCalendarView: DisplayDelegate {
     public func sizeForHeader(_ date: Date?, type: CalendarType) -> CGSize? {
         delegate?.sizeForHeader(date, type: type)
     }
@@ -332,7 +332,7 @@ extension CalendarView: DisplayDelegate {
     }
 }
 
-extension CalendarView {
+extension KVKCalendarView {
     
     public var style: Style {
         get {

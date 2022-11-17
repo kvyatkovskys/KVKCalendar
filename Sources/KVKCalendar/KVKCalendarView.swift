@@ -10,7 +10,10 @@
 import UIKit
 import EventKit
 
-public final class CalendarView: UIView {
+@available(swift, deprecated: 0.6.11, obsoleted: 0.6.12, renamed: "KVKCalendarView")
+public final class CalendarView: UIView {}
+
+public final class KVKCalendarView: UIView {
     
     struct Parameters {
         var type = CalendarType.day

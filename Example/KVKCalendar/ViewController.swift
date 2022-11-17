@@ -10,7 +10,7 @@ import UIKit
 import KVKCalendar
 import EventKit
 
-final class ViewController: UIViewController, KVKCalendarSettings, UIPopoverPresentationControllerDelegate {
+final class ViewController: UIViewController, KVKCalendarSettings, KVKCalendarDataModel, UIPopoverPresentationControllerDelegate {
     
     var events = [Event]() {
         didSet {
@@ -35,10 +35,10 @@ final class ViewController: UIViewController, KVKCalendarSettings, UIPopoverPres
         return button
     }()
     
-    private lazy var calendarView: CalendarView = {
+    private lazy var calendarView: KVKCalendarView = {
         var frame = view.frame
         frame.origin.y = 0
-        let calendar = CalendarView(frame: frame, date: selectDate, style: style)
+        let calendar = KVKCalendarView(frame: frame, date: selectDate, style: style)
         calendar.delegate = self
         calendar.dataSource = self
         return calendar

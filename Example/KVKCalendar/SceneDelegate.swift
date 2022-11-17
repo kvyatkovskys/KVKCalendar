@@ -42,7 +42,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         if #available(iOS 14.0, *) {
 #if DEBUG_SwiftUI
-            return UIHostingController(rootView: ContentView())
+            return UIHostingController(rootView: CalendarView())
 #else
             return createNavVC(ViewController())
 #endif

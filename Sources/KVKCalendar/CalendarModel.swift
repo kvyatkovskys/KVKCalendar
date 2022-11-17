@@ -129,7 +129,7 @@ public struct Event {
     public var ID: String
     
     @available(swift, deprecated: 0.5.8, obsoleted: 0.5.9, renamed: "title")
-    public var text: String = ""
+    public var text: String?
     public var title: TextEvent = TextEvent()
     
     public var start: Date = Date()
