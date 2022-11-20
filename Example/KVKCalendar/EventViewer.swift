@@ -41,6 +41,7 @@ final class EventViewer: UIView {
         } else {
             backgroundColor = .white
         }
+        reloadFrame(frame: CGRect(origin: .zero, size: frame.size))
         addSubview(textLabel)
         addSubview(lineView)
     }

@@ -77,13 +77,7 @@ final class DayView: UIView {
     
     @discardableResult private func updateEventViewer(frame: CGRect) -> CGRect? {
         var viewerFrame = frame
-        // hard reset the width when we change the orientation
-        if UIApplication.shared.orientation.isPortrait {
-            viewerFrame.size.width = bounds.width * 0.5
-            viewerFrame.origin.x = viewerFrame.width
-        } else {
-            viewerFrame.origin.x = bounds.width - viewerFrame.width
-        }
+        viewerFrame.origin.x = bounds.width - viewerFrame.width
         guard let eventViewer = dataSource?.willDisplayEventViewer(date: parameters.data.date,
                                                                    frame: viewerFrame) else { return nil }
         
@@ -197,16 +191,7 @@ extension DayView: CalendarSettingProtocol {
                 if let idx = subviews.firstIndex(where: { $0.tag == tagEventViewer }) {
                     subviews[idx].removeFromSuperview()
                     var viewerFrame = timelineFrame
-                    
-                    let width: CGFloat
-                    if UIApplication.shared.orientation.isPortrait {
-                        width = frame.width * 0.5
-                        timelineFrame.size.width = frame.width - width
-                    } else {
-                        width = defaultWidth
-                    }
-                    
-                    viewerFrame.size.width = width
+                    viewerFrame.size.width = defaultWidth
                     if let resultViewerFrame = updateEventViewer(frame: viewerFrame) {
                         // notify when we did change the frame of viewer
                         delegate?.didChangeViewerFrame(resultViewerFrame)

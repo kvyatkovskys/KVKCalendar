@@ -22,7 +22,6 @@ struct CalendarViewDisplayable: UIViewRepresentable, KVKCalendarSettings, KVKCal
         createCalendarStyle()
     }
     var selectDate = Date()
-    var eventViewer = EventViewer()
 
     private var calendar = KVKCalendarView(frame: .zero)
         
@@ -70,6 +69,7 @@ struct CalendarViewDisplayable: UIViewRepresentable, KVKCalendarSettings, KVKCal
     final class Coordinator: NSObject, CalendarDataSource, CalendarDelegate {
         
         private var view: CalendarViewDisplayable
+        private var eventViewer: EventViewer?
         
         var events: [Event] = [] {
             didSet {
@@ -123,9 +123,12 @@ struct CalendarViewDisplayable: UIViewRepresentable, KVKCalendarSettings, KVKCal
         }
         
         func willDisplayEventViewer(date: Date, frame: CGRect) -> UIView? {
-            view.eventViewer.frame = frame
-            view.eventViewer.reloadFrame(frame: frame)
-            return view.eventViewer
+            if eventViewer == nil {
+                eventViewer = EventViewer(frame: frame)
+            } else {
+                eventViewer?.frame = frame
+            }
+            return eventViewer
         }
         
         func didChangeEvent(_ event: Event, start: Date?, end: Date?) {
@@ -135,7 +138,7 @@ struct CalendarViewDisplayable: UIViewRepresentable, KVKCalendarSettings, KVKCal
         }
         
         func didChangeViewerFrame(_ frame: CGRect) {
-            view.eventViewer.reloadFrame(frame: frame)
+            eventViewer?.reloadFrame(frame: frame)
         }
         
         func didAddNewEvent(_ event: Event, _ date: Date?) {
@@ -148,5 +151,19 @@ struct CalendarViewDisplayable: UIViewRepresentable, KVKCalendarSettings, KVKCal
             updatedDate = dates.first ?? Date()
         }
         
+        @available(iOS 14.0, *)
+        func willDisplayEventOptionMenu(_ event: Event, type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)? {
+            view.handleOptionMenu(type: type)
+        }
+        
+        func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?) {
+            print(type, event)
+            switch type {
+            case .day:
+                eventViewer?.text = event.title.timeline
+            default:
+                break
+            }
+        }
     }
 }
