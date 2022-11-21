@@ -51,6 +51,11 @@ public struct DefaultTimelineEventLayout: TimelineEventLayout {
                         }
                     }
 
+                    let pageWidth = context.pageFrame.width + context.pageFrame.origin.x
+                    let newEventWidth = newX + frame.width
+                    if newEventWidth > pageWidth {
+                        frame.size.width -= newEventWidth - pageWidth + context.style.timeline.offsetEvent
+                    }
                     frame.origin.x = newX
                 }
 
