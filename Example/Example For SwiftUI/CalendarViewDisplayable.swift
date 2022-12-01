@@ -70,6 +70,28 @@ struct CalendarViewDisplayable: UIViewRepresentable, KVKCalendarSettings, KVKCal
         
         private var view: CalendarViewDisplayable
         private var eventViewer: EventViewer?
+        private var selectedTimezones: [TimeZone] = [] {
+            didSet {
+                var updatedStyle = view.calendar.style
+                //updatedStyle.timezone = .current
+                updatedStyle.timeline.cornerHeaderWidth = leftOffset
+                view.calendar.updateStyle(updatedStyle)
+                view.calendar.reloadData()
+            }
+        }
+        private var leftOffset: CGFloat {
+            if selectedTimezones.count == 1
+                && selectedTimezones.first?.identifier == view.calendar.style.timezone.identifier {
+                return 0
+            }
+            
+            switch selectedTimezones.count {
+            case 2:
+                return CGFloat(selectedTimezones.count * 22)
+            default:
+                return CGFloat(selectedTimezones.count * 28)
+            }
+        }
         
         var events: [Event] = [] {
             didSet {
@@ -165,5 +187,26 @@ struct CalendarViewDisplayable: UIViewRepresentable, KVKCalendarSettings, KVKCal
                 break
             }
         }
+        
+        func dequeueTimeLabel(_ label: TimelineLabel) -> (current: TimelineLabel, others: [UILabel])? {
+            view.handleTimelineLabel(zones: selectedTimezones, label: label)
+        }
+        
+        func dequeueCornerHeader(date: Date, frame: CGRect) -> UIView? {
+            let cornerView = UIView(frame: CGRect(origin: .zero, size: CGSize(width: 50, height: frame.height)))
+            let btn = UIButton(type: .system)
+            btn.setTitle("MSK", for: .normal)
+            btn.setTitleColor(.systemRed, for: .normal)
+            btn.setTitleColor(.lightGray, for: .selected)
+            btn.frame = cornerView.frame
+            if #available(iOS 14.0, *) {
+                btn.showsMenuAsPrimaryAction = true
+            } else {
+                // Fallback on earlier versions
+            }
+            cornerView.addSubview(btn)
+            return cornerView
+        }
+        
     }
 }

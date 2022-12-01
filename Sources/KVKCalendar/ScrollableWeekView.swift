@@ -146,14 +146,7 @@ final class ScrollableWeekView: UIView {
     }
     
     private func createCollectionView(frame: CGRect, isScrollEnabled: Bool) -> UICollectionView {
-        let x: CGFloat
-        if type == .day {
-            x = 0
-        } else {
-            x = style.timeline.allLeftOffset
-        }
-        let newFrame = CGRect(x: x, y: frame.origin.y, width: frame.width - x, height: frame.height)
-        let collection = UICollectionView(frame: newFrame, collectionViewLayout: layout)
+        let collection = UICollectionView(frame: frame, collectionViewLayout: layout)
         collection.isPagingEnabled = true
         collection.showsHorizontalScrollIndicator = false
         collection.backgroundColor = .clear
@@ -239,20 +232,22 @@ extension ScrollableWeekView: CalendarSettingProtocol {
             collectionView.reloadData()
             addSubview(customView)
         } else {
+            if let cornerHeader = dataSource?.dequeueCornerHeader(date: date,
+                                                                  frame: CGRect(x: 0, y: 0,
+                                                                                width: style.timeline.cornerHeaderWidth,
+                                                                                height: bounds.height)) {
+                addSubview(cornerHeader)
+                mainFrame.origin.x = cornerHeader.frame.width
+                mainFrame.size.width -= cornerHeader.frame.width
+            } else if Platform.currentInterface != .phone {
+                titleView?.frame.origin.x = 10
+            }
+            
             calculateFrameForCollectionViewIfNeeded(&mainFrame)
             collectionView = createCollectionView(frame: mainFrame,
                                                   isScrollEnabled: style.headerScroll.isScrollEnabled)
             addSubview(collectionView)
             addTitleHeaderIfNeeded(frame: collectionView.frame)
-            
-            if let cornerHeader = dataSource?.dequeueCornerHeader(date: date,
-                                                                  frame: CGRect(x: 0, y: 0,
-                                                                                width: collectionView.frame.origin.x,
-                                                                                height: bounds.height)) {
-                addSubview(cornerHeader)
-            } else if Platform.currentInterface != .phone {
-                titleView?.frame.origin.x = 10
-            }
         }
         
         addSubview(bottomLineView)

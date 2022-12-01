@@ -88,7 +88,7 @@ extension CurrentLineView: CalendarSettingProtocol {
 #if targetEnvironment(macCatalyst)
         widthOffset = 20
 #else
-        widthOffset = 5
+        widthOffset = 15
 #endif
 
         timeLabel.frame = CGRect(x: 0, y: 0,

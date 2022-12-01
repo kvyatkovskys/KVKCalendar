@@ -127,12 +127,35 @@ extension KVKCalendarSettings where Self: KVKCalendarDataModel {
         completion(events)
     }
     
+    func handleTimelineLabel(zones: [TimeZone],
+                             label: TimelineLabel) -> (current: TimelineLabel, others: [UILabel])? {
+        var otherLabels = [UILabel]()
+        let current = label
+        
+        zones.enumerated().forEach {
+            let x = (CGFloat($0.offset) * current.frame.width) + style.timeline.offsetTimeX
+            let otherLabel = UILabel(frame: CGRect(x: x, y: current.frame.origin.y,
+                                                   width: current.frame.width, height: current.frame.height))
+            let labelDate = changeToTimeZone(label.hashTime, from: style.timezone, to: $0.element)
+            otherLabel.text = timeFormatter(date: labelDate, format: style.timeSystem.format)
+            otherLabel.textAlignment = style.timeline.timeAlignment
+            otherLabel.font = style.timeline.timeFont
+            
+            if $0.element.identifier == style.timezone.identifier {
+                current.frame = otherLabel.frame
+            } else {
+                otherLabels.append(otherLabel)
+            }
+        }
+        
+        return (current, otherLabels)
+    }
 }
 
 extension KVKCalendarSettings {
     
     var defaultStringDate: String {
-        "14.12.2022"
+        "14.11.2022"
     }
     
     var defaultDate: Date {
@@ -145,13 +168,26 @@ extension KVKCalendarSettings {
         return formatter
     }
     
+    func changeToTimeZone(_ hour: Int, from: TimeZone, to: TimeZone) -> Date {
+        let today = Date()
+        let components = DateComponents(year: today.kvkYear,
+                                        month: today.kvkMonth,
+                                        day: today.kvkDay,
+                                        hour: hour,
+                                        minute: 0)
+        let date = Calendar.current.date(from: components) ?? today
+        let sourceOffset = from.secondsFromGMT(for: date)
+        let destinationOffset = to.secondsFromGMT(for: date)
+        let timeInterval = TimeInterval(destinationOffset - sourceOffset)
+        return Date(timeInterval: timeInterval, since: date)
+    }
+    
     func handleCustomEventView(event: Event, style: Style, frame: CGRect) -> EventViewGeneral? {
         guard event.ID == "2" else { return nil }
         
         return CustomViewEvent(style: style, event: event, frame: frame)
     }
     
-    @available(iOS 13.0, *)
     func handleOptionMenu(type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)? {
         guard type == .day else { return nil }
         
@@ -194,6 +230,10 @@ extension KVKCalendarSettings {
         }
         style.timeline.scrollLineHourMode = .onlyOnInitForDate(defaultDate)
         style.timeline.showLineHourMode = .always
+        style.month.scrollDirection = .horizontal
+        style.month.isPagingEnabled = true
+        style.month.autoSelectionDateWhenScrolling = true
+        style.timeline.cornerHeaderWidth = 60
         return style
     }
     

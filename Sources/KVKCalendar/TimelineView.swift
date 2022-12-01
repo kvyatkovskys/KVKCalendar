@@ -298,7 +298,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         labels.items.forEach { scrollView.addSubview($0) }
         horizontalLines.forEach { scrollView.addSubview($0) }
         
-        let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft + style.timeline.cornerHeaderWidth
+        let leftOffset = style.timeline.widthTime + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
         let widthPage = (frame.width - leftOffset) / CGFloat(dates.count)
         let heightPage = scrollView.contentSize.height
         var allDayEvents = [AllDayView.PrepareEvents]()

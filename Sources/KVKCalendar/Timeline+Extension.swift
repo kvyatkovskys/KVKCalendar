@@ -325,7 +325,7 @@ extension TimelineView {
         var otherTimes = [UILabel]()
         for (idx, txtHour) in timeSystem.hours.enumerated() where idx >= start {
             let yTime = (calculatedTimeY + style.timeline.heightTime) * CGFloat(idx - start)
-            let time = TimelineLabel(frame: CGRect(x: style.timeline.offsetTimeX + style.timeline.cornerHeaderWidth,
+            let time = TimelineLabel(frame: CGRect(x: style.timeline.offsetTimeX,
                                                    y: yTime,
                                                    width: style.timeline.widthTime,
                                                    height: style.timeline.heightTime))
@@ -354,7 +354,7 @@ extension TimelineView {
             let time = item.element
             let idx = item.offset
             
-            let xLine = time.frame.width + style.timeline.offsetTimeX + style.timeline.offsetLineLeft + style.timeline.cornerHeaderWidth
+            let xLine = time.frame.width + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
             let lineFrame = CGRect(x: xLine,
                                    y: time.center.y,
                                    width: frame.width - xLine,
@@ -711,7 +711,7 @@ extension TimelineView: EventDelegate {
         let time = calculateChangingTime(pointY: pointTempY)
         
         if let minute = time.minute, 0...59 ~= minute {
-            movingMinuteLabel.frame = CGRect(x: style.timeline.offsetTimeX + style.timeline.cornerHeaderWidth,
+            movingMinuteLabel.frame = CGRect(x: style.timeline.offsetTimeX,
                                              y: (pointY - offset) - style.timeline.heightTime,
                                              width: style.timeline.widthTime, height: style.timeline.heightTime)
             scrollView.addSubview(movingMinuteLabel)

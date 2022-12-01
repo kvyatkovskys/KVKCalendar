@@ -221,7 +221,7 @@ public struct TimelineStyle {
     public var scale: Scale? = Scale(min: 1, max: 6)
     
     public var allLeftOffset: CGFloat {
-        widthTime + offsetTimeX + offsetLineLeft + cornerHeaderWidth
+        widthTime + offsetTimeX + offsetLineLeft
     }
     
     public enum ViewMode: Int {
