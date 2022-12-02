@@ -14,6 +14,7 @@ final class ScrollableWeekView: UIView {
     var didTrackScrollOffset: ((CGFloat?, Bool) -> Void)?
     var didSelectDate: ((Date?, CalendarType) -> Void)?
     var didChangeDay: ((TimelinePageView.SwitchPageType) -> Void)?
+    var didUpdateStyle: ((CalendarType) -> Void)?
     
     struct Parameters {
         let frame: CGRect
@@ -82,6 +83,12 @@ final class ScrollableWeekView: UIView {
     
     private var titleView: ScrollableWeekHeaderTitleView?
     private let bottomLineView = UIView()
+    private let cornerBtn: UIButton = {
+        let btn = UIButton(type: .system)
+        btn.setTitleColor(.systemRed, for: .normal)
+        btn.setTitleColor(.lightGray, for: .selected)
+        return btn
+    }()
     
     init(parameters: Parameters) {
         self.params = parameters
@@ -239,7 +246,23 @@ extension ScrollableWeekView: CalendarSettingProtocol {
                 addSubview(cornerHeader)
                 mainFrame.origin.x = cornerHeader.frame.width
                 mainFrame.size.width -= cornerHeader.frame.width
-            } else if Platform.currentInterface != .phone {
+            } else {
+                cornerBtn.frame = CGRect(x: 0, y: 0,
+                                         width: style.timeline.cornerHeaderWidth,
+                                         height: bounds.height)
+                cornerBtn.setTitle(style.timezone.abbreviation(), for: .normal)
+                if #available(iOS 14.0, *) {
+                    cornerBtn.showsMenuAsPrimaryAction = true
+                    cornerBtn.menu = createTimeZonesMenu()
+                } else {
+                    // Fallback on earlier versions
+                }
+                addSubview(cornerBtn)
+                mainFrame.origin.x = cornerBtn.frame.width
+                mainFrame.size.width -= cornerBtn.frame.width
+            }
+            
+            if Platform.currentInterface != .phone {
                 titleView?.frame.origin.x = 10
             }
             
@@ -399,6 +422,27 @@ extension ScrollableWeekView: UICollectionViewDelegate, UICollectionViewDelegate
         let width = collectionView.bounds.width / CGFloat(maxDays)
         return CGSize(width: width, height: collectionView.bounds.height)
     }
+}
+
+extension ScrollableWeekView {
+    
+    private func createTimeZonesMenu() -> UIMenu {
+        let actions = style.timeZoneIds.compactMap { (item) in
+            UIAction(title: item,
+                     state: style.selectedTimeZones.contains(where: { $0.identifier == item }) ? .on : .off) { [weak self] (_) in
+                if let timeZone = TimeZone(identifier: item) {
+                    self?.style.timezone = timeZone
+                    self?.style.selectedTimeZones.append(timeZone)
+                    if (self?.style.selectedTimeZones.count ?? 0) > 3 {
+                        self?.style.selectedTimeZones.removeFirst()
+                    }
+                    self?.didUpdateStyle?(self?.type ?? .day)
+                }
+            }
+        }
+        return UIMenu(title: "List of Time zones", children: actions)
+    }
+    
 }
 
 #endif

@@ -10,7 +10,6 @@ import UIKit
 import KVKCalendar
 import EventKit
 
-@available(iOS 13.0, *)
 final class ViewController: UIViewController, KVKCalendarSettings, KVKCalendarDataModel, UIPopoverPresentationControllerDelegate {
     
     var events = [Event]() {
@@ -53,10 +52,6 @@ final class ViewController: UIViewController, KVKCalendarSettings, KVKCalendarDa
         control.addTarget(self, action: #selector(switchCalendar), for: .valueChanged)
         return control
     }()
-        
-    private let timeZoneIds = TimeZone.knownTimeZoneIdentifiers
-    private var selectedTimeZone: TimeZone = .current
-    private var timelineTimeZones: [TimeZone] = []
     
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -119,21 +114,6 @@ final class ViewController: UIViewController, KVKCalendarSettings, KVKCalendarDa
         }
     }
     
-    private func createTimeZonesMenu() -> UIMenu {
-        let actions = TimeZone.knownTimeZoneIdentifiers.compactMap { (item) in
-            UIAction(title: item, state: selectedTimeZone.identifier == item ? .on : .off) { [weak self] (_) in
-                if let timeZone = TimeZone(identifier: item) {
-                    self?.selectedTimeZone = timeZone
-                    self?.timelineTimeZones.append(timeZone)
-                    if (self?.timelineTimeZones.count ?? 0) > 3 {
-                        self?.timelineTimeZones.removeFirst()
-                    }
-                    self?.calendarView.reloadData()
-                }
-            }
-        }
-        return UIMenu(title: "List of Time zones", children: actions)
-    }
 }
 
 // MARK: - Calendar delegate
@@ -182,29 +162,11 @@ extension ViewController: CalendarDelegate {
 
 // MARK: - Calendar datasource
 
-@available(iOS 13.0, *)
 extension ViewController: CalendarDataSource {
     
-    func dequeueTimeLabel(_ label: TimelineLabel) -> (current: TimelineLabel, others: [UILabel])? {
-        handleTimelineLabel(zones: [], label: label)
-    }
-    
-    func dequeueCornerHeader(date: Date, frame: CGRect) -> UIView? {
-        let cornerView = UIView(frame: frame)
-        let btn = UIButton(type: .system)
-        btn.setTitle(selectedTimeZone.abbreviation(), for: .normal)
-        btn.setTitleColor(.systemRed, for: .normal)
-        btn.setTitleColor(.lightGray, for: .selected)
-        btn.frame = cornerView.frame
-        if #available(iOS 14.0, *) {
-            btn.showsMenuAsPrimaryAction = true
-            btn.menu = createTimeZonesMenu()
-        } else {
-            // Fallback on earlier versions
-        }
-        cornerView.addSubview(btn)
-        return cornerView
-    }
+//    func dequeueTimeLabel(_ label: TimelineLabel) -> (current: TimelineLabel, others: [UILabel])? {
+//        handleTimelineLabel(zones: [], label: label)
+//    }
     
     func willSelectDate(_ date: Date, type: CalendarType) {
         print(date, type)

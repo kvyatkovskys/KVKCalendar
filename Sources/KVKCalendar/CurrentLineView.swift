@@ -94,7 +94,7 @@ extension CurrentLineView: CalendarSettingProtocol {
         timeLabel.frame = CGRect(x: 0, y: 0,
                                  width: style.timeline.currentLineHourWidth - widthOffset,
                                  height: frame.height)
-        dotView.frame = CGRect(x: style.timeline.allLeftOffset - (style.timeline.currentLineHourDotSize.width * 0.5) - frame.origin.x,
+        dotView.frame = CGRect(x: timeLabel.frame.width + 5,
                                y: (frame.height * 0.5) - 2,
                                width: style.timeline.currentLineHourDotSize.width,
                                height: style.timeline.currentLineHourDotSize.height)

@@ -1,5 +1,5 @@
 //
-//  CalendarView+Extension.swift
+//  KVKCalendarView+Extension.swift
 //  KVKCalendar
 //
 //  Created by Sergei Kviatkovskii on 14.12.2020.
@@ -329,6 +329,12 @@ extension KVKCalendarView: DisplayDelegate {
     
     public func willSelectDate(_ date: Date, type: CalendarType) {
         delegate?.willSelectDate(date, type: type)
+    }
+    
+    public func didUpdateStyle(_ style: Style, type: CalendarType) {
+        updateStyle(style)
+        reloadData()
+        delegate?.didUpdateStyle(style, type: type)
     }
 }
 

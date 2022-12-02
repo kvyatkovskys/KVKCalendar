@@ -35,7 +35,7 @@
 		67FF774F81829D25627A95523D121DCB /* AllDayEventModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 778DFD3FBB832D6E4D23F25335FFBEF0 /* AllDayEventModel.swift */; };
 		681E095B5B26C2C43F3712DE60C0EE04 /* KVKCalendar-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 4156390BBF62FCCDDD0E7939667888E7 /* KVKCalendar-dummy.m */; };
 		6F0D7E0034E08D9E007E126E021CEAFB /* MonthCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96098C6CF6C1BA70E1197BA7471FC51F /* MonthCell.swift */; };
-		71F3B422C4D8488E7E4ADD2E2A52C94D /* CalendarView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95889043D19F567D2F068D3DF793D13 /* CalendarView+Extension.swift */; };
+		71F3B422C4D8488E7E4ADD2E2A52C94D /* KVKCalendarView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95889043D19F567D2F068D3DF793D13 /* KVKCalendarView+Extension.swift */; };
 		7AB5F896D779959653E7AD5286432B46 /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB364C8715A22990F1D7C8B6FDE7F94F /* EventKit.framework */; };
 		7B2B45BE5BD852E6BC3AAA9621F088CF /* DayPadCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B6179D20EE3F4E1B968A8E83351B79D /* DayPadCell.swift */; };
 		7E5134C9C2E7CDE8C290E0F8640157A1 /* MonthData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313894D26574F72BECD3DCB3780EC5D7 /* MonthData.swift */; };
@@ -143,7 +143,7 @@
 		9DDDFB44C1E4A1CAC17F5959155FCA80 /* CalendarModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CalendarModel.swift; path = Sources/KVKCalendar/CalendarModel.swift; sourceTree = "<group>"; };
 		A041F8C0C72AA971369C6848FF758D74 /* Pods_KVKCalendar_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KVKCalendar_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A09F113E4975793648F12FDC38102325 /* ResizeEventView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ResizeEventView.swift; path = Sources/KVKCalendar/ResizeEventView.swift; sourceTree = "<group>"; };
-		A95889043D19F567D2F068D3DF793D13 /* CalendarView+Extension.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "CalendarView+Extension.swift"; path = "Sources/KVKCalendar/CalendarView+Extension.swift"; sourceTree = "<group>"; };
+		A95889043D19F567D2F068D3DF793D13 /* KVKCalendarView+Extension.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "KVKCalendarView+Extension.swift"; path = "Sources/KVKCalendar/KVKCalendarView+Extension.swift"; sourceTree = "<group>"; };
 		A9624963DF6186D58BC646C877E68CDF /* Pods-KVKCalendar_Tests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-KVKCalendar_Tests-dummy.m"; sourceTree = "<group>"; };
 		AB364C8715A22990F1D7C8B6FDE7F94F /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/EventKit.framework; sourceTree = DEVELOPER_DIR; };
 		AD144A2432F96A11EBF7681230A39D4F /* DayPhoneCell.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DayPhoneCell.swift; path = Sources/KVKCalendar/DayPhoneCell.swift; sourceTree = "<group>"; };
@@ -300,7 +300,7 @@
 				8A296C8DC2AC32446F7C661A876C043A /* CalendarData.swift */,
 				9DDDFB44C1E4A1CAC17F5959155FCA80 /* CalendarModel.swift */,
 				0AC1EFA39EACC49AC87CDD4DC127B85B /* KVKCalendarView.swift */,
-				A95889043D19F567D2F068D3DF793D13 /* CalendarView+Extension.swift */,
+				A95889043D19F567D2F068D3DF793D13 /* KVKCalendarView+Extension.swift */,
 				7ED99FB8A745CDF19E67E51BEDB31728 /* CurrentLineView.swift */,
 				E0C12DDE8C694F5EAE4DCA3C5ABF45C2 /* Date+Extension.swift */,
 				CD2FEDB8B803BCED77D12A798EF2E282 /* DayCell.swift */,
@@ -545,7 +545,7 @@
 				80F2D7EF1FD9A18404BA24798C596B10 /* CalendarData.swift in Sources */,
 				F921AE5E2656EAFD007669C6 /* AllDayView.swift in Sources */,
 				E7166AB631A1F363BEC98DB2BB114360 /* CalendarModel.swift in Sources */,
-				71F3B422C4D8488E7E4ADD2E2A52C94D /* CalendarView+Extension.swift in Sources */,
+				71F3B422C4D8488E7E4ADD2E2A52C94D /* KVKCalendarView+Extension.swift in Sources */,
 				F9258BCA28037DED00750B5C /* ScrollableWeekHeaderTitleView.swift in Sources */,
 				17BEAAC59928F37A39C7E34B5D385C0B /* KVKCalendarView.swift in Sources */,
 				DE29FAA9F97EB2995F905ABC8B0B5944 /* CurrentLineView.swift in Sources */,
@@ -646,7 +646,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/KVKCalendar/KVKCalendar-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/KVKCalendar/KVKCalendar-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MODULEMAP_FILE = "Target Support Files/KVKCalendar/KVKCalendar.modulemap";
 				PRODUCT_MODULE_NAME = KVKCalendar;
@@ -678,7 +678,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/KVKCalendar/KVKCalendar-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/KVKCalendar/KVKCalendar-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MODULEMAP_FILE = "Target Support Files/KVKCalendar/KVKCalendar.modulemap";
 				PRODUCT_MODULE_NAME = KVKCalendar;
@@ -744,7 +744,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -809,7 +809,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -838,7 +838,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = "Target Support Files/Pods-KVKCalendar_Example/Pods-KVKCalendar_Example-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MACH_O_TYPE = staticlib;
 				MODULEMAP_FILE = "Target Support Files/Pods-KVKCalendar_Example/Pods-KVKCalendar_Example.modulemap";
@@ -871,7 +871,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = "Target Support Files/Pods-KVKCalendar_Tests/Pods-KVKCalendar_Tests-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MACH_O_TYPE = staticlib;
 				MODULEMAP_FILE = "Target Support Files/Pods-KVKCalendar_Tests/Pods-KVKCalendar_Tests.modulemap";
@@ -904,7 +904,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = "Target Support Files/Pods-KVKCalendar_Tests/Pods-KVKCalendar_Tests-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MACH_O_TYPE = staticlib;
 				MODULEMAP_FILE = "Target Support Files/Pods-KVKCalendar_Tests/Pods-KVKCalendar_Tests.modulemap";
@@ -938,7 +938,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = "Target Support Files/Pods-KVKCalendar_Example/Pods-KVKCalendar_Example-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MACH_O_TYPE = staticlib;
 				MODULEMAP_FILE = "Target Support Files/Pods-KVKCalendar_Example/Pods-KVKCalendar_Example.modulemap";

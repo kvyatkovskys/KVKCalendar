@@ -398,6 +398,10 @@ extension WeekView: TimelineDelegate {
         delegate?.didChangeEvent(event, start: startDate, end: endDate)
     }
     
+    func dequeueTimeLabel(_ label: TimelineLabel) -> (current: TimelineLabel, others: [UILabel])? {
+        nil
+    }
+    
 }
 
 #endif

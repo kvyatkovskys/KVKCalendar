@@ -28,8 +28,12 @@ public struct Style {
     public var startWeekDay: StartDayType = .monday
     public var followInSystemTheme: Bool = true
     public var systemCalendars: Set<String> = []
+    public var timeZoneIds = TimeZone.knownTimeZoneIdentifiers
+    public var selectedTimeZones: [TimeZone]
     
     public init(configureAsDefaultCalendar: Bool = true) {
+        selectedTimeZones = [timezone]
+        
         guard configureAsDefaultCalendar else { return }
         
         if Platform.currentInterface == .phone {
