@@ -44,14 +44,16 @@ final class ViewController: UIViewController, KVKCalendarSettings, KVKCalendarDa
         return calendar
     }()
     
-    private lazy var segmentedControl: UISegmentedControl = {
-        let array = CalendarType.allCases
-        let control = UISegmentedControl(items: array.map { $0.rawValue.capitalized })
-        control.tintColor = .systemRed
-        control.selectedSegmentIndex = 0
-        control.addTarget(self, action: #selector(switchCalendar), for: .valueChanged)
-        return control
-    }()
+    private var calendarTypeBtn: UIBarButtonItem {
+        if #available(iOS 14.0, *) {
+            let btn = UIBarButtonItem(title: calendarView.selectedType.title, menu: createCalendarTypesMenu())
+            btn.style = .done
+            btn.tintColor = .systemRed
+            return btn
+        } else {
+            return UIBarButtonItem()
+        }
+    }
     
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -64,11 +66,10 @@ final class ViewController: UIViewController, KVKCalendarSettings, KVKCalendarDa
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        navigationItem.title = "KVKCalendar"
         view.backgroundColor = .systemBackground
         view.addSubview(calendarView)
-        navigationItem.titleView = segmentedControl
-        navigationItem.rightBarButtonItems = [todayButton, reloadStyle]
+        setupBarButtons()
         
         loadEvents(dateFormat: style.timeSystem.format) { (events) in
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
@@ -97,10 +98,22 @@ final class ViewController: UIViewController, KVKCalendarSettings, KVKCalendarDa
         calendarView.reloadData()
     }
     
-    @objc private func switchCalendar(sender: UISegmentedControl) {
-        let type = CalendarType.allCases[sender.selectedSegmentIndex]
-        calendarView.set(type: type, date: selectDate)
-        calendarView.reloadData()
+    private func setupBarButtons() {
+        navigationItem.leftBarButtonItems = [calendarTypeBtn, todayButton]
+        navigationItem.rightBarButtonItems = [reloadStyle]
+    }
+    
+    @available(iOS 14.0, *)
+    private func createCalendarTypesMenu() -> UIMenu {
+        let actions: [UIMenuElement] = KVKCalendar.CalendarType.allCases.compactMap { (item) in
+            UIAction(title: item.title, state: item == calendarView.selectedType ? .on : .off) { [weak self] (_) in
+                guard let self = self else { return }
+                self.calendarView.set(type: item, date: self.selectDate)
+                self.calendarView.reloadData()
+                self.setupBarButtons()
+            }
+        }
+        return UIMenu(children: actions)
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -118,7 +131,6 @@ final class ViewController: UIViewController, KVKCalendarSettings, KVKCalendarDa
 
 // MARK: - Calendar delegate
 
-@available(iOS 13.0, *)
 extension ViewController: CalendarDelegate {
     func didChangeEvent(_ event: Event, start: Date?, end: Date?) {
         if let result = handleChangingEvent(event, start: start, end: end) {

@@ -84,9 +84,8 @@ final class AllDayView: UIView {
         backgroundColor = params.style.allDay.backgroundColor
         subviews.filter { $0.tag == 123 }.forEach { $0.removeFromSuperview() }
         
-        let widthTitle = style.timeline.allLeftOffset
         titleLabel.frame = CGRect(x: params.style.allDay.offsetX, y: 0,
-                                  width: widthTitle - params.style.allDay.offsetX,
+                                  width: leftOffsetWithAdditionalTime - params.style.allDay.offsetX,
                                   height: params.style.allDay.height)
         titleLabel.font = params.style.allDay.fontTitle
         titleLabel.textColor = params.style.allDay.titleColor

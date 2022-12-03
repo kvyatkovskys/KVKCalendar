@@ -196,7 +196,6 @@ extension KVKCalendarSettings {
         style.month.scrollDirection = .horizontal
         style.month.isPagingEnabled = true
         style.month.autoSelectionDateWhenScrolling = true
-        style.timeline.cornerHeaderWidth = 60
         return style
     }
     

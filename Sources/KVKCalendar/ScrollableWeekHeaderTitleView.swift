@@ -32,7 +32,11 @@ final class ScrollableWeekHeaderTitleView: UIView {
         }
     }
     
-    private let titleLabel = UILabel()
+    private let titleLabel: UILabel = {
+        let lbl = UILabel()
+        lbl.adjustsFontSizeToFitWidth = true
+        return lbl
+    }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)

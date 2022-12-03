@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-@available(iOS 13.0, *)
 struct DeviceRotationViewModifier: ViewModifier {
     
     let action: (UIInterfaceOrientation) -> Void
@@ -22,7 +21,6 @@ struct DeviceRotationViewModifier: ViewModifier {
     
 }
 
-@available(iOS 13.0, *)
 public extension View {
     
     func kvkOnRotate(action: @escaping (UIInterfaceOrientation) -> Void) -> some View {
@@ -44,7 +42,6 @@ public extension View {
     
 }
 
-@available(iOS 13.0, *)
 public protocol ItemsMenuProxy: Identifiable, Equatable {
     
     var title: String { get }
@@ -111,7 +108,6 @@ struct ItemsMenu_Previews: PreviewProvider {
     }
 }
 
-@available(iOS 13.0, *)
 public struct StatefulPreviewWrapper<Value, Content: View>: View {
     @State var value: Value
     var content: (Binding<Value>) -> Content

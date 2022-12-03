@@ -9,7 +9,6 @@
 import Foundation
 import KVKCalendar
 
-@available(iOS 13.0, *)
 final class CalendarViewModel: ObservableObject, KVKCalendarSettings, KVKCalendarDataModel {
     
     // 🤔👹🍻😬🥸

@@ -31,20 +31,6 @@ extension TimelineView {
         isDisplayedHorizontalLines
     }
     
-    var actualSelectedTimeZoneCount: CGFloat {
-        guard style.selectedTimeZones.count > 1 else { return 0 }
-        
-        return CGFloat(style.selectedTimeZones.count - 1)
-    }
-    
-    var leftOffsetWithAdditionalTime: CGFloat {
-        guard actualSelectedTimeZoneCount > 0 else {
-            return style.timeline.offsetTimeX + style.timeline.offsetLineLeft
-        }
-        
-        return actualSelectedTimeZoneCount * style.timeline.allLeftOffset
-    }
-    
 }
 
 extension TimelineView: UIScrollViewDelegate {
@@ -367,11 +353,9 @@ extension TimelineView {
         times.enumerated().reduce([]) { acc, item -> [UIView] in
             let time = item.element
             let idx = item.offset
-            
-            let xLine = time.frame.width + leftOffsetWithAdditionalTime
-            let lineFrame = CGRect(x: xLine,
+            let lineFrame = CGRect(x: leftOffsetWithAdditionalTime,
                                    y: time.center.y,
-                                   width: frame.width - xLine,
+                                   width: frame.width - leftOffsetWithAdditionalTime,
                                    height: style.timeline.heightLine)
             let line = UIView(frame: lineFrame)
             line.backgroundColor = style.timeline.separatorLineColor
@@ -725,7 +709,7 @@ extension TimelineView: EventDelegate {
         let time = calculateChangingTime(pointY: pointTempY)
         
         if let minute = time.minute, 0...59 ~= minute {
-            movingMinuteLabel.frame = CGRect(x: style.timeline.offsetTimeX + leftOffsetWithAdditionalTime,
+            movingMinuteLabel.frame = CGRect(x: leftOffsetWithAdditionalTime,
                                              y: (pointY - offset) - style.timeline.heightTime,
                                              width: style.timeline.widthTime, height: style.timeline.heightTime)
             scrollView.addSubview(movingMinuteLabel)
@@ -774,7 +758,7 @@ extension TimelineView: CalendarSettingProtocol {
     }
     
     func setUI(reload: Bool = false) {
-        currentLineView.frame.origin.x = timeLabels.first?.frame.origin.x ?? style.timeline.cornerHeaderWidth
+        currentLineView.frame.origin.x = timeLabels.first?.frame.origin.x ?? (leftOffsetWithAdditionalTime - style.timeline.widthTime)
         
         scrollView.backgroundColor = style.timeline.backgroundColor
         scrollView.isScrollEnabled = style.timeline.scrollDirections.contains(.vertical)

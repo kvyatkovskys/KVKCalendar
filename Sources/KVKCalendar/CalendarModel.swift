@@ -354,6 +354,20 @@ extension CalendarSettingProtocol {
     func setDate(_ date: Date, animated: Bool) {}
     func setUI(reload: Bool = false) {}
     
+    var actualSelectedTimeZoneCount: CGFloat {
+        guard style.selectedTimeZones.count > 1 else { return 0 }
+        
+        return CGFloat(style.selectedTimeZones.count)
+    }
+    
+    var leftOffsetWithAdditionalTime: CGFloat {
+        guard actualSelectedTimeZoneCount > 0 else {
+            return style.timeline.allLeftOffset
+        }
+        
+        return (actualSelectedTimeZoneCount * style.timeline.widthTime) + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
+    }
+    
     func changeToTimeZone(_ hour: Int, from: TimeZone, to: TimeZone) -> Date {
         let today = Date()
         let components = DateComponents(year: today.kvkYear,

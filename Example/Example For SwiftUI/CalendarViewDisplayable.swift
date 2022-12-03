@@ -10,7 +10,6 @@ import SwiftUI
 import KVKCalendar
 import EventKit
 
-@available(iOS 13.0, *)
 struct CalendarViewDisplayable: UIViewRepresentable, KVKCalendarSettings, KVKCalendarDataModel {
         
     @Binding var events: [Event]

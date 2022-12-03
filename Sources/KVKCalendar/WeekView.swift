@@ -306,6 +306,11 @@ extension WeekView: CalendarSettingProtocol {
                 self.timelinePage.addNewTimelineView(newTimeline, to: .begin)
             }
         }
+        view.didUpdateStyle = { [weak self] (type) in
+            guard let self = self else { return }
+            
+            self.delegate?.didUpdateStyle(self.scrollableWeekView.style, type: type)
+        }
         return view
     }
     
@@ -399,7 +404,7 @@ extension WeekView: TimelineDelegate {
     }
     
     func dequeueTimeLabel(_ label: TimelineLabel) -> (current: TimelineLabel, others: [UILabel])? {
-        nil
+        handleTimelineLabel(zones: style.selectedTimeZones, label: label)
     }
     
 }

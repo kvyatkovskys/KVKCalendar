@@ -87,6 +87,7 @@ final class ScrollableWeekView: UIView {
         let btn = UIButton(type: .system)
         btn.setTitleColor(.systemRed, for: .normal)
         btn.setTitleColor(.lightGray, for: .selected)
+        btn.titleLabel?.font = .systemFont(ofSize: 17)
         return btn
     }()
     
@@ -241,23 +242,52 @@ extension ScrollableWeekView: CalendarSettingProtocol {
         } else {
             if let cornerHeader = dataSource?.dequeueCornerHeader(date: date,
                                                                   frame: CGRect(x: 0, y: 0,
-                                                                                width: style.timeline.cornerHeaderWidth,
+                                                                                width: leftOffsetWithAdditionalTime,
                                                                                 height: bounds.height)) {
                 addSubview(cornerHeader)
                 mainFrame.origin.x = cornerHeader.frame.width
                 mainFrame.size.width -= cornerHeader.frame.width
             } else {
                 cornerBtn.frame = CGRect(x: 0, y: 0,
-                                         width: style.timeline.cornerHeaderWidth,
+                                         width: leftOffsetWithAdditionalTime,
                                          height: bounds.height)
                 cornerBtn.setTitle(style.timezone.abbreviation(), for: .normal)
+                cornerBtn.titleLabel?.adjustsFontSizeToFitWidth = true
+                addSubview(cornerBtn)
+                
                 if #available(iOS 14.0, *) {
                     cornerBtn.showsMenuAsPrimaryAction = true
                     cornerBtn.menu = createTimeZonesMenu()
+                    
+                    if style.selectedTimeZones.count > 1 {
+                        cornerBtn.frame.size.height -= 35
+                        
+                        let actions: [UIAction] = style.selectedTimeZones.compactMap { (item) in
+                            UIAction(title: item.abbreviation() ?? "-") { [weak self] (_) in
+                                self?.style.timezone = item
+                                self?.didUpdateStyle?(self?.type ?? .day)
+                            }
+                        }
+                        let sgObject = UISegmentedControl(frame: CGRect(x: 2,
+                                                                        y: cornerBtn.frame.height + 5,
+                                                                        width: cornerBtn.frame.width - 4,
+                                                                        height: 25),
+                                                          actions: actions)
+                        sgObject.selectedSegmentIndex = style.selectedTimeZones.firstIndex(where: { $0.identifier == style.timezone.identifier }) ?? 0
+                        let sizeFont: CGFloat
+                        if Platform.currentInterface == .phone {
+                            sizeFont = 8
+                        } else {
+                            sizeFont = 10
+                        }
+                        let defaultAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: sizeFont)]
+                        sgObject.setTitleTextAttributes(defaultAttributes, for: .normal)
+                        addSubview(sgObject)
+                    }
                 } else {
                     // Fallback on earlier versions
                 }
-                addSubview(cornerBtn)
+                
                 mainFrame.origin.x = cornerBtn.frame.width
                 mainFrame.size.width -= cornerBtn.frame.width
             }

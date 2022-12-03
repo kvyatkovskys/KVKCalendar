@@ -184,7 +184,6 @@ public struct TimelineStyle {
     public var widthTime: CGFloat = 40
     public var heightTime: CGFloat = 20
     public var offsetTimeX: CGFloat = 10
-    public var cornerHeaderWidth: CGFloat = 0
     public var offsetTimeY: CGFloat = 25
     public var timeColor: UIColor = .systemGray
     public var timeAlignment: NSTextAlignment = .center
