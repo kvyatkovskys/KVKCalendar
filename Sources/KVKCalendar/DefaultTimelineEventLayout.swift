@@ -39,7 +39,7 @@ public struct DefaultTimelineEventLayout: TimelineEventLayout {
                     var newWidth = frame.width
                     newWidth /= CGFloat(crossEvent.events.count)
                     newWidth -= context.style.timeline.offsetEvent
-                    frame.size.width = newWidth
+                    frame.size.width = event.style?.defaultWidth ?? newWidth
                     
                     if crossEvent.events.count > 1 {
                         rects.forEach { (rect) in

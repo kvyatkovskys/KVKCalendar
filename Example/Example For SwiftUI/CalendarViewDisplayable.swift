@@ -52,14 +52,14 @@ struct CalendarViewDisplayable: UIViewRepresentable, KVKCalendarSettings, KVKCal
         selectDate = defaultDate
         
         var frame: CGRect
-        #if targetEnvironment(macCatalyst)
+#if targetEnvironment(macCatalyst)
         frame = CGRect(origin: .zero, size: UIApplication.shared.windowSize)
-        #else
+#else
         let offset = UIApplication.shared.screenOffset
         frame = UIScreen.main.bounds
         frame.size.height -= (offset.top + offset.bottom)
         frame.size.width -= (offset.right + offset.left)
-        #endif
+#endif
         
         calendar = KVKCalendarView(frame: frame, date: selectDate, style: style)
     }

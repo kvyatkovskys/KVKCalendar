@@ -176,10 +176,6 @@ extension ViewController: CalendarDelegate {
 
 extension ViewController: CalendarDataSource {
     
-//    func dequeueTimeLabel(_ label: TimelineLabel) -> (current: TimelineLabel, others: [UILabel])? {
-//        handleTimelineLabel(zones: [], label: label)
-//    }
-    
     func willSelectDate(_ date: Date, type: CalendarType) {
         print(date, type)
     }

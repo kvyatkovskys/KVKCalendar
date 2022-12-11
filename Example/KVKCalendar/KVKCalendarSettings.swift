@@ -118,9 +118,12 @@ extension KVKCalendarSettings where Self: KVKCalendarDataModel {
                 var customeStyle = style.event
                 customeStyle.defaultHeight = 40
                 event.style = customeStyle
-            }
-            if item.id == "40" {
+            } else if item.id == "40" {
                 event.recurringType = .everyYear
+            } else if item.id == "1400" {
+                var customeStyle = style.event
+                customeStyle.defaultWidth = 40
+                event.style = customeStyle
             }
             return event
         })
@@ -196,6 +199,7 @@ extension KVKCalendarSettings {
         style.month.scrollDirection = .horizontal
         style.month.isPagingEnabled = true
         style.month.autoSelectionDateWhenScrolling = true
+        style.timeline.useDefaultCorderHeader = true
         return style
     }
     
@@ -299,11 +303,7 @@ extension UIApplication {
     }
     
     var statusBarHeight: CGFloat {
-        if #available(iOS 13.0, *) {
-            return activeWindow?.windowScene?.statusBarManager?.statusBarFrame.height ?? 24
-        } else {
-            return statusBarFrame.height
-        }
+        activeWindow?.windowScene?.statusBarManager?.statusBarFrame.height ?? 24
     }
     
     var windowSize: CGSize {
@@ -315,16 +315,7 @@ extension UIApplication {
             let barHeight = UIApplication.shared.statusBarHeight
             return UIEdgeInsets(top: barHeight, left: 0, bottom: 0, right: 0)
         }
-        
-        if #available(iOS 11.0, *) {
-            if let insets = UIApplication.shared.activeWindow?.rootViewController?.view.safeAreaInsets {
-                return insets
-            } else {
-                return oldInsets
-            }
-        } else {
-            return oldInsets
-        }
+        return UIApplication.shared.activeWindow?.rootViewController?.view.safeAreaInsets ?? oldInsets
     }
     
 }

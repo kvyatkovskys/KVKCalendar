@@ -21,7 +21,7 @@ final class CurrentLineView: UIView {
         let label = TimelineLabel()
         label.textAlignment = .center
         label.adjustsFontSizeToFitWidth = true
-        label.minimumScaleFactor = 0.6
+        label.minimumScaleFactor = 0.4
         label.hashTime = Date().kvkMinute
         return label
     }()
@@ -84,17 +84,10 @@ extension CurrentLineView: CalendarSettingProtocol {
         timeLabel.textColor = style.timeline.currentLineHourColor
         timeLabel.font = style.timeline.currentLineHourFont
 
-        let widthOffset: CGFloat
-#if targetEnvironment(macCatalyst)
-        widthOffset = 20
-#else
-        widthOffset = 15
-#endif
-
         timeLabel.frame = CGRect(x: 0, y: 0,
-                                 width: style.timeline.currentLineHourWidth - widthOffset,
+                                 width: style.timeline.currentLineHourWidth,
                                  height: frame.height)
-        dotView.frame = CGRect(x: timeLabel.frame.width + 5,
+        dotView.frame = CGRect(x: leftOffsetWithAdditionalTime - (style.timeline.currentLineHourDotSize.width * 0.5),
                                y: (frame.height * 0.5) - 2,
                                width: style.timeline.currentLineHourDotSize.width,
                                height: style.timeline.currentLineHourDotSize.height)
@@ -116,6 +109,10 @@ extension CurrentLineView: CalendarSettingProtocol {
     func reloadFrame(_ frame: CGRect) {
         self.frame.size.width = frame.width
         self.frame.origin.x = frame.origin.x
+    }
+    
+    func setOffsetForTime(_ offset: CGFloat) {
+        timeLabel.frame.origin.x = offset
     }
 }
 

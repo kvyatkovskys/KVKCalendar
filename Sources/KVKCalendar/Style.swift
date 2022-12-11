@@ -37,7 +37,7 @@ public struct Style {
         guard configureAsDefaultCalendar else { return }
         
         if Platform.currentInterface == .phone {
-            timeline.currentLineHourWidth = 45
+            timeline.currentLineHourWidth = 40
             timeline.offsetTimeX = 2
             timeline.offsetLineLeft = 2
             headerScroll.titleDateAlignment = .center
@@ -48,7 +48,7 @@ public struct Style {
             month.weekDayAlignment = .center
             month.isHiddenSeparatorOnEmptyDate = true
             month.colorBackgroundWeekendDate = .clear
-            month.fontTitleHeader =  .boldSystemFont(ofSize: 19)
+            month.fontTitleHeader = .boldSystemFont(ofSize: 19)
             month.isHiddenSectionHeader = false
             month.isHiddenTitleHeader = true
             week.colorBackground = .white
@@ -202,7 +202,7 @@ public struct TimelineStyle {
     public var currentLineHourColor: UIColor = .red
     public var currentLineHourDotSize: CGSize = CGSize(width: 5, height: 5)
     public var currentLineHourDotCornersRadius: CGSize = CGSize(width: 2.5, height: 2.5)
-    public var currentLineHourWidth: CGFloat = 60
+    public var currentLineHourWidth: CGFloat = 40
     public var currentLineHourHeight: CGFloat = 1
     public var separatorLineColor: UIColor = .gray
     public var movingMinutesColor: UIColor = .systemBlue
@@ -222,6 +222,7 @@ public struct TimelineStyle {
     public var timeDividerColor: UIColor = .lightGray
     public var timeDividerFont: UIFont = .systemFont(ofSize: 10)
     public var scale: Scale? = Scale(min: 1, max: 6)
+    public var useDefaultCorderHeader = false
     
     public var allLeftOffset: CGFloat {
         widthTime + offsetTimeX + offsetLineLeft

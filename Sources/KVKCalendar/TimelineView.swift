@@ -48,10 +48,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     }()
     
     var calculatedCurrentLineViewFrame: CGRect {
-        var currentLineFrame = frame
-        currentLineFrame.origin = timeLabels.first?.frame.origin ?? CGPoint(x: style.timeline.currentLineHourWidth,
-                                                                            y: 0)
-        return currentLineFrame
+        frame
     }
     
     private(set) var tagCurrentHourLine = -10
@@ -82,7 +79,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         let label = TimelineLabel()
         label.adjustsFontSizeToFitWidth = true
         label.textColor = style.timeline.movingMinutesColor
-        label.textAlignment = .right
+        label.textAlignment = .left
         label.font = style.timeline.timeFont
         label.isHidden = !isDisplayedMovingTime
         return label
@@ -182,6 +179,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
 
         currentLineView.reloadFrame(calculatedCurrentLineViewFrame)
         currentLineView.updateStyle(style, force: true)
+        currentLineView.setOffsetForTime(timeLabels.first?.frame.origin.x ?? 0)
         let pointY = calculatePointYByMinute(date.kvkMinute, time: time)
         currentLineView.frame.origin.y = pointY - (currentLineView.frame.height * 0.5)
         scrollView.addSubview(currentLineView)

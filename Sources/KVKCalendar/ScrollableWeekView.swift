@@ -247,7 +247,7 @@ extension ScrollableWeekView: CalendarSettingProtocol {
                 addSubview(cornerHeader)
                 mainFrame.origin.x = cornerHeader.frame.width
                 mainFrame.size.width -= cornerHeader.frame.width
-            } else {
+            } else if style.timeline.useDefaultCorderHeader {
                 cornerBtn.frame = CGRect(x: 0, y: 0,
                                          width: leftOffsetWithAdditionalTime,
                                          height: bounds.height)
