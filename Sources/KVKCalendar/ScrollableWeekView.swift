@@ -458,16 +458,24 @@ extension ScrollableWeekView {
     
     private func createTimeZonesMenu() -> UIMenu {
         let actions = style.timeZoneIds.compactMap { (item) in
-            UIAction(title: item,
-                     state: style.selectedTimeZones.contains(where: { $0.identifier == item }) ? .on : .off) { [weak self] (_) in
-                if let timeZone = TimeZone(identifier: item) {
+            let alreadySelected = style.selectedTimeZones.contains(where: { $0.identifier == item })
+            
+            return UIAction(title: item, state: alreadySelected ? .on : .off) { [weak self] (_) in
+                guard let timeZone = TimeZone(identifier: item) else { return }
+                
+                if alreadySelected {
+                    self?.style.selectedTimeZones.removeAll(where: { $0.identifier == item })
+                    if self?.style.timezone.identifier == item {
+                        self?.style.timezone = self?.style.selectedTimeZones.last ?? TimeZone.current
+                    }
+                } else {
                     self?.style.timezone = timeZone
                     self?.style.selectedTimeZones.append(timeZone)
                     if (self?.style.selectedTimeZones.count ?? 0) > 3 {
                         self?.style.selectedTimeZones.removeFirst()
                     }
-                    self?.didUpdateStyle?(self?.type ?? .day)
                 }
+                self?.didUpdateStyle?(self?.type ?? .day)
             }
         }
         return UIMenu(title: "List of Time zones", children: actions)

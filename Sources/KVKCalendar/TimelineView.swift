@@ -250,6 +250,23 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         scrollView.scrollRectToVisible(frame, animated: true)
     }
     
+    private typealias EventOrder = (Event, Event) -> Bool
+    private func sortedEvent(_ lhs: Event,
+                             rhs: Event) -> Bool {
+        let predicates: [EventOrder] = [
+            { $0.style?.defaultWidth != nil && !($1.style?.defaultWidth != nil) },
+            { $0.start.kvkHour < $1.start.kvkHour }
+        ]
+        
+        for predicate in predicates {
+            if !predicate(lhs, rhs) && !predicate(rhs, lhs) {
+                continue
+            }
+            return predicate(lhs, rhs)
+        }
+        return false
+    }
+    
     func create(dates: [Date], events: [Event], recurringEvents: [Event], selectedDate: Date) {
         isResizableEventEnable = false
         delegate?.didDisplayEvents(events, dates: dates)
@@ -277,12 +294,14 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             startHour = style.timeline.startHour
         } else {
             if dates.count > 1 {
-                startHour = filteredEvents.sorted(by: { $0.start.kvkHour < $1.start.kvkHour })
+                startHour = filteredEvents
+                    .sorted(by: { $0.start.kvkHour < $1.start.kvkHour })
                     .first?.start.kvkHour ?? style.timeline.startHour
             } else {
-                startHour = filteredEvents.filter { compareStartDate(selectedDate, with: $0) }
-                .sorted(by: { $0.start.kvkHour < $1.start.kvkHour })
-                .first?.start.kvkHour ?? style.timeline.startHour
+                startHour = filteredEvents
+                    .filter { compareStartDate(selectedDate, with: $0) }
+                    .sorted(by: { $0.start.kvkHour < $1.start.kvkHour })
+                    .first?.start.kvkHour ?? style.timeline.startHour
             }
         }
         
@@ -315,11 +334,13 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             let verticalLine = createVerticalLine(pointX: pointX, date: date)
             layer.addSublayer(verticalLine)
             
-            let eventsByDate = filteredEvents.filter {
-                compareStartDate(date, with: $0)
-                || compareEndDate(date, with: $0)
-                || checkMultipleDate(date, with: $0)
-            }
+            let eventsByDate = filteredEvents
+                .filter {
+                    compareStartDate(date, with: $0)
+                    || compareEndDate(date, with: $0)
+                    || checkMultipleDate(date, with: $0)
+                }
+                .sorted(by: sortedEvent(_:rhs:))
             let allDayEventsForDate = filteredAllDayEvents.filter {
                 compareStartDate(date, with: $0)
                 || compareEndDate(date, with: $0)

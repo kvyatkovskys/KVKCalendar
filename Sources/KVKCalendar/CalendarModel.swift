@@ -261,8 +261,8 @@ public extension Event {
     }
     
     struct Color {
-        let value: UIColor
-        let alpha: CGFloat
+        public let value: UIColor
+        public let alpha: CGFloat
         
         public init(_ color: UIColor, alpha: CGFloat = 0.3) {
             self.value = color

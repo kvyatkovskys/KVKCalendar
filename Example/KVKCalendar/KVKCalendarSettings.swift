@@ -149,9 +149,14 @@ extension KVKCalendarSettings {
     }
     
     func handleCustomEventView(event: Event, style: Style, frame: CGRect) -> EventViewGeneral? {
-        guard event.ID == "2" else { return nil }
-        
-        return CustomViewEvent(style: style, event: event, frame: frame)
+        switch event.ID {
+        case "2":
+            return CustomViewEvent(style: style, event: event, frame: frame)
+        case "1400":
+            return BlockViewEvent(style: style, event: event, frame: frame)
+        default:
+            return nil
+        }
     }
     
     func handleOptionMenu(type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)? {
@@ -225,11 +230,28 @@ final class CustomViewEvent: EventViewGeneral {
         imageView.frame = CGRect(origin: CGPoint(x: 3, y: 1), size: CGSize(width: frame.width - 6, height: frame.height - 2))
         imageView.contentMode = .scaleAspectFit
         addSubview(imageView)
-        backgroundColor = event.backgroundColor
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+}
+
+final class BlockViewEvent: EventViewGeneral {
+    override init(style: Style, event: Event, frame: CGRect) {
+        var updatedStyle = style
+        updatedStyle.event.states = []
+        super.init(style: updatedStyle, event: event, frame: frame)
+        isUserInteractionEnabled = false
+        backgroundColor = event.color?.value
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func draw(_ rect: CGRect) {
+        
     }
 }
 
