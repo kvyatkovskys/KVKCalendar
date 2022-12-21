@@ -136,7 +136,7 @@ extension DayView: TimelineDelegate {
         delegate?.didAddNewEvent(event, date)
     }
     
-    func didChangeEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint, newDay: Int?) {
+    func didChangeEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint, newDate: Date?) {
         var startComponents = DateComponents()
         startComponents.year = event.start.kvkYear
         startComponents.month = event.start.kvkMonth

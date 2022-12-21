@@ -370,17 +370,23 @@ extension WeekView: TimelineDelegate {
         delegate?.didAddNewEvent(event, newDate)
     }
     
-    func didChangeEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint, newDay: Int?) {
+    func didChangeEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint, newDate: Date?) {
         var day = event.start.kvkDay
-        if let newDayEvent = newDay {
-            day = newDayEvent
+        var month = event.start.kvkMonth
+        var year = event.start.kvkYear
+        if let newDayEvent = newDate {
+            day = newDayEvent.kvkDay
+            month = newDayEvent.kvkMonth
+            year = newDayEvent.kvkYear
         } else if let newDate = scrollableWeekView.getDateByPointX(point.x), day != newDate.kvkDay {
             day = newDate.kvkDay
+            month = newDate.kvkMonth
+            year = newDate.kvkYear
         }
         
         var startComponents = DateComponents()
-        startComponents.year = event.start.kvkYear
-        startComponents.month = event.start.kvkMonth
+        startComponents.year = year
+        startComponents.month = month
         startComponents.day = day
         startComponents.hour = hour
         startComponents.minute = minute
@@ -389,14 +395,28 @@ extension WeekView: TimelineDelegate {
         let hourOffset = event.end.kvkHour - event.start.kvkHour
         let minuteOffset = event.end.kvkMinute - event.start.kvkMinute
         var endComponents = DateComponents()
-        endComponents.year = event.end.kvkYear
-        endComponents.month = event.end.kvkMonth
+        
+        if event.end.kvkYear != event.start.kvkYear {
+            let offset = event.end.kvkYear - event.start.kvkYear
+            endComponents.year = year + offset
+        } else {
+            endComponents.year = year
+        }
+        
+        if event.end.kvkMonth != event.start.kvkMonth {
+            let offset = event.end.kvkMonth - event.start.kvkMonth
+            endComponents.month = month + offset
+        } else {
+            endComponents.month = month
+        }
+        
         if event.end.kvkDay != event.start.kvkDay {
             let offset = event.end.kvkDay - event.start.kvkDay
             endComponents.day = day + offset
         } else {
             endComponents.day = day
         }
+        
         endComponents.hour = hour + hourOffset
         endComponents.minute = minute + minuteOffset
         let endDate = style.calendar.date(from: endComponents)

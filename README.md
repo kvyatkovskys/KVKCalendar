@@ -32,7 +32,7 @@ Please, use [Issues](https://github.com/kvyatkovskys/KVKCalendar/issues) only fo
 
 ## Requirements
 
-- iOS 10.0+, iPadOS 10.0+, MacOS 11.0+ (supports Mac Catalyst)
+- iOS 13.0+, iPadOS 13.0+, MacOS 11.0+ (supports Mac Catalyst)
 - Swift 5.0+
 
 ## Installation

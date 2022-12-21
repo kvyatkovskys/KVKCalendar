@@ -652,21 +652,21 @@ extension TimelineView: EventDelegate {
         location.y = (location.y - eventPreviewYOffset) - style.timeline.offsetEvent - 6
         let startTime = movingMinuteLabel.time
         if !event.isNew {
-            var newDayEvent: Int?
+            var newDateEvent: Date?
             var updatedEvent = event
             
-            if paramaters.type == .week, let newDate = shadowView.date {
-                newDayEvent = newDate.kvkDay
+            if paramaters.type == .week, let shadowDate = shadowView.date {
+                newDateEvent = shadowDate
                 
                 if event.recurringType != .none {
-                    updatedEvent = event.updateDate(newDate: newDate, calendar: style.calendar) ?? event
+                    updatedEvent = event.updateDate(newDate: shadowDate, calendar: style.calendar) ?? event
                 }
             }
             delegate?.didChangeEvent(updatedEvent,
                                      minute: startTime.minute,
                                      hour: startTime.hour,
                                      point: location,
-                                     newDay: newDayEvent)
+                                     newDate: newDateEvent)
         }
         
         shadowView.removeFromSuperview()
