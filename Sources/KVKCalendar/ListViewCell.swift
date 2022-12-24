@@ -45,12 +45,7 @@ final class ListViewCell: KVKTableViewCell {
         dotView.translatesAutoresizingMaskIntoConstraints = false
         txtLabel.translatesAutoresizingMaskIntoConstraints = false
     
-        let leftDot: NSLayoutConstraint
-        if #available(iOS 11.0, *) {
-            leftDot = dotView.leftAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leftAnchor)
-        } else {
-            leftDot = dotView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15)
-        }
+        let leftDot = dotView.leftAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leftAnchor)
         let centerYDot = dotView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         let widthDot = dotView.widthAnchor.constraint(equalToConstant: 20)
         let heightDot = dotView.heightAnchor.constraint(equalToConstant: 20)

@@ -162,11 +162,11 @@ extension KVKCalendarSettings {
     func handleOptionMenu(type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)? {
         guard type == .day else { return nil }
         
-        let action = UIAction(title: "Test", attributes: .destructive) { _ in
+        let action = UIAction(title: "Delete", attributes: .destructive) { _ in
             print("test tap")
         }
         
-        return (UIMenu(title: "Test menu", children: [action]), nil)
+        return (UIMenu(title: "Options", children: [action]), nil)
     }
     
     func handleCell<T>(parameter: CellParameter,
@@ -196,9 +196,7 @@ extension KVKCalendarSettings {
         style.timeline.isHiddenStubEvent = false
         style.startWeekDay = .sunday
         style.systemCalendars = ["Calendar1", "Calendar2", "Calendar3"]
-        if #available(iOS 13.0, *) {
-            style.event.iconFile = UIImage(systemName: "paperclip")
-        }
+        style.event.iconFile = UIImage(systemName: "paperclip")
         style.timeline.scrollLineHourMode = .onlyOnInitForDate(defaultDate)
         style.timeline.showLineHourMode = .always
         style.month.scrollDirection = .horizontal

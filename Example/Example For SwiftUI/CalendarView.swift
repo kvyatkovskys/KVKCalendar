@@ -35,7 +35,7 @@ struct CalendarView: View {
                 events = items
             }
         }
-        .navigationBarTitle("", displayMode: .inline)
+        .navigationBarTitle("KVKCalendar", displayMode: .inline)
         .edgesIgnoringSafeArea(.bottom)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {

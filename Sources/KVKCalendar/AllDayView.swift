@@ -110,10 +110,10 @@ final class AllDayView: UIView {
             break
         }
         
-        if let customHeaderCorderView = dataSource?.dequeueAllDayCornerHeader(date: params.date,
+        if let customHeaderCornerView = dataSource?.dequeueAllDayCornerHeader(date: params.date,
                                                                               frame: CGRect(origin: frame.origin, size: CGSize(width: titleLabel.frame.width, height: frame.height))) {
-            customHeaderCorderView.tag = 123
-            addSubview(customHeaderCorderView)
+            customHeaderCornerView.tag = 123
+            addSubview(customHeaderCornerView)
         } else {
             addSubview(titleLabel)
         }

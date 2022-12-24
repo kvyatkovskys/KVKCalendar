@@ -180,15 +180,6 @@ extension ViewController: CalendarDataSource {
         print(date, type)
     }
     
-    func dequeueAllDayViewEvent(_ event: Event, date: Date, frame: CGRect) -> UIView? {
-        if date.kvkDay == 11 {
-            let view = UIView(frame: frame)
-            view.backgroundColor = .systemRed
-            return view
-        }
-        return nil
-    }
-    
     @available(iOS 14.0, *)
     func willDisplayEventOptionMenu(_ event: Event, type: CalendarType) -> (menu: UIMenu, customButton: UIButton?)? {
         handleOptionMenu(type: type)

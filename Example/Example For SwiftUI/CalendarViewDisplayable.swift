@@ -60,7 +60,6 @@ struct CalendarViewDisplayable: UIViewRepresentable, KVKCalendarSettings, KVKCal
         frame.size.height -= (offset.top + offset.bottom)
         frame.size.width -= (offset.right + offset.left)
 #endif
-        
         calendar = KVKCalendarView(frame: frame, date: selectDate, style: style)
     }
     

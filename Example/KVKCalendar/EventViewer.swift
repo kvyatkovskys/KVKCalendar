@@ -20,11 +20,7 @@ final class EventViewer: UIView {
     
     private let lineView: UIView = {
         let view = UIView()
-        if #available(iOS 13.0, *) {
-            view.backgroundColor = .systemGray3
-        } else {
-            view.backgroundColor = .lightGray
-        }
+        view.backgroundColor = .systemGray3
         return view
     }()
     
@@ -36,11 +32,7 @@ final class EventViewer: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        if #available(iOS 13.0, *) {
-            backgroundColor = .systemBackground
-        } else {
-            backgroundColor = .white
-        }
+        backgroundColor = .systemBackground
         reloadFrame(frame: CGRect(origin: .zero, size: frame.size))
         addSubview(textLabel)
         addSubview(lineView)

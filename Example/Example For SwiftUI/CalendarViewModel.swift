@@ -12,6 +12,7 @@ import KVKCalendar
 final class CalendarViewModel: ObservableObject, KVKCalendarSettings, KVKCalendarDataModel {
     
     // 🤔👹🍻😬🥸
+    // only for example
     var events: [Event] = []
     
     var style: KVKCalendar.Style {
