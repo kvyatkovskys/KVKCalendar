@@ -257,6 +257,7 @@ extension ScrollableWeekView: CalendarSettingProtocol {
                 
                 if #available(iOS 14.0, *) {
                     cornerBtn.showsMenuAsPrimaryAction = true
+                    cornerBtn.addPointInteraction()
                     cornerBtn.menu = createTimeZonesMenu()
                     
                     if style.selectedTimeZones.count > 1 {

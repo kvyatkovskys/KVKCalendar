@@ -56,9 +56,8 @@ final class ListViewCell: KVKTableViewCell {
         let leftTxt = txtLabel.leftAnchor.constraint(equalTo: dotView.rightAnchor, constant: 10)
         let rightTxt = txtLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15)
         NSLayoutConstraint.activate([topTxt, bottomTxt, leftTxt, rightTxt])
-        
         if #available(iOS 13.4, *) {
-            addPointInteraction(on: self, delegate: self)
+            addPointInteraction()
         }
     }
     
@@ -68,8 +67,7 @@ final class ListViewCell: KVKTableViewCell {
     
     override func setSkeletons(_ skeletons: Bool,
                                insets: UIEdgeInsets = UIEdgeInsets(top: 4, left: 4, bottom: 4, right: 4),
-                               cornerRadius: CGFloat = 2)
-    {
+                               cornerRadius: CGFloat = 2) {
         isUserInteractionEnabled = !skeletons
         txtLabel.isHidden = skeletons
         dotView.isHidden = skeletons
@@ -84,21 +82,6 @@ final class ListViewCell: KVKTableViewCell {
             stubDotView.removeFromSuperview()
             stubLabelView.removeFromSuperview()
         }
-    }
-    
-}
-
-@available(iOS 13.4, *)
-extension ListViewCell: PointerInteractionProtocol {
-    
-    func pointerInteraction(_ interaction: UIPointerInteraction, styleFor region: UIPointerRegion) -> UIPointerStyle? {
-        var pointerStyle: UIPointerStyle?
-        
-        if let interactionView = interaction.view {
-            let targetedPreview = UITargetedPreview(view: interactionView)
-            pointerStyle = UIPointerStyle(effect: .highlight(targetedPreview))
-        }
-        return pointerStyle
     }
     
 }

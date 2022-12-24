@@ -78,8 +78,6 @@ extension CurrentLineView: CalendarSettingProtocol {
         dotView.backgroundColor = style.timeline.currentLineHourColor
         
         formatter.dateFormat = style.timeSystem.format
-        formatter.timeZone = style.timezone
-        formatter.locale = style.locale
         
         timeLabel.textColor = style.timeline.currentLineHourColor
         timeLabel.font = style.timeline.currentLineHourFont

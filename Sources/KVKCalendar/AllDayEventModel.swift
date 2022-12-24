@@ -9,21 +9,6 @@
 
 import UIKit
 
-@available(iOS 13.4, *)
-extension AllDayEventView: PointerInteractionProtocol {
-    
-    func pointerInteraction(_ interaction: UIPointerInteraction, styleFor region: UIPointerRegion) -> UIPointerStyle? {
-        var pointerStyle: UIPointerStyle?
-
-        if let interactionView = interaction.view {
-            let targetedPreview = UITargetedPreview(view: interactionView)
-            pointerStyle = UIPointerStyle(effect: .hover(targetedPreview))
-        }
-        return pointerStyle
-    }
-    
-}
-
 struct AllDayEvent {
     let date: Date
     let event: Event

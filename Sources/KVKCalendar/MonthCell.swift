@@ -269,7 +269,7 @@ final class MonthCell: KVKCollectionViewCell {
         contentView.addSubview(dateLabel)
                 
         if #available(iOS 13.4, *) {
-            addPointInteraction(on: self, delegate: self)
+            contentView.addPointInteraction()
         }
     }
     
@@ -472,21 +472,6 @@ extension MonthCell: UIGestureRecognizerDelegate {
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
                            shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
-    }
-    
-}
-
-@available(iOS 13.4, *)
-extension MonthCell: PointerInteractionProtocol {
-    
-    func pointerInteraction(_ interaction: UIPointerInteraction, styleFor region: UIPointerRegion) -> UIPointerStyle? {
-        var pointerStyle: UIPointerStyle?
-        
-        if let interactionView = interaction.view {
-            let targetedPreview = UITargetedPreview(view: interactionView)
-            pointerStyle = UIPointerStyle(effect: .hover(targetedPreview))
-        }
-        return pointerStyle
     }
     
 }

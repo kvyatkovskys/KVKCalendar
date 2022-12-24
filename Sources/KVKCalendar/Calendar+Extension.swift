@@ -406,18 +406,21 @@ extension UITableView: KVKDequeueProxyProtocol {}
 extension UICollectionView: KVKDequeueProxyProtocol {}
 
 @available(iOS 13.4, *)
-protocol PointerInteractionProtocol: UIPointerInteractionDelegate {
+extension UIView: UIPointerInteractionDelegate {
     
-    func addPointInteraction(on view: UIView, delegate: UIPointerInteractionDelegate)
+    func addPointInteraction() {
+        let interaction = UIPointerInteraction(delegate: self)
+        addInteraction(interaction)
+    }
     
-}
-
-@available(iOS 13.4, *)
-extension PointerInteractionProtocol {
-    
-    func addPointInteraction(on view: UIView, delegate: UIPointerInteractionDelegate) {
-        let interaction = UIPointerInteraction(delegate: delegate)
-        view.addInteraction(interaction)
+    public func pointerInteraction(_ interaction: UIPointerInteraction, styleFor region: UIPointerRegion) -> UIPointerStyle? {
+        var pointerStyle: UIPointerStyle?
+        
+        if let interactionView = interaction.view {
+            let targetedPreview = UITargetedPreview(view: interactionView)
+            pointerStyle = UIPointerStyle(effect: .highlight(targetedPreview))
+        }
+        return pointerStyle
     }
     
 }

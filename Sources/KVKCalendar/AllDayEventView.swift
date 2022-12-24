@@ -45,7 +45,7 @@ final class AllDayEventView: UIView {
         addGestureRecognizer(tap)
         
         if #available(iOS 13.4, *) {
-            addPointInteraction(on: self, delegate: self)
+            addPointInteraction()
         }
     }
     
