@@ -173,7 +173,7 @@ extension WeekView: CalendarSettingProtocol {
                 guard let self = self else { return }
                 
                 let newTimeline = self.createTimelineView(frame: self.timelinePage.bounds)
-                
+                newTimeline.updateStyle(self.style, force: reload)
                 switch type {
                 case .next:
                     self.nextDate()

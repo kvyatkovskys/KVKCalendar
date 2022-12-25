@@ -199,8 +199,6 @@ extension KVKCalendarSettings {
         style.event.iconFile = UIImage(systemName: "paperclip")
         style.timeline.scrollLineHourMode = .onlyOnInitForDate(defaultDate)
         style.timeline.showLineHourMode = .always
-        style.month.scrollDirection = .horizontal
-        style.month.isPagingEnabled = true
         style.month.autoSelectionDateWhenScrolling = true
         style.timeline.useDefaultCorderHeader = true
         return style
