@@ -243,7 +243,8 @@ extension ScrollableWeekView: CalendarSettingProtocol {
             if let cornerHeader = dataSource?.dequeueCornerHeader(date: date,
                                                                   frame: CGRect(x: 0, y: 0,
                                                                                 width: leftOffsetWithAdditionalTime,
-                                                                                height: bounds.height)) {
+                                                                                height: bounds.height),
+                                                                  type: type) {
                 addSubview(cornerHeader)
                 mainFrame.origin.x = cornerHeader.frame.width
                 mainFrame.size.width -= cornerHeader.frame.width

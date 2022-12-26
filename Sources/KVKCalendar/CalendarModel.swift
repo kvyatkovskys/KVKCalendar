@@ -469,7 +469,7 @@ public protocol CalendarDataSource: AnyObject {
     
     func dequeueTimeLabel(_ label: TimelineLabel) -> (current: TimelineLabel, others: [UILabel])?
     
-    func dequeueCornerHeader(date: Date, frame: CGRect) -> UIView?
+    func dequeueCornerHeader(date: Date, frame: CGRect, type: CalendarType) -> UIView?
     
     func dequeueAllDayCornerHeader(date: Date, frame: CGRect) -> UIView?
 }
@@ -507,7 +507,7 @@ public extension CalendarDataSource {
     
     func dequeueTimeLabel(_ label: TimelineLabel) -> (current: TimelineLabel, others: [UILabel])? { nil }
     
-    func dequeueCornerHeader(date: Date, frame: CGRect) -> UIView? { nil }
+    func dequeueCornerHeader(date: Date, frame: CGRect, type: CalendarType) -> UIView? { nil }
     
     func dequeueAllDayCornerHeader(date: Date, frame: CGRect) -> UIView? { nil }
     

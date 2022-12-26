@@ -276,8 +276,8 @@ extension KVKCalendarView: DisplayDataSource {
         dataSource?.dequeueAllDayCornerHeader(date: date, frame: frame)
     }
 
-    public func dequeueCornerHeader(date: Date, frame: CGRect) -> UIView? {
-        dataSource?.dequeueCornerHeader(date: date, frame: frame)
+    public func dequeueCornerHeader(date: Date, frame: CGRect, type: CalendarType) -> UIView? {
+        dataSource?.dequeueCornerHeader(date: date, frame: frame, type: type)
     }
     
 }
