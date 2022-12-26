@@ -112,7 +112,7 @@ final class ResizeEventView: UIView {
         bottomView.addSubview(bottomCircleView)
         
         if #available(iOS 13.4, *) {
-            addPointInteraction(on: self, delegate: self)
+            addPointInteraction()
         }
     }
     
@@ -144,17 +144,7 @@ final class ResizeEventView: UIView {
 }
 
 @available(iOS 13.4, *)
-extension ResizeEventView: PointerInteractionProtocol {
-    
-    func pointerInteraction(_ interaction: UIPointerInteraction, styleFor region: UIPointerRegion) -> UIPointerStyle? {
-        var pointerStyle: UIPointerStyle?
-        
-        if let interactionView = interaction.view {
-            let targetedPreview = UITargetedPreview(view: interactionView)
-            pointerStyle = UIPointerStyle(effect: .highlight(targetedPreview))
-        }
-        return pointerStyle
-    }
+extension ResizeEventView {
     
     func pointerInteraction(_ interaction: UIPointerInteraction, regionFor request: UIPointerRegionRequest, defaultRegion: UIPointerRegion) -> UIPointerRegion? {
         if topView.frame.contains(request.location) {

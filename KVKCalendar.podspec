@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'KVKCalendar'
-  s.version          = '0.6.11'
+  s.version          = '0.6.12'
   s.summary          = 'A most fully customization calendar for Apple platforms.'
   
   s.description      = <<-DESC
@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
   s.author           = { 'Sergei Kviatkovskii' => 'sergejkvyatkovskij@gmail.com' }
   s.source           = { :git => 'https://github.com/kvyatkovskys/KVKCalendar.git', :tag => s.version.to_s }
   s.social_media_url = 'https://github.com/kvyatkovskys'
-  s.ios.deployment_target = '10.0'
+  s.ios.deployment_target = '13.0'
   s.source_files     = 'Sources/**/*.swift'
   s.frameworks       = 'UIKit', 'EventKit'
   s.swift_version    = '5.0'

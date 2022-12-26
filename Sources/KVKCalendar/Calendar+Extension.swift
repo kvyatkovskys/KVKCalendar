@@ -122,9 +122,7 @@ extension UIApplication {
             } else {
                 return false
             }
-        } else if #available(iOS 11.0, *),
-                  let keyWindow = UIApplication.shared.windows.first(where: { $0.isKeyWindow })
-        {
+        } else if let keyWindow = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) {
             return keyWindow.safeAreaInsets.bottom > 0
         } else {
             return false
@@ -200,14 +198,6 @@ extension UICollectionView {
     
 }
 
-public extension UIView {
-    
-    static var kvkIdentifier: String {
-        return String(describing: self)
-    }
-    
-}
-
 extension UITableView {
     
     func kvkRegister<T: UITableViewCell>(_ cell: T.Type) {
@@ -222,10 +212,9 @@ extension UITableView {
 
 extension UIColor {
     
-    @available(iOS 13, *)
     static func useForStyle(dark: UIColor, white: UIColor) -> UIColor {
-        return UIColor { (traitCollection: UITraitCollection) -> UIColor in
-            return traitCollection.userInterfaceStyle == .dark ? dark : white
+        UIColor { (traitCollection: UITraitCollection) -> UIColor in
+            traitCollection.userInterfaceStyle == .dark ? dark : white
         }
     }
     
@@ -234,11 +223,7 @@ extension UIColor {
 extension UIScreen {
     
     static var isDarkMode: Bool {
-        if #available(iOS 12.0, *) {
-            return main.traitCollection.userInterfaceStyle == .dark
-        } else {
-            return false
-        }
+        main.traitCollection.userInterfaceStyle == .dark
     }
     
 }
@@ -254,17 +239,9 @@ extension UIView {
     }
     
     func setRoundCorners(_ corners: UIRectCorner = .allCorners, radius: CGSize) {
-        if #available(iOS 11.0, *) {
-            setRoundCorners(corners.convertedCorners, radius: max(radius.width, radius.height))
-        } else {
-            let path = UIBezierPath(roundedRect: bounds, byRoundingCorners: corners, cornerRadii: radius)
-            let mask = CAShapeLayer()
-            mask.path = path.cgPath
-            layer.mask = mask
-        }
+        setRoundCorners(corners.convertedCorners, radius: max(radius.width, radius.height))
     }
     
-    @available(iOS 11.0, *)
     func setRoundCorners(_ corners: CACornerMask = [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMaxYCorner], radius: CGFloat) {
         layer.masksToBounds = true
         layer.cornerRadius = radius
@@ -319,7 +296,47 @@ extension UIRectCorner {
     
 }
 
-public extension UITableView {
+public protocol KVKCellIdentifierProxy: AnyObject {
+    
+    static var kvkIdentifier: String { get }
+    
+}
+
+extension UIView: KVKCellIdentifierProxy {
+    
+    public static var kvkIdentifier: String {
+        String(describing: self)
+    }
+    
+}
+
+public protocol KVKDequeueProxyProtocol: AnyObject {}
+
+//public extension KVKDequeueProxyProtocol {
+//
+//    func kvkDequeueCell<T, U: KVKCellIdentifierProxy>(type: CalendarType,
+//                                                      view: T,
+//                                                      id: String = U.kvkIdentifier,
+//                                                      indexPath: IndexPath? = nil,
+//                                                      configure: (U) -> Void) -> U? {
+//        switch type {
+//
+//        case .month:
+//            if let cell = (view as? UITableView)?.kvkDequeueCell(id: id,
+//                                                                 indexPath: indexPath,
+//                                                                 configure: configure) {
+//                return cell
+//            } else {
+//                return nil
+//            }
+//        default:
+//            return nil
+//        }
+//    }
+//
+//}
+
+public extension KVKDequeueProxyProtocol where Self: UITableView {
     
     func kvkDequeueCell<T: UITableViewCell>(id: String = T.kvkIdentifier, indexPath: IndexPath? = nil, configure: (T) -> Void) -> T {
         kvkRegister(T.self)
@@ -353,7 +370,7 @@ public extension UITableView {
     
 }
 
-public extension UICollectionView {
+public extension KVKDequeueProxyProtocol where Self: UICollectionView {
     
     func kvkDequeueCell<T: UICollectionViewCell>(id: String = T.kvkIdentifier, indexPath: IndexPath, configure: (T) -> Void) -> T {
         kvkRegister(T.self, id: id)
@@ -385,19 +402,25 @@ public extension UICollectionView {
     
 }
 
-@available(iOS 13.4, *)
-protocol PointerInteractionProtocol: UIPointerInteractionDelegate {
-    
-    func addPointInteraction(on view: UIView, delegate: UIPointerInteractionDelegate)
-    
-}
+extension UITableView: KVKDequeueProxyProtocol {}
+extension UICollectionView: KVKDequeueProxyProtocol {}
 
 @available(iOS 13.4, *)
-extension PointerInteractionProtocol {
+extension UIView: UIPointerInteractionDelegate {
     
-    func addPointInteraction(on view: UIView, delegate: UIPointerInteractionDelegate) {
-        let interaction = UIPointerInteraction(delegate: delegate)
-        view.addInteraction(interaction)
+    func addPointInteraction() {
+        let interaction = UIPointerInteraction(delegate: self)
+        addInteraction(interaction)
+    }
+    
+    public func pointerInteraction(_ interaction: UIPointerInteraction, styleFor region: UIPointerRegion) -> UIPointerStyle? {
+        var pointerStyle: UIPointerStyle?
+        
+        if let interactionView = interaction.view {
+            let targetedPreview = UITargetedPreview(view: interactionView)
+            pointerStyle = UIPointerStyle(effect: .highlight(targetedPreview))
+        }
+        return pointerStyle
     }
     
 }

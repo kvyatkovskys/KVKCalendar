@@ -8,7 +8,6 @@
 import UIKit
 import SwiftUI
 
-@available(iOS 13.0, *)
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
@@ -20,30 +19,34 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
         window = UIWindow(windowScene: windowScene)
-        let navVC = UINavigationController(rootViewController: makeViewController())
-        navVC.isNavigationBarHidden = false
-        navVC.navigationBar.isTranslucent = false
-        
-        if #available(iOS 15.0, *) {
-            let appearance = UINavigationBarAppearance()
-            appearance.configureWithOpaqueBackground()
-            navVC.navigationBar.standardAppearance = appearance
-            navVC.navigationBar.scrollEdgeAppearance = appearance
-        }
-        
-        window?.rootViewController = navVC
+        let vc = makeViewController()
+        window?.rootViewController = vc
         window?.makeKeyAndVisible()
     }
     
     private func makeViewController() -> UIViewController {
+        func createNavVC(_ vc: UIViewController) -> UINavigationController {
+            let navVC = UINavigationController(rootViewController: vc)
+            navVC.isNavigationBarHidden = false
+            navVC.navigationBar.isTranslucent = false
+            
+            if #available(iOS 15.0, *) {
+                let appearance = UINavigationBarAppearance()
+                appearance.configureWithOpaqueBackground()
+                navVC.navigationBar.standardAppearance = appearance
+                navVC.navigationBar.scrollEdgeAppearance = appearance
+            }
+            return navVC
+        }
+        
         if #available(iOS 14.0, *) {
 #if DEBUG_SwiftUI
-            return UIHostingController(rootView: ContentView())
+            return UIHostingController(rootView: CalendarView())
 #else
-            return ViewController()
+            return createNavVC(ViewController())
 #endif
         } else {
-            return ViewController()
+            return createNavVC(ViewController())
         }
     }
 

@@ -60,7 +60,7 @@ final class EventView: EventViewGeneral {
         addSubview(textView)
         
         if #available(iOS 13.4, *) {
-            addPointInteraction(on: self, delegate: self)
+            addPointInteraction()
         }
     }
     
@@ -88,7 +88,7 @@ final class EventView: EventViewGeneral {
         }
         
         button.menu = menu
-        addPointInteraction(on: button, delegate: self)
+        addPointInteraction()
         addSubview(button)
     }
     
@@ -122,21 +122,6 @@ final class EventView: EventViewGeneral {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-}
-
-@available(iOS 13.4, *)
-extension EventView: PointerInteractionProtocol {
-    
-    func pointerInteraction(_ interaction: UIPointerInteraction, styleFor region: UIPointerRegion) -> UIPointerStyle? {
-        var pointerStyle: UIPointerStyle?
-        
-        if let interactionView = interaction.view {
-            let targetedPreview = UITargetedPreview(view: interactionView)
-            pointerStyle = UIPointerStyle(effect: .hover(targetedPreview))
-        }
-        return pointerStyle
     }
     
 }

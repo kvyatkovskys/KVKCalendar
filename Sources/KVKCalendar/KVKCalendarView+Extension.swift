@@ -1,5 +1,5 @@
 //
-//  CalendarView+Extension.swift
+//  KVKCalendarView+Extension.swift
 //  KVKCalendar
 //
 //  Created by Sergei Kviatkovskii on 14.12.2020.
@@ -10,7 +10,7 @@
 import UIKit
 import EventKit
 
-extension CalendarView {
+extension KVKCalendarView {
     // MARK: Public methods
     
     /// **DEPRECATED**
@@ -225,7 +225,7 @@ extension CalendarView {
     }
 }
 
-extension CalendarView: DisplayDataSource {
+extension KVKCalendarView: DisplayDataSource {
     public func dequeueCell<T>(parameter: CellParameter, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol? where T : UIScrollView {
         dataSource?.dequeueCell(parameter: parameter, type: type, view: view, indexPath: indexPath)
     }
@@ -276,13 +276,13 @@ extension CalendarView: DisplayDataSource {
         dataSource?.dequeueAllDayCornerHeader(date: date, frame: frame)
     }
 
-    public func dequeueCornerHeader(date: Date, frame: CGRect) -> UIView? {
-        dataSource?.dequeueCornerHeader(date: date, frame: frame)
+    public func dequeueCornerHeader(date: Date, frame: CGRect, type: CalendarType) -> UIView? {
+        dataSource?.dequeueCornerHeader(date: date, frame: frame, type: type)
     }
     
 }
 
-extension CalendarView: DisplayDelegate {
+extension KVKCalendarView: DisplayDelegate {
     public func sizeForHeader(_ date: Date?, type: CalendarType) -> CGSize? {
         delegate?.sizeForHeader(date, type: type)
     }
@@ -330,9 +330,15 @@ extension CalendarView: DisplayDelegate {
     public func willSelectDate(_ date: Date, type: CalendarType) {
         delegate?.willSelectDate(date, type: type)
     }
+    
+    public func didUpdateStyle(_ style: Style, type: CalendarType) {
+        updateStyle(style)
+        reloadData()
+        delegate?.didUpdateStyle(style, type: type)
+    }
 }
 
-extension CalendarView {
+extension KVKCalendarView {
     
     public var style: Style {
         get {

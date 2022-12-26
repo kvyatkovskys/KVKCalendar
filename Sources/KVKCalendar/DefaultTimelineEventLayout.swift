@@ -24,6 +24,7 @@ public struct DefaultTimelineEventLayout: TimelineEventLayout {
         
         switch viewMode {
         case .default:
+            let pageWidth = context.pageFrame.width + context.pageFrame.origin.x
             let crossEvents = context.calculateCrossEvents(forEvents: events)
             events.forEach { (event) in
                 var frame = context.getEventRect(start: event.start,
@@ -38,8 +39,8 @@ public struct DefaultTimelineEventLayout: TimelineEventLayout {
                     var newWidth = frame.width
                     newWidth /= CGFloat(crossEvent.events.count)
                     newWidth -= context.style.timeline.offsetEvent
-                    frame.size.width = newWidth
-
+                    frame.size.width = event.style?.defaultWidth ?? newWidth
+                    
                     if crossEvent.events.count > 1 {
                         rects.forEach { (rect) in
                             while rect.intersects(CGRect(x: newX,
@@ -50,10 +51,26 @@ public struct DefaultTimelineEventLayout: TimelineEventLayout {
                             }
                         }
                     }
+                    
+                    // when the current event exceeds a certain frame
+                    if newX >= pageWidth {
+                        let value = frame.width * 0.5
+                        let lastIdx = rects.count - 1
+                        if var lastUpdatedRect = rects[safe: lastIdx] {
+                            lastUpdatedRect.size.width -= value
+                            rects.removeLast()
+                            rects.append(lastUpdatedRect)
+                        }
+                        newX -= value
+                    }
 
+                    // sometimes the event width is large than the page width
+                    let newEventWidth = newX + frame.width
+                    if newEventWidth > pageWidth {
+                        frame.size.width -= newEventWidth - pageWidth + context.style.timeline.offsetEvent
+                    }
                     frame.origin.x = newX
                 }
-
                 rects.append(frame)
             }
         case .list:

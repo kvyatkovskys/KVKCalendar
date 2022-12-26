@@ -77,13 +77,7 @@ final class DayView: UIView {
     
     @discardableResult private func updateEventViewer(frame: CGRect) -> CGRect? {
         var viewerFrame = frame
-        // hard reset the width when we change the orientation
-        if UIApplication.shared.orientation.isPortrait {
-            viewerFrame.size.width = bounds.width * 0.5
-            viewerFrame.origin.x = viewerFrame.width
-        } else {
-            viewerFrame.origin.x = bounds.width - viewerFrame.width
-        }
+        viewerFrame.origin.x = bounds.width - viewerFrame.width
         guard let eventViewer = dataSource?.willDisplayEventViewer(date: parameters.data.date,
                                                                    frame: viewerFrame) else { return nil }
         
@@ -142,7 +136,7 @@ extension DayView: TimelineDelegate {
         delegate?.didAddNewEvent(event, date)
     }
     
-    func didChangeEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint, newDay: Int?) {
+    func didChangeEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint, newDate: Date?) {
         var startComponents = DateComponents()
         startComponents.year = event.start.kvkYear
         startComponents.month = event.start.kvkMonth
@@ -164,6 +158,9 @@ extension DayView: TimelineDelegate {
         delegate?.didChangeEvent(event, start: startDate, end: endDate)
     }
     
+    func dequeueTimeLabel(_ label: TimelineLabel) -> (current: TimelineLabel, others: [UILabel])? {
+        handleTimelineLabel(zones: style.selectedTimeZones, label: label)
+    }
 }
 
 extension DayView: CalendarSettingProtocol {
@@ -197,16 +194,7 @@ extension DayView: CalendarSettingProtocol {
                 if let idx = subviews.firstIndex(where: { $0.tag == tagEventViewer }) {
                     subviews[idx].removeFromSuperview()
                     var viewerFrame = timelineFrame
-                    
-                    let width: CGFloat
-                    if UIDevice.current.orientation.isPortrait {
-                        width = frame.width * 0.5
-                        timelineFrame.size.width = frame.width - width
-                    } else {
-                        width = defaultWidth
-                    }
-                    
-                    viewerFrame.size.width = width
+                    viewerFrame.size.width = defaultWidth
                     if let resultViewerFrame = updateEventViewer(frame: viewerFrame) {
                         // notify when we did change the frame of viewer
                         delegate?.didChangeViewerFrame(resultViewerFrame)
@@ -253,6 +241,7 @@ extension DayView: CalendarSettingProtocol {
                 guard let self = self else { return }
                 
                 let newTimeline = self.createTimelineView(frame: self.timelinePage.bounds)
+                newTimeline.updateStyle(self.style, force: reload)
                 switch type {
                 case .next:
                     self.nextDate()
@@ -375,6 +364,11 @@ extension DayView: CalendarSettingProtocol {
             case .previous:
                 self.timelinePage.addNewTimelineView(newTimeline, to: .begin)
             }
+        }
+        view.didUpdateStyle = { [weak self] (type) in
+            guard let self = self else { return }
+            
+            self.delegate?.didUpdateStyle(self.scrollableWeekView.style, type: type)
         }
         return view
     }

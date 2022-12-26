@@ -325,7 +325,7 @@ extension TimelineView {
         var otherTimes = [UILabel]()
         for (idx, txtHour) in timeSystem.hours.enumerated() where idx >= start {
             let yTime = (calculatedTimeY + style.timeline.heightTime) * CGFloat(idx - start)
-            let time = TimelineLabel(frame: CGRect(x: style.timeline.offsetTimeX + style.timeline.cornerHeaderWidth,
+            let time = TimelineLabel(frame: CGRect(x: leftOffsetWithAdditionalTime,
                                                    y: yTime,
                                                    width: style.timeline.widthTime,
                                                    height: style.timeline.heightTime))
@@ -339,7 +339,7 @@ extension TimelineView {
             time.tag = idx - start
             time.isHidden = !isDisplayedTimes
             
-            if let item = dataSource?.dequeueTimeLabel(time) {
+            if let item = dataSource?.dequeueTimeLabel(time) ?? delegate?.dequeueTimeLabel(time) {
                 otherTimes += item.others
                 times.append(item.current)
             } else {
@@ -353,11 +353,9 @@ extension TimelineView {
         times.enumerated().reduce([]) { acc, item -> [UIView] in
             let time = item.element
             let idx = item.offset
-            
-            let xLine = time.frame.width + style.timeline.offsetTimeX + style.timeline.offsetLineLeft + style.timeline.cornerHeaderWidth
-            let lineFrame = CGRect(x: xLine,
+            let lineFrame = CGRect(x: leftOffsetWithAdditionalTime,
                                    y: time.center.y,
-                                   width: frame.width - xLine,
+                                   width: frame.width - leftOffsetWithAdditionalTime,
                                    height: style.timeline.heightLine)
             let line = UIView(frame: lineFrame)
             line.backgroundColor = style.timeline.separatorLineColor
@@ -654,21 +652,21 @@ extension TimelineView: EventDelegate {
         location.y = (location.y - eventPreviewYOffset) - style.timeline.offsetEvent - 6
         let startTime = movingMinuteLabel.time
         if !event.isNew {
-            var newDayEvent: Int?
+            var newDateEvent: Date?
             var updatedEvent = event
             
-            if paramaters.type == .week, let newDate = shadowView.date {
-                newDayEvent = newDate.kvkDay
+            if paramaters.type == .week, let shadowDate = shadowView.date {
+                newDateEvent = shadowDate
                 
                 if event.recurringType != .none {
-                    updatedEvent = event.updateDate(newDate: newDate, calendar: style.calendar) ?? event
+                    updatedEvent = event.updateDate(newDate: shadowDate, calendar: style.calendar) ?? event
                 }
             }
             delegate?.didChangeEvent(updatedEvent,
                                      minute: startTime.minute,
                                      hour: startTime.hour,
                                      point: location,
-                                     newDay: newDayEvent)
+                                     newDate: newDateEvent)
         }
         
         shadowView.removeFromSuperview()
@@ -711,7 +709,7 @@ extension TimelineView: EventDelegate {
         let time = calculateChangingTime(pointY: pointTempY)
         
         if let minute = time.minute, 0...59 ~= minute {
-            movingMinuteLabel.frame = CGRect(x: style.timeline.offsetTimeX + style.timeline.cornerHeaderWidth,
+            movingMinuteLabel.frame = CGRect(x: leftOffsetWithAdditionalTime,
                                              y: (pointY - offset) - style.timeline.heightTime,
                                              width: style.timeline.widthTime, height: style.timeline.heightTime)
             scrollView.addSubview(movingMinuteLabel)
@@ -760,7 +758,7 @@ extension TimelineView: CalendarSettingProtocol {
     }
     
     func setUI(reload: Bool = false) {
-        currentLineView.frame.origin.x = timeLabels.first?.frame.origin.x ?? style.timeline.cornerHeaderWidth
+        currentLineView.frame.origin.x = timeLabels.first?.frame.origin.x ?? (leftOffsetWithAdditionalTime - style.timeline.widthTime)
         
         scrollView.backgroundColor = style.timeline.backgroundColor
         scrollView.isScrollEnabled = style.timeline.scrollDirections.contains(.vertical)

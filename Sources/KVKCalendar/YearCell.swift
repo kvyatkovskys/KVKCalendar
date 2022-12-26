@@ -92,7 +92,7 @@ final class YearCell: UICollectionViewCell {
         addSubview(titleLabel)
         
         if #available(iOS 13.4, *) {
-            addPointInteraction(on: self, delegate: self)
+            addPointInteraction()
         }
     }
     
@@ -200,21 +200,6 @@ final class YearCell: UICollectionViewCell {
         label.layer.cornerRadius = label.frame.height / 2
         label.clipsToBounds = true
     }
-}
-
-@available(iOS 13.4, *)
-extension YearCell: PointerInteractionProtocol {
-    
-    func pointerInteraction(_ interaction: UIPointerInteraction, styleFor region: UIPointerRegion) -> UIPointerStyle? {
-        var pointerStyle: UIPointerStyle?
-        
-        if let interactionView = interaction.view {
-            let targetedPreview = UITargetedPreview(view: interactionView)
-            pointerStyle = UIPointerStyle(effect: .hover(targetedPreview))
-        }
-        return pointerStyle
-    }
-    
 }
 
 #endif

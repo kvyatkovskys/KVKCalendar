@@ -8,6 +8,14 @@
 import Foundation
 
 public extension Date {
+    
+    private init(year: Int, month: Int, day: Int, hour: Int, minute: Int) {
+        self.init()
+        let isoDate = "\(year)-\(month)-\(day)T\(hour):\(minute):00+0000"
+        let dateFormatter = ISO8601DateFormatter()
+        self = dateFormatter.date(from: isoDate) ?? self
+    }
+    
     func titleForLocale(_ locale: Locale, formatter: DateFormatter) -> String {
         formatter.locale = locale
         return formatter.string(from: self)

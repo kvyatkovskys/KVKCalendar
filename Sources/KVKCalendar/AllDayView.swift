@@ -84,9 +84,8 @@ final class AllDayView: UIView {
         backgroundColor = params.style.allDay.backgroundColor
         subviews.filter { $0.tag == 123 }.forEach { $0.removeFromSuperview() }
         
-        let widthTitle = style.timeline.allLeftOffset
         titleLabel.frame = CGRect(x: params.style.allDay.offsetX, y: 0,
-                                  width: widthTitle - params.style.allDay.offsetX,
+                                  width: leftOffsetWithAdditionalTime - params.style.allDay.offsetX,
                                   height: params.style.allDay.height)
         titleLabel.font = params.style.allDay.fontTitle
         titleLabel.textColor = params.style.allDay.titleColor
@@ -111,10 +110,10 @@ final class AllDayView: UIView {
             break
         }
         
-        if let customHeaderCorderView = dataSource?.dequeueAllDayCornerHeader(date: params.date,
+        if let customHeaderCornerView = dataSource?.dequeueAllDayCornerHeader(date: params.date,
                                                                               frame: CGRect(origin: frame.origin, size: CGSize(width: titleLabel.frame.width, height: frame.height))) {
-            customHeaderCorderView.tag = 123
-            addSubview(customHeaderCorderView)
+            customHeaderCornerView.tag = 123
+            addSubview(customHeaderCornerView)
         } else {
             addSubview(titleLabel)
         }

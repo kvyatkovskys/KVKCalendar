@@ -78,10 +78,24 @@ public enum TimeHourSystem: Int {
             return "HH:mm"
         }
     }
+    
+    public var shortFormat: String {
+        switch self {
+        case .twelveHour, .twelve:
+            return "h a"
+        case .twentyFourHour, .twentyFour:
+            return "HH:mm"
+        }
+    }
 }
 
-public enum CalendarType: String, CaseIterable {
+public enum CalendarType: String, CaseIterable, ItemsMenuProxy {
     case day, week, month, year, list
+    
+    public var title: String {
+        rawValue.capitalized
+    }
+
 }
 
 extension CalendarType: Identifiable {
@@ -124,7 +138,7 @@ public struct Event {
     public var ID: String
     
     @available(swift, deprecated: 0.5.8, obsoleted: 0.5.9, renamed: "title")
-    public var text: String = ""
+    public var text: String?
     public var title: TextEvent = TextEvent()
     
     public var start: Date = Date()
@@ -155,7 +169,7 @@ public struct Event {
     public var recurringType: Event.RecurringType = .none
     
     ///custom style
-    ///(in-progress) works only with a default height
+    ///(in-progress) works only with a default (widht & height)
     public var style: EventStyle? = nil
     public var systemEvent: EKEvent? = nil
     
@@ -247,8 +261,8 @@ public extension Event {
     }
     
     struct Color {
-        let value: UIColor
-        let alpha: CGFloat
+        public let value: UIColor
+        public let alpha: CGFloat
         
         public init(_ color: UIColor, alpha: CGFloat = 0.3) {
             self.value = color
@@ -340,6 +354,64 @@ extension CalendarSettingProtocol {
     func setDate(_ date: Date, animated: Bool) {}
     func setUI(reload: Bool = false) {}
     
+    var actualSelectedTimeZoneCount: CGFloat {
+        guard style.selectedTimeZones.count > 1 else { return 0 }
+        
+        return CGFloat(style.selectedTimeZones.count)
+    }
+    
+    var leftOffsetWithAdditionalTime: CGFloat {
+        guard actualSelectedTimeZoneCount > 0 else {
+            return style.timeline.allLeftOffset
+        }
+        
+        return (actualSelectedTimeZoneCount * style.timeline.widthTime) + style.timeline.offsetTimeX + style.timeline.offsetLineLeft
+    }
+    
+    func changeToTimeZone(_ hour: Int, from: TimeZone, to: TimeZone) -> Date {
+        let today = Date()
+        let components = DateComponents(year: today.kvkYear,
+                                        month: today.kvkMonth,
+                                        day: today.kvkDay,
+                                        hour: hour,
+                                        minute: 0)
+        let date = Calendar.current.date(from: components) ?? today
+        let sourceOffset = from.secondsFromGMT(for: date)
+        let destinationOffset = to.secondsFromGMT(for: date)
+        let timeInterval = TimeInterval(destinationOffset - sourceOffset)
+        return Date(timeInterval: timeInterval, since: date)
+    }
+    
+    func handleTimelineLabel(zones: [TimeZone],
+                             label: TimelineLabel) -> (current: TimelineLabel, others: [UILabel])? {
+        var otherLabels = [UILabel]()
+        let current = label
+        
+        zones.enumerated().forEach {
+            let x = (CGFloat($0.offset) * current.frame.width) + style.timeline.offsetTimeX
+            let otherLabel = UILabel(frame: CGRect(x: x, y: current.frame.origin.y,
+                                                   width: current.frame.width, height: current.frame.height))
+            let labelDate = changeToTimeZone(label.hashTime, from: style.timezone, to: $0.element)
+            otherLabel.text = timeFormatter(date: labelDate, format: style.timeSystem.shortFormat)
+            otherLabel.textAlignment = style.timeline.timeAlignment
+            otherLabel.font = style.timeline.timeFont
+            otherLabel.adjustsFontSizeToFitWidth = true
+            
+            if $0.element.identifier == style.timezone.identifier {
+                current.frame = otherLabel.frame
+            } else {
+                otherLabels.append(otherLabel)
+            }
+        }
+        
+        return (current, otherLabels)
+    }
+    
+    func timeFormatter(date: Date, format: String) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = format
+        return formatter.string(from: date)
+    }
 }
 
 // MARK: - Data source protocol
@@ -397,7 +469,7 @@ public protocol CalendarDataSource: AnyObject {
     
     func dequeueTimeLabel(_ label: TimelineLabel) -> (current: TimelineLabel, others: [UILabel])?
     
-    func dequeueCornerHeader(date: Date, frame: CGRect) -> UIView?
+    func dequeueCornerHeader(date: Date, frame: CGRect, type: CalendarType) -> UIView?
     
     func dequeueAllDayCornerHeader(date: Date, frame: CGRect) -> UIView?
 }
@@ -435,7 +507,7 @@ public extension CalendarDataSource {
     
     func dequeueTimeLabel(_ label: TimelineLabel) -> (current: TimelineLabel, others: [UILabel])? { nil }
     
-    func dequeueCornerHeader(date: Date, frame: CGRect) -> UIView? { nil }
+    func dequeueCornerHeader(date: Date, frame: CGRect, type: CalendarType) -> UIView? { nil }
     
     func dequeueAllDayCornerHeader(date: Date, frame: CGRect) -> UIView? { nil }
     
@@ -493,6 +565,8 @@ public protocol CalendarDelegate: AnyObject {
     
     /// deselect event on timeline
     func didDeselectEvent(_ event: Event, animated: Bool)
+    
+    func didUpdateStyle(_ style: Style, type: CalendarType)
 }
 
 public extension CalendarDelegate {
@@ -523,6 +597,8 @@ public extension CalendarDelegate {
     func didDeselectEvent(_ event: Event, animated: Bool) {}
     
     func didChangeViewerFrame(_ frame: CGRect) {}
+    
+    func didUpdateStyle(_ style: Style, type: CalendarType) {}
 }
 
 // MARK: - Private Display dataSource

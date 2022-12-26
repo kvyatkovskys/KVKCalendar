@@ -10,7 +10,7 @@ import UIKit
 import KVKCalendar
 import EventKit
 
-final class ViewController: UIViewController, KVKCalendarSettings, UIPopoverPresentationControllerDelegate {
+final class ViewController: UIViewController, KVKCalendarSettings, KVKCalendarDataModel, UIPopoverPresentationControllerDelegate {
     
     var events = [Event]() {
         didSet {
@@ -35,24 +35,26 @@ final class ViewController: UIViewController, KVKCalendarSettings, UIPopoverPres
         return button
     }()
     
-    private lazy var calendarView: CalendarView = {
+    private lazy var calendarView: KVKCalendarView = {
         var frame = view.frame
         frame.origin.y = 0
-        let calendar = CalendarView(frame: frame, date: selectDate, style: style)
+        let calendar = KVKCalendarView(frame: frame, date: selectDate, style: style)
         calendar.delegate = self
         calendar.dataSource = self
         return calendar
     }()
     
-    private lazy var segmentedControl: UISegmentedControl = {
-        let array = CalendarType.allCases
-        let control = UISegmentedControl(items: array.map { $0.rawValue.capitalized })
-        control.tintColor = .systemRed
-        control.selectedSegmentIndex = 0
-        control.addTarget(self, action: #selector(switchCalendar), for: .valueChanged)
-        return control
-    }()
-        
+    private var calendarTypeBtn: UIBarButtonItem {
+        if #available(iOS 14.0, *) {
+            let btn = UIBarButtonItem(title: calendarView.selectedType.title, menu: createCalendarTypesMenu())
+            btn.style = .done
+            btn.tintColor = .systemRed
+            return btn
+        } else {
+            return UIBarButtonItem()
+        }
+    }
+    
     init() {
         super.init(nibName: nil, bundle: nil)
         selectDate = defaultDate
@@ -64,15 +66,10 @@ final class ViewController: UIViewController, KVKCalendarSettings, UIPopoverPres
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        if #available(iOS 13.0, *) {
-            view.backgroundColor = .systemBackground
-        } else {
-            view.backgroundColor = .white
-        }
+        navigationItem.title = "KVKCalendar"
+        view.backgroundColor = .systemBackground
         view.addSubview(calendarView)
-        navigationItem.titleView = segmentedControl
-        navigationItem.rightBarButtonItems = [todayButton, reloadStyle]
+        setupBarButtons()
         
         loadEvents(dateFormat: style.timeSystem.format) { (events) in
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
@@ -101,10 +98,22 @@ final class ViewController: UIViewController, KVKCalendarSettings, UIPopoverPres
         calendarView.reloadData()
     }
     
-    @objc private func switchCalendar(sender: UISegmentedControl) {
-        let type = CalendarType.allCases[sender.selectedSegmentIndex]
-        calendarView.set(type: type, date: selectDate)
-        calendarView.reloadData()
+    private func setupBarButtons() {
+        navigationItem.leftBarButtonItems = [calendarTypeBtn, todayButton]
+        navigationItem.rightBarButtonItems = [reloadStyle]
+    }
+    
+    @available(iOS 14.0, *)
+    private func createCalendarTypesMenu() -> UIMenu {
+        let actions: [UIMenuElement] = KVKCalendar.CalendarType.allCases.compactMap { (item) in
+            UIAction(title: item.title, state: item == calendarView.selectedType ? .on : .off) { [weak self] (_) in
+                guard let self = self else { return }
+                self.calendarView.set(type: item, date: self.selectDate)
+                self.calendarView.reloadData()
+                self.setupBarButtons()
+            }
+        }
+        return UIMenu(children: actions)
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -117,6 +126,7 @@ final class ViewController: UIViewController, KVKCalendarSettings, UIPopoverPres
             self?.events = events
         }
     }
+    
 }
 
 // MARK: - Calendar delegate
@@ -166,13 +176,8 @@ extension ViewController: CalendarDelegate {
 
 extension ViewController: CalendarDataSource {
     
-    func dequeueAllDayViewEvent(_ event: Event, date: Date, frame: CGRect) -> UIView? {
-        if date.kvkDay == 11 {
-            let view = UIView(frame: frame)
-            view.backgroundColor = .systemRed
-            return view
-        }
-        return nil
+    func willSelectDate(_ date: Date, type: CalendarType) {
+        print(date, type)
     }
     
     @available(iOS 14.0, *)

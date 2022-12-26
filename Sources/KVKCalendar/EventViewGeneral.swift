@@ -164,7 +164,7 @@ open class EventViewGeneral: UIView, CalendarTimer {
         }
     }
     
-    public override func draw(_ rect: CGRect) {
+    open override func draw(_ rect: CGRect) {
         guard let context = UIGraphicsGetCurrentContext() else { return }
         
         context.interpolationQuality = .none

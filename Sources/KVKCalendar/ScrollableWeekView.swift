@@ -14,6 +14,7 @@ final class ScrollableWeekView: UIView {
     var didTrackScrollOffset: ((CGFloat?, Bool) -> Void)?
     var didSelectDate: ((Date?, CalendarType) -> Void)?
     var didChangeDay: ((TimelinePageView.SwitchPageType) -> Void)?
+    var didUpdateStyle: ((CalendarType) -> Void)?
     
     struct Parameters {
         let frame: CGRect
@@ -82,6 +83,13 @@ final class ScrollableWeekView: UIView {
     
     private var titleView: ScrollableWeekHeaderTitleView?
     private let bottomLineView = UIView()
+    private let cornerBtn: UIButton = {
+        let btn = UIButton(type: .system)
+        btn.setTitleColor(.systemRed, for: .normal)
+        btn.setTitleColor(.lightGray, for: .selected)
+        btn.titleLabel?.font = .systemFont(ofSize: 17)
+        return btn
+    }()
     
     init(parameters: Parameters) {
         self.params = parameters
@@ -146,14 +154,7 @@ final class ScrollableWeekView: UIView {
     }
     
     private func createCollectionView(frame: CGRect, isScrollEnabled: Bool) -> UICollectionView {
-        let x: CGFloat
-        if type == .day {
-            x = 0
-        } else {
-            x = style.timeline.allLeftOffset
-        }
-        let newFrame = CGRect(x: x, y: frame.origin.y, width: frame.width - x, height: frame.height)
-        let collection = UICollectionView(frame: newFrame, collectionViewLayout: layout)
+        let collection = UICollectionView(frame: frame, collectionViewLayout: layout)
         collection.isPagingEnabled = true
         collection.showsHorizontalScrollIndicator = false
         collection.backgroundColor = .clear
@@ -239,20 +240,69 @@ extension ScrollableWeekView: CalendarSettingProtocol {
             collectionView.reloadData()
             addSubview(customView)
         } else {
+            if let cornerHeader = dataSource?.dequeueCornerHeader(date: date,
+                                                                  frame: CGRect(x: 0, y: 0,
+                                                                                width: leftOffsetWithAdditionalTime,
+                                                                                height: bounds.height),
+                                                                  type: type) {
+                addSubview(cornerHeader)
+                mainFrame.origin.x = cornerHeader.frame.width
+                mainFrame.size.width -= cornerHeader.frame.width
+            } else if style.timeline.useDefaultCorderHeader {
+                cornerBtn.frame = CGRect(x: 0, y: 0,
+                                         width: leftOffsetWithAdditionalTime,
+                                         height: bounds.height)
+                cornerBtn.setTitle(style.timezone.abbreviation(), for: .normal)
+                cornerBtn.titleLabel?.adjustsFontSizeToFitWidth = true
+                addSubview(cornerBtn)
+                
+                if #available(iOS 14.0, *) {
+                    cornerBtn.showsMenuAsPrimaryAction = true
+                    cornerBtn.addPointInteraction()
+                    cornerBtn.menu = createTimeZonesMenu()
+                    
+                    if style.selectedTimeZones.count > 1 {
+                        cornerBtn.frame.size.height -= 35
+                        
+                        let actions: [UIAction] = style.selectedTimeZones.compactMap { (item) in
+                            UIAction(title: item.abbreviation() ?? "-") { [weak self] (_) in
+                                self?.style.timezone = item
+                                self?.didUpdateStyle?(self?.type ?? .day)
+                            }
+                        }
+                        let sgObject = UISegmentedControl(frame: CGRect(x: 2,
+                                                                        y: cornerBtn.frame.height + 5,
+                                                                        width: cornerBtn.frame.width - 4,
+                                                                        height: 25),
+                                                          actions: actions)
+                        sgObject.selectedSegmentIndex = style.selectedTimeZones.firstIndex(where: { $0.identifier == style.timezone.identifier }) ?? 0
+                        let sizeFont: CGFloat
+                        if Platform.currentInterface == .phone {
+                            sizeFont = 8
+                        } else {
+                            sizeFont = 10
+                        }
+                        let defaultAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: sizeFont)]
+                        sgObject.setTitleTextAttributes(defaultAttributes, for: .normal)
+                        addSubview(sgObject)
+                    }
+                } else {
+                    // Fallback on earlier versions
+                }
+                
+                mainFrame.origin.x = cornerBtn.frame.width
+                mainFrame.size.width -= cornerBtn.frame.width
+            }
+            
+            if Platform.currentInterface != .phone {
+                titleView?.frame.origin.x = 10
+            }
+            
             calculateFrameForCollectionViewIfNeeded(&mainFrame)
             collectionView = createCollectionView(frame: mainFrame,
                                                   isScrollEnabled: style.headerScroll.isScrollEnabled)
             addSubview(collectionView)
             addTitleHeaderIfNeeded(frame: collectionView.frame)
-            
-            if let cornerHeader = dataSource?.dequeueCornerHeader(date: date,
-                                                                  frame: CGRect(x: 0, y: 0,
-                                                                                width: collectionView.frame.origin.x,
-                                                                                height: bounds.height)) {
-                addSubview(cornerHeader)
-            } else if Platform.currentInterface != .phone {
-                titleView?.frame.origin.x = 10
-            }
         }
         
         addSubview(bottomLineView)
@@ -404,6 +454,35 @@ extension ScrollableWeekView: UICollectionViewDelegate, UICollectionViewDelegate
         let width = collectionView.bounds.width / CGFloat(maxDays)
         return CGSize(width: width, height: collectionView.bounds.height)
     }
+}
+
+extension ScrollableWeekView {
+    
+    private func createTimeZonesMenu() -> UIMenu {
+        let actions = style.timeZoneIds.compactMap { (item) in
+            let alreadySelected = style.selectedTimeZones.contains(where: { $0.identifier == item })
+            
+            return UIAction(title: item, state: alreadySelected ? .on : .off) { [weak self] (_) in
+                guard let timeZone = TimeZone(identifier: item) else { return }
+                
+                if alreadySelected {
+                    self?.style.selectedTimeZones.removeAll(where: { $0.identifier == item })
+                    if self?.style.timezone.identifier == item {
+                        self?.style.timezone = self?.style.selectedTimeZones.last ?? TimeZone.current
+                    }
+                } else {
+                    self?.style.timezone = timeZone
+                    self?.style.selectedTimeZones.append(timeZone)
+                    if (self?.style.selectedTimeZones.count ?? 0) > 3 {
+                        self?.style.selectedTimeZones.removeFirst()
+                    }
+                }
+                self?.didUpdateStyle?(self?.type ?? .day)
+            }
+        }
+        return UIMenu(title: "List of Time zones", children: actions)
+    }
+    
 }
 
 #endif
