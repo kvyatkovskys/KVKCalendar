@@ -38,8 +38,8 @@ extension KVKCalendarView {
                 weekView.reloadData(events)
             case .month:
                 monthView.reloadData(events)
-            case .list:
-                listView.reloadData(events)
+            //case .list:
+              //  listView.reloadData(events)
             default:
                 break
             }
