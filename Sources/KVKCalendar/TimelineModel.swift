@@ -79,7 +79,6 @@ extension EventDateProtocol {
         
         let result = event.start.kvkDay != event.end.kvkDay
         && (startDate...endDate).contains(timeInterval)
-        && event.start.kvkYear == date?.kvkYear
         
         if checkMonth {
             return result && event.start.kvkMonth == date?.kvkMonth
