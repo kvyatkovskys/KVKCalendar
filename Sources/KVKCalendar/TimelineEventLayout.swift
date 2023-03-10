@@ -46,7 +46,7 @@ public extension TimelineEventLayoutContext {
                 newFrame.size.height = defaultHeight
             } else if end.kvkHour == time.hashTime, end.kvkDay == date?.kvkDay {
                 // to avoid crash https://github.com/kvyatkovskys/KVKCalendar/issues/237
-                if start.kvkHour == end.kvkHour && start.kvkMinute == end.kvkMinute {
+                if start.kvkHour == end.kvkHour && start.kvkMinute == end.kvkMinute, start.kvkDay == end.kvkDay {
                     newFrame.size.height = 30
                     return
                 }
