@@ -292,6 +292,17 @@ extension ScrollableWeekView: CalendarSettingProtocol {
                 
                 mainFrame.origin.x = cornerBtn.frame.width
                 mainFrame.size.width -= cornerBtn.frame.width
+            } else {
+                if type == .week {
+                    let spacerView = UIView()
+                    spacerView.frame = CGRect(x: 0, y: 0,
+                                              width: leftOffsetWithAdditionalTime,
+                                              height: bounds.height)
+                    spacerView.backgroundColor = .clear
+                    addSubview(spacerView)
+                    mainFrame.origin.x = spacerView.frame.width
+                    mainFrame.size.width -= spacerView.frame.width
+                }
             }
             
             if Platform.currentInterface != .phone {
