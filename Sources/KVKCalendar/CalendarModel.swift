@@ -131,11 +131,11 @@ public struct TextEvent {
     }
 }
 
-public struct Event {
+public struct Event: Identifiable {
     static let idForNewEvent = "-999"
     
     /// unique identifier of Event
-    public var ID: String
+    public var uniqID: String
     
     @available(swift, deprecated: 0.5.8, obsoleted: 0.5.9, renamed: "title")
     public var text: String?
@@ -174,7 +174,7 @@ public struct Event {
     public var systemEvent: EKEvent? = nil
     
     public init(ID: String) {
-        self.ID = ID
+        self.uniqID = ID
         
         if let tempColor = color {
             let value = prepareColor(tempColor)
@@ -184,7 +184,7 @@ public struct Event {
     }
     
     public init(event: EKEvent, monthTitle: String? = nil, listTitle: String? = nil) {
-        ID = event.eventIdentifier
+        uniqID = event.eventIdentifier
         title = TextEvent(timeline: event.title,
                           month: monthTitle ?? event.title,
                           list: listTitle ?? event.title)
@@ -215,6 +215,22 @@ public struct Event {
 
 extension Event {
     
+    public var id: String {
+        uniqID
+    }
+    
+    static func stub(id: String? = nil) -> Event {
+        var event = Event(ID: id ?? "-1")
+        event.title = TextEvent(timeline: "Text event number 10",
+                                month: "Text event number 10",
+                                list: "Text event number 10")
+        return event
+    }
+    
+}
+
+extension Event {
+    
     enum EventType: String {
         case allDay, usual
     }
@@ -223,13 +239,13 @@ extension Event {
 
 extension Event {
     var hash: Int {
-        ID.hashValue
+        id.hashValue
     }
 }
 
 public extension Event {
     var isNew: Bool {
-        ID == Event.idForNewEvent
+        uniqID == Event.idForNewEvent
     }
     
     enum RecurringType: Int {
@@ -337,7 +353,7 @@ public protocol EventProtocol {
 
 // MARK: - Settings protocol
 
-protocol CalendarSettingProtocol: AnyObject {
+protocol CalendarSettingProtocol {
     
     var style: Style { get set }
     
@@ -350,6 +366,8 @@ protocol CalendarSettingProtocol: AnyObject {
 
 extension CalendarSettingProtocol {
     
+    func reloadFrame(_ frame: CGRect) {}
+    func updateStyle(_ style: Style, force: Bool) {}
     func reloadData(_ events: [Event]) {}
     func setDate(_ date: Date, animated: Bool) {}
     func setUI(reload: Bool = false) {}

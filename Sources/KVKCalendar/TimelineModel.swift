@@ -43,7 +43,7 @@ extension EventDateProtocol {
                             calendar: Calendar) -> [Event] {
         if !recurringEvents.isEmpty, let date = date {
             return recurringEvents.reduce([], { (acc, event) -> [Event] in
-                guard !filteredEventsByDay.contains(where: { $0.ID == event.ID })
+                guard !filteredEventsByDay.contains(where: { $0.id == event.id })
                         && (date.compare(event.start) == .orderedDescending
                             || showRecurringEventInPast) else { return acc }
                 

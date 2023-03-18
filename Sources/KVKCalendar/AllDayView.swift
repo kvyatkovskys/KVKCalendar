@@ -8,6 +8,69 @@
 #if os(iOS)
 
 import UIKit
+import SwiftUI
+
+@available(iOS 15.0, *)
+struct AllDayNewView: View {
+    
+    struct Parameters {
+        let date: Date
+        let events: [Event]
+        let type: CalendarType
+        var style: Style
+        weak var delegate: TimelineDelegate?
+    }
+    
+    private var style: Style {
+        parameters.style
+    }
+    
+    private var columns: [GridItem] = [
+        GridItem(.flexible()),
+        GridItem(.flexible())
+    ]
+    
+    private let parameters: Parameters
+    @Binding private var event: Event?
+    
+    init(parameters: Parameters, event: Binding<Event?>) {
+        self.parameters = parameters
+        _event = event
+    }
+    
+    var body: some View {
+        HStack {
+            Text(style.allDay.titleText)
+                .padding(5)
+            ScrollView {
+                LazyVGrid(columns: columns) {
+                    ForEach(parameters.events) { (event) in
+                        Button {
+                            self.event = event
+                        } label: {
+                            AllDayEventNewView(event: event,
+                                               style: style.allDay)
+                        }
+
+                    }
+                }
+            }
+            .padding([.top, .bottom, .trailing], 5)
+            .frame(maxWidth: .infinity)
+            Spacer()
+        }
+        .frame(maxHeight: 100)
+        .background(Color(uiColor: style.allDay.backgroundColor))
+    }
+    
+}
+
+@available(iOS 15.0, *)
+struct AllDayNewView_Preview: PreviewProvider {
+    static var previews: some View {
+        AllDayNewView(parameters: AllDayNewView.Parameters(date: Date(), events: [Event.stub(id: "1"), Event.stub(id: "2"), Event.stub(id: "3"), Event.stub(id: "4"), Event.stub(id: "5")], type: .day, style: Style()), event: .constant(nil))
+    }
+}
 
 final class AllDayView: UIView {
     

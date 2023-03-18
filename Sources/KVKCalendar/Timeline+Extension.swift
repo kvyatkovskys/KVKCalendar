@@ -277,7 +277,7 @@ extension TimelineView {
     }
     
     func deselectEvent(_ event: Event, animated: Bool) {
-        guard let eventViewGeneral = scrollView.subviews.first(where: { ($0 as? EventViewGeneral)?.event.ID == event.ID }) as? EventViewGeneral else { return }
+        guard let eventViewGeneral = scrollView.subviews.first(where: { ($0 as? EventViewGeneral)?.event.id == event.id }) as? EventViewGeneral else { return }
         
         guard let eventView = eventViewGeneral as? EventView else {
             deselectEvent?(eventViewGeneral.event)

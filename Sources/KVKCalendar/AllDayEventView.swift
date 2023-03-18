@@ -8,6 +8,36 @@
 #if os(iOS)
 
 import UIKit
+import SwiftUI
+
+@available(iOS 15.0, *)
+struct AllDayEventNewView: View {
+    
+    let event: Event
+    let style: AllDayStyle
+    
+    var body: some View {
+        HStack {
+            Text(event.title.timeline)
+                .foregroundColor(Color(uiColor: event.textColor))
+                .font(Font(style.fontTitle))
+                .padding(5)
+            Spacer()
+        }
+        .background(Color(uiColor: event.backgroundColor))
+        .cornerRadius(style.eventCornersRadius.width)
+        .hoverEffect(.automatic)
+    }
+    
+}
+
+@available(iOS 15.0, *)
+struct AllDayEventNewView_Preview: PreviewProvider {
+    static var previews: some View {
+        AllDayEventNewView(event: Event.stub(),
+                           style: AllDayStyle())
+    }
+}
 
 final class AllDayEventView: UIView {
     

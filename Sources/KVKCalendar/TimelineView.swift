@@ -357,7 +357,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                 recurringEventsByDate = recurringEvents.reduce([], { (acc, event) -> [Event] in
                     // TODO: need fix
                     // there's still a problem with the second recurring event when an event is created for severel dates
-                    guard !eventsByDate.contains(where: { $0.ID == event.ID })
+                    guard !eventsByDate.contains(where: { $0.id == event.id })
                             && (date.compare(event.start) == .orderedDescending
                                 || style.event.showRecurringEventInPast) else { return acc }
                     
