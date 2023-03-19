@@ -8,10 +8,11 @@
 #if os(iOS)
 
 import Foundation
+import SwiftUI
 
-public final class ListViewData: EventDateProtocol {
+public final class ListViewData: ObservableObject, EventDateProtocol {
     
-    public struct SectionListView {
+    public struct SectionListView: Identifiable {
         let date: Date
         var events: [Event]
         
@@ -19,11 +20,15 @@ public final class ListViewData: EventDateProtocol {
             self.date = date
             self.events = events
         }
+        
+        public var id: Date {
+            date
+        }
     }
     
-    var sections: [SectionListView]
+    @Published var sections: [SectionListView]
     var date: Date
-    var isSkeletonVisible = false
+    @Published var isSkeletonVisible = false
     
     private let style: Style?
     private let lastDate: Date?
@@ -46,6 +51,11 @@ public final class ListViewData: EventDateProtocol {
         let dateSection = sections[section].date
         formatter.locale = locale
         return formatter.string(from: dateSection)
+    }
+    
+    func titleOfHeader(date: Date, formatter: DateFormatter, locale: Locale) -> String {
+        formatter.locale = locale
+        return formatter.string(from: date)
     }
     
     func reloadEvents(_ events: [Event]) {

@@ -8,6 +8,89 @@
 #if os(iOS)
 
 import UIKit
+import SwiftUI
+
+@available(iOS 15.0, *)
+public struct ListNewView: View {
+    
+    private let params: ListView.Parameters
+    @Binding private var date: Date?
+    @Binding private var event: Event?
+    
+    private var style: Style {
+        params.style
+    }
+    @ObservedObject private var vm: ListViewData
+    
+    public init(params: ListView.Parameters,
+                date: Binding<Date?>,
+                event: Binding<Event?>) {
+        self.params = params
+        self.vm = params.data
+        _date = date
+        _event = event
+    }
+    
+    public var body: some View {
+        bodyView
+    }
+    
+    @ViewBuilder
+    private var bodyView: some View {
+        if #available(iOS 16.0, *) {
+            NavigationStack {
+                listBody
+            }
+        } else {
+            NavigationView {
+                listBody
+            }
+            .navigationViewStyle(StackNavigationViewStyle())
+        }
+    }
+    
+    private var listBody: some View {
+        List {
+            ForEach(vm.sections) { (section) in
+                Section {
+                    ForEach(section.events) { (event) in
+                        Button {
+                            self.event = event
+                        } label: {
+                            HStack {
+                                Circle()
+                                    .fill(Color(uiColor: event.backgroundColor))
+                                    .frame(width: 30, height: 30)
+                                Text(event.title.list ?? "")
+                                    .padding([.top, .bottom, .trailing], 10)
+                                Spacer()
+                            }
+                        }
+                    }
+                } header: {
+                    Button {
+                        date = section.date
+                    } label: {
+                        Text(vm.titleOfHeader(date: section.date, formatter: style.list.headerDateFormatter, locale: style.locale))
+                    }
+                    .foregroundColor(.black)
+                    .padding(5)
+                }
+            }
+        }
+        .listStyle(PlainListStyle())
+    }
+    
+}
+
+@available(iOS 15.0, *)
+struct ListNewView_Preview: PreviewProvider {
+    
+    static var previews: some View {
+        ListNewView(params: ListView.Parameters(style: Style(), data: ListViewData(date: Date(), sections: [ListViewData.SectionListView(date: Date(), events: [Event.stub()])])), date: .constant(nil), event: .constant(nil))
+    }
+    
+}
 
 public final class ListView: UIView, CalendarSettingProtocol {
     

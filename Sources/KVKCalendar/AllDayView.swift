@@ -59,7 +59,7 @@ struct AllDayNewView: View {
             .frame(maxWidth: .infinity)
             Spacer()
         }
-        .frame(maxHeight: 100)
+        .frame(maxHeight: 90)
         .background(Color(uiColor: style.allDay.backgroundColor))
     }
     
