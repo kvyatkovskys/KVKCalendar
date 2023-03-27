@@ -26,7 +26,7 @@ public final class ListViewData: ObservableObject, EventDateProtocol {
         }
     }
     
-    @Published var sections: [SectionListView]
+    @Published var sections: [SectionListView] = []
     var date: Date
     @Published var isSkeletonVisible = false
     
@@ -37,7 +37,6 @@ public final class ListViewData: ObservableObject, EventDateProtocol {
         self.date = data.date
         self.lastDate = data.months.last?.days.filter { $0.type != .empty }.last?.date
         self.style = style
-        self.sections = []
     }
     
     public init(date: Date, sections: [SectionListView]) {
@@ -59,7 +58,8 @@ public final class ListViewData: ObservableObject, EventDateProtocol {
     }
     
     func reloadEvents(_ events: [Event]) {
-        sections = events.filter { $0.recurringType != .none }.reduce([], { (acc, event) -> [SectionListView] in
+        var sectionTmp = [SectionListView]()
+        sectionTmp = events.filter { $0.recurringType != .none }.reduce([], { (acc, event) -> [SectionListView] in
             var accTemp = acc
             
             if let date = lastDate, let calendar = style?.calendar {
@@ -77,7 +77,7 @@ public final class ListViewData: ObservableObject, EventDateProtocol {
             return accTemp
         })
         
-        sections += events.filter { $0.recurringType == .none }.reduce([], { (acc, event) -> [SectionListView] in
+        sectionTmp += events.filter { $0.recurringType == .none }.reduce([], { (acc, event) -> [SectionListView] in
             var accTemp = acc
             
             if event.start.kvkDay != event.end.kvkDay {
@@ -118,7 +118,7 @@ public final class ListViewData: ObservableObject, EventDateProtocol {
             return accTemp
         })
         
-        sections = sections.sorted(by: { $0.date < $1.date })
+        sections = sectionTmp.sorted(by: { $0.date < $1.date })
     }
     
     func event(indexPath: IndexPath) -> Event {

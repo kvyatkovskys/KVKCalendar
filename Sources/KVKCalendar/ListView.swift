@@ -24,11 +24,15 @@ public struct ListNewView: View {
     
     public init(params: ListView.Parameters,
                 date: Binding<Date?>,
-                event: Binding<Event?>) {
+                event: Binding<Event?>,
+                events: Binding<[Event]>) {
         self.params = params
         self.vm = params.data
         _date = date
         _event = event
+        if params.data.sections.isEmpty {
+            vm.reloadEvents(events.wrappedValue)
+        }
     }
     
     public var body: some View {
@@ -45,7 +49,7 @@ public struct ListNewView: View {
             NavigationView {
                 listBody
             }
-            .navigationViewStyle(StackNavigationViewStyle())
+            .navigationViewStyle(.stack)
         }
     }
     
@@ -87,7 +91,11 @@ public struct ListNewView: View {
 struct ListNewView_Preview: PreviewProvider {
     
     static var previews: some View {
-        ListNewView(params: ListView.Parameters(style: Style(), data: ListViewData(date: Date(), sections: [ListViewData.SectionListView(date: Date(), events: [Event.stub()])])), date: .constant(nil), event: .constant(nil))
+        let style = Style()
+        return Group {
+            ListNewView(params: ListView.Parameters(style: style, data: ListViewData(data: CalendarData(date: Date(), years: 4, style: style), style: style)), date: .constant(nil), event: .constant(nil), events: .constant([.stub(id: "1"), .stub(id: "2"), .stub(id: "3")]))
+            ListNewView(params: ListView.Parameters(style: style, data: ListViewData(date: Date(), sections: [ListViewData.SectionListView(date: Date(), events: [Event.stub()])])), date: .constant(nil), event: .constant(nil), events: .constant([]))
+        }
     }
     
 }

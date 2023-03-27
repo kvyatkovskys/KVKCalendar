@@ -8,17 +8,22 @@
 #if os(iOS)
 
 import Foundation
+import SwiftUI
 
-final class YearData {
+final class YearData: ObservableObject {
     
-    struct YearSection {
+    struct YearSection: Identifiable {
         let date: Date
         var months: [Month]
+        
+        var id: Int {
+            date.hashValue
+        }
     }
     
     var date: Date
     var style: Style
-    let sections: [YearSection]
+    @Published var sections: [YearSection]
     let rowsInPage = 3
     let columnsInPage = 4
     var middleRowInPage: Int {

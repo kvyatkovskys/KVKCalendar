@@ -8,6 +8,232 @@
 #if os(iOS)
 
 import UIKit
+import SwiftUI
+
+@available(iOS 15.0, *)
+struct YearNewView: View {
+    
+    @ObservedObject var data: YearData
+    @Binding var date: Date
+    
+    private var style: Style {
+        data.style
+    }
+    
+    private let columns: [GridItem] = [
+        GridItem(.flexible(), spacing: 5),
+        GridItem(.flexible(), spacing: 5),
+        GridItem(.flexible(), spacing: 5)
+    ]
+    
+    init(data: CalendarData, date: Binding<Date>, style: Style) {
+        self.data = YearData(data: data, date: date.wrappedValue, style: style)
+        _date = date
+    }
+    
+    var body: some View {
+        ScrollViewReader { (proxy) in
+            List {
+                ForEach(data.sections) { (section) in
+                    Section {
+                        LazyVGrid(columns: columns) {
+                            ForEach(section.months) { (month) in
+                                YearMonthView(month: month, style: style, selectedDate: $date)
+                            }
+                        }
+                    } header: {
+                        HStack {
+                            Text(section.date.titleForLocale(style.locale, formatter: style.year.titleFormatter))
+                                .foregroundColor(Date().kvkYear == section.date.kvkYear ? .red : Color(uiColor: style.year.colorTitleHeader))
+                                .font(
+                                    .largeTitle
+                                    .weight(.bold)
+                                )
+                        }
+                        .padding([.top, .bottom], 5)
+                        .id(section.date)
+                    }
+                }
+                .listRowBackground(EmptyView())
+                .listRowSeparator(.hidden)
+            }
+            .listStyle(.plain)
+            .task {
+                withAnimation {
+                    proxy.scrollTo(date, anchor: .top)
+                }
+            }
+        }
+    }
+    
+}
+
+@available(iOS 15.0, *)
+struct YearNewView_Previews: PreviewProvider {
+    
+    static var previews: some View {
+        let style = Style()
+        let monthData = MonthData(parameters: .init(data: CalendarData(date: Date(), years: 4, style: style), startDay: style.startWeekDay, calendar: style.calendar, style: style))
+        return Group {
+            YearNewView(data: monthData.data, date: .constant(Date()), style: Style())
+            YearNewView(data: monthData.data, date: .constant(Date()), style: Style())
+                .preferredColorScheme(.dark)
+        }
+    }
+    
+}
+
+@available(iOS 15.0, *)
+private struct YearMonthView: View {
+    
+    var month: Month
+    var style: Style
+    @Binding var selectedDate: Date
+    
+    private let columns: [GridItem] = [
+        GridItem(.flexible(), spacing: 1),
+        GridItem(.flexible(), spacing: 1),
+        GridItem(.flexible(), spacing: 1),
+        GridItem(.flexible(), spacing: 1),
+        GridItem(.flexible(), spacing: 1),
+        GridItem(.flexible(), spacing: 1),
+        GridItem(.flexible(), spacing: 1)
+    ]
+    
+    var body: some View {
+        Button {
+            selectedDate = month.date
+        } label: {
+            VStack(alignment: .leading, spacing: 5) {
+                HStack {
+                    Text(month.name)
+                    Spacer()
+                }
+                WeekSimpleView(style: style)
+                LazyVGrid(columns: columns) {
+                    ForEach(month.days) { (day) in
+                        if let date = day.date, day.type != .empty {
+                            VStack(alignment: .center) {
+                                Text("\(date.kvkDay)")
+                                    .foregroundColor(getCurrentTxtColor(date, selectedDay: selectedDate))
+                                    .font(
+                                        .system(size: 10)
+                                    )
+                                    .minimumScaleFactor(0.5)
+                                    .padding(1)
+                            }
+                            .background(getCurrentBgTxtColor(date, selectedDay: selectedDate))
+                        } else {
+                            Text("")
+                        }
+                    }
+                }
+                Spacer()
+            }
+        }
+
+    }
+    
+    private func getCurrentTxtColor(_ day: Date,
+                                    selectedDay: Date) -> Color {
+        if day.kvkIsEqual(selectedDay) {
+            return .white
+        } else {
+            return .black
+        }
+    }
+    
+    private func getCurrentBgTxtColor(_ day: Date,
+                                      selectedDay: Date) -> Color {
+        if day.kvkIsEqual(selectedDay) && day.kvkIsEqual(Date()) {
+            return .red
+        } else if day.kvkIsEqual(selectedDay) {
+            return .black
+        } else {
+            return .clear
+        }
+    }
+    
+}
+
+@available(iOS 15.0, *)
+struct WeekSimpleView: View {
+    
+    @State private var days: [Date] = []
+    private let style: Style
+    
+    init(style: Style) {
+        self.style = style
+        let startWeekDate = style.startWeekDay == .sunday ? Date().kvkStartSundayOfWeek : Date().kvkStartMondayOfWeek
+        let items: [Date] = Array(0..<7).compactMap {
+            guard let dateTemp = startWeekDate else { return nil }
+            
+            return style.calendar.date(byAdding: .day,
+                                       value: $0,
+                                       to: dateTemp)
+        }
+        _days = State(initialValue: items)
+    }
+    
+    private func getOffsetDate(offset: Int, to date: Date?) -> Date? {
+        guard let dateTemp = date else { return nil }
+        
+        return style.calendar.date(byAdding: .day, value: offset, to: dateTemp)
+    }
+    
+    private var fontSize: CGFloat {
+        if Platform.currentInterface == .phone {
+            return 8
+        } else {
+            return 16
+        }
+    }
+    
+    var body: some View {
+        HStack(spacing: 2) {
+            ForEach(days, id: \.self) { (day) in
+                Text(day.titleForLocale(style.locale, formatter: style.year.weekdayFormatter))
+                    .foregroundColor(getTxtColor(day, style: style))
+                    .font(
+                        .system(size: fontSize)
+                        .weight(.light)
+                    )
+                    .minimumScaleFactor(0.5)
+                    .background(getTxtBgColor(day, style: style))
+            }
+        }
+    }
+    
+    private func getTxtColor(_ day: Date, style: Style) -> Color {
+        if day.isWeekend {
+            return Color(uiColor: style.week.colorWeekendDate)
+        } else if day.isWeekday {
+            return Color(uiColor: style.week.colorDate)
+        } else {
+            return .clear
+        }
+    }
+    
+    private func getTxtBgColor(_ day: Date, style: Style) -> Color {
+        if day.isWeekend {
+            return Color(uiColor: style.week.colorWeekendBackground)
+        } else if day.isWeekday {
+            return Color(uiColor: style.week.colorWeekdayBackground)
+        } else {
+            return .clear
+        }
+    }
+    
+}
+
+@available(iOS 15.0, *)
+struct WeekSimpleView_Previews: PreviewProvider {
+    
+    static var previews: some View {
+        WeekSimpleView(style: Style())
+    }
+    
+}
 
 final class YearView: UIView {
     private var data: YearData

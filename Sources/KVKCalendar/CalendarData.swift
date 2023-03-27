@@ -177,14 +177,19 @@ struct CalendarData {
     }
 }
 
-struct Month {
+struct Month: Identifiable {
     let name: String
     let date: Date
     var days: [Day]
     var weeks: Int
+    
+    var id: Int {
+        date.hashValue
+    }
 }
 
-struct Day {
+struct Day: Identifiable, Equatable, Hashable {
+    
     let type: DayType
     var date: Date?
     var events: [Event]
@@ -203,6 +208,18 @@ struct Day {
         self.type = type
         self.events = data
         self.date = date
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(date)
+    }
+    
+    var id: Int {
+        date?.hashValue ?? type.hashValue
+    }
+    
+    static func == (lhs: Day, rhs: Day) -> Bool {
+        lhs.date == rhs.date
     }
 }
 

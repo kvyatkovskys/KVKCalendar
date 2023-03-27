@@ -63,7 +63,7 @@ extension KVKCalendarSettings where Self: KVKCalendarDataModel {
         let endTime = timeFormatter(date: end, format: style.timeSystem.format)
         newEvent.start = start
         newEvent.end = end
-        newEvent.ID = "\(events.count + 1)"
+        newEvent.uniqID = "\(events.count + 1)"
         newEvent.title = TextEvent(timeline: "\(startTime) - \(endTime)\n new time",
                                    month: "\(startTime) - \(endTime)\n new time",
                                    list: "\(startTime) - \(endTime)\n new time")
@@ -149,7 +149,7 @@ extension KVKCalendarSettings {
     }
     
     func handleCustomEventView(event: Event, style: Style, frame: CGRect) -> EventViewGeneral? {
-        switch event.ID {
+        switch event.uniqID {
         case "2":
             return CustomViewEvent(style: style, event: event, frame: frame)
         case "1400":
