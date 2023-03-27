@@ -124,7 +124,7 @@ private struct YearMonthView: View {
                             }
                             .background(getCurrentBgTxtColor(date, selectedDay: selectedDate))
                         } else {
-                            Text("")
+                            Text("-")
                         }
                     }
                 }
