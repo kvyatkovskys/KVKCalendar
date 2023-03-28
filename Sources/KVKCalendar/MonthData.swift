@@ -9,7 +9,7 @@
 
 import UIKit
 
-final class MonthData: EventDateProtocol {
+final class MonthData: ObservableObject, EventDateProtocol {
     
     typealias DayOfMonth = (indexPath: IndexPath, day: Day?, weeks: Int)
     
@@ -21,9 +21,9 @@ final class MonthData: EventDateProtocol {
     }
     
     var selectedSection: Int = -1
-    var date: Date
-    var data: CalendarData
-    let daysCount: Int
+    @Published var date: Date
+    @Published var data: CalendarData
+    var daysCount: Int = 0
     
     let tagEventPagePreview = -20
     let eventPreviewYOffset: CGFloat = 30
@@ -42,6 +42,7 @@ final class MonthData: EventDateProtocol {
     private let showRecurringEventInPast: Bool
     
     init(parameters: Parameters) {
+        self.date = parameters.data.date
         self.data = parameters.data
         self.calendar = parameters.calendar
         self.scrollDirection = parameters.style.month.scrollDirection
@@ -72,7 +73,6 @@ final class MonthData: EventDateProtocol {
             return acc + [monthTemp]
         })
         self.data.months = months
-        self.date = parameters.data.date
         self.daysCount = months.reduce(0, { $0 + $1.days.count })
     }
     

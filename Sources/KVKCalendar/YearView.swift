@@ -14,7 +14,6 @@ import SwiftUI
 struct YearNewView: View {
     
     @ObservedObject var data: YearData
-    @Binding var date: Date
     
     private var style: Style {
         data.style
@@ -26,41 +25,45 @@ struct YearNewView: View {
         GridItem(.flexible(), spacing: 5)
     ]
     
-    init(data: CalendarData, date: Binding<Date>, style: Style) {
-        self.data = YearData(data: data, date: date.wrappedValue, style: style)
-        _date = date
+    init(data: CalendarData, style: Style) {
+        self.data = YearData(data: data, date: data.date, style: style)
     }
     
     var body: some View {
         ScrollViewReader { (proxy) in
-            List {
-                ForEach(data.sections) { (section) in
-                    Section {
-                        LazyVGrid(columns: columns) {
+            ScrollView {
+                LazyVGrid(columns: columns, pinnedViews: .sectionHeaders) {
+                    ForEach(data.sections) { (section) in
+                        Section {
                             ForEach(section.months) { (month) in
-                                YearMonthView(month: month, style: style, selectedDate: $date)
+                                Button {
+                                    data.date = month.date
+                                } label: {
+                                    YearMonthView(month: month, style: style, selectedDate: data.date)
+                                }
+                                .tint(.black)
                             }
+                        } header: {
+                            HStack {
+                                Text(section.date.titleForLocale(style.locale, formatter: style.year.titleFormatter))
+                                    .foregroundColor(Date().kvkYear == section.date.kvkYear ? .red : Color(uiColor: style.year.colorTitleHeader))
+                                    .font(
+                                        .largeTitle
+                                            .weight(.bold)
+                                    )
+                                    .padding(5)
+                                Spacer()
+                            }
+                            .background(.thickMaterial)
+                            .padding([.top, .bottom], 10)
                         }
-                    } header: {
-                        HStack {
-                            Text(section.date.titleForLocale(style.locale, formatter: style.year.titleFormatter))
-                                .foregroundColor(Date().kvkYear == section.date.kvkYear ? .red : Color(uiColor: style.year.colorTitleHeader))
-                                .font(
-                                    .largeTitle
-                                    .weight(.bold)
-                                )
-                        }
-                        .padding([.top, .bottom], 5)
-                        .id(section.date)
+                        .id(section.date.kvkYear)
                     }
                 }
-                .listRowBackground(EmptyView())
-                .listRowSeparator(.hidden)
             }
-            .listStyle(.plain)
             .task {
                 withAnimation {
-                    proxy.scrollTo(date, anchor: .top)
+                    proxy.scrollTo(data.date.kvkYear, anchor: .top)
                 }
             }
         }
@@ -75,8 +78,8 @@ struct YearNewView_Previews: PreviewProvider {
         let style = Style()
         let monthData = MonthData(parameters: .init(data: CalendarData(date: Date(), years: 4, style: style), startDay: style.startWeekDay, calendar: style.calendar, style: style))
         return Group {
-            YearNewView(data: monthData.data, date: .constant(Date()), style: Style())
-            YearNewView(data: monthData.data, date: .constant(Date()), style: Style())
+            YearNewView(data: monthData.data, style: Style())
+            YearNewView(data: monthData.data, style: Style())
                 .preferredColorScheme(.dark)
         }
     }
@@ -88,7 +91,7 @@ private struct YearMonthView: View {
     
     var month: Month
     var style: Style
-    @Binding var selectedDate: Date
+    @State var selectedDate: Date
     
     private let columns: [GridItem] = [
         GridItem(.flexible(), spacing: 1),
@@ -101,43 +104,40 @@ private struct YearMonthView: View {
     ]
     
     var body: some View {
-        Button {
-            selectedDate = month.date
-        } label: {
-            VStack(alignment: .leading, spacing: 5) {
-                HStack {
-                    Text(month.name)
-                    Spacer()
-                }
-                WeekSimpleView(style: style)
-                LazyVGrid(columns: columns) {
-                    ForEach(month.days) { (day) in
-                        if let date = day.date, day.type != .empty {
-                            VStack(alignment: .center) {
-                                Text("\(date.kvkDay)")
-                                    .foregroundColor(getCurrentTxtColor(date, selectedDay: selectedDate))
-                                    .font(
-                                        .system(size: 10)
-                                    )
-                                    .minimumScaleFactor(0.5)
-                                    .padding(1)
-                            }
-                            .background(getCurrentBgTxtColor(date, selectedDay: selectedDate))
-                        } else {
-                            Text("-")
-                        }
-                    }
-                }
+        VStack(alignment: .leading, spacing: 5) {
+            HStack {
+                Text(month.name)
                 Spacer()
             }
+            WeekSimpleView(style: style)
+            LazyVGrid(columns: columns) {
+                ForEach(month.days) { (day) in
+                    if let date = day.date, day.type != .empty {
+                        VStack(alignment: .center) {
+                            Text("\(date.kvkDay)")
+                                .foregroundColor(getCurrentTxtColor(date, selectedDay: selectedDate))
+                                .font(
+                                    .system(size: 10)
+                                )
+                                .minimumScaleFactor(0.5)
+                                .padding(1)
+                        }
+                        .background(getCurrentBgTxtColor(date, selectedDay: selectedDate))
+                    } else {
+                        Text("")
+                    }
+                }
+            }
+            Spacer()
         }
-
     }
     
     private func getCurrentTxtColor(_ day: Date,
                                     selectedDay: Date) -> Color {
         if day.kvkIsEqual(selectedDay) {
             return .white
+        } else if day.isWeekend {
+            return Color(uiColor: style.week.colorWeekendDate)
         } else {
             return .black
         }
@@ -157,36 +157,14 @@ private struct YearMonthView: View {
 }
 
 @available(iOS 15.0, *)
-struct WeekSimpleView: View {
+struct WeekSimpleView: View, WeekPreparing {
     
-    @State private var days: [Date] = []
+    private var days: [Date] = []
     private let style: Style
     
     init(style: Style) {
         self.style = style
-        let startWeekDate = style.startWeekDay == .sunday ? Date().kvkStartSundayOfWeek : Date().kvkStartMondayOfWeek
-        let items: [Date] = Array(0..<7).compactMap {
-            guard let dateTemp = startWeekDate else { return nil }
-            
-            return style.calendar.date(byAdding: .day,
-                                       value: $0,
-                                       to: dateTemp)
-        }
-        _days = State(initialValue: items)
-    }
-    
-    private func getOffsetDate(offset: Int, to date: Date?) -> Date? {
-        guard let dateTemp = date else { return nil }
-        
-        return style.calendar.date(byAdding: .day, value: offset, to: dateTemp)
-    }
-    
-    private var fontSize: CGFloat {
-        if Platform.currentInterface == .phone {
-            return 8
-        } else {
-            return 16
-        }
+        days = getWeekDays(style: style)
     }
     
     var body: some View {
@@ -194,10 +172,7 @@ struct WeekSimpleView: View {
             ForEach(days, id: \.self) { (day) in
                 Text(day.titleForLocale(style.locale, formatter: style.year.weekdayFormatter))
                     .foregroundColor(getTxtColor(day, style: style))
-                    .font(
-                        .system(size: fontSize)
-                        .weight(.light)
-                    )
+                    .font(Font(style.year.weekFont))
                     .minimumScaleFactor(0.5)
                     .background(getTxtBgColor(day, style: style))
             }

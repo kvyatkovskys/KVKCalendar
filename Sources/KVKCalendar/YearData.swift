@@ -21,7 +21,7 @@ final class YearData: ObservableObject {
         }
     }
     
-    var date: Date
+    @Published var date: Date
     var style: Style
     @Published var sections: [YearSection]
     let rowsInPage = 3

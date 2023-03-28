@@ -238,4 +238,21 @@ public enum StartDayType: Int {
     case monday, sunday
 }
 
+protocol WeekPreparing {}
+
+extension WeekPreparing {
+    
+    func getWeekDays(style: Style) -> [Date] {
+        let startWeekDate = style.startWeekDay == .sunday ? Date().kvkStartSundayOfWeek : Date().kvkStartMondayOfWeek
+        return Array(0..<7).compactMap { date -> Date? in
+            guard let dateTemp = startWeekDate else { return nil }
+            
+            return style.calendar.date(byAdding: .day,
+                                       value: date,
+                                       to: dateTemp)
+        }
+    }
+    
+}
+
 #endif

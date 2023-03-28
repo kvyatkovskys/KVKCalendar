@@ -8,6 +8,199 @@
 #if os(iOS)
 
 import UIKit
+import SwiftUI
+
+@available(iOS 15.0, *)
+struct MonthNewView: View {
+    
+    @ObservedObject var vm: MonthData
+    let style: Style
+    
+    private let columns: [GridItem] = [
+        GridItem(.flexible(), spacing: 1),
+        GridItem(.flexible(), spacing: 1),
+        GridItem(.flexible(), spacing: 1),
+        GridItem(.flexible(), spacing: 1),
+        GridItem(.flexible(), spacing: 1),
+        GridItem(.flexible(), spacing: 1),
+        GridItem(.flexible(), spacing: 1)
+    ]
+    
+    var body: some View {
+        ScrollViewReader { (proxy) in
+            ScrollView {
+                LazyVGrid(columns: columns, pinnedViews: .sectionHeaders) {
+                    ForEach(vm.data.months) { (month) in
+                        Section {
+                            ForEach(month.days) { (day) in
+                                MonthDayView(date: day.date ?? vm.date, selectedDate: vm.date, style: style, events: [])
+                            }
+                        } header: {
+                            MonthWeekView(style: style, date: month.date)
+                            .background(.thickMaterial)
+                        }
+                        .id(5)
+                    }
+                }
+            }
+            .task {
+                withAnimation {
+                    proxy.scrollTo(5, anchor: .top)
+                }
+            }
+        }
+    }
+    
+}
+
+@available(iOS 15.0, *)
+struct MonthNewView_Previews: PreviewProvider {
+    
+    static var previews: some View {
+        MonthNewView(vm: MonthData(parameters: MonthData.Parameters(data: CalendarData(date: Date(), years: 4, style: Style()), startDay: .sunday, calendar: Calendar.current, style: Style())), style: Style())
+    }
+    
+}
+
+@available(iOS 15.0, *)
+struct MonthDayView: View {
+    
+    let date: Date
+    let selectedDate: Date
+    let style: Style
+    let events: [Event]
+    
+    var body: some View {
+        VStack {
+            HStack {
+                Spacer()
+                VStack {
+                    Text("\(date.kvkDay)")
+                        .foregroundColor(getTxtColor(date, style: style))
+                        .font(Font(style.month.fontNameDate))
+                        .padding(4)
+                }
+                .background(getBgTxtColor(date, selectedDay: selectedDate))
+                .clipShape(Capsule())
+            }
+            Spacer()
+        }
+        .background(getBgColor(date, style: style))
+    }
+    
+    private func getBgTxtColor(_ day: Date,
+                                      selectedDay: Date) -> Color {
+        if day.kvkIsEqual(selectedDay) && day.kvkIsEqual(Date()) {
+            return .red
+        } else if day.kvkIsEqual(selectedDay) {
+            return .black
+        } else {
+            return .white
+        }
+    }
+    
+    private func getTxtColor(_ day: Date, style: Style) -> Color {
+        if day.kvkIsEqual(Date()) {
+            return .white
+        } else if day.isWeekend {
+            return Color(uiColor: style.week.colorWeekendDate)
+        } else if day.isWeekday {
+            return Color(uiColor: style.week.colorDate)
+        } else {
+            return .black
+        }
+    }
+    
+    private func getBgColor(_ day: Date, style: Style) -> Color {
+        if day.isWeekend {
+            return Color(uiColor: style.month.colorBackgroundWeekendDate)
+        } else {
+            return Color(uiColor: style.month.colorBackgroundDate)
+        }
+    }
+    
+}
+
+@available(iOS 15.0, *)
+struct MonthDayView_Previews: PreviewProvider {
+    
+    static var previews: some View {
+        MonthDayView(date: Date(), selectedDate: Date(), style: Style(), events: [.stub(id: "1"), .stub(id: "2")])
+    }
+    
+}
+
+@available(iOS 15.0, *)
+struct MonthWeekView: View, WeekPreparing {
+    
+    private let date: Date
+    private var days: [Date] = []
+    private let style: Style
+    
+    init(style: Style, date: Date) {
+        self.style = style
+        self.date = date
+        days = getWeekDays(style: style)
+    }
+    
+    var body: some View {
+        VStack {
+            Text(date.titleForLocale(style.locale, formatter: style.month.titleFormatter))
+                .foregroundColor(getMonthTxtColor(date, style: style))
+                .font(Font(style.month.fontTitleHeader))
+                .frame(maxWidth: .infinity, alignment: .leading)
+            HStack(spacing: 2) {
+                ForEach(days, id: \.self) { (day) in
+                    Text(day.titleForLocale(style.locale, formatter: style.month.weekdayFormatter))
+                        .foregroundColor(getTxtColor(day, style: style))
+                        .font(Font(style.month.weekFont))
+                        .minimumScaleFactor(0.5)
+                        .background(getTxtBgColor(day, style: style))
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                }
+            }
+        }
+        .padding([.top, .bottom], 10)
+    }
+    
+    private func getMonthTxtColor(_ date: Date, style: Style) -> Color {
+        if Date().kvkYear == date.kvkYear && Date().kvkMonth == date.kvkMonth {
+            return Color(uiColor: style.month.colorTitleCurrentDate)
+        } else {
+            return Color(uiColor: style.month.colorTitleHeader)
+        }
+    }
+    
+    private func getTxtColor(_ day: Date, style: Style) -> Color {
+        if day.isWeekend {
+            return Color(uiColor: style.week.colorWeekendDate)
+        } else if day.isWeekday {
+            return Color(uiColor: style.week.colorDate)
+        } else {
+            return .clear
+        }
+    }
+    
+    private func getTxtBgColor(_ day: Date, style: Style) -> Color {
+        if day.isWeekend {
+            return Color(uiColor: style.week.colorWeekendBackground)
+        } else if day.isWeekday {
+            return Color(uiColor: style.week.colorWeekdayBackground)
+        } else {
+            return .clear
+        }
+    }
+    
+}
+
+@available(iOS 15.0, *)
+struct MonthWeekView_Previews: PreviewProvider {
+    
+    static var previews: some View {
+        MonthWeekView(style: Style(), date: Date())
+    }
+    
+}
 
 final class MonthView: UIView {
     
