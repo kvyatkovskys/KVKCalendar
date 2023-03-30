@@ -27,27 +27,41 @@ struct MonthNewView: View {
     ]
     
     var body: some View {
-        ScrollViewReader { (proxy) in
-            ScrollView {
-                LazyVGrid(columns: columns, pinnedViews: .sectionHeaders) {
-                    ForEach(vm.data.months) { (month) in
-                        Section {
+        VStack {
+            MonthWeekView(style: style, date: vm.date)
+                .background(.thickMaterial)
+            ScrollViewReader { (proxy) in
+                ScrollView {
+                    LazyVGrid(columns: columns, pinnedViews: .sectionHeaders) {
+                        ForEach(vm.data.months) { (month) in
                             ForEach(month.days) { (day) in
-                                MonthDayView(date: day.date ?? vm.date, selectedDate: vm.date, style: style, events: [])
+                                MonthDayView(day: day, selectedDate: vm.date, style: style)
+                                    .onTapGesture {
+                                        if Platform.currentInterface == .phone {
+                                            withAnimation {
+                                                vm.date = day.date ?? Date()
+                                            }
+                                        }
+                                    }
+                                    .onTapGesture(count: 2) {
+                                        if Platform.currentInterface != .phone {
+                                            withAnimation {
+                                                vm.date = day.date ?? Date()
+                                            }
+                                        }
+                                    }
                             }
-                        } header: {
-                            MonthWeekView(style: style, date: month.date)
-                            .background(.thickMaterial)
                         }
-                        .id(5)
+                    }
+                }
+                .padding(.top, 10)
+                .task {
+                    withAnimation {
+                        proxy.scrollTo(vm.date, anchor: .top)
                     }
                 }
             }
-            .task {
-                withAnimation {
-                    proxy.scrollTo(5, anchor: .top)
-                }
-            }
+            Spacer()
         }
     }
     
@@ -57,7 +71,11 @@ struct MonthNewView: View {
 struct MonthNewView_Previews: PreviewProvider {
     
     static var previews: some View {
-        MonthNewView(vm: MonthData(parameters: MonthData.Parameters(data: CalendarData(date: Date(), years: 4, style: Style()), startDay: .sunday, calendar: Calendar.current, style: Style())), style: Style())
+        var style = Style()
+        style.startWeekDay = .sunday
+        var data = CalendarData(date: Date(), years: 1, style: style)
+        data.months[0].days[0].events = [.stub(id: "1"), .stub(id: "2")]
+        return MonthNewView(vm: MonthData(parameters: MonthData.Parameters(data: data, startDay: .sunday, calendar: Calendar.current, style: style)), style: style)
     }
     
 }
@@ -65,46 +83,116 @@ struct MonthNewView_Previews: PreviewProvider {
 @available(iOS 15.0, *)
 struct MonthDayView: View {
     
-    let date: Date
+    let day: Day
     let selectedDate: Date
     let style: Style
-    let events: [Event]
+    
+    private var dayTxt: String {
+        switch day.type {
+        case .empty:
+            return ""
+        default:
+            guard let dt = day.date else { return "" }
+            return "\(dt.kvkDay)"
+        }
+    }
+    private var date: Date {
+        day.date ?? Date()
+    }
+    private var height: CGFloat {
+        switch Platform.currentInterface {
+        case .phone:
+            return 90
+        default:
+            return 100
+        }
+    }
     
     var body: some View {
         VStack {
+            if day.type != .empty && Platform.currentInterface == .phone {
+                if day.date?.kvkDay == 1 {
+                    Text(date.titleForLocale(style.locale, formatter: style.month.shortInDayMonthFormatter).capitalized)
+                        .foregroundColor(getTxtHeaderColor(day))
+                        .font(Font(style.month.fontTitleHeader))
+                        .frame(height: 14.5)
+                } else {
+                    Spacer()
+                        .frame(height: 21.5)
+                }
+                Divider()
+            }
             HStack {
-                Spacer()
+                if Platform.currentInterface != .phone {
+                    Spacer()
+                }
                 VStack {
-                    Text("\(date.kvkDay)")
-                        .foregroundColor(getTxtColor(date, style: style))
+                    Text(dayTxt)
+                        .foregroundColor(getTxtColor(day, selectedDay: selectedDate, style: style))
                         .font(Font(style.month.fontNameDate))
                         .padding(4)
+                        .frame(minWidth: 25)
                 }
-                .background(getBgTxtColor(date, selectedDay: selectedDate))
+                .background(getBgTxtColor(day, selectedDay: selectedDate))
                 .clipShape(Capsule())
+            }
+            if Platform.currentInterface == .phone {
+                ForEach(day.events.prefix(2)) { (event) in
+                    Circle()
+                        .foregroundColor(Color(uiColor: event.backgroundColor))
+                        .frame(width: 5, height: 5)
+                }
+            } else {
+                
             }
             Spacer()
         }
         .background(getBgColor(date, style: style))
+        .frame(height: height)
     }
     
-    private func getBgTxtColor(_ day: Date,
-                                      selectedDay: Date) -> Color {
-        if day.kvkIsEqual(selectedDay) && day.kvkIsEqual(Date()) {
+    private func getTxtHeaderColor(_ day: Day) -> Color {
+        let currentDate = Date()
+        if let dt = day.date,
+           dt.kvkYear == currentDate.kvkYear,
+           dt.kvkMonth == currentDate.kvkMonth {
             return .red
-        } else if day.kvkIsEqual(selectedDay) {
+        } else {
+            return .black
+        }
+    }
+    
+    private func getBgTxtColor(_ day: Day,
+                               selectedDay: Date) -> Color {
+        if day.type == .empty {
+            return .clear
+        }
+        
+        let date = day.date ?? Date()
+        if date.kvkIsEqual(selectedDay) && date.kvkIsEqual(Date()) {
+            return .red
+        } else if date.kvkIsEqual(selectedDay) {
             return .black
         } else {
             return .white
         }
     }
     
-    private func getTxtColor(_ day: Date, style: Style) -> Color {
-        if day.kvkIsEqual(Date()) {
+    private func getTxtColor(_ day: Day,
+                             selectedDay: Date,
+                             style: Style) -> Color {
+        if day.type == .empty {
+            return .clear
+        }
+        
+        let date = day.date ?? Date()
+        if date.kvkIsEqual(Date()) && date.kvkIsEqual(selectedDay) {
             return .white
-        } else if day.isWeekend {
+        } else if date.kvkIsEqual(selectedDay) {
+            return .white
+        } else if date.isWeekend {
             return Color(uiColor: style.week.colorWeekendDate)
-        } else if day.isWeekday {
+        } else if date.isWeekday {
             return Color(uiColor: style.week.colorDate)
         } else {
             return .black
@@ -125,7 +213,7 @@ struct MonthDayView: View {
 struct MonthDayView_Previews: PreviewProvider {
     
     static var previews: some View {
-        MonthDayView(date: Date(), selectedDate: Date(), style: Style(), events: [.stub(id: "1"), .stub(id: "2")])
+        MonthDayView(day: Day(type: .monday, date: Date(), data: [.stub(id: "1"), .stub(id: "2")]), selectedDate: Date(), style: Style())
     }
     
 }
@@ -144,11 +232,13 @@ struct MonthWeekView: View, WeekPreparing {
     }
     
     var body: some View {
-        VStack {
-            Text(date.titleForLocale(style.locale, formatter: style.month.titleFormatter))
-                .foregroundColor(getMonthTxtColor(date, style: style))
-                .font(Font(style.month.fontTitleHeader))
-                .frame(maxWidth: .infinity, alignment: .leading)
+        VStack(spacing: 10) {
+            if Platform.currentInterface != .phone {
+                Text(date.titleForLocale(style.locale, formatter: style.month.titleFormatter))
+                    .foregroundColor(getMonthTxtColor(date, style: style))
+                    .font(Font(style.month.fontTitleHeader))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
             HStack(spacing: 2) {
                 ForEach(days, id: \.self) { (day) in
                     Text(day.titleForLocale(style.locale, formatter: style.month.weekdayFormatter))
@@ -156,7 +246,8 @@ struct MonthWeekView: View, WeekPreparing {
                         .font(Font(style.month.weekFont))
                         .minimumScaleFactor(0.5)
                         .background(getTxtBgColor(day, style: style))
-                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .frame(maxWidth: .infinity,
+                               alignment: Platform.currentInterface == .phone ? .center : .trailing)
                 }
             }
         }
@@ -197,7 +288,9 @@ struct MonthWeekView: View, WeekPreparing {
 struct MonthWeekView_Previews: PreviewProvider {
     
     static var previews: some View {
-        MonthWeekView(style: Style(), date: Date())
+        var style = Style()
+        style.startWeekDay = .sunday
+        return MonthWeekView(style: style, date: Date())
     }
     
 }
