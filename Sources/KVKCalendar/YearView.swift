@@ -37,7 +37,7 @@ struct YearNewView: View {
                         Section {
                             ForEach(section.months) { (month) in
                                 Button {
-                                    data.date = month.date
+                                    data.handleSelectedDate(month.date)
                                 } label: {
                                     YearMonthView(month: month, style: style, selectedDate: data.date)
                                 }
@@ -47,10 +47,7 @@ struct YearNewView: View {
                             HStack {
                                 Text(section.date.titleForLocale(style.locale, formatter: style.year.titleFormatter))
                                     .foregroundColor(Date().kvkYear == section.date.kvkYear ? .red : Color(uiColor: style.year.colorTitleHeader))
-                                    .font(
-                                        .largeTitle
-                                            .weight(.bold)
-                                    )
+                                    .font(Font(style.year.fontTitleHeader))
                                     .padding(5)
                                 Spacer()
                             }
@@ -76,7 +73,7 @@ struct YearNewView_Previews: PreviewProvider {
     
     static var previews: some View {
         let style = Style()
-        let monthData = MonthData(parameters: .init(data: CalendarData(date: Date(), years: 4, style: style), startDay: style.startWeekDay, calendar: style.calendar, style: style))
+        let monthData = MonthData(parameters: .init(data: CalendarData(date: Date(), years: 2, style: style), startDay: style.startWeekDay, calendar: style.calendar, style: style))
         return Group {
             YearNewView(data: monthData.data, style: Style())
             YearNewView(data: monthData.data, style: Style())
@@ -91,7 +88,7 @@ private struct YearMonthView: View {
     
     var month: Month
     var style: Style
-    @State var selectedDate: Date
+    var selectedDate: Date
     
     private let columns: [GridItem] = [
         GridItem(.flexible(), spacing: 1),
@@ -103,10 +100,15 @@ private struct YearMonthView: View {
         GridItem(.flexible(), spacing: 1)
     ]
     
+    private var daySize: CGSize {
+        Platform.currentInterface == .phone ? CGSize(width: 15, height: 15) : CGSize(width: 30, height: 30)
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack {
                 Text(month.name)
+                    .font(Font(style.year.fontTitle))
                 Spacer()
             }
             WeekSimpleView(style: style)
@@ -116,13 +118,13 @@ private struct YearMonthView: View {
                         VStack(alignment: .center) {
                             Text("\(date.kvkDay)")
                                 .foregroundColor(getCurrentTxtColor(date, selectedDay: selectedDate))
-                                .font(
-                                    .system(size: 10)
-                                )
+                                .font(Font(style.year.fontDayTitle))
                                 .minimumScaleFactor(0.5)
-                                .padding(1)
+                                .frame(width: daySize.width, height: daySize.height)
+                                .fixedSize()
                         }
                         .background(getCurrentBgTxtColor(date, selectedDay: selectedDate))
+                        .clipShape(Circle())
                     } else {
                         Text("")
                     }
@@ -171,10 +173,12 @@ struct WeekSimpleView: View, WeekPreparing {
         HStack(spacing: 2) {
             ForEach(days, id: \.self) { (day) in
                 Text(day.titleForLocale(style.locale, formatter: style.year.weekdayFormatter))
+                    .minimumScaleFactor(0.5)
+                    .lineLimit(1)
                     .foregroundColor(getTxtColor(day, style: style))
                     .font(Font(style.year.weekFont))
-                    .minimumScaleFactor(0.5)
                     .background(getTxtBgColor(day, style: style))
+                    .frame(maxWidth: .infinity)
             }
         }
     }

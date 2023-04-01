@@ -49,6 +49,12 @@ final class YearData: ObservableObject {
             return accTemp
         })
     }
+    
+    func handleSelectedDate(_ date: Date) {
+        var components = DateComponents(year: date.kvkYear, month: date.kvkMonth, day: self.date.kvkDay)
+        let dt = style.calendar.date(from: components)
+        self.date = dt ?? date
+    }
 }
 
 #endif
