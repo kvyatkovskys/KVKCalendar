@@ -14,54 +14,55 @@ import SwiftUI
 struct MonthNewView: View {
     
     @ObservedObject var vm: MonthData
+    @State private var scrollingDates: Set<Date> = []
     let style: Style
     
     private let columns: [GridItem] = [
-        GridItem(.flexible(), spacing: 1),
-        GridItem(.flexible(), spacing: 1),
-        GridItem(.flexible(), spacing: 1),
-        GridItem(.flexible(), spacing: 1),
-        GridItem(.flexible(), spacing: 1),
-        GridItem(.flexible(), spacing: 1),
-        GridItem(.flexible(), spacing: 1)
+        GridItem(.flexible(), spacing: 0),
+        GridItem(.flexible(), spacing: 0),
+        GridItem(.flexible(), spacing: 0),
+        GridItem(.flexible(), spacing: 0),
+        GridItem(.flexible(), spacing: 0),
+        GridItem(.flexible(), spacing: 0),
+        GridItem(.flexible(), spacing: 0)
     ]
     
+    private var tapCountToSelectDay: Int {
+        Platform.currentInterface == .phone ? 1 : 2
+    }
+    
     var body: some View {
-        VStack {
-            MonthWeekView(style: style, date: vm.date)
+        VStack(spacing: 0) {
+            MonthWeekView(style: style, date: scrollingDates.first ?? vm.date)
                 .background(.thickMaterial)
-            ScrollViewReader { (proxy) in
-                ScrollView {
-                    LazyVGrid(columns: columns, pinnedViews: .sectionHeaders) {
-                        ForEach(vm.data.months) { (month) in
-                            ForEach(month.days) { (day) in
-                                MonthDayView(day: day, selectedDate: vm.date, style: style)
-                                    .onTapGesture {
-                                        if Platform.currentInterface == .phone {
-                                            withAnimation {
-                                                vm.date = day.date ?? Date()
+            GeometryReader { (geometry) in
+                ScrollViewReader { (proxy) in
+                    ScrollView {
+                        LazyVGrid(columns: columns, spacing: 0) {
+                            ForEach(vm.data.months) { (month) in
+                                Section {
+                                    ForEach(month.days) { (day) in
+                                        MonthDayView(day: day, selectedDate: vm.date, style: style)
+                                            .onTapGesture(count: tapCountToSelectDay) {
+                                                withAnimation {
+                                                    vm.date = day.date ?? Date()
+                                                }
                                             }
-                                        }
+                                            .disabled(day.type == .empty)
                                     }
-                                    .onTapGesture(count: 2) {
-                                        if Platform.currentInterface != .phone {
-                                            withAnimation {
-                                                vm.date = day.date ?? Date()
-                                            }
-                                        }
-                                    }
+                                }
+                                .id(month.date.kvkStartOfMonth)
                             }
                         }
                     }
-                }
-                .padding(.top, 10)
-                .task {
-                    withAnimation {
-                        proxy.scrollTo(vm.date, anchor: .top)
+                    .task {
+                        withAnimation {
+                            proxy.scrollTo(vm.date.kvkStartOfMonth, anchor: .top)
+                        }
                     }
+                    .edgesIgnoringSafeArea(.bottom)
                 }
             }
-            Spacer()
         }
     }
     
@@ -74,7 +75,7 @@ struct MonthNewView_Previews: PreviewProvider {
         var style = Style()
         style.startWeekDay = .sunday
         var data = CalendarData(date: Date(), years: 1, style: style)
-        data.months[0].days[0].events = [.stub(id: "1"), .stub(id: "2")]
+        data.months[0].days[0].events = [.stub(id: "1"), .stub(id: "2"), .stub(id: "2")]
         return MonthNewView(vm: MonthData(parameters: MonthData.Parameters(data: data, startDay: .sunday, calendar: Calendar.current, style: style)), style: style)
     }
     
@@ -102,24 +103,34 @@ struct MonthDayView: View {
     private var height: CGFloat {
         switch Platform.currentInterface {
         case .phone:
-            return 90
+            return 80
         default:
-            return 100
+            return 120
         }
+    }
+    private var dayPadding: CGFloat {
+        Platform.currentInterface == .phone ? 0 : 5
+    }
+    private var borderColor: Color {
+        Platform.currentInterface == .phone ? .clear : Color(uiColor: style.month.colorSeparator)
+    }
+    private var borderWidth: CGFloat {
+        Platform.currentInterface == .phone ? 0 : style.month.widthSeparator
     }
     
     var body: some View {
         VStack {
             if day.type != .empty && Platform.currentInterface == .phone {
-                if day.date?.kvkDay == 1 {
-                    Text(date.titleForLocale(style.locale, formatter: style.month.shortInDayMonthFormatter).capitalized)
-                        .foregroundColor(getTxtHeaderColor(day))
-                        .font(Font(style.month.fontTitleHeader))
-                        .frame(height: 14.5)
-                } else {
-                    Spacer()
-                        .frame(height: 21.5)
+                VStack {
+                    if day.date?.kvkDay == 1 {
+                        Text(date.titleForLocale(style.locale, formatter: style.month.shortInDayMonthFormatter).capitalized)
+                            .foregroundColor(getTxtHeaderColor(day))
+                            .minimumScaleFactor(0.9)
+                            .font(Font(style.month.fontTitleHeader))
+                    }
                 }
+                .frame(height: 14)
+                .fixedSize()
                 Divider()
             }
             HStack {
@@ -135,20 +146,21 @@ struct MonthDayView: View {
                 }
                 .background(getBgTxtColor(day, selectedDay: selectedDate))
                 .clipShape(Capsule())
+                .padding([.top, .trailing], dayPadding)
             }
-            if Platform.currentInterface == .phone {
-                ForEach(day.events.prefix(2)) { (event) in
-                    Circle()
-                        .foregroundColor(Color(uiColor: event.backgroundColor))
-                        .frame(width: 5, height: 5)
-                }
+            if Platform.currentInterface == .phone && !day.events.isEmpty {
+                Circle()
+                    .foregroundColor(.gray)
+                    .frame(width: 8, height: 8)
+                    .fixedSize()
             } else {
                 
             }
             Spacer()
         }
         .background(getBgColor(date, style: style))
-        .frame(height: height)
+        .frame(minHeight: height)
+        .border(borderColor, width: borderWidth)
     }
     
     private func getTxtHeaderColor(_ day: Day) -> Color {
@@ -173,6 +185,8 @@ struct MonthDayView: View {
             return .red
         } else if date.kvkIsEqual(selectedDay) {
             return .black
+        } else if date.isWeekend && Platform.currentInterface != .phone {
+            return .clear
         } else {
             return .white
         }
@@ -213,7 +227,7 @@ struct MonthDayView: View {
 struct MonthDayView_Previews: PreviewProvider {
     
     static var previews: some View {
-        MonthDayView(day: Day(type: .monday, date: Date(), data: [.stub(id: "1"), .stub(id: "2")]), selectedDate: Date(), style: Style())
+        MonthDayView(day: Day(type: .monday, date: Date(), data: [.stub(id: "1"), .stub(id: "2"), .stub(id: "3")]), selectedDate: Date(), style: Style())
     }
     
 }
