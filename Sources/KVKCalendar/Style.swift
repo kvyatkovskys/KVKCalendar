@@ -123,7 +123,7 @@ public struct HeaderScrollStyle {
     public var titleDateColorCorner: UIColor = .red
     
     public var colorDate: UIColor = .black
-    public var fontDate: UIFont = .systemFont(ofSize: 17)
+    public var fontDate: UIFont = .boldSystemFont(ofSize: 17)
     public var colorNameDay: UIColor = .black
     public var fontNameDay: UIFont = .systemFont(ofSize: 10)
     public var colorCurrentDate: UIColor = .white

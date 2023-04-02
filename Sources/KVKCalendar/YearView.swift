@@ -163,20 +163,24 @@ struct WeekSimpleView: View, WeekPreparing {
     
     private var days: [Date] = []
     private let style: Style
+    private let formatter: DateFormatter
+    private let font: UIFont
     
-    init(style: Style) {
+    init(style: Style, formatter: DateFormatter? = nil, font: UIFont? = nil) {
         self.style = style
+        self.formatter = formatter ?? style.year.weekdayFormatter
+        self.font = font ?? style.year.weekFont
         days = getWeekDays(style: style)
     }
     
     var body: some View {
         HStack(spacing: 2) {
             ForEach(days, id: \.self) { (day) in
-                Text(day.titleForLocale(style.locale, formatter: style.year.weekdayFormatter))
+                Text(day.titleForLocale(style.locale, formatter: formatter))
                     .minimumScaleFactor(0.5)
                     .lineLimit(1)
                     .foregroundColor(getTxtColor(day, style: style))
-                    .font(Font(style.year.weekFont))
+                    .font(Font(font))
                     .background(getTxtBgColor(day, style: style))
                     .frame(maxWidth: .infinity)
             }
