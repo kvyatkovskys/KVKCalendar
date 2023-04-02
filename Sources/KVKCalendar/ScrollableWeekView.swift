@@ -8,6 +8,118 @@
 #if os(iOS)
 
 import UIKit
+import SwiftUI
+
+@available(iOS 15.0, *)
+struct ScrollableWeekNewView: View {
+    
+    @Binding var date: Date
+    let days: [Day]
+    let style: Style
+    
+    private let rows:[ GridItem] = [
+        GridItem(.flexible(minimum: 100))
+    ]
+    
+    var body: some View {
+        ScrollViewReader { (proxy) in
+            VStack {
+                if Platform.currentInterface != .phone {
+                    HStack {
+                        Text(date.titleForLocale(style.locale, formatter: style.headerScroll.titleFormatter))
+                            .foregroundColor(Color(uiColor: style.headerScroll.titleDateColor))
+                            .font(Font(style.headerScroll.titleDateFont))
+                        Spacer()
+                        Button("Today") {
+                            date = Date()
+                            withAnimation {
+                                proxy.scrollTo(date.kvkStartSundayOfWeek)
+                            }
+                        }
+                        .tint(.red)
+                    }
+                    .padding([.leading, .trailing])
+                }
+                ScrollView(.horizontal) {
+                    LazyHGrid(rows: rows) {
+                        ForEach(days) { (day) in
+                            if Platform.currentInterface == .phone {
+                                
+                            } else {
+                                HStack {
+                                    Text(day.date?.titleForLocale(style.locale, formatter: style.headerScroll.weekdayFormatter).capitalized ?? "")
+                                        .foregroundColor(getTxtColor(day, selectedDay: date, style: style))
+                                        .font(Font(style.headerScroll.fontNameDay))
+                                    if let dt = day.date, day.type != .empty {
+                                        Text("\(dt.kvkDay)")
+                                            .font(Font(style.headerScroll.fontDate))
+                                    } else {
+                                        Text("")
+                                    }
+                                    Spacer()
+                                }
+                                .onTapGesture {
+                                    date = day.date ?? Date()
+                                }
+                                .id(day.date)
+                            }
+                        }
+                    }
+                    .frame(minHeight: 30, maxHeight: 60)
+                }
+            }
+        }
+    }
+    
+    private func getBgTxtColor(_ day: Day,
+                               selectedDay: Date) -> Color {
+        if day.type == .empty {
+            return .clear
+        }
+        
+        let date = day.date ?? Date()
+        if date.kvkIsEqual(selectedDay) && date.kvkIsEqual(Date()) {
+            return .red
+        } else if date.kvkIsEqual(selectedDay) {
+            return .black
+        } else if date.isWeekend && Platform.currentInterface != .phone {
+            return .clear
+        } else {
+            return .white
+        }
+    }
+    
+    private func getTxtColor(_ day: Day,
+                             selectedDay: Date,
+                             style: Style) -> Color {
+        if day.type == .empty {
+            return .clear
+        }
+        
+        let date = day.date ?? Date()
+        if date.kvkIsEqual(Date()) && date.kvkIsEqual(selectedDay) {
+            return .white
+        } else if date.kvkIsEqual(selectedDay) {
+            return .white
+        } else if date.isWeekend {
+            return Color(uiColor: style.headerScroll.colorWeekendDate)
+        } else if date.isWeekday {
+            return Color(uiColor: style.headerScroll.colorDate)
+        } else {
+            return .black
+        }
+    }
+    
+}
+
+@available(iOS 15.0, *)
+struct ScrollableWeekNewView_Previews: PreviewProvider {
+    static var previews: some View {
+        let commonData = CalendarData(date: Date(), years: 1, style: Style())
+        let dayData = DayData(data: commonData, startDay: .sunday)
+        return ScrollableWeekNewView(date: .constant(Date()), days: dayData.days, style: Style())
+    }
+}
 
 final class ScrollableWeekView: UIView {
     

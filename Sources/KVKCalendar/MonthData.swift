@@ -23,6 +23,7 @@ final class MonthData: ObservableObject, EventDateProtocol {
     var selectedSection: Int = -1
     @Published var date: Date
     @Published var data: CalendarData
+    @Published var selectedEvent: Event?
     var daysCount: Int = 0
     
     let tagEventPagePreview = -20

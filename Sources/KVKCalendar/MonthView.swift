@@ -14,7 +14,6 @@ import SwiftUI
 struct MonthNewView: View {
     
     @ObservedObject var vm: MonthData
-    @State private var scrollingDates: Set<Date> = []
     let style: Style
     
     private let columns: [GridItem] = [
@@ -32,17 +31,22 @@ struct MonthNewView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            MonthWeekView(style: style, date: scrollingDates.first ?? vm.date)
+        ScrollViewReader { (proxy) in
+            VStack(spacing: 0) {
+                MonthWeekView(style: style, date: vm.date) {
+                    vm.date = Date()
+                    withAnimation {
+                        proxy.scrollTo(vm.date.kvkStartOfMonth, anchor: .top)
+                    }
+                }
                 .background(.thickMaterial)
-            GeometryReader { (geometry) in
-                ScrollViewReader { (proxy) in
+                GeometryReader { (geometry) in
                     ScrollView {
                         LazyVGrid(columns: columns, spacing: 0) {
                             ForEach(vm.data.months) { (month) in
                                 Section {
                                     ForEach(month.days) { (day) in
-                                        MonthDayView(day: day, selectedDate: vm.date, style: style)
+                                        MonthDayView(day: day, selectedDate: vm.date, style: style, selectedEvent: $vm.selectedEvent)
                                             .onTapGesture(count: tapCountToSelectDay) {
                                                 withAnimation {
                                                     vm.date = day.date ?? Date()
@@ -75,7 +79,9 @@ struct MonthNewView_Previews: PreviewProvider {
         var style = Style()
         style.startWeekDay = .sunday
         var data = CalendarData(date: Date(), years: 1, style: style)
-        data.months[0].days[0].events = [.stub(id: "1"), .stub(id: "2"), .stub(id: "2")]
+        var allDayEvent = Event.stub(id: "4")
+        allDayEvent.isAllDay = true
+        data.months[0].days[0].events = [allDayEvent, .stub(id: "1"), .stub(id: "2"), .stub(id: "3")]
         return MonthNewView(vm: MonthData(parameters: MonthData.Parameters(data: data, startDay: .sunday, calendar: Calendar.current, style: style)), style: style)
     }
     
@@ -87,6 +93,7 @@ struct MonthDayView: View {
     let day: Day
     let selectedDate: Date
     let style: Style
+    @Binding var selectedEvent: Event?
     
     private var dayTxt: String {
         switch day.type {
@@ -105,7 +112,7 @@ struct MonthDayView: View {
         case .phone:
             return 80
         default:
-            return 120
+            return 180
         }
     }
     private var dayPadding: CGFloat {
@@ -154,7 +161,12 @@ struct MonthDayView: View {
                     .frame(width: 8, height: 8)
                     .fixedSize()
             } else {
-                
+                VStack(spacing: 4) {
+                    ForEach(day.events.prefix(4)) { (event) in
+                        MonthEventView(event: event, selectedEvent: $selectedEvent)
+                    }
+                }
+                .padding([.leading, .trailing], 2)
             }
             Spacer()
         }
@@ -227,7 +239,10 @@ struct MonthDayView: View {
 struct MonthDayView_Previews: PreviewProvider {
     
     static var previews: some View {
-        MonthDayView(day: Day(type: .monday, date: Date(), data: [.stub(id: "1"), .stub(id: "2"), .stub(id: "3")]), selectedDate: Date(), style: Style())
+        var allDayEvent = Event.stub(id: "4")
+        allDayEvent.isAllDay = true
+        let events: [Event] = [allDayEvent, .stub(id: "1"), .stub(id: "2"), .stub(id: "3")]
+        return MonthDayView(day: Day(type: .monday, date: Date(), data: events), selectedDate: Date(), style: Style(), selectedEvent: .constant(nil))
     }
     
 }
@@ -235,23 +250,34 @@ struct MonthDayView_Previews: PreviewProvider {
 @available(iOS 15.0, *)
 struct MonthWeekView: View, WeekPreparing {
     
-    private let date: Date
+    private var date: Date
     private var days: [Date] = []
     private let style: Style
+    private var didSelectToday: (() -> Void)?
     
-    init(style: Style, date: Date) {
+    init(style: Style,
+         date: Date,
+         didSelectToday: (() -> Void)? = nil) {
         self.style = style
         self.date = date
+        self.didSelectToday = didSelectToday
         days = getWeekDays(style: style)
     }
     
     var body: some View {
         VStack(spacing: 10) {
             if Platform.currentInterface != .phone {
-                Text(date.titleForLocale(style.locale, formatter: style.month.titleFormatter))
-                    .foregroundColor(getMonthTxtColor(date, style: style))
-                    .font(Font(style.month.fontTitleHeader))
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                HStack {
+                    Text(date.titleForLocale(style.locale, formatter: style.month.titleFormatter))
+                        .foregroundColor(getMonthTxtColor(date, style: style))
+                        .font(Font(style.month.fontTitleHeader))
+                    Spacer()
+                    Button("Today") {
+                        didSelectToday?()
+                    }
+                    .tint(.red)
+                }
+                .padding([.leading, .trailing])
             }
             HStack(spacing: 2) {
                 ForEach(days, id: \.self) { (day) in
@@ -307,6 +333,79 @@ struct MonthWeekView_Previews: PreviewProvider {
         return MonthWeekView(style: style, date: Date())
     }
     
+}
+
+@available(iOS 15.0, *)
+struct MonthEventView: View {
+    var event: Event
+    @Binding var selectedEvent: Event?
+    
+    var body: some View {
+        Button {
+            withAnimation {
+                selectedEvent = event
+            }
+        } label: {
+            HStack {
+                if event.isAllDay {
+                    Text(event.title.month ?? "")
+                        .foregroundColor(txtColor)
+                        .lineLimit(1)
+                        .padding(2)
+                } else {
+                    Circle()
+                        .frame(width: 7, height: 7)
+                        .foregroundColor(Color(uiColor: event.backgroundColor))
+                    Text(event.title.month ?? "")
+                        .foregroundColor(txtColor)
+                        .lineLimit(1)
+                    Text(event.start.formatted(.dateTime.hour()))
+                        .font(.subheadline)
+                        .foregroundColor(txtTimeColor)
+                }
+            }
+            .padding([.leading, .trailing], 1)
+        }
+        .tint(.black)
+        .background(bgColor)
+        .cornerRadius(radius)
+    }
+    
+    private var radius: CGFloat {
+        if event.uniqID == selectedEvent?.uniqID {
+            return 5
+        }
+        return event.isAllDay ? 5 : 0
+    }
+    
+    private var txtColor: Color {
+        event.uniqID == selectedEvent?.uniqID ? .white : .black
+    }
+    
+    private var txtTimeColor: Color {
+        event.uniqID == selectedEvent?.uniqID ? .white : .gray
+    }
+    
+    private var bgColor: Color {
+        if event.uniqID == selectedEvent?.uniqID {
+            return Color(uiColor: event.color?.value ?? event.backgroundColor)
+        }
+        return event.isAllDay ? Color(uiColor: event.backgroundColor) : .clear
+    }
+}
+
+@available(iOS 15.0, *)
+struct MonthEventView_Previews: PreviewProvider {
+    static var previews: some View {
+        var event = Event.stub(id: "1")
+        event.isAllDay = false
+        var event2 = Event.stub(id: "2")
+        event2.isAllDay = true
+        return Group {
+            MonthEventView(event: event, selectedEvent: .constant(nil))
+            MonthEventView(event: event2, selectedEvent: .constant(nil))
+        }
+    }
 }
 
 final class MonthView: UIView {
