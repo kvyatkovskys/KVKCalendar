@@ -8,6 +8,71 @@
 #if os(iOS)
 
 import UIKit
+import SwiftUI
+
+@available(iOS 15.0, *)
+struct TimelineNewView: View {
+    
+    let style: Style
+    
+    var body: some View {
+        GeometryReader { (geometry) in
+            ScrollViewReader { (proxy) in
+                ScrollView {
+                    ForEach(style.timeSystem.hours.indices, id: \.self) { (idx) in
+                        let hour = style.timeSystem.hours[idx]
+                        ZStack {
+                            VStack {
+                                HStack {
+                                    Text(hour)
+                                        .foregroundColor(Color(uiColor: style.timeline.timeColor))
+                                        .font(Font(style.timeline.timeFont))
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.5)
+                                    VStack {
+                                        Divider()
+                                    }
+                                }
+                                .coordinateSpace(name: "\(idx)")
+                                .id(idx)
+                                Spacer()
+                                    .frame(height: 100)
+                            }
+                            if idx == 12 {
+                                HStack {
+                                    Text("\(geometry.frame(in: .named("12")).origin.y)")//Date().formatted(.dateTime.hour().minute()))
+                                        .minimumScaleFactor(0.6)
+                                        .foregroundColor(Color(uiColor: style.timeline.currentLineHourColor))
+                                        .font(Font(style.timeline.currentLineHourFont))
+                                    Spacer()
+                                    VStack {
+                                        Divider()
+                                            .background(.red)
+                                    }
+                                }
+                                .frame(height: 20)
+                            }
+                        }
+                    }
+                }
+                .task {
+                    withAnimation {
+                        proxy.scrollTo(Date().kvkHour, anchor: .center)
+                    }
+                }
+                .padding([.leading], 5)
+            }
+        }
+    }
+}
+
+@available(iOS 15.0, *)
+struct TimelineNewView_Previews: PreviewProvider {
+    static var previews: some View {
+        let style = Style()
+        return TimelineNewView(style: style)
+    }
+}
 
 final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     

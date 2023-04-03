@@ -22,7 +22,7 @@ public struct CellParameter {
     public var events: [Event] = []
 }
 
-public enum TimeHourSystem: Int {
+public enum TimeHourSystem: Int, Identifiable {
     @available(swift, deprecated: 0.3.6, obsoleted: 0.3.7, renamed: "twelve")
     case twelveHour = 0
     @available(swift, deprecated: 0.3.6, obsoleted: 0.3.7, renamed: "twentyFour")
@@ -30,6 +30,10 @@ public enum TimeHourSystem: Int {
     
     case twelve = 12
     case twentyFour = 24
+    
+    public var id: TimeHourSystem {
+        self
+    }
     
     var hours: [String] {
         switch self {
