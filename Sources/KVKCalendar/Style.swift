@@ -30,10 +30,10 @@ public struct Style {
     public var systemCalendars: Set<String> = []
     /// Linux timezone identifiers
     public var timeZoneIds: [String] = ["America/New_York", "Europe/London", "Europe/Moscow", "Asia/Tokyo"]
-    public var selectedTimeZones: [TimeZone]
+    public var selectedTimeZones: [TimeZone] = []
     
     public init(configureAsDefaultCalendar: Bool = true) {
-        selectedTimeZones = [timezone]
+        //selectedTimeZones = [timezone]
         
         guard configureAsDefaultCalendar else { return }
         

@@ -13,54 +13,13 @@ import SwiftUI
 @available(iOS 15.0, *)
 struct TimelineNewView: View {
     
-    let style: Style
+    let params: TimelineViewWrapper.Parameters
     
     var body: some View {
-        GeometryReader { (geometry) in
-            ScrollViewReader { (proxy) in
-                ScrollView {
-                    ForEach(style.timeSystem.hours.indices, id: \.self) { (idx) in
-                        let hour = style.timeSystem.hours[idx]
-                        ZStack {
-                            VStack {
-                                HStack {
-                                    Text(hour)
-                                        .foregroundColor(Color(uiColor: style.timeline.timeColor))
-                                        .font(Font(style.timeline.timeFont))
-                                        .lineLimit(1)
-                                        .minimumScaleFactor(0.5)
-                                    VStack {
-                                        Divider()
-                                    }
-                                }
-                                .coordinateSpace(name: "\(idx)")
-                                .id(idx)
-                                Spacer()
-                                    .frame(height: 100)
-                            }
-                            if idx == 12 {
-                                HStack {
-                                    Text("\(geometry.frame(in: .named("12")).origin.y)")//Date().formatted(.dateTime.hour().minute()))
-                                        .minimumScaleFactor(0.6)
-                                        .foregroundColor(Color(uiColor: style.timeline.currentLineHourColor))
-                                        .font(Font(style.timeline.currentLineHourFont))
-                                    Spacer()
-                                    VStack {
-                                        Divider()
-                                            .background(.red)
-                                    }
-                                }
-                                .frame(height: 20)
-                            }
-                        }
-                    }
-                }
-                .task {
-                    withAnimation {
-                        proxy.scrollTo(Date().kvkHour, anchor: .center)
-                    }
-                }
-                .padding([.leading], 5)
+        VStack {
+            GeometryReader { (geometry) in
+                TimelineViewWrapper(params: params, frame: geometry.frame(in: .local))
+                    .edgesIgnoringSafeArea(.bottom)
             }
         }
     }
@@ -69,8 +28,70 @@ struct TimelineNewView: View {
 @available(iOS 15.0, *)
 struct TimelineNewView_Previews: PreviewProvider {
     static var previews: some View {
-        let style = Style()
-        return TimelineNewView(style: style)
+        var style = Style()
+        style.timeline.offsetTimeY = 50
+        return TimelineNewView(params: TimelineViewWrapper.Parameters(style: style, type: .week, dates: [Date(), Date(), Date()], selectedDate: Date(), events: [], recurringEvents: []))
+    }
+}
+
+struct TimelineViewWrapper: UIViewControllerRepresentable {
+    
+    struct Parameters {
+        let style: Style
+        let type: CalendarType
+        let dates: [Date]
+        let selectedDate: Date
+        let events: [Event]
+        let recurringEvents: [Event]
+    }
+    
+    var params: TimelineViewWrapper.Parameters
+    var frame: CGRect
+    
+    func makeUIViewController(context: Context) -> some UIViewController {
+        let page = setupTimelinePageView()
+        page.didSwitchTimelineView = { (_, _) in
+            
+        }
+        page.willDisplayTimelineView = { (_, _) in
+            
+        }
+        return page
+    }
+    
+    func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
+        
+    }
+    
+    private func setupTimelinePageView() -> TimelinePageVC {
+        let timelineViews = Array(0..<params.style.timeline.maxLimitCachedPages).reduce([]) { (acc, _) -> [TimelineView] in
+            acc + [createTimelineView()]
+        }
+        let page = TimelinePageVC(maxLimit: params.style.timeline.maxLimitCachedPages,
+                                  pages: timelineViews)
+        return page
+    }
+    
+    private func createTimelineView() -> TimelineView {
+        let view = TimelineView(parameters: TimelineView.Parameters(style: params.style, type: params.type), frame: frame)
+        view.setup(dates: params.dates,
+                   events: params.events,
+                   recurringEvents: params.recurringEvents,
+                   selectedDate: params.selectedDate)
+//        view.delegate = self
+//        view.dataSource = dataSource
+//        view.deselectEvent = { [weak self] (event) in
+//            self?.delegate?.didDeselectEvent(event, animated: true)
+//        }
+//        view.didChangeParameters = { [weak self] (params) in
+//            if params.scale != self?.timelineScale {
+//                self?.timelineScale = params.scale
+//            }
+//            if params.scrollToCurrentTimeOnlyOnInit != self?.scrollToCurrentTimeOnlyOnInit {
+//                self?.scrollToCurrentTimeOnlyOnInit = params.scrollToCurrentTimeOnlyOnInit
+//            }
+//        }
+        return view
     }
 }
 
@@ -80,7 +101,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         var style: Style
         var type: CalendarType
         var scale: CGFloat = 1
-        var scrollToCurrentTimeOnlyOnInit: Bool?
+        var scrollToCurrentTimeOnlyOnInit: Bool? = false
     }
     
     weak var delegate: TimelineDelegate?
@@ -124,6 +145,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     private(set) var tagAllDayEventView = -70
     private(set) var tagStubEvent = -80
     private(set) var timeLabels = [TimelineLabel]()
+    var timeLabelsDict = [Int: TimelineLabel]()
     private(set) var timeSystem: TimeHourSystem
     private let timerKey = "CurrentHourTimerKey"
     private(set) var events = [Event]()
@@ -157,13 +179,22 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         return view
     }()
     
+    private var centerYCurrentLine = NSLayoutConstraint()
+    private(set) lazy var currentLine: CurrentLineView = {
+        let view = CurrentLineView(parameters: .init(style: style))
+        view.tag = tagCurrentHourLine
+        return view
+    }()
+    
     private(set) lazy var scrollView: UIScrollView = {
         let scroll = UIScrollView()
         scroll.delegate = self
         return scroll
     }()
     
-    init(parameters: Parameters, frame: CGRect) {
+    init(parameters: Parameters,
+         frame: CGRect = .zero,
+         newFlow: Bool = false) {
         self.paramaters = parameters
         self.timeSystem = parameters.style.timeSystem
         self.eventLayout = parameters.style.timeline.eventLayout
@@ -201,6 +232,42 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         }
     }
     
+    private func setupCurrentLineConstraints(pointY: CGFloat, time: TimelineLabel) {
+        currentLine.removeFromSuperview()
+        scrollView.addSubview(currentLine)
+        currentLine.translatesAutoresizingMaskIntoConstraints = false
+        let leading = currentLine.leadingAnchor.constraint(equalTo: leadingAnchor)
+        let centerY = currentLine.centerYAnchor.constraint(equalTo: time.centerYAnchor,
+                                                           constant: pointY)
+        let height = currentLine.heightAnchor.constraint(equalToConstant: 15)
+        let trailing = currentLine.trailingAnchor.constraint(equalTo: trailingAnchor)
+        NSLayoutConstraint.activate([leading, centerY, height, trailing])
+    }
+    
+    private func movingCurrentLine() {
+        guard !isValidTimer(timerKey) && isDisplayedCurrentTime else { return }
+        
+        func action() {
+            let nextDate = Date().kvkConvertTimeZone(TimeZone.current, to: style.timezone)
+            guard currentLine.valueHash != nextDate.kvkMinute.hashValue,
+                  let time = getTimeLabel(hour: nextDate.kvkHour) else { return }
+            
+            let pointY = calculateYByMinute(nextDate.kvkMinute, time: time)
+            setupCurrentLineConstraints(pointY: pointY, time: time)
+            currentLine.valueHash = nextDate.kvkMinute.hashValue
+            currentLine.date = nextDate
+            
+            if isDisplayedTimes {
+//                if let timeNext = self.getTimelineLabel(hour: nextDate.kvkHour + 1) {
+//                    timeNext.isHidden = self.currentLine.frame.intersects(timeNext.frame)
+//                }
+//                time.isHidden = time.frame.intersects(self.currentLine.frame)
+            }
+        }
+        
+        startTimer(timerKey, repeats: true, addToRunLoop: true, action: action)
+    }
+    
     private func movingCurrentLineHour() {
         guard !isValidTimer(timerKey) && isDisplayedCurrentTime else { return }
         
@@ -231,6 +298,28 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         }
         
         startTimer(timerKey, repeats: true, addToRunLoop: true, action: action)
+    }
+    
+    private func showCurrentLine() {
+        currentLine.isHidden = !isDisplayedCurrentTime
+        let date = Date().kvkConvertTimeZone(TimeZone.current, to: style.timezone)
+        guard style.timeline.showLineHourMode.showForDates(dates),
+              let time = getTimeLabel(hour: date.kvkHour) else {
+            stopTimer(timerKey)
+            return
+        }
+
+        currentLine.updateStyle(style, force: true)
+        let pointY = calculateYByMinute(date.kvkMinute, time: time)
+        setupCurrentLineConstraints(pointY: pointY, time: time)
+        movingCurrentLine()
+        
+        if isDisplayedTimes {
+            if let timeNext = getTimelineLabel(hour: date.kvkHour + 1) {
+                //timeNext.isHidden = currentLineView.frame.intersects(timeNext.frame)
+            }
+            //time.isHidden = currentLineView.frame.intersects(time.frame)
+        }
     }
     
     private func showCurrentLineHour() {
@@ -275,44 +364,46 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         return pointY
     }
     
+    private func calculateYByMinute(_ minute: Int, time: TimelineLabel) -> CGFloat {
+        let pointY: CGFloat
+        if 1...59 ~= minute {
+            let minutePercent = 59.0 / CGFloat(minute)
+            // all height = 15 + half of height = 7
+            pointY = (calculatedTimeY / minutePercent) + 22
+        } else {
+            pointY = 0
+        }
+        return pointY
+    }
+    
     private func scrollToCurrentTime(_ startHour: Int) {
         guard style.timeline.scrollLineHourMode.scrollForDates(dates) && isDisplayedCurrentTime else { return }
-        
+
         let date = Date()
-        guard let time = getTimelineLabel(hour: date.kvkHour)else {
+        guard let time = getTimeLabel(hour: date.kvkHour)else {
             scrollView.setContentOffset(.zero, animated: true)
             return
         }
-        
-        var frame = scrollView.frame
-        frame.origin.y = time.frame.origin.y - 10
-        
+
         if let value = paramaters.scrollToCurrentTimeOnlyOnInit {
             if value {
                 paramaters.scrollToCurrentTimeOnlyOnInit = false
                 // some delay to save a visible scrolling
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    self.scrollView.scrollRectToVisible(frame, animated: true)
+                    self.scrollView.setContentOffset(time.frame.origin, animated: true)
                 }
             }
         } else {
-            scrollView.scrollRectToVisible(frame, animated: true)
+            scrollView.setContentOffset(time.frame.origin, animated: true)
         }
     }
     
     private func scrollToHour(_ hour: Int) {
-        guard let time = getTimelineLabel(hour: hour) else {
+        guard let time = getTimeLabel(hour: hour) else {
             scrollView.setContentOffset(.zero, animated: true)
             return
         }
-        
-        var frame = scrollView.frame
-        if style.allDay.isPinned {
-            frame.origin.y = time.frame.origin.y - 60
-        } else {
-            frame.origin.y = time.frame.origin.y - 10
-        }
-        scrollView.scrollRectToVisible(frame, animated: true)
+        scrollView.setContentOffset(time.frame.origin, animated: true)
     }
     
     private typealias EventOrder = (Event, Event) -> Bool
@@ -330,6 +421,62 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             return predicate(lhs, rhs)
         }
         return false
+    }
+    
+    func setup(dates: [Date], events: [Event], recurringEvents: [Event], selectedDate: Date) {
+        isResizableEventEnable = false
+        
+        // save parameters
+        self.dates = dates
+        self.events = events
+        self.recurringEvents = recurringEvents
+        self.selectedDate = selectedDate
+        
+        // calculate a start hour
+        let startHour: Int
+        if !style.timeline.startFromFirstEvent {
+            startHour = style.timeline.startHour
+        } else {
+            if dates.count > 1 {
+                startHour = events
+                    .sorted(by: { $0.start.kvkHour < $1.start.kvkHour })
+                    .first?.start.kvkHour ?? style.timeline.startHour
+            } else {
+                startHour = events
+                    .filter { compareStartDate(selectedDate, with: $0) }
+                    .sorted(by: { $0.start.kvkHour < $1.start.kvkHour })
+                    .first?.start.kvkHour ?? style.timeline.startHour
+            }
+        }
+        // add time label to timeline
+        let labels = createAndAddTimesLabel(start: startHour)
+        // add horizontal separator lines
+        let lines = createAndAddHorizontalLines(times: labels.times)
+        // show current line if needed
+        showCurrentLine()
+        
+        dates.enumerated().forEach { (item) in
+            let date = item.element
+            let index = item.offset
+            // add vertical separator line
+            let item = createAndAddVerticalLine(maxDates: dates.count, date: date, index: index, topLine: lines.first, bottomLine: lines.last)
+            
+            // TODO: replace a new SUI view
+            createAndAddColumn(date: date,
+                               maxIndex: dates.count - 1,
+                               index: index,
+                               width: item.1,
+                               vLine: item.0)
+        }
+        
+        // scroll to specific position if needed
+        if !forceDisableScrollToCurrentTime {
+            if let preferredHour = style.timeline.scrollToHour, !style.timeline.startFromFirstEvent {
+                scrollToHour(preferredHour)
+            } else {
+                scrollToCurrentTime(startHour)
+            }
+        }
     }
     
     func create(dates: [Date], events: [Event], recurringEvents: [Event], selectedDate: Date) {

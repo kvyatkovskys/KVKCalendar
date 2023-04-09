@@ -232,7 +232,7 @@ final class AllDayView: UIView {
     
     private func createVerticalLine(pointX: CGFloat) -> VerticalLineView {
         let frame = CGRect(x: pointX, y: 0, width: params.style.timeline.widthLine, height: bounds.height)
-        let line = VerticalLineView(frame: frame)
+        let line = VerticalLineView(date: Date(), color: params.style.timeline.separatorLineColor, width: params.style.timeline.widthLine, frame: frame)
         line.backgroundColor = params.style.timeline.separatorLineColor
         line.isHidden = !params.style.week.showVerticalDayDivider
         return line

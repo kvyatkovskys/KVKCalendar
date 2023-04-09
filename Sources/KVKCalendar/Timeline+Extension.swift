@@ -320,6 +320,10 @@ extension TimelineView {
         timeLabels.first(where: { $0.hashTime == hour })
     }
     
+    func getTimeLabel(hour: Int) -> TimelineLabel? {
+        timeLabelsDict[hour]
+    }
+    
     func createTimesLabel(start: Int) -> (times: [TimelineLabel], items: [UILabel]) {
         var times = [TimelineLabel]()
         var otherTimes = [UILabel]()
@@ -346,6 +350,45 @@ extension TimelineView {
                 times.append(time)
             }
         }
+        return (times, otherTimes)
+    }
+    
+    func createAndAddTimesLabel(start: Int) -> (times: [TimelineLabel], items: [UILabel]) {
+        var times = [TimelineLabel]()
+        var otherTimes = [UILabel]()
+        var allHeight: CGFloat = 0
+        for (idx, txtHour) in timeSystem.hours.enumerated() where idx >= start {
+            let yTime = (calculatedTimeY + style.timeline.heightTime) * CGFloat(idx - start)
+            let time = TimelineLabel()
+            time.font = style.timeline.timeFont
+            time.textAlignment = style.timeline.timeAlignment
+            time.textColor = style.timeline.timeColor
+            time.text = txtHour
+            let hourTmp = TimeHourSystem.twentyFour.hours[idx]
+            let hour = timeLabelFormatter.date(from: hourTmp)?.kvkHour ?? 0
+            time.hashTime = hour
+            time.tag = idx - start
+            time.isHidden = !isDisplayedTimes
+            
+            if let item = dataSource?.dequeueTimeLabel(time) ?? delegate?.dequeueTimeLabel(time) {
+                otherTimes += item.others
+                times.append(item.current)
+            } else {
+                timeLabelsDict[hour] = time
+                times.append(time)
+            }
+            
+            scrollView.addSubview(time)
+            time.translatesAutoresizingMaskIntoConstraints = false
+            let width = time.widthAnchor.constraint(equalToConstant: style.timeline.widthTime)
+            let height = time.heightAnchor.constraint(equalToConstant: style.timeline.heightTime)
+            let leading = time.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor,
+                                                        constant: style.timeline.offsetTimeX)
+            let top = time.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: yTime)
+            NSLayoutConstraint.activate([width, height, leading, top])
+            allHeight += style.timeline.heightTime + calculatedTimeY
+        }
+        scrollView.contentSize = CGSize(width: frame.width, height: allHeight)
         return (times, otherTimes)
     }
     
@@ -382,6 +425,73 @@ extension TimelineView {
         }
     }
     
+    func createAndAddHorizontalLines(times: [TimelineLabel]) -> [UIView] {
+        times.enumerated().reduce([]) { acc, item -> [UIView] in
+            let time = item.element
+            let idx = item.offset
+            let line = UIView()
+            line.backgroundColor = style.timeline.separatorLineColor
+            line.tag = idx
+            line.isHidden = !isDisplayedHorizontalLines
+            var lines = [line]
+            
+//            if let dividerType = style.timeline.dividerType {
+//                let heightBlock = calculatedTimeY + style.timeline.heightTime
+//                lines += (1..<dividerType.rawValue).compactMap({ idxDivider in
+//                    let yOffset = heightBlock / CGFloat(dividerType.rawValue) * CGFloat(idxDivider)
+//                    let divider = DividerView(parameters: .init(style: style),
+//                                              frame: CGRect(x: 0,
+//                                                            y: line.frame.origin.y + yOffset - (style.timeline.heightTime / 2),
+//                                                            width: scrollView.bounds.width,
+//                                                            height: style.timeline.heightTime))
+//                    divider.txt = ":\(dividerType.minutes * idxDivider)"
+//                    return divider
+//
+//                })
+//            }
+            scrollView.addSubview(line)
+            line.translatesAutoresizingMaskIntoConstraints = false
+            let height = line.heightAnchor.constraint(equalToConstant: style.timeline.heightLine)
+            let leading = line.leadingAnchor.constraint(equalTo: time.trailingAnchor)
+            let trailing = line.trailingAnchor.constraint(equalTo: trailingAnchor)
+            let centerY = line.centerYAnchor.constraint(equalTo: time.centerYAnchor)
+            NSLayoutConstraint.activate([height, leading, trailing, centerY])
+            
+            return acc + lines
+        }
+    }
+    
+    func createAndAddVerticalLine(maxDates: Int,
+                                  date: Date,
+                                  index: Int,
+                                  topLine: UIView?,
+                                  bottomLine: UIView?) -> (VerticalLineView, CGFloat) {
+        let view = VerticalLineView(date: date, color: style.timeline.separatorLineColor, width: style.timeline.widthLine)
+        view.tag = index
+        scrollView.addSubview(view)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        
+        let timeOffset = style.timeline.widthTime + style.timeline.offsetTimeX
+        let widthColumn = (frame.width - timeOffset) / CGFloat(maxDates)
+        let top = view.topAnchor.constraint(equalTo: topLine?.topAnchor ?? scrollView.topAnchor)
+        
+        let leading: NSLayoutConstraint
+        if index == 0 {
+            leading = view.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor)
+        } else {
+            let offset = CGFloat(index) * widthColumn + timeOffset
+            leading = view.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: offset)
+        }
+        
+        let bottom = view.bottomAnchor.constraint(equalTo: bottomLine?.bottomAnchor ?? scrollView.bottomAnchor)
+        let width = view.widthAnchor.constraint(equalToConstant: style.timeline.widthLine)
+        NSLayoutConstraint.activate([top, leading, bottom, width])
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
+        
+        return (view, widthColumn)
+    }
+    
     func createVerticalLine(pointX: CGFloat, date: Date?) -> VerticalLineLayer {
         let frame = CGRect(x: pointX, y: 0, width: style.timeline.widthLine, height: scrollView.contentSize.height)
         
@@ -394,6 +504,35 @@ extension TimelineView {
                                      width: style.timeline.widthLine)
         line.isHidden = !style.week.showVerticalDayDivider
         return line
+    }
+    
+    func createAndAddColumn(date: Date,
+                            maxIndex: Int,
+                            index: Int,
+                            width: CGFloat,
+                            vLine: VerticalLineView) {
+        let columnView = UIView()
+        columnView.backgroundColor = .systemPink
+        columnView.layer.borderColor = UIColor.black.cgColor
+        columnView.layer.borderWidth = 1
+        scrollView.addSubview(columnView)
+        columnView.translatesAutoresizingMaskIntoConstraints = false
+        
+        let topColumn = columnView.topAnchor.constraint(equalTo: vLine.topAnchor)
+        let bottomColumn = columnView.bottomAnchor.constraint(equalTo: vLine.bottomAnchor)
+        let leadingColumn: NSLayoutConstraint
+        let widthColumn = columnView.widthAnchor.constraint(equalToConstant: width)
+        
+        if index == maxIndex {
+            leadingColumn = columnView.trailingAnchor.constraint(equalTo: trailingAnchor)
+        } else if index == 0 {
+            let offset = style.timeline.widthTime + style.timeline.offsetTimeX
+            leadingColumn = columnView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: offset)
+        } else {
+            leadingColumn = columnView.leadingAnchor.constraint(equalTo: vLine.trailingAnchor)
+        }
+
+        NSLayoutConstraint.activate([topColumn, bottomColumn, leadingColumn, widthColumn])
     }
     
     func getEventView(style: Style, event: Event, frame: CGRect, date: Date? = nil) -> EventViewGeneral {
