@@ -91,7 +91,7 @@ extension CurrentLineView: CalendarSettingProtocol {
 //                                y: frame.height * 0.5,
 //                                width: frame.width - frame.origin.x,
 //                                height: style.timeline.currentLineHourHeight)
-        [timeLabel, lineView, dotView].forEach({ addSubview($0) })
+        [timeLabel, lineView, dotView].forEach { addSubview($0) }
         timeLabel.translatesAutoresizingMaskIntoConstraints = false
         lineView.translatesAutoresizingMaskIntoConstraints = false
         dotView.translatesAutoresizingMaskIntoConstraints = false

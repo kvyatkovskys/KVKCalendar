@@ -28,7 +28,7 @@ public extension TimelineEventLayoutContext {
     func getEventRect(start: Date, end: Date, date: Date?, style eventStyle: EventStyle?) -> CGRect {
         var newFrame = pageFrame
         let midnight = 24
-
+        
         timeLabels.forEach { (time) in
             // calculate position 'y' event
             if start.kvkHour == time.hashTime && start.kvkDay == date?.kvkDay {
@@ -40,7 +40,7 @@ public extension TimelineEventLayoutContext {
             } else if let firstTimeLabel = getTimelineLabel(startHour), start.kvkDay != date?.kvkDay {
                 newFrame.origin.y = calculatePointYByMinute(startHour, firstTimeLabel)
             }
-
+            
             // calculate 'height' event
             if let defaultHeight = eventStyle?.defaultHeight {
                 newFrame.size.height = defaultHeight
@@ -55,7 +55,7 @@ public extension TimelineEventLayoutContext {
                 if time.tag == midnight, let newTime = timeLabels.first {
                     timeTemp = newTime
                 }
-
+                
                 let summHeight = (CGFloat(timeTemp.tag) * (calculatedTimeY + timeTemp.frame.height)) - newFrame.origin.y + (timeTemp.frame.height / 2)
                 if 0...59 ~= end.kvkMinute {
                     let minutePercent = 59.0 / CGFloat(end.kvkMinute)
@@ -68,7 +68,43 @@ public extension TimelineEventLayoutContext {
                 newFrame.size.height = (CGFloat(time.tag) * (calculatedTimeY + time.frame.height)) - newFrame.origin.y + (time.frame.height / 2)
             }
         }
-
+        
+        return newFrame
+    }
+    
+    func getEventRectNew(start: Date, end: Date, date: Date, style eventStyle: EventStyle?) -> CGRect {
+        var newFrame = pageFrame
+        let midnight = 24
+        guard let startTime = getTimelineLabel(start.kvkHour),
+              let endTime = getTimelineLabel(end.kvkHour) else { return .zero }
+        
+        // calculate position 'y' event
+        if start.kvkHour == startTime.hashTime && start.kvkDay == date.kvkDay {
+            if startTime.tag == midnight, let newTime = timeLabels.first {
+                newFrame.origin.y = calculatePointYByMinute(start.kvkMinute, newTime)
+            } else {
+                newFrame.origin.y = calculatePointYByMinute(start.kvkMinute, startTime)
+            }
+        } else if let firstTimeLabel = getTimelineLabel(startHour), start.kvkDay != date.kvkDay {
+            newFrame.origin.y = calculatePointYByMinute(startHour, firstTimeLabel)
+        }
+        
+        // calculate 'height' event
+        if let defaultHeight = eventStyle?.defaultHeight {
+            newFrame.size.height = defaultHeight
+        } else if end.kvkHour == endTime.hashTime, end.kvkDay == date.kvkDay {
+            // to avoid crash https://github.com/kvyatkovskys/KVKCalendar/issues/237
+            if start.kvkDay == end.kvkDay && start.kvkHour == end.kvkHour && start.kvkMinute == end.kvkMinute {
+                newFrame.size.height = 30
+                return newFrame
+            }
+            
+            let newHeight = calculatePointYByMinute(end.kvkMinute, endTime) - newFrame.origin.y
+            newFrame.size.height = newHeight - style.timeline.offsetEvent
+        } else if end.kvkDay != date.kvkDay {
+            newFrame.size.height = getTimelineLabel(24)?.yTime ?? pageFrame.height
+        }
+        
         return newFrame
     }
 }
@@ -80,7 +116,7 @@ public extension TimelineEventLayoutContext {
     func calculateCrossEvents(forEvents events: [Event]) -> [TimeInterval: CrossEvent] {
         var eventsTemp = events
         var crossEvents = [TimeInterval: CrossEvent]()
-
+        
         while let event = eventsTemp.first {
             let start = event.start.timeIntervalSince1970
             let end = event.end.timeIntervalSince1970
@@ -90,17 +126,17 @@ public extension TimelineEventLayoutContext {
                 let itemEnd = item.end.timeIntervalSince1970 - TimeInterval(style.timeline.offsetEvent)
                 let itemStart = item.start.timeIntervalSince1970
                 guard itemEnd > itemStart && endCalculated > start else { return false }
-
+                
                 return (itemStart...itemEnd).contains(start)
                 || (itemStart...itemEnd).contains(endCalculated)
                 || (start...endCalculated).contains(itemStart)
                 || (start...endCalculated).contains(itemEnd)
             }
-
+            
             crossEvents[crossEventNew.eventTime.start] = crossEventNew
             eventsTemp.removeFirst()
         }
-
+        
         return crossEvents
     }
 }

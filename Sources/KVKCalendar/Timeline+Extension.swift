@@ -369,6 +369,7 @@ extension TimelineView {
             time.hashTime = hour
             time.tag = idx - start
             time.isHidden = !isDisplayedTimes
+            time.yTime = yTime
             
             if let item = dataSource?.dequeueTimeLabel(time) ?? delegate?.dequeueTimeLabel(time) {
                 otherTimes += item.others
@@ -386,6 +387,7 @@ extension TimelineView {
                                                         constant: style.timeline.offsetTimeX)
             let top = time.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: yTime)
             NSLayoutConstraint.activate([width, height, leading, top])
+            time.setNeedsLayout()
             allHeight += style.timeline.heightTime + calculatedTimeY
         }
         scrollView.contentSize = CGSize(width: frame.width, height: allHeight)
@@ -486,9 +488,7 @@ extension TimelineView {
         let bottom = view.bottomAnchor.constraint(equalTo: bottomLine?.bottomAnchor ?? scrollView.bottomAnchor)
         let width = view.widthAnchor.constraint(equalToConstant: style.timeline.widthLine)
         NSLayoutConstraint.activate([top, leading, bottom, width])
-        view.setNeedsLayout()
-        view.layoutIfNeeded()
-        
+        view.setNeedsLayout()        
         return (view, widthColumn)
     }
     
@@ -510,11 +510,8 @@ extension TimelineView {
                             maxIndex: Int,
                             index: Int,
                             width: CGFloat,
-                            vLine: VerticalLineView) {
+                            vLine: VerticalLineView) -> UIView {
         let columnView = UIView()
-        columnView.backgroundColor = .systemPink
-        columnView.layer.borderColor = UIColor.black.cgColor
-        columnView.layer.borderWidth = 1
         scrollView.addSubview(columnView)
         columnView.translatesAutoresizingMaskIntoConstraints = false
         
@@ -533,6 +530,7 @@ extension TimelineView {
         }
 
         NSLayoutConstraint.activate([topColumn, bottomColumn, leadingColumn, widthColumn])
+        return columnView
     }
     
     func getEventView(style: Style, event: Event, frame: CGRect, date: Date? = nil) -> EventViewGeneral {

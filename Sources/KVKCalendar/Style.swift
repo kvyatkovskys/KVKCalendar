@@ -155,7 +155,7 @@ public struct HeaderScrollStyle {
 public struct TimelineStyle {
     public var startFromFirstEvent: Bool = false
     public var eventFont: UIFont = .boldSystemFont(ofSize: 12)
-    public var offsetEvent: CGFloat = 3
+    public var offsetEvent: CGFloat = 2
     public var startHour: Int = 0
     public var scrollToHour: Int? = nil
     public var movingMinuteLabelRoundUpTime: UInt = 15
