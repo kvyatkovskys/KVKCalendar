@@ -472,9 +472,9 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                 let rect = CGRect(origin: frame.origin,
                                   size: CGSize(width: item.1, height: frame.height))
                 let context = TimelineEventLayoutContext(style: style, type: paramaters.type, pageFrame: rect, startHour: startHour, timeLabels: labels.times, calculatedTimeY: calculatedTimeY, calculatePointYByMinute: calculateYInTimeline(_:time:), getTimelineLabel: getTimeLabel(hour:))
-                let rectEvent = context.getEventRectNew(start: date, end: Calendar.current.date(byAdding: .hour, value: 1, to: date) ?? date, date: date, style: style.event)
+                let rectEvent = context.getEventRectNew(start: date, end: Calendar.current.date(byAdding: .minute, value: 100, to: date) ?? date, date: date, style: style.event)
                 let label = UILabel()
-                label.text = "\(rectEvent.origin.y)"
+                label.text = "\(rectEvent.height)"
                 label.numberOfLines = 0
                 label.frame = rectEvent
                 label.backgroundColor = .systemBlue.withAlphaComponent(0.3)

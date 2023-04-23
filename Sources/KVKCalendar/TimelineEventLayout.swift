@@ -79,7 +79,7 @@ public extension TimelineEventLayoutContext {
               let endTime = getTimelineLabel(end.kvkHour) else { return .zero }
         
         // calculate position 'y' event
-        if start.kvkHour == startTime.hashTime && start.kvkDay == date.kvkDay {
+        if start.kvkDay == date.kvkDay {
             if startTime.tag == midnight, let newTime = timeLabels.first {
                 newFrame.origin.y = calculatePointYByMinute(start.kvkMinute, newTime)
             } else {
@@ -92,7 +92,7 @@ public extension TimelineEventLayoutContext {
         // calculate 'height' event
         if let defaultHeight = eventStyle?.defaultHeight {
             newFrame.size.height = defaultHeight
-        } else if end.kvkHour == endTime.hashTime, end.kvkDay == date.kvkDay {
+        } else if end.kvkDay == date.kvkDay {
             // to avoid crash https://github.com/kvyatkovskys/KVKCalendar/issues/237
             if start.kvkDay == end.kvkDay && start.kvkHour == end.kvkHour && start.kvkMinute == end.kvkMinute {
                 newFrame.size.height = 30
