@@ -112,7 +112,6 @@ public extension TimelineEventLayoutContext {
 // MARK: - Helpers
 
 public extension TimelineEventLayoutContext {
-    // count event cross in one hour
     func calculateCrossEvents(forEvents events: [Event]) -> [TimeInterval: CrossEvent] {
         var eventsTemp = events
         var crossEvents = [TimeInterval: CrossEvent]()

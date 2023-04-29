@@ -8,6 +8,7 @@
 #if os(iOS)
 
 import UIKit
+import SwiftUI
 
 extension TimelineView {
     
@@ -506,12 +507,16 @@ extension TimelineView {
         return line
     }
     
+    @available(iOS 16.0, *)
     func createAndAddColumn(date: Date,
+                            events: [TimelineColumnView.Container],
                             maxIndex: Int,
                             index: Int,
                             width: CGFloat,
-                            vLine: VerticalLineView) -> UIView {
-        let columnView = UIView()
+                            vLine: VerticalLineView) {
+        guard let columnView = UIHostingController(rootView: TimelineColumnView(items: events)).view else { return }
+        
+        columnView.backgroundColor = .clear
         scrollView.addSubview(columnView)
         columnView.translatesAutoresizingMaskIntoConstraints = false
         
@@ -528,9 +533,7 @@ extension TimelineView {
         } else {
             leadingColumn = columnView.leadingAnchor.constraint(equalTo: vLine.trailingAnchor)
         }
-
         NSLayoutConstraint.activate([topColumn, bottomColumn, leadingColumn, widthColumn])
-        return columnView
     }
     
     func getEventView(style: Style, event: Event, frame: CGRect, date: Date? = nil) -> EventViewGeneral {

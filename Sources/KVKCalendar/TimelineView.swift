@@ -10,7 +10,7 @@
 import UIKit
 import SwiftUI
 
-@available(iOS 15.0, *)
+@available(iOS 16.0, *)
 struct TimelineNewView: View {
     
     let params: TimelineViewWrapper.Parameters
@@ -25,7 +25,7 @@ struct TimelineNewView: View {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 16.0, *)
 struct TimelineNewView_Previews: PreviewProvider {
     static var previews: some View {
         var style = Style()
@@ -34,6 +34,7 @@ struct TimelineNewView_Previews: PreviewProvider {
     }
 }
 
+@available(iOS 16.0, *)
 struct TimelineViewWrapper: UIViewControllerRepresentable {
     
     struct Parameters {
@@ -63,6 +64,7 @@ struct TimelineViewWrapper: UIViewControllerRepresentable {
         
     }
     
+    @available(iOS 16.0, *)
     private func setupTimelinePageView() -> TimelinePageVC {
         let timelineViews = Array(0..<params.style.timeline.maxLimitCachedPages).reduce([]) { (acc, _) -> [TimelineView] in
             acc + [createTimelineView()]
@@ -72,6 +74,7 @@ struct TimelineViewWrapper: UIViewControllerRepresentable {
         return page
     }
     
+    @available(iOS 16.0, *)
     private func createTimelineView() -> TimelineView {
         let view = TimelineView(parameters: TimelineView.Parameters(style: params.style, type: params.type), frame: frame)
         view.setup(dates: params.dates,
@@ -415,6 +418,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         return false
     }
     
+    @available(iOS 16.0, *)
     func setup(dates: [Date], events: [Event], recurringEvents: [Event], selectedDate: Date) {
         isResizableEventEnable = false
         
@@ -453,12 +457,6 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             // add vertical separator line
             let item = createAndAddVerticalLine(maxDates: dates.count, date: date, index: index, topLine: lines.first, bottomLine: lines.last)
             
-            // TODO: replace a new SUI view
-            let column = createAndAddColumn(date: date,
-                                            maxIndex: dates.count - 1,
-                                            index: index,
-                                            width: item.1,
-                                            vLine: item.0)
             let eventsByDate = events
                 .filter {
                     compareStartDate(date, with: $0)
@@ -469,16 +467,19 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             let recurringEventsByDate = prepareRecurringEvents(recurringEvents, eventsByDate: events, date: date)
             let sortedEventsByDate = (eventsByDate + recurringEventsByDate).sorted(by: { $0.start < $1.start })
             do {
-                let rect = CGRect(origin: frame.origin,
-                                  size: CGSize(width: item.1, height: frame.height))
+                let rect = CGRect(origin: frame.origin, size: CGSize(width: item.1, height: frame.height))
                 let context = TimelineEventLayoutContext(style: style, type: paramaters.type, pageFrame: rect, startHour: startHour, timeLabels: labels.times, calculatedTimeY: calculatedTimeY, calculatePointYByMinute: calculateYInTimeline(_:time:), getTimelineLabel: getTimeLabel(hour:))
-                let rectEvent = context.getEventRectNew(start: date, end: Calendar.current.date(byAdding: .minute, value: 100, to: date) ?? date, date: date, style: style.event)
-                let label = UILabel()
-                label.text = "\(rectEvent.height)"
-                label.numberOfLines = 0
-                label.frame = rectEvent
-                label.backgroundColor = .systemBlue.withAlphaComponent(0.3)
-                column.addSubview(label)
+                let eventsAndRects: [TimelineColumnView.Container] = sortedEventsByDate.reduce([]) { (acc, event) in
+                    let rectEvent = context.getEventRectNew(start: event.start, end: event.end, date: date, style: event.style)
+                    return acc + [TimelineColumnView.Container(event: event, rect: rectEvent)]
+                }
+                
+                createAndAddColumn(date: date,
+                                   events: eventsAndRects,
+                                   maxIndex: dates.count - 1,
+                                   index: index,
+                                   width: item.1,
+                                   vLine: item.0)
             }
         }
         
