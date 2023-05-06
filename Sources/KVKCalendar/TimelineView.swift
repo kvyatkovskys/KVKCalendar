@@ -30,7 +30,13 @@ struct TimelineNewView_Previews: PreviewProvider {
     static var previews: some View {
         var style = Style()
         style.timeline.offsetTimeY = 50
-        return TimelineNewView(params: TimelineViewWrapper.Parameters(style: style, type: .week, dates: [Date(), Date(), Date()], selectedDate: Date(), events: [], recurringEvents: []))
+        let events: [Event] = [.stub(id: "1", duration: 50),
+                               .stub(id: "2", duration: 30),
+                               .stub(id: "3", startFrom: 30, duration: 55),
+                               .stub(id: "4", startFrom: 80, duration: 30),
+                               .stub(id: "5", startFrom: 80, duration: 30)
+        ]
+        return TimelineNewView(params: TimelineViewWrapper.Parameters(style: style, type: .week, dates: [Date(), Date(), Date()], selectedDate: Date(), events: events, recurringEvents: [], selectedEvent: .constant(nil)))
     }
 }
 
@@ -44,6 +50,7 @@ struct TimelineViewWrapper: UIViewControllerRepresentable {
         let selectedDate: Date
         let events: [Event]
         let recurringEvents: [Event]
+        var selectedEvent: Binding<Event?>
     }
     
     var params: TimelineViewWrapper.Parameters
@@ -80,7 +87,8 @@ struct TimelineViewWrapper: UIViewControllerRepresentable {
         view.setup(dates: params.dates,
                    events: params.events,
                    recurringEvents: params.recurringEvents,
-                   selectedDate: params.selectedDate)
+                   selectedDate: params.selectedDate,
+                   selectedEvent: params.selectedEvent)
 
 //        view.deselectEvent = { [weak self] (event) in
 //            self?.delegate?.didDeselectEvent(event, animated: true)
@@ -355,7 +363,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         switch minute {
         case let x where 1...59 ~= x:
             let minutePercent = 59.0 / CGFloat(minute)
-            let newY = (calculatedTimeY + time.bounds.height) / minutePercent
+            let newY = (calculatedTimeY + style.timeline.heightTime) / minutePercent
             return time.yTime + newY
         default:
             return time.yTime
@@ -365,7 +373,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     private func calculateYByMinute(_ minute: Int, time: TimelineLabel) -> CGFloat {
         if 1...59 ~= minute {
             let minutePercent = 59.0 / CGFloat(minute)
-            return (calculatedTimeY + 17) / minutePercent
+            return (calculatedTimeY + style.timeline.heightTime) / minutePercent
         } else {
             return 0
         }
@@ -419,7 +427,11 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     }
     
     @available(iOS 16.0, *)
-    func setup(dates: [Date], events: [Event], recurringEvents: [Event], selectedDate: Date) {
+    func setup(dates: [Date],
+               events: [Event],
+               recurringEvents: [Event],
+               selectedDate: Date,
+               selectedEvent: Binding<Event?>) {
         isResizableEventEnable = false
         
         // save parameters
@@ -467,15 +479,17 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             let recurringEventsByDate = prepareRecurringEvents(recurringEvents, eventsByDate: events, date: date)
             let sortedEventsByDate = (eventsByDate + recurringEventsByDate).sorted(by: { $0.start < $1.start })
             do {
-                let rect = CGRect(origin: frame.origin, size: CGSize(width: item.1, height: frame.height))
-                let context = TimelineEventLayoutContext(style: style, type: paramaters.type, pageFrame: rect, startHour: startHour, timeLabels: labels.times, calculatedTimeY: calculatedTimeY, calculatePointYByMinute: calculateYInTimeline(_:time:), getTimelineLabel: getTimeLabel(hour:))
+                let pageFrame = CGRect(origin: frame.origin, size: CGSize(width: item.1, height: frame.height))
+                let context = TimelineEventLayoutContext(style: style, type: paramaters.type, pageFrame: pageFrame, startHour: startHour, timeLabels: labels.times, calculatedTimeY: calculatedTimeY, calculatePointYByMinute: calculateYInTimeline(_:time:), getTimelineLabel: getTimeLabel(hour:))
                 let eventsAndRects: [TimelineColumnView.Container] = sortedEventsByDate.reduce([]) { (acc, event) in
                     let rectEvent = context.getEventRectNew(start: event.start, end: event.end, date: date, style: event.style)
                     return acc + [TimelineColumnView.Container(event: event, rect: rectEvent)]
                 }
-                
+                let crossEvents = context.calculateCrossEvents(forEvents: sortedEventsByDate)
                 createAndAddColumn(date: date,
-                                   events: eventsAndRects,
+                                   crossEvents: crossEvents,
+                                   eventsAndRects: eventsAndRects,
+                                   selectedEvent: selectedEvent,
                                    maxIndex: dates.count - 1,
                                    index: index,
                                    width: item.1,

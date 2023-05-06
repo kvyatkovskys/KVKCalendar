@@ -509,12 +509,15 @@ extension TimelineView {
     
     @available(iOS 16.0, *)
     func createAndAddColumn(date: Date,
-                            events: [TimelineColumnView.Container],
+                            crossEvents: [TimeInterval: CrossEvent],
+                            eventsAndRects: [TimelineColumnView.Container],
+                            selectedEvent: Binding<Event?>,
                             maxIndex: Int,
                             index: Int,
                             width: CGFloat,
                             vLine: VerticalLineView) {
-        guard let columnView = UIHostingController(rootView: TimelineColumnView(items: events)).view else { return }
+        let pageColumnView = TimelineColumnView(selectedEvent: selectedEvent, items: eventsAndRects, crossEvents: crossEvents, style: style)
+        guard let columnView = UIHostingController(rootView: pageColumnView).view else { return }
         
         columnView.backgroundColor = .clear
         scrollView.addSubview(columnView)

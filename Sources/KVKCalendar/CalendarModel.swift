@@ -223,8 +223,10 @@ extension Event {
         uniqID
     }
     
-    static func stub(id: String? = nil) -> Event {
+    static func stub(id: String? = nil, startFrom: Int? = nil, duration: Int? = nil) -> Event {
         var event = Event(ID: id ?? "-1")
+        event.start = Calendar.current.date(byAdding: .minute, value: startFrom ?? 0, to: Date()) ?? Date()
+        event.end = Calendar.current.date(byAdding: .minute, value: duration ?? 30, to: event.start) ?? Date()
         event.title = TextEvent(timeline: "Text event number 10",
                                 month: "Text event number 10",
                                 list: "Text event number 10")

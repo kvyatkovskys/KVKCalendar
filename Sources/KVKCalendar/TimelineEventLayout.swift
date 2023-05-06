@@ -9,8 +9,8 @@
 
 import UIKit
 
-public struct TimelineEventLayoutContext {
-    public let style: Style
+public struct TimelineEventLayoutContext: TimelineEventLayoutProtocol {
+    public var style: Style
     let type: CalendarType
     let pageFrame: CGRect
     let startHour: Int
@@ -111,7 +111,14 @@ public extension TimelineEventLayoutContext {
 
 // MARK: - Helpers
 
-public extension TimelineEventLayoutContext {
+public protocol TimelineEventLayoutProtocol {
+    
+    var style: Style { get set }
+    
+}
+
+public extension TimelineEventLayoutProtocol {
+    
     func calculateCrossEvents(forEvents events: [Event]) -> [TimeInterval: CrossEvent] {
         var eventsTemp = events
         var crossEvents = [TimeInterval: CrossEvent]()
