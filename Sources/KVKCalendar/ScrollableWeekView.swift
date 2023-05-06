@@ -13,7 +13,7 @@ import SwiftUI
 @available(iOS 15.0, *)
 struct ScrollableWeekNewView: View {
     
-    @State var date: Date
+    @Binding var date: Date
     let weeks: [[Day]]
     let style: Style
     
@@ -112,8 +112,8 @@ struct ScrollableWeekNewView_Previews: PreviewProvider {
         var style = Style()
         style.startWeekDay = .sunday
         let commonData = CalendarData(date: Date(), years: 1, style: style)
-        let dayData = DayData(data: commonData, startDay: .sunday)
-        return ScrollableWeekNewView(date: Date(), weeks: dayData.daysBySection, style: style)
+        let weekData = WeekData(data: commonData, startDay: .sunday, maxDays: style.week.maxDays)
+        return ScrollableWeekNewView(date: .constant(Date()), weeks: weekData.weeks, style: style)
     }
 }
 
@@ -204,6 +204,10 @@ struct WeeksHorizontalView: UIViewRepresentable {
                 }
             } else {
                 parent.collectionView.scrollToItem(at: IndexPath(row: 0, section: idx), at: .left, animated: animated)
+            }
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                self?.lastContentOffset = self?.parent.collectionView.contentOffset.x ?? 0
             }
         }
         

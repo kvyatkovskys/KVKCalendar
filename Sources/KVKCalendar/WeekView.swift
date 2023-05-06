@@ -7,7 +7,51 @@
 
 #if os(iOS)
 
+import SwiftUI
 import UIKit
+
+@available(iOS 16.0, *)
+struct WeekNewView: View {
+    
+    @ObservedObject var params: WeekData
+    var style: Style
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            ScrollableWeekNewView(date: $params.date, weeks: params.weeks, style: style)
+            if !params.allDayEvents.isEmpty {
+                AllDayNewView(parameters: AllDayNewView.Parameters(events: params.allDayEvents,
+                                                                   type: .week,
+                                                                   style: style),
+                              event: $params.selectedEvent)
+                .fixedSize(horizontal: false, vertical: true)
+            }
+            TimelineNewView(params: TimelineViewWrapper.Parameters(style: style, dates: params.timelineDays, selectedDate: params.date, events: params.events, recurringEvents: params.recurringEvents, selectedEvent: $params.selectedEvent))
+        }
+    }
+    
+}
+
+@available(iOS 16.0, *)
+struct WeekNewView_Previews: PreviewProvider {
+    
+    static var previews: some View {
+        var style = Style()
+        style.startWeekDay = .sunday
+        let commonData = CalendarData(date: Date(), years: 1, style: style)
+        let events: [Event] = [.stub(id: "1", duration: 50),
+//                               .stub(id: "2", duration: 30),
+//                               .stub(id: "3", startFrom: 30, duration: 55),
+//                               .stub(id: "4", startFrom: 80, duration: 30),
+//                               .stub(id: "5", startFrom: 80, duration: 30)
+        ]
+        let params = WeekData(data: commonData, startDay: .sunday, maxDays: style.week.maxDays)
+        params.events = events
+        params.allDayEvents = [.allDayStub(id: "-2")]
+        return WeekNewView(params: params, style: style)
+    }
+    
+}
 
 final class WeekView: UIView {
     

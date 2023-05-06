@@ -32,7 +32,7 @@ struct EventNewView: View {
             HStack(spacing: 3) {
                 Rectangle()
                     .fill(Color(uiColor: event.color?.value ?? .blue))
-                    .frame(width: 3)
+                    .frame(minWidth: 3, maxWidth: 3, maxHeight: .infinity)
                 VStack {
                     Text(event.title.timeline)
                         .multilineTextAlignment(.leading)

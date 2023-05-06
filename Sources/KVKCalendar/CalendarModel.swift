@@ -233,6 +233,14 @@ extension Event {
         return event
     }
     
+    static func allDayStub(id: String? = nil) -> Event {
+        var event = Event(ID: id ?? "-1")
+        event.title = TextEvent(timeline: "Text event number 10",
+                                month: "Text event number 10",
+                                list: "Text event number 10")
+        return event
+    }
+    
 }
 
 extension Event {

@@ -36,7 +36,7 @@ struct TimelineNewView_Previews: PreviewProvider {
                                .stub(id: "4", startFrom: 80, duration: 30),
                                .stub(id: "5", startFrom: 80, duration: 30)
         ]
-        return TimelineNewView(params: TimelineViewWrapper.Parameters(style: style, type: .week, dates: [Date(), Date(), Date()], selectedDate: Date(), events: events, recurringEvents: [], selectedEvent: .constant(nil)))
+        return TimelineNewView(params: TimelineViewWrapper.Parameters(style: style, dates: [Date(), Date(), Date()], selectedDate: Date(), events: events, recurringEvents: [], selectedEvent: .constant(nil)))
     }
 }
 
@@ -45,7 +45,6 @@ struct TimelineViewWrapper: UIViewControllerRepresentable {
     
     struct Parameters {
         let style: Style
-        let type: CalendarType
         let dates: [Date]
         let selectedDate: Date
         let events: [Event]
@@ -83,7 +82,7 @@ struct TimelineViewWrapper: UIViewControllerRepresentable {
     
     @available(iOS 16.0, *)
     private func createTimelineView() -> TimelineView {
-        let view = TimelineView(parameters: TimelineView.Parameters(style: params.style, type: params.type), frame: frame)
+        let view = TimelineView(parameters: TimelineView.Parameters(style: params.style, type: .week), frame: frame)
         view.setup(dates: params.dates,
                    events: params.events,
                    recurringEvents: params.recurringEvents,

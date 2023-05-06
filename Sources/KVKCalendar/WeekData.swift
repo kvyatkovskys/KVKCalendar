@@ -7,18 +7,47 @@
 
 #if os(iOS)
 
+import SwiftUI
+import Combine
 import Foundation
 
-final class WeekData: EventDateProtocol, ScrollableWeekProtocol {
+final class WeekData: ObservableObject, EventDateProtocol, ScrollableWeekProtocol {
     var days: [Day] = []
-    var date: Date
+    @Published var date: Date
+    @Published var timelineDays: [Date] = []
+    @Published var allDayEvents: [Event] = []
+    @Binding var selectedEvent: Event?
     var events: [Event] = []
     var recurringEvents: [Event] = []
+    var weeks: [[Day]] = []
+    
+    @available(swift, deprecated: 0.6.13, renamed: "weeks")
     var daysBySection: [[Day]] = []
     
-    init(data: CalendarData, startDay: StartDayType, maxDays: Int) {
+    private var cancellation: Set<AnyCancellable> = []
+    
+    init(data: CalendarData, startDay: StartDayType, maxDays: Int, selectedEvent: Binding<Event?> = .constant(nil)) {
         self.date = data.date
+        _selectedEvent = selectedEvent
         reloadData(data, startDay: startDay, maxDays: maxDays)
+        
+        $date
+            .map { [weak self] (dt) -> [Date] in
+                (self?.getDaysByDate(dt) ?? []).compactMap { $0.date }
+            }
+            .assign(to: \.timelineDays, on: self)
+            .store(in: &cancellation)
+    }
+    
+    private func getIdxByDate(_ date: Date) -> Int? {
+        weeks.firstIndex(where: { week in
+            week.firstIndex(where: { $0.date?.kvkIsEqual(date) ?? false }) != nil
+        })
+    }
+    
+    private func getDaysByDate(_ date: Date) -> [Day] {
+        guard let idx = getIdxByDate(date) else { return [] }
+        return weeks[idx]
     }
     
     func filterEvents(_ events: [Event], dates: [Date]) -> [Event] {
@@ -34,6 +63,7 @@ final class WeekData: EventDateProtocol, ScrollableWeekProtocol {
     func reloadData(_ data: CalendarData, startDay: StartDayType, maxDays: Int) {
         days = getDates(data: data, startDay: startDay, maxDays: maxDays)
         daysBySection = prepareDays(days, maxDayInWeek: maxDays)
+        weeks = daysBySection
     }
     
     private func getDates(data: CalendarData, startDay: StartDayType, maxDays: Int) -> [Day] {

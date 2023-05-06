@@ -14,7 +14,6 @@ import SwiftUI
 struct AllDayNewView: View {
     
     struct Parameters {
-        let date: Date
         let events: [Event]
         let type: CalendarType
         var style: Style
@@ -39,9 +38,12 @@ struct AllDayNewView: View {
     }
     
     var body: some View {
-        HStack {
+        HStack(spacing: 0) {
             Text(style.allDay.titleText)
-                .padding(5)
+                .multilineTextAlignment(.leading)
+                .minimumScaleFactor(0.5)
+                .frame(maxWidth: style.timeline.widthTime, maxHeight: 20)
+                .padding(.trailing, 2)
             ScrollView {
                 LazyVGrid(columns: columns) {
                     ForEach(parameters.events) { (event) in
@@ -59,7 +61,7 @@ struct AllDayNewView: View {
             .frame(maxWidth: .infinity)
             Spacer()
         }
-        .frame(maxHeight: 90)
+        .frame(minHeight: style.allDay.height, maxHeight: style.allDay.maxHeight)
         .background(Color(uiColor: style.allDay.backgroundColor))
     }
     
@@ -68,7 +70,7 @@ struct AllDayNewView: View {
 @available(iOS 15.0, *)
 struct AllDayNewView_Preview: PreviewProvider {
     static var previews: some View {
-        AllDayNewView(parameters: AllDayNewView.Parameters(date: Date(), events: [Event.stub(id: "1"), Event.stub(id: "2"), Event.stub(id: "3"), Event.stub(id: "4"), Event.stub(id: "5")], type: .day, style: Style()), event: .constant(nil))
+        AllDayNewView(parameters: AllDayNewView.Parameters(events: [Event.stub(id: "1"), Event.stub(id: "2"), Event.stub(id: "3"), Event.stub(id: "4"), Event.stub(id: "5")], type: .day, style: Style()), event: .constant(nil))
     }
 }
 
