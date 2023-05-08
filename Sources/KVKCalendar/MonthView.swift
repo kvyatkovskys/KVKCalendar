@@ -510,7 +510,9 @@ final class MonthView: UIView {
         // to check when the calendarView is displayed on superview
         guard superview?.superview != nil && collectionView?.dataSource != nil else { return }
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+            guard let self = self else { return }
+            
             if let attributes = self.collectionView?.layoutAttributesForSupplementaryElement(ofKind: UICollectionView.elementKindSectionHeader, at: IndexPath(row: 0, section: idx)),
                let inset = self.collectionView?.contentInset {
                 let contentOffset: CGPoint
@@ -526,6 +528,9 @@ final class MonthView: UIView {
                 }
                 self.collectionView?.setContentOffset(contentOffset, animated: animated)
             } else {
+                let index = IndexPath(row: 0, section: idx)
+                guard self.parameters.monthData.days[index] != nil else { return }
+                
                 let scrollType: UICollectionView.ScrollPosition = self.style.month.scrollDirection == .horizontal ? .left : .top
                 self.collectionView?.scrollToItem(at: IndexPath(row: 0, section: idx), at: scrollType, animated: animated)
             }
