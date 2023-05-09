@@ -13,12 +13,12 @@ import SwiftUI
 @available(iOS 16.0, *)
 struct TimelineNewView: View {
     
-    let params: TimelineViewWrapper.Parameters
+    let vm: TimelineViewWrapper.Parameters
     
     var body: some View {
         VStack {
             GeometryReader { (geometry) in
-                TimelineViewWrapper(params: params, frame: geometry.frame(in: .local))
+                TimelineViewWrapper(params: vm, frame: geometry.frame(in: .local))
                     .edgesIgnoringSafeArea(.bottom)
             }
         }
@@ -36,12 +36,14 @@ struct TimelineNewView_Previews: PreviewProvider {
                                .stub(id: "4", startFrom: 80, duration: 30),
                                .stub(id: "5", startFrom: 80, duration: 30)
         ]
-        return TimelineNewView(params: TimelineViewWrapper.Parameters(style: style, dates: [Date(), Date(), Date()], selectedDate: Date(), events: events, recurringEvents: [], selectedEvent: .constant(nil)))
+        return TimelineNewView(vm: TimelineViewWrapper.Parameters(style: style, dates: [Date(), Date(), Date()], selectedDate: Date(), events: events, recurringEvents: [], selectedEvent: .constant(nil)))
     }
 }
 
 @available(iOS 16.0, *)
 struct TimelineViewWrapper: UIViewControllerRepresentable {
+    
+    typealias UIViewControllerType = TimelinePageVC
     
     struct Parameters {
         let style: Style
@@ -55,7 +57,7 @@ struct TimelineViewWrapper: UIViewControllerRepresentable {
     var params: TimelineViewWrapper.Parameters
     var frame: CGRect
     
-    func makeUIViewController(context: Context) -> some UIViewController {
+    func makeUIViewController(context: Context) -> TimelinePageVC {
         let page = setupTimelinePageView()
         page.didSwitchTimelineView = { (_, _) in
             
@@ -66,8 +68,12 @@ struct TimelineViewWrapper: UIViewControllerRepresentable {
         return page
     }
     
-    func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
+    func updateUIViewController(_ uiViewController: TimelinePageVC, context: Context) {
+        guard let oldDates = uiViewController.timelineView?.dates,
+              let oldEvents = uiViewController.timelineView?.events else { return }
         
+        guard oldDates != params.dates || oldEvents != params.events else { return }
+        uiViewController.reloadPages(with: params)
     }
     
     @available(iOS 16.0, *)
@@ -88,18 +94,6 @@ struct TimelineViewWrapper: UIViewControllerRepresentable {
                    recurringEvents: params.recurringEvents,
                    selectedDate: params.selectedDate,
                    selectedEvent: params.selectedEvent)
-
-//        view.deselectEvent = { [weak self] (event) in
-//            self?.delegate?.didDeselectEvent(event, animated: true)
-//        }
-//        view.didChangeParameters = { [weak self] (params) in
-//            if params.scale != self?.timelineScale {
-//                self?.timelineScale = params.scale
-//            }
-//            if params.scrollToCurrentTimeOnlyOnInit != self?.scrollToCurrentTimeOnlyOnInit {
-//                self?.scrollToCurrentTimeOnlyOnInit = params.scrollToCurrentTimeOnlyOnInit
-//            }
-//        }
         return view
     }
 }
@@ -307,11 +301,11 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     }
     
     private func showCurrentLine() {
+        stopTimer(timerKey)
+        currentLine.valueHash = nil
         currentLine.isHidden = !isDisplayedCurrentTime
-        guard style.timeline.showLineHourMode.showForDates(dates) else {
-            stopTimer(timerKey)
-            return
-        }
+        guard style.timeline.showLineHourMode.showForDates(dates) else { return }
+        
         currentLine.updateStyle(style, force: true)
         movingCurrentLine()
     }
@@ -455,6 +449,8 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                     .first?.start.kvkHour ?? style.timeline.startHour
             }
         }
+        
+        scrollView.subviews.forEach { $0.removeFromSuperview() }
         // add time label to timeline
         let labels = createAndAddTimesLabel(start: startHour)
         // add horizontal separator lines

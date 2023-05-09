@@ -273,6 +273,16 @@ extension TimelineView {
         eventView.deselectEvent()
     }
     
+    @available(iOS 16.0, *)
+    func reloadTimeline(params: TimelineViewWrapper.Parameters) {
+        setup(dates: params.dates,
+              events: params.events,
+              recurringEvents: params.recurringEvents,
+              selectedDate: params.selectedDate,
+              selectedEvent: params.selectedEvent)
+        
+    }
+    
     func reloadTimeline() {
         create(dates: dates, events: events, recurringEvents: recurringEvents, selectedDate: selectedDate)
     }

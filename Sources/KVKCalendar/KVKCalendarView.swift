@@ -7,8 +7,50 @@
 
 #if os(iOS)
 
+import SwiftUI
 import UIKit
 import EventKit
+
+@available(iOS 16.0, *)
+public struct KVKCalendarSwiftUIView: View {
+    
+    @ObservedObject public var vm: KVKCalendarViewModel
+    
+    public init(vm: KVKCalendarViewModel) {
+        self.vm = vm
+    }
+    
+    public var body: some View {
+        bodyView
+    }
+    
+    @ViewBuilder
+    private var bodyView: some View {
+        switch vm.type {
+        case .week:
+            WeekNewView(vm: vm.weekData)
+        case .month:
+            MonthNewView(vm: MonthData(parameters: MonthData.Parameters(data: vm.data, startDay: vm.data.style.startWeekDay, calendar: vm.data.style.calendar, style: vm.data.style)), style: vm.data.style)
+        case .year:
+            YearNewView(data: vm.data, style: vm.data.style)
+        case .list:
+            ListNewView(params: ListView.Parameters(style: vm.data.style, data: ListViewData(data: vm.data, style: vm.data.style)), date: .constant(nil), event: .constant(nil), events: .constant([]))
+        default:
+            EmptyView()
+        }
+    }
+}
+
+@available(iOS 16.0, *)
+struct KVKCalendarSwiftUIView_Previews: PreviewProvider {
+    
+    static var date = Date()
+    
+    static var previews: some View {
+        KVKCalendarSwiftUIView(vm: KVKCalendarViewModel(date: Date(), style: Style()))
+    }
+    
+}
 
 @available(swift, deprecated: 0.6.11, obsoleted: 0.6.12, renamed: "KVKCalendarView")
 public final class CalendarView: UIView {}
@@ -58,9 +100,7 @@ public final class KVKCalendarView: UIView {
         self.dayView = DayView(parameters: .init(style: adaptiveStyle, data: dayData), frame: frame)
         
         // week view
-        self.weekData = WeekData(data: calendarData,
-                                 startDay: adaptiveStyle.startWeekDay,
-                                 maxDays: adaptiveStyle.week.maxDays)
+        self.weekData = WeekData(data: calendarData)
         self.weekView = WeekView(parameters: .init(data: weekData, style: adaptiveStyle), frame: frame)
         
         // month view

@@ -359,6 +359,14 @@ extension Event {
     }
 }
 
+extension Event: Equatable {
+    
+    public static func == (lhs: Event, rhs: Event) -> Bool {
+        lhs.id == rhs.id
+    }
+    
+}
+
 // MARK: - Event protocol
 
 public protocol EventProtocol {

@@ -10,8 +10,7 @@
 import Foundation
 
 struct CalendarData {
-    private let style: Style
-    
+    let style: Style
     let maxBoxCount = 42
     let minBoxCount = 35
     let date: Date
@@ -65,7 +64,6 @@ struct CalendarData {
             
             var months = zip(nameMonths, dateMonths).map { Month(name: $0.0,
                                                                  date: $0.1,
-                                                                 days: [],
                                                                  weeks: numberOfWeeksInMonth($0.1, calendar: calendar)) }
             
             for (idx, month) in months.enumerated() {
@@ -180,7 +178,7 @@ struct CalendarData {
 struct Month: Identifiable {
     let name: String
     let date: Date
-    var days: [Day]
+    var days: [Day] = []
     var weeks: Int
     
     var id: Int {

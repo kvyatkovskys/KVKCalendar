@@ -282,6 +282,11 @@ final class TimelinePageVC: UIPageViewController {
         items.forEach { $0.value.reloadTimeline() }
     }
     
+    @available(iOS 16.0, *)
+    func reloadPages(with params: TimelineViewWrapper.Parameters) {
+        pages.forEach { $0.value.reloadTimeline(params: params) }
+    }
+    
     func removeAll(excludeCurrentPage: Bool = false) {
         if excludeCurrentPage {
             pages = pages.filter { $0.key == currentIndex }

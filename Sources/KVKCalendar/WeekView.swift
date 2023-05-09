@@ -13,20 +13,12 @@ import UIKit
 @available(iOS 16.0, *)
 struct WeekNewView: View {
     
-    @ObservedObject var params: WeekData
-    var style: Style
+    @ObservedObject var vm: WeekData
     
     var body: some View {
         VStack(spacing: 0) {
-            ScrollableWeekNewView(date: $params.date, weeks: params.weeks, style: style)
-            if !params.allDayEvents.isEmpty {
-                AllDayNewView(parameters: AllDayNewView.Parameters(events: params.allDayEvents,
-                                                                   type: .week,
-                                                                   style: style),
-                              event: $params.selectedEvent)
-                .fixedSize(horizontal: false, vertical: true)
-            }
-            TimelineNewView(params: TimelineViewWrapper.Parameters(style: style, dates: params.timelineDays, selectedDate: params.date, events: params.events, recurringEvents: params.recurringEvents, selectedEvent: $params.selectedEvent))
+            ScrollableWeekNewView(vm: vm)
+            TimelineNewView(vm: TimelineViewWrapper.Parameters(style: vm.style, dates: vm.timelineDays, selectedDate: vm.date, events: vm.events, recurringEvents: vm.recurringEvents, selectedEvent: $vm.selectedEvent))
         }
     }
     
@@ -45,10 +37,10 @@ struct WeekNewView_Previews: PreviewProvider {
 //                               .stub(id: "4", startFrom: 80, duration: 30),
 //                               .stub(id: "5", startFrom: 80, duration: 30)
         ]
-        let params = WeekData(data: commonData, startDay: .sunday, maxDays: style.week.maxDays)
-        params.events = events
-        params.allDayEvents = [.allDayStub(id: "-2")]
-        return WeekNewView(params: params, style: style)
+        let vm = WeekData(data: commonData, selectedEvent: .constant(nil))
+        vm.events = events
+        vm.allDayEvents = [.allDayStub(id: "-2")]
+        return WeekNewView(vm: vm)
     }
     
 }

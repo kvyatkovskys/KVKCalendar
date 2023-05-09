@@ -13,10 +13,12 @@ import Foundation
 
 final class WeekData: ObservableObject, EventDateProtocol, ScrollableWeekProtocol {
     var days: [Day] = []
+    let style: Style
     @Published var date: Date
     @Published var timelineDays: [Date] = []
     @Published var allDayEvents: [Event] = []
     @Binding var selectedEvent: Event?
+    var idTimeline = 0
     var events: [Event] = []
     var recurringEvents: [Event] = []
     var weeks: [[Day]] = []
@@ -26,14 +28,17 @@ final class WeekData: ObservableObject, EventDateProtocol, ScrollableWeekProtoco
     
     private var cancellation: Set<AnyCancellable> = []
     
-    init(data: CalendarData, startDay: StartDayType, maxDays: Int, selectedEvent: Binding<Event?> = .constant(nil)) {
+    init(data: CalendarData, selectedEvent: Binding<Event?> = .constant(nil)) {
         self.date = data.date
+        self.style = data.style
         _selectedEvent = selectedEvent
-        reloadData(data, startDay: startDay, maxDays: maxDays)
+        reloadData(data, startDay: data.style.startWeekDay, maxDays: data.style.week.maxDays)
         
         $date
             .map { [weak self] (dt) -> [Date] in
-                (self?.getDaysByDate(dt) ?? []).compactMap { $0.date }
+                guard let self else { return [] }
+                self.idTimeline += 1
+                return self.getDaysByDate(dt).compactMap { $0.date }
             }
             .assign(to: \.timelineDays, on: self)
             .store(in: &cancellation)
