@@ -15,10 +15,16 @@ struct WeekNewView: View {
     
     @ObservedObject var vm: WeekData
     
+    private var timelineParams: TimelineViewWrapper.Parameters {
+        TimelineViewWrapper.Parameters(style: vm.style, dates: vm.timelineDays, selectedDate: vm.date, events: vm.events, recurringEvents: vm.recurringEvents, selectedEvent: $vm.selectedEvent)
+    }
+    
     var body: some View {
         VStack(spacing: 0) {
             ScrollableWeekNewView(vm: vm)
-            TimelineNewView(vm: TimelineViewWrapper.Parameters(style: vm.style, dates: vm.timelineDays, selectedDate: vm.date, events: vm.events, recurringEvents: vm.recurringEvents, selectedEvent: $vm.selectedEvent))
+            TimelineNewView(vm: timelineParams, didSwitchDate: { (dt) in
+                vm.date = dt
+            })
         }
     }
     

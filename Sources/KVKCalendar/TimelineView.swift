@@ -14,12 +14,17 @@ import SwiftUI
 struct TimelineNewView: View {
     
     let vm: TimelineViewWrapper.Parameters
+    var didSwitchDate: ((Date) -> Void)?
+    var willSwitchDate: ((Date) -> Void)?
     
     var body: some View {
         VStack {
             GeometryReader { (geometry) in
-                TimelineViewWrapper(params: vm, frame: geometry.frame(in: .local))
-                    .edgesIgnoringSafeArea(.bottom)
+                TimelineViewWrapper(params: vm,
+                                    frame: geometry.frame(in: .local),
+                                    didSwitchDate: didSwitchDate,
+                                    willSwitchDate: willSwitchDate)
+                .edgesIgnoringSafeArea(.bottom)
             }
         }
     }
@@ -48,7 +53,7 @@ struct TimelineViewWrapper: UIViewControllerRepresentable {
     struct Parameters {
         let style: Style
         let dates: [Date]
-        let selectedDate: Date
+        var selectedDate: Date
         let events: [Event]
         let recurringEvents: [Event]
         var selectedEvent: Binding<Event?>
@@ -56,27 +61,40 @@ struct TimelineViewWrapper: UIViewControllerRepresentable {
     
     var params: TimelineViewWrapper.Parameters
     var frame: CGRect
+    var didSwitchDate: ((Date) -> Void)?
+    var willSwitchDate: ((Date) -> Void)?
     
     func makeUIViewController(context: Context) -> TimelinePageVC {
         let page = setupTimelinePageView()
-        page.didSwitchTimelineView = { (_, _) in
-            
-        }
-        page.willDisplayTimelineView = { (_, _) in
-            
-        }
         return page
     }
     
     func updateUIViewController(_ uiViewController: TimelinePageVC, context: Context) {
+        uiViewController.didSwitchTimelineView = { (_, type) in
+            let date = switchDateBy(type)
+            didSwitchDate?(date)
+        }
+        uiViewController.willDisplayTimelineView = { (_, type) in
+            let date = switchDateBy(type)
+            willSwitchDate?(date)
+        }
         guard let oldDates = uiViewController.timelineView?.dates,
               let oldEvents = uiViewController.timelineView?.events else { return }
         
         guard oldDates != params.dates || oldEvents != params.events else { return }
+        
         uiViewController.reloadPages(with: params)
     }
     
-    @available(iOS 16.0, *)
+    private func switchDateBy(_ type: TimelinePageVC.SwitchPageType) -> Date {
+        switch type {
+        case .previous:
+            return params.style.calendar.date(byAdding: .day, value: -params.dates.count, to: params.selectedDate) ?? params.selectedDate
+        case .next:
+            return params.style.calendar.date(byAdding: .day, value: params.dates.count, to: params.selectedDate) ?? params.selectedDate
+        }
+    }
+    
     private func setupTimelinePageView() -> TimelinePageVC {
         let timelineViews = Array(0..<params.style.timeline.maxLimitCachedPages).reduce([]) { (acc, _) -> [TimelineView] in
             acc + [createTimelineView()]
@@ -86,7 +104,6 @@ struct TimelineViewWrapper: UIViewControllerRepresentable {
         return page
     }
     
-    @available(iOS 16.0, *)
     private func createTimelineView() -> TimelineView {
         let view = TimelineView(parameters: TimelineView.Parameters(style: params.style, type: .week), frame: frame)
         view.setup(dates: params.dates,

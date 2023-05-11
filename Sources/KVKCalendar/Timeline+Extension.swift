@@ -481,6 +481,9 @@ extension TimelineView {
                                   bottomLine: UIView?) -> (VerticalLineView, CGFloat) {
         let view = VerticalLineView(date: date, color: style.timeline.separatorLineColor, width: style.timeline.widthLine)
         view.tag = index
+        if index == 0 {
+            view.isHidden = true
+        }
         scrollView.addSubview(view)
         view.translatesAutoresizingMaskIntoConstraints = false
         

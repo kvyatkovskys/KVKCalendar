@@ -80,7 +80,10 @@ struct TimelineColumnView_Previews: PreviewProvider {
             TimelineColumnView.Container(event: .stub(id: "4", startFrom: 80, duration: 30), rect: CGRect(x: 0, y: 500, width: 0, height: 100)),
             TimelineColumnView.Container(event: .stub(id: "5", startFrom: 80, duration: 30), rect: CGRect(x: 0, y: 500, width: 0, height: 100))
         ]
-        return TimelineColumnView(selectedEvent: .constant(nil), items: items, crossEvents: [:], style: Style())
+        return Group {
+            TimelineColumnView(selectedEvent: .constant(nil), items: items, crossEvents: [:], style: Style())
+            TimelineColumnView(selectedEvent: .constant(.stub(id: "1")), items: items, crossEvents: [:], style: Style())
+        }
     }
 }
 

@@ -18,7 +18,6 @@ final class WeekData: ObservableObject, EventDateProtocol, ScrollableWeekProtoco
     @Published var timelineDays: [Date] = []
     @Published var allDayEvents: [Event] = []
     @Binding var selectedEvent: Event?
-    var idTimeline = 0
     var events: [Event] = []
     var recurringEvents: [Event] = []
     var weeks: [[Day]] = []
@@ -36,9 +35,7 @@ final class WeekData: ObservableObject, EventDateProtocol, ScrollableWeekProtoco
         
         $date
             .map { [weak self] (dt) -> [Date] in
-                guard let self else { return [] }
-                self.idTimeline += 1
-                return self.getDaysByDate(dt).compactMap { $0.date }
+                self?.getDaysByDate(dt).compactMap { $0.date } ?? []
             }
             .assign(to: \.timelineDays, on: self)
             .store(in: &cancellation)
