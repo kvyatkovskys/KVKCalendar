@@ -9,7 +9,7 @@
 
 import Foundation
 
-public final class ListViewData: EventDateProtocol {
+open class ListViewData: EventDateProtocol {
     
     public struct SectionListView {
         let date: Date
