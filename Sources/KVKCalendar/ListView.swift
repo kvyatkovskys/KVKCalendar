@@ -100,7 +100,7 @@ struct ListNewView_Preview: PreviewProvider {
     
 }
 
-public final class ListView: UIView, CalendarSettingProtocol {
+open class ListView: UIView, CalendarSettingProtocol {
     
     public struct Parameters {
         var style: Style
@@ -147,7 +147,7 @@ public final class ListView: UIView, CalendarSettingProtocol {
         addSubview(tableView)
     }
     
-    required init?(coder: NSCoder) {
+    required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
@@ -204,15 +204,15 @@ public final class ListView: UIView, CalendarSettingProtocol {
 
 extension ListView: UITableViewDataSource, UITableViewDelegate {
     
-    public func numberOfSections(in tableView: UITableView) -> Int {
+    open func numberOfSections(in tableView: UITableView) -> Int {
         params.data.numberOfSection()
     }
     
-    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         params.data.numberOfItemsInSection(section)
     }
     
-    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard !params.data.isSkeletonVisible else {
             return tableView.kvkDequeueCell { (cell: ListViewCell) in
                 cell.setSkeletons(params.data.isSkeletonVisible)
@@ -230,7 +230,7 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
         }
     }
     
-    public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    open func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         guard !params.data.isSkeletonVisible else {
             return tableView.kvkDequeueView { (view: ListViewHeader) in
                 view.setSkeletons(params.data.isSkeletonVisible)
@@ -252,7 +252,7 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
         }
     }
     
-    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    open func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         guard !params.data.isSkeletonVisible else {
             return 45
         }
@@ -265,7 +265,7 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
         }
     }
     
-    public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    open func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         guard !params.data.isSkeletonVisible else {
             return 50
         }
@@ -280,12 +280,16 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
         }
     }
     
-    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
         let event = params.data.event(indexPath: indexPath)
         let frameCell = tableView.cellForRow(at: indexPath)?.frame
         delegate?.didSelectEvent(event, type: .list, frame: frameCell)
+    }
+    
+    open func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        
     }
     
 }

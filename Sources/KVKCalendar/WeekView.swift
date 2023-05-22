@@ -38,7 +38,7 @@ struct WeekNewView_Previews: PreviewProvider {
         style.startWeekDay = .sunday
         let commonData = CalendarData(date: Date(), years: 1, style: style)
         let events: [Event] = [.stub(id: "1", duration: 50),
-//                               .stub(id: "2", duration: 30),
+                               .stub(id: "2", duration: 30),
 //                               .stub(id: "3", startFrom: 30, duration: 55),
 //                               .stub(id: "4", startFrom: 80, duration: 30),
 //                               .stub(id: "5", startFrom: 80, duration: 30)

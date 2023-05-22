@@ -10,7 +10,7 @@
 import Foundation
 import SwiftUI
 
-public final class ListViewData: ObservableObject, EventDateProtocol {
+open class ListViewData: ObservableObject, EventDateProtocol {
     
     public struct SectionListView: Identifiable {
         let date: Date
