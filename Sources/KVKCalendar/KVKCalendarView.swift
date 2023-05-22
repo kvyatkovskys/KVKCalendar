@@ -27,6 +27,8 @@ public struct KVKCalendarSwiftUIView: View {
     @ViewBuilder
     private var bodyView: some View {
         switch vm.type {
+        case .day:
+            WeekNewView(vm: vm.dayData)
         case .week:
             WeekNewView(vm: vm.weekData)
         case .month:
@@ -35,8 +37,6 @@ public struct KVKCalendarSwiftUIView: View {
             YearNewView(data: vm.data, style: vm.data.style)
         case .list:
             ListNewView(params: ListView.Parameters(style: vm.data.style, data: ListViewData(data: vm.data, style: vm.data.style)), date: .constant(nil), event: .constant(nil), events: .constant([]))
-        default:
-            EmptyView()
         }
     }
 }

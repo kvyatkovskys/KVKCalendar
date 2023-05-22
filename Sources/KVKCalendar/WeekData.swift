@@ -27,11 +27,13 @@ final class WeekData: ObservableObject, EventDateProtocol, ScrollableWeekProtoco
     
     private var cancellation: Set<AnyCancellable> = []
     
-    init(data: CalendarData, selectedEvent: Binding<Event?> = .constant(nil)) {
+    init(data: CalendarData, type: CalendarType = .week, selectedEvent: Binding<Event?> = .constant(nil)) {
         self.date = data.date
         self.style = data.style
         _selectedEvent = selectedEvent
-        reloadData(data, startDay: data.style.startWeekDay, maxDays: data.style.week.maxDays)
+        reloadData(data,
+                   startDay: data.style.startWeekDay,
+                   maxDays: type == .week ? data.style.week.maxDays : 1)
         
         $date
             .map { [weak self] (dt) -> [Date] in

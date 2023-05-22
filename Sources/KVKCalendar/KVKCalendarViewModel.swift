@@ -12,8 +12,9 @@ import Combine
 open class KVKCalendarViewModel: ObservableObject {
     
     var data: CalendarData
-    var type: CalendarType
+    @Published public var type: CalendarType
     @ObservedObject var weekData: WeekData
+    @ObservedObject var dayData: WeekData
     @Published public var date: Date
     
     private var cancellable: Set<AnyCancellable> = []
@@ -27,9 +28,14 @@ open class KVKCalendarViewModel: ObservableObject {
                             years: years,
                             style: style)
         weekData = WeekData(data: data)
+        dayData = WeekData(data: data, type: .day)
         self.type = type
         
         weekData.$date
+            .removeDuplicates()
+            .assign(to: \.date, on: self)
+            .store(in: &cancellable)
+        dayData.$date
             .removeDuplicates()
             .assign(to: \.date, on: self)
             .store(in: &cancellable)

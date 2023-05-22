@@ -43,10 +43,16 @@ struct WeekNewView_Previews: PreviewProvider {
 //                               .stub(id: "4", startFrom: 80, duration: 30),
 //                               .stub(id: "5", startFrom: 80, duration: 30)
         ]
-        let vm = WeekData(data: commonData, selectedEvent: .constant(nil))
-        vm.events = events
-        vm.allDayEvents = [.allDayStub(id: "-2")]
-        return WeekNewView(vm: vm)
+        let vmWeek = WeekData(data: commonData, selectedEvent: .constant(nil))
+        vmWeek.events = events
+        vmWeek.allDayEvents = [.allDayStub(id: "-2")]
+        let vmDay = WeekData(data: commonData, type: .day, selectedEvent: .constant(nil))
+        vmDay.events = events
+        vmDay.allDayEvents = [.allDayStub(id: "-2")]
+        return Group {
+            WeekNewView(vm: vmDay)
+            WeekNewView(vm: vmWeek)
+        }
     }
     
 }

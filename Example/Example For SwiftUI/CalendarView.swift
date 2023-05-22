@@ -35,6 +35,9 @@ struct CalendarView: View {
             .kvkOnRotate(action: { (newOrientation) in
                 orientation = newOrientation
             })
+            .onChange(of: typeCalendar, perform: { (newValue) in
+                calendarVM.type = newValue
+            })
             .navigationBarTitle(calendarVM.date.formatted(), displayMode: .inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
