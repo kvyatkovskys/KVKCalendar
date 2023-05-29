@@ -18,7 +18,7 @@ struct TimelineNewView: View {
     var willSwitchDate: ((Date) -> Void)?
     
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             GeometryReader { (geometry) in
                 TimelineViewWrapper(params: vm,
                                     frame: geometry.frame(in: .local),
@@ -35,11 +35,12 @@ struct TimelineNewView_Previews: PreviewProvider {
     static var previews: some View {
         var style = Style()
         style.timeline.offsetTimeY = 50
-        let events: [Event] = [.stub(id: "1", duration: 50),
-                               .stub(id: "2", duration: 30),
-                               .stub(id: "3", startFrom: 30, duration: 55),
-                               .stub(id: "4", startFrom: 80, duration: 30),
-                               .stub(id: "5", startFrom: 80, duration: 30)
+        let events: [Event] = [
+            .stub(id: "1", startFrom: -50, duration: 50),
+            .stub(id: "2", startFrom: 60, duration: 30),
+            .stub(id: "3", startFrom: -30, duration: 55),
+            .stub(id: "4", startFrom: -80, duration: 30),
+            .stub(id: "5", startFrom: -80, duration: 30)
         ]
         return TimelineNewView(vm: TimelineViewWrapper.Parameters(style: style, dates: [Date(), Date(), Date()], selectedDate: Date(), events: events, recurringEvents: [], selectedEvent: .constant(nil)))
     }

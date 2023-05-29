@@ -26,25 +26,28 @@ struct EventNewView: View {
     }
     
     var body: some View {
-        Button {
-            didSelect?()
-        } label: {
-            HStack(spacing: 3) {
-                Rectangle()
-                    .fill(Color(uiColor: event.color?.value ?? .blue))
-                    .frame(minWidth: 3, maxWidth: 3, maxHeight: .infinity)
-                VStack {
-                    Text(event.title.timeline)
-                        .multilineTextAlignment(.leading)
-                        .minimumScaleFactor(0.7)
+        GeometryReader { (proxy) in
+            Button {
+                didSelect?()
+            } label: {
+                HStack(spacing: 3) {
+                    Rectangle()
+                        .fill(Color(uiColor: event.color?.value ?? .blue))
+                        .frame(minWidth: 3, maxWidth: 3, maxHeight: .infinity)
+                    if proxy.frame(in: .local).height >= 10 {
+                        VStack {
+                            Text(event.title.timeline)
+                                .multilineTextAlignment(.leading)
+                                .minimumScaleFactor(0.2)
+                            Spacer()
+                        }
+                        .tint(tintColor)
+                    }
                     Spacer()
                 }
-                .tint(tintColor)
-                .padding(.vertical, 5)
-                Spacer()
+                .background(bgColor)
+                .cornerRadius(style.event.eventCornersRadius.width)
             }
-            .background(bgColor)
-            .cornerRadius(style.event.eventCornersRadius.width)
         }
     }
     
@@ -56,6 +59,7 @@ struct EventNewView_Previews: PreviewProvider {
     static var previews: some View {
         EventNewView(isSelected: false, event: .stub(), style: Style())
             .padding()
+            .frame(height: 45)
     }
     
 }

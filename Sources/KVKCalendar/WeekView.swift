@@ -37,11 +37,12 @@ struct WeekNewView_Previews: PreviewProvider {
         var style = Style()
         style.startWeekDay = .sunday
         let commonData = CalendarData(date: Date(), years: 1, style: style)
-        let events: [Event] = [.stub(id: "1", duration: 50),
-                               .stub(id: "2", duration: 30),
-//                               .stub(id: "3", startFrom: 30, duration: 55),
-//                               .stub(id: "4", startFrom: 80, duration: 30),
-//                               .stub(id: "5", startFrom: 80, duration: 30)
+        let events: [Event] = [
+            //.stub(id: "1", startFrom: -100, duration: 50),
+            .stub(id: "2", startFrom: -120, duration: 20),
+            //                               .stub(id: "3", startFrom: 30, duration: 55),
+            //                               .stub(id: "4", startFrom: 80, duration: 30),
+            //                               .stub(id: "5", startFrom: 80, duration: 30)
         ]
         let vmWeek = WeekData(data: commonData, selectedEvent: .constant(nil))
         vmWeek.events = events
@@ -51,6 +52,7 @@ struct WeekNewView_Previews: PreviewProvider {
         vmDay.allDayEvents = [.allDayStub(id: "-2")]
         return Group {
             WeekNewView(vm: vmDay)
+                .previewDisplayName("Day new View")
             WeekNewView(vm: vmWeek)
         }
     }
