@@ -136,9 +136,6 @@ public struct Event {
     
     /// unique identifier of Event
     public var ID: String
-    
-    @available(swift, deprecated: 0.5.8, obsoleted: 0.5.9, renamed: "title")
-    public var text: String?
     public var title: TextEvent = TextEvent()
     
     public var start: Date = Date()
@@ -156,14 +153,6 @@ public struct Event {
     public var textColor: UIColor = .white
     public var isAllDay: Bool = false
     public var isContainsFile: Bool = false
-    
-    @available(swift, deprecated: 0.5.8, obsoleted: 0.5.9, renamed: "title")
-    public var textForMonth: String = ""
-    @available(swift, deprecated: 0.5.8, obsoleted: 0.5.9, renamed: "title")
-    public var textForList: String = ""
-    
-    @available(swift, deprecated: 0.4.6, obsoleted: 0.4.7, renamed: "data")
-    public var eventData: Any? = nil
     public var data: Any? = nil
     
     public var recurringType: Event.RecurringType = .none
@@ -472,6 +461,8 @@ public protocol CalendarDataSource: AnyObject {
     func dequeueCornerHeader(date: Date, frame: CGRect, type: CalendarType) -> UIView?
     
     func dequeueAllDayCornerHeader(date: Date, frame: CGRect) -> UIView?
+    
+    func willDisplaySectionsInListView(_ sections: [ListViewData.SectionListView])
 }
 
 public extension CalendarDataSource {
@@ -510,6 +501,8 @@ public extension CalendarDataSource {
     func dequeueCornerHeader(date: Date, frame: CGRect, type: CalendarType) -> UIView? { nil }
     
     func dequeueAllDayCornerHeader(date: Date, frame: CGRect) -> UIView? { nil }
+    
+    func willDisplaySectionsInListView(_ sections: [ListViewData.SectionListView]) {}
     
 }
 
