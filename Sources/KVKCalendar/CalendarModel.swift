@@ -501,6 +501,8 @@ public protocol CalendarDataSource: AnyObject {
     func dequeueCornerHeader(date: Date, frame: CGRect, type: CalendarType) -> UIView?
     
     func dequeueAllDayCornerHeader(date: Date, frame: CGRect) -> UIView?
+    
+    func willDisplaySectionsInListView(_ sections: [ListViewData.SectionListView])
 }
 
 public extension CalendarDataSource {
@@ -539,6 +541,8 @@ public extension CalendarDataSource {
     func dequeueCornerHeader(date: Date, frame: CGRect, type: CalendarType) -> UIView? { nil }
     
     func dequeueAllDayCornerHeader(date: Date, frame: CGRect) -> UIView? { nil }
+    
+    func willDisplaySectionsInListView(_ sections: [ListViewData.SectionListView]) {}
     
 }
 

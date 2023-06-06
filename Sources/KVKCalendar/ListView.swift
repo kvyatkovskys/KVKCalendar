@@ -178,6 +178,7 @@ open class ListView: UIView, CalendarSettingProtocol {
     
     func reloadData(_ events: [Event]) {
         params.data.reloadEvents(events)
+        dataSource?.willDisplaySectionsInListView(params.data.sections)
         tableView.reloadData()
     }
     

@@ -280,6 +280,10 @@ extension KVKCalendarView: DisplayDataSource {
         dataSource?.dequeueCornerHeader(date: date, frame: frame, type: type)
     }
     
+    public func willDisplaySectionsInListView(_ sections: [ListViewData.SectionListView]) {
+        dataSource?.willDisplaySectionsInListView(sections)
+    }
+    
 }
 
 extension KVKCalendarView: DisplayDelegate {
