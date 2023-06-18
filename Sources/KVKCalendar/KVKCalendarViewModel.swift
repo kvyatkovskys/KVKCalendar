@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import Combine
 
-open class KVKCalendarViewModel: ObservableObject {
+class KVKCalendarViewModel: ObservableObject {
     
     var data: CalendarData
     @Published public var type: CalendarType
@@ -19,15 +19,15 @@ open class KVKCalendarViewModel: ObservableObject {
     
     private var cancellable: Set<AnyCancellable> = []
     
-    public init(date: Date,
-                years: Int = 4,
-                style: Style,
-                type: CalendarType = .week) {
+    init(date: Date,
+         years: Int = 4,
+         style: Style,
+         type: CalendarType = .week) {
         self.date = date
         data = CalendarData(date: date,
                             years: years,
                             style: style)
-        weekData = WeekData(data: data)
+        weekData = WeekData(data: data, events: [])
         dayData = WeekData(data: data, type: .day)
         self.type = type
         
@@ -41,8 +41,12 @@ open class KVKCalendarViewModel: ObservableObject {
             .store(in: &cancellable)
     }
     
-    public func setDate(_ date: Date) {
+    func setDate(_ date: Date) {
         weekData.date = date
+    }
+    
+    func setEvents(_ events: [Event]) {
+        weekData.events = events
     }
     
 }

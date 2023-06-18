@@ -14,41 +14,37 @@ struct CalendarView: View {
     
     @State private var typeCalendar = CalendarType.week
     @State private var orientation: UIInterfaceOrientation = .unknown
-    @ObservedObject private var vm: CalendarViewModel
-    @ObservedObject private var calendarVM: KVKCalendarViewModel
-    
-    init() {
-        vm = CalendarViewModel()
-        calendarVM = KVKCalendarViewModel(date: Date(), style: Style())
-    }
+    @ObservedObject private var vm = CalendarViewModel()
     
     var body: some View {
         NavigationStack {
-            VStack {
-                calendarView
-            }
+            calendarView
+                .task {
+                    vm.loadEvents()
+                }
         }
     }
     
     private var calendarView: some View {
-        KVKCalendarSwiftUIView(vm: calendarVM)
+        KVKCalendarSwiftUIView(type: $typeCalendar,
+                               date: vm.initialDate,
+                               events: vm.events,
+                               selectedDate: $vm.selectedDate)
             .kvkOnRotate(action: { (newOrientation) in
                 orientation = newOrientation
             })
-            .onChange(of: typeCalendar, perform: { (newValue) in
-                calendarVM.type = newValue
-            })
-            .navigationBarTitle(calendarVM.date.formatted(), displayMode: .inline)
+            .navigationBarTitle(vm.selectedDate.formatted(), displayMode: .inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    HStack {
+                ToolbarItemGroup(placement: .navigationBarLeading) {
+                    HStack(spacing: 0) {
                         Picker(typeCalendar.title, selection: $typeCalendar) {
                             ForEach(CalendarType.allCases) { (type) in
                                 Text(type.title)
                             }
                         }
+                        .frame(width: 80)
                         Button {
-                            calendarVM.setDate(Date())
+                            vm.selectedDate = Date()
                         } label: {
                             Text("Today")
                                 .font(.headline)
@@ -58,9 +54,7 @@ struct CalendarView: View {
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
-                        if let event = vm.addNewEvent() {
-                            vm.events.append(event)
-                        }
+                        vm.addNewEvent()
                     } label: {
                         Image(systemName: "plus")
                     }

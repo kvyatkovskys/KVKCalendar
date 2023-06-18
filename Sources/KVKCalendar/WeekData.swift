@@ -18,7 +18,7 @@ final class WeekData: ObservableObject, EventDateProtocol, ScrollableWeekProtoco
     @Published var timelineDays: [Date] = []
     @Published var allDayEvents: [Event] = []
     @Binding var selectedEvent: Event?
-    var events: [Event] = []
+    @Published var events: [Event]
     var recurringEvents: [Event] = []
     var weeks: [[Day]] = []
     
@@ -26,9 +26,15 @@ final class WeekData: ObservableObject, EventDateProtocol, ScrollableWeekProtoco
     var daysBySection: [[Day]] = []
     
     private var cancellation: Set<AnyCancellable> = []
+    private let type: CalendarType
     
-    init(data: CalendarData, type: CalendarType = .week, selectedEvent: Binding<Event?> = .constant(nil)) {
+    init(data: CalendarData,
+         type: CalendarType = .week,
+         events: [Event] = [],
+         selectedEvent: Binding<Event?> = .constant(nil)) {
         self.date = data.date
+        self.type = type
+        _events = Published(initialValue: events)
         self.style = data.style
         _selectedEvent = selectedEvent
         reloadData(data,
@@ -65,23 +71,22 @@ final class WeekData: ObservableObject, EventDateProtocol, ScrollableWeekProtoco
     }
     
     func reloadData(_ data: CalendarData, startDay: StartDayType, maxDays: Int) {
-        days = getDates(data: data, startDay: startDay, maxDays: maxDays)
-        daysBySection = prepareDays(days, maxDayInWeek: maxDays)
-        weeks = daysBySection
+        var startDayProxy = startDay
+        if type == .week && maxDays != 7 {
+            startDayProxy = .sunday
+        }
+        
+        days = getDates(data: data, startDay: startDayProxy, maxDays: maxDays)
+        weeks = prepareDays(days, maxDayInWeek: maxDays)
     }
     
     private func getDates(data: CalendarData, startDay: StartDayType, maxDays: Int) -> [Day] {
-        var item = startDay
-        if maxDays != 7 {
-            item = .sunday
-        }
-        
         var tempDays = data.months.reduce([], { $0 + $1.days })
         let startIdx = tempDays.count > maxDays ? tempDays.count - maxDays : tempDays.count
-        let endWeek = data.addEndEmptyDays(Array(tempDays[startIdx..<tempDays.count]), startDay: item)
+        let endWeek = data.addEndEmptyDays(Array(tempDays[startIdx..<tempDays.count]), startDay: startDay)
         
         tempDays.removeSubrange(startIdx..<tempDays.count)
-        let defaultDays = data.addStartEmptyDays(tempDays, startDay: item) + endWeek
+        let defaultDays = data.addStartEmptyDays(tempDays, startDay: startDay) + endWeek
         var extensionDays: [Day] = []
         
         if maxDays != 7,

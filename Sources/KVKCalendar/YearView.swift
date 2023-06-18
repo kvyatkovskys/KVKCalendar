@@ -111,7 +111,7 @@ private struct YearMonthView: View {
                     .font(Font(style.year.fontTitle))
                 Spacer()
             }
-            WeekSimpleView(style: style)
+            WeekTitlesView(style: style)
             LazyVGrid(columns: columns) {
                 ForEach(month.days) { (day) in
                     if let date = day.date, day.type != .empty {
@@ -159,7 +159,7 @@ private struct YearMonthView: View {
 }
 
 @available(iOS 15.0, *)
-struct WeekSimpleView: View, WeekPreparing {
+struct WeekTitlesView: View, WeekPreparing {
     
     private var days: [Date] = []
     private let style: Style
@@ -213,7 +213,7 @@ struct WeekSimpleView: View, WeekPreparing {
 struct WeekSimpleView_Previews: PreviewProvider {
     
     static var previews: some View {
-        WeekSimpleView(style: Style())
+        WeekTitlesView(style: Style())
     }
     
 }

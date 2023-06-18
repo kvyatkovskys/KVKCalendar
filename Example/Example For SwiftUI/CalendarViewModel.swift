@@ -6,7 +6,7 @@
 //  Copyright © 2022 CocoaPods. All rights reserved.
 //
 
-import Foundation
+import SwiftUI
 import KVKCalendar
 
 final class CalendarViewModel: ObservableObject, KVKCalendarSettings, KVKCalendarDataModel {
@@ -19,14 +19,17 @@ final class CalendarViewModel: ObservableObject, KVKCalendarSettings, KVKCalenda
         createCalendarStyle()
     }
     
-    func loadEvents(completion: @escaping ([Event]) -> Void) {
+    func loadEvents() {
         DispatchQueue.main.asyncAfter(wallDeadline: .now() + 3) { [weak self] in
-            self!.loadEvents(dateFormat: self!.style.timeSystem.format, completion: completion)
+            self!.loadEvents(dateFormat: self!.style.timeSystem.format) { (result) in
+                self?.events = result
+            }
         }
     }
     
-    func addNewEvent() -> Event? {
-        handleNewEvent(Event(ID: "\(events.count + 1)"), date: Date())
+    func addNewEvent() {
+        guard let newEvent = handleNewEvent(Event(ID: "\(events.count + 1)"), date: Date()) else { return }
+        events.append(newEvent)
     }
     
 }

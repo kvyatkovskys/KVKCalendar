@@ -46,8 +46,7 @@ struct ScrollableWeekNewView: View {
                     .padding([.leading, .trailing])
                 } else {
                     HStack {
-                        WeekSimpleView(style: vm.style,
-                                       formatter: dayShortFormatter, font: vm.style.headerScroll.fontNameDay)
+                        WeekTitlesView(style: vm.style, formatter: dayShortFormatter, font: vm.style.headerScroll.fontNameDay)
                     }
                 }
                 WeeksHorizontalView(weeks: vm.weeks, style: vm.style, date: $vm.date)
@@ -110,7 +109,7 @@ struct ScrollableWeekNewView: View {
 struct ScrollableWeekNewView_Previews: PreviewProvider {
     static var previews: some View {
         var style = Style()
-        style.startWeekDay = .sunday
+        style.startWeekDay = .monday
         let commonData = CalendarData(date: Date(), years: 1, style: style)
         let weekData = WeekData(data: commonData)
         return ScrollableWeekNewView(vm: weekData)

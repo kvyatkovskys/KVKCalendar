@@ -14,7 +14,7 @@ import SwiftUI
 public struct ListNewView: View {
     
     private let params: ListView.Parameters
-    @Binding private var date: Date?
+    @Binding private var date: Date
     @Binding private var event: Event?
     
     private var style: Style {
@@ -23,7 +23,7 @@ public struct ListNewView: View {
     @ObservedObject private var vm: ListViewData
     
     public init(params: ListView.Parameters,
-                date: Binding<Date?>,
+                date: Binding<Date>,
                 event: Binding<Event?>,
                 events: Binding<[Event]>) {
         self.params = params
@@ -93,8 +93,8 @@ struct ListNewView_Preview: PreviewProvider {
     static var previews: some View {
         let style = Style()
         return Group {
-            ListNewView(params: ListView.Parameters(style: style, data: ListViewData(data: CalendarData(date: Date(), years: 4, style: style), style: style)), date: .constant(nil), event: .constant(nil), events: .constant([.stub(id: "1"), .stub(id: "2"), .stub(id: "3")]))
-            ListNewView(params: ListView.Parameters(style: style, data: ListViewData(date: Date(), sections: [ListViewData.SectionListView(date: Date(), events: [Event.stub()])])), date: .constant(nil), event: .constant(nil), events: .constant([]))
+            ListNewView(params: ListView.Parameters(style: style, data: ListViewData(data: CalendarData(date: Date(), years: 4, style: style), style: style)), date: .constant(Date()), event: .constant(nil), events: .constant([.stub(id: "1"), .stub(id: "2"), .stub(id: "3")]))
+            ListNewView(params: ListView.Parameters(style: style, data: ListViewData(date: Date(), sections: [ListViewData.SectionListView(date: Date(), events: [Event.stub()])])), date: .constant(Date()), event: .constant(nil), events: .constant([]))
         }
     }
     

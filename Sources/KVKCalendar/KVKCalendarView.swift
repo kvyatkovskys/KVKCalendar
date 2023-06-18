@@ -14,10 +14,24 @@ import EventKit
 @available(iOS 16.0, *)
 public struct KVKCalendarSwiftUIView: View {
     
-    @ObservedObject public var vm: KVKCalendarViewModel
+    @Binding private var type: CalendarType
+    private var date: Date
+    private var events: [Event]
+    @Binding private var selectedDate: Date
+    @Binding private var selectedEvent: Event?
+    @ObservedObject private var vm: KVKCalendarViewModel
     
-    public init(vm: KVKCalendarViewModel) {
-        self.vm = vm
+    public init(type: Binding<CalendarType>,
+         date: Date,
+         events: [Event],
+         selectedDate: Binding<Date> = .constant(Date()),
+         selectedEvent: Binding<Event?> = .constant(nil)) {
+        _type = type
+        self.date = date
+        self.events = events
+        _selectedDate = selectedDate
+        _selectedEvent = selectedEvent
+        self.vm = KVKCalendarViewModel(date: date, style: Style(), type: type.wrappedValue)
     }
     
     public var body: some View {
@@ -36,7 +50,7 @@ public struct KVKCalendarSwiftUIView: View {
         case .year:
             YearNewView(data: vm.data, style: vm.data.style)
         case .list:
-            ListNewView(params: ListView.Parameters(style: vm.data.style, data: ListViewData(data: vm.data, style: vm.data.style)), date: .constant(nil), event: .constant(nil), events: .constant([]))
+            ListNewView(params: ListView.Parameters(style: vm.data.style, data: ListViewData(data: vm.data, style: vm.data.style)), date: $selectedDate, event: $selectedEvent, events: .constant([]))
         }
     }
 }
@@ -47,7 +61,7 @@ struct KVKCalendarSwiftUIView_Previews: PreviewProvider {
     static var date = Date()
     
     static var previews: some View {
-        KVKCalendarSwiftUIView(vm: KVKCalendarViewModel(date: Date(), style: Style()))
+        KVKCalendarSwiftUIView(type: .constant(.week), date: Date(), events: [])
     }
     
 }
