@@ -11,24 +11,33 @@ import KVKCalendar
 
 final class CalendarViewModel: ObservableObject, KVKCalendarSettings, KVKCalendarDataModel {
     
+    @Published var type = CalendarType.week
+    @Published var orientation: UIInterfaceOrientation = .unknown
     @Published var events: [Event] = []
-    @Published var initialDate = Date()
-    @Published var selectedDate: Date = Date()
+    @Published var date = Date()
     
-    var style: KVKCalendar.Style {
+    var style: Style {
         createCalendarStyle()
     }
     
+    init() {
+        _date = Published(initialValue: defaultDate)
+    }
+    
     func loadEvents() {
-        DispatchQueue.main.asyncAfter(wallDeadline: .now() + 3) { [weak self] in
-            self!.loadEvents(dateFormat: self!.style.timeSystem.format) { (result) in
-                self?.events = result
+        Task {
+            try await Task.sleep(nanoseconds: 300_000_000)
+            
+            await MainActor.run {
+                loadEvents(dateFormat: style.timeSystem.format) { [weak self] (result) in
+                    self?.events = result
+                }
             }
         }
     }
     
     func addNewEvent() {
-        guard let newEvent = handleNewEvent(Event(ID: "\(events.count + 1)"), date: Date()) else { return }
+        guard let newEvent = handleNewEvent(Event(ID: "\(events.count + 1)"), date: date) else { return }
         events.append(newEvent)
     }
     

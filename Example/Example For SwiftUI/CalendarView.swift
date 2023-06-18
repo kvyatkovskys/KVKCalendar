@@ -11,9 +11,7 @@ import KVKCalendar
 
 @available(iOS 16.0, *)
 struct CalendarView: View {
-    
-    @State private var typeCalendar = CalendarType.week
-    @State private var orientation: UIInterfaceOrientation = .unknown
+
     @ObservedObject private var vm = CalendarViewModel()
     
     var body: some View {
@@ -26,25 +24,25 @@ struct CalendarView: View {
     }
     
     private var calendarView: some View {
-        KVKCalendarSwiftUIView(type: $typeCalendar,
-                               date: vm.initialDate,
+        KVKCalendarSwiftUIView(type: $vm.type,
+                               date: $vm.date,
                                events: vm.events,
-                               selectedDate: $vm.selectedDate)
+                               style: vm.style)
             .kvkOnRotate(action: { (newOrientation) in
-                orientation = newOrientation
+                vm.orientation = newOrientation
             })
-            .navigationBarTitle(vm.selectedDate.formatted(), displayMode: .inline)
+            .navigationBarTitle(vm.date.formatted(), displayMode: .inline)
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarLeading) {
                     HStack(spacing: 0) {
-                        Picker(typeCalendar.title, selection: $typeCalendar) {
+                        Picker(vm.type.title, selection: $vm.type) {
                             ForEach(CalendarType.allCases) { (type) in
                                 Text(type.title)
                             }
                         }
                         .frame(width: 80)
                         Button {
-                            vm.selectedDate = Date()
+                            vm.date = Date()
                         } label: {
                             Text("Today")
                                 .font(.headline)

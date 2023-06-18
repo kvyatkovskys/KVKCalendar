@@ -15,23 +15,19 @@ import EventKit
 public struct KVKCalendarSwiftUIView: View {
     
     @Binding private var type: CalendarType
-    private var date: Date
-    private var events: [Event]
-    @Binding private var selectedDate: Date
+    @Binding private var date: Date
     @Binding private var selectedEvent: Event?
     @ObservedObject private var vm: KVKCalendarViewModel
     
     public init(type: Binding<CalendarType>,
-         date: Date,
-         events: [Event],
-         selectedDate: Binding<Date> = .constant(Date()),
-         selectedEvent: Binding<Event?> = .constant(nil)) {
+                date: Binding<Date>,
+                events: [Event],
+                selectedEvent: Binding<Event?> = .constant(nil),
+                style: KVKCalendar.Style) {
         _type = type
-        self.date = date
-        self.events = events
-        _selectedDate = selectedDate
+        _date = date
         _selectedEvent = selectedEvent
-        self.vm = KVKCalendarViewModel(date: date, style: Style(), type: type.wrappedValue)
+        vm = KVKCalendarViewModel(date: date.wrappedValue, events: events, style: style, type: type.wrappedValue)
     }
     
     public var body: some View {
@@ -50,7 +46,7 @@ public struct KVKCalendarSwiftUIView: View {
         case .year:
             YearNewView(data: vm.data, style: vm.data.style)
         case .list:
-            ListNewView(params: ListView.Parameters(style: vm.data.style, data: ListViewData(data: vm.data, style: vm.data.style)), date: $selectedDate, event: $selectedEvent, events: .constant([]))
+            ListNewView(params: ListView.Parameters(style: vm.data.style, data: ListViewData(data: vm.data, style: vm.data.style)), date: $date, event: $selectedEvent, events: .constant([]))
         }
     }
 }
@@ -58,10 +54,10 @@ public struct KVKCalendarSwiftUIView: View {
 @available(iOS 16.0, *)
 struct KVKCalendarSwiftUIView_Previews: PreviewProvider {
     
-    static var date = Date()
+    @State static var date = Date()
     
     static var previews: some View {
-        KVKCalendarSwiftUIView(type: .constant(.week), date: Date(), events: [])
+        KVKCalendarSwiftUIView(type: .constant(.week), date: Binding(get: { date }, set: { date = $0 }), events: [], style: KVKCalendar.Style())
     }
     
 }

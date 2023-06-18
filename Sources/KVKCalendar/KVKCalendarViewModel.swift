@@ -20,6 +20,7 @@ class KVKCalendarViewModel: ObservableObject {
     private var cancellable: Set<AnyCancellable> = []
     
     init(date: Date,
+         events: [KVKCalendar.Event],
          years: Int = 4,
          style: Style,
          type: CalendarType = .week) {
@@ -27,8 +28,8 @@ class KVKCalendarViewModel: ObservableObject {
         data = CalendarData(date: date,
                             years: years,
                             style: style)
-        weekData = WeekData(data: data, events: [])
-        dayData = WeekData(data: data, type: .day)
+        weekData = WeekData(data: data, events: events)
+        dayData = WeekData(data: data, type: .day, events: events)
         self.type = type
         
         weekData.$date
