@@ -40,15 +40,17 @@ struct CalendarView: View {
                                 Text(type.title)
                             }
                         }
-                        .frame(width: 80)
-                        Button {
-                            vm.date = Date()
-                        } label: {
-                            Text("Today")
-                                .font(.headline)
+                        .tint(.red)
+                        if UIDevice.current.userInterfaceIdiom == .phone {
+                            Button {
+                                vm.date = Date()
+                            } label: {
+                                Text("Today")
+                                    .font(.headline)
+                            }
+                            .tint(.red)
                         }
                     }
-                    .tint(.red)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {

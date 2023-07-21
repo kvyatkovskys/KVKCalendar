@@ -22,7 +22,9 @@ struct ScrollableWeekNewView: View {
     private var spacing: CGFloat {
         Platform.currentInterface == .phone ? 5 : 0
     }
-    
+    private var leftPadding: CGFloat {
+        vm.type == .week ? vm.style.timeline.widthTime + vm.style.timeline.offsetTimeX : 0
+    }
     private var dayShortFormatter: DateFormatter {
         let format = DateFormatter()
         format.dateFormat = "EEEEE"
@@ -45,13 +47,13 @@ struct ScrollableWeekNewView: View {
                     }
                     .padding([.leading, .trailing])
                 } else {
-                    HStack {
-                        WeekTitlesView(style: vm.style, formatter: dayShortFormatter, font: vm.style.headerScroll.fontNameDay)
-                    }
+                    WeekTitlesView(style: vm.style, formatter: dayShortFormatter, font: vm.style.headerScroll.fontNameDay)
+                        .padding(.leading, leftPadding)
                 }
                 WeeksHorizontalView(weeks: vm.weeks, style: vm.style, date: $vm.date)
                     .frame(minHeight: daySize.width,
                            maxHeight: daySize.height)
+                    .padding(.leading, leftPadding)
                 if Platform.currentInterface == .phone {
                     HStack {
                         Spacer()
@@ -111,7 +113,7 @@ struct ScrollableWeekNewView_Previews: PreviewProvider {
         var style = Style()
         style.startWeekDay = .monday
         let commonData = CalendarData(date: Date(), years: 1, style: style)
-        let weekData = WeekData(data: commonData)
+        let weekData = WeekData(data: commonData, type: .week)
         return ScrollableWeekNewView(vm: weekData)
     }
 }

@@ -89,10 +89,12 @@ public extension TimelineEventLayoutContext {
             newFrame.origin.y = calculatePointYByMinute(startHour, firstTimeLabel)
         }
         
+        // TODO: it doesn't work correctly right now
         // calculate 'height' event
-        if let defaultHeight = eventStyle?.defaultHeight {
-            newFrame.size.height = defaultHeight
-        } else if end.kvkDay == date.kvkDay {
+//        if let defaultHeight = eventStyle?.defaultHeight {
+//            newFrame.size.height = defaultHeight
+//        } else
+        if end.kvkDay == date.kvkDay {
             // to avoid crash https://github.com/kvyatkovskys/KVKCalendar/issues/237
             if start.kvkDay == end.kvkDay && start.kvkHour == end.kvkHour && start.kvkMinute == end.kvkMinute {
                 newFrame.size.height = 30

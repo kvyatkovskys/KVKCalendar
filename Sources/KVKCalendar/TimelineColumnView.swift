@@ -76,6 +76,9 @@ struct TimelineColumnView_Previews: PreviewProvider {
         let items: [TimelineColumnView.Container] = [
             TimelineColumnView.Container(event: .stub(id: "1", duration: 50), rect: CGRect(x: 0, y: 100, width: 0, height: 350)),
             TimelineColumnView.Container(event: .stub(id: "2", duration: 5), rect: CGRect(x: 0, y: 100, width: 0, height: 10)),
+            TimelineColumnView.Container(event: .stub(id: "6", startFrom: 20, duration: 30), rect: CGRect(x: 0, y: 120, width: 0, height: 100)),
+            TimelineColumnView.Container(event: .stub(id: "7", startFrom: 20, duration: 30), rect: CGRect(x: 0, y: 120, width: 0, height: 100)),
+            TimelineColumnView.Container(event: .stub(id: "8", startFrom: 20, duration: 30), rect: CGRect(x: 0, y: 120, width: 0, height: 100)),
             TimelineColumnView.Container(event: .stub(id: "3", startFrom: 30, duration: 55), rect: CGRect(x: 0, y: 270, width: 0, height: 400)),
             TimelineColumnView.Container(event: .stub(id: "4", startFrom: 80, duration: 30), rect: CGRect(x: 0, y: 500, width: 0, height: 100)),
             TimelineColumnView.Container(event: .stub(id: "5", startFrom: 80, duration: 30), rect: CGRect(x: 0, y: 500, width: 0, height: 100))
@@ -149,6 +152,7 @@ struct EventStack: Layout {
                 moveXIfNeeded()
             }
             
+            // TODO: on the future
             // when the current event exceeds a certain frame
             if newX >= pageFrame.width {
                 let value = frame.width * 0.5

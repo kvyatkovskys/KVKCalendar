@@ -26,7 +26,7 @@ final class WeekData: ObservableObject, EventDateProtocol, ScrollableWeekProtoco
     var daysBySection: [[Day]] = []
     
     private var cancellation: Set<AnyCancellable> = []
-    private let type: CalendarType
+    private(set) var type: CalendarType
     
     init(data: CalendarData,
          type: CalendarType = .week,
