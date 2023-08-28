@@ -131,10 +131,6 @@ extension WeekHeaderView: CalendarSettingProtocol {
         parameters.isFromYear
     }
     
-    func setDate(_ date: Date, animated: Bool) {
-        self.date = date
-    }
-    
     func setUI(reload: Bool = false) {
         subviews.forEach { $0.removeFromSuperview() }
         addViews(frame: frame, isFromYear: isFromYear)

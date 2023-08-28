@@ -232,7 +232,7 @@ extension MonthView: CalendarSettingProtocol {
         let reload = self.style != style
         self.style = style
         setUI(reload: reload || force)
-        weekHeaderView.setDate(parameters.monthData.date, animated: false)
+        weekHeaderView.date = parameters.monthData.date
         if reload {
             parameters.monthData.selectedSection = -1
         }
