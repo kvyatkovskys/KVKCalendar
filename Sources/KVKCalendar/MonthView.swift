@@ -476,11 +476,12 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         let width: CGFloat
         let height: CGFloat
         
+        let heightSectionHeader = style.month.heightSectionHeader
         switch style.month.scrollDirection {
         case .horizontal:
             var superViewWidth = collectionView.bounds.width
-            if !style.month.isHiddenSectionHeader {
-                superViewWidth -= style.month.heightSectionHeader
+            if !style.month.isHiddenSectionHeader && superViewWidth >= heightSectionHeader {
+                superViewWidth -= heightSectionHeader
             }
             width = superViewWidth / 7
             height = collectionView.frame.height / 6
@@ -492,8 +493,8 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
             }
             
             var superViewHeight = collectionView.bounds.height
-            if !style.month.isHiddenSectionHeader {
-                superViewHeight -= style.month.heightSectionHeader
+            if !style.month.isHiddenSectionHeader && superViewHeight >= heightSectionHeader {
+                superViewHeight -= heightSectionHeader
             }
             
             height = superViewHeight / CGFloat(item.weeks)

@@ -229,7 +229,7 @@ extension YearView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
         var width: CGFloat
         var height = collectionView.frame.height
         
-        if height > 0 {
+        if height > 0 && height >= data.style.year.heightTitleHeader {
             height -= data.style.year.heightTitleHeader
         }
         
