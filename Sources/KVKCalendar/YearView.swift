@@ -190,6 +190,7 @@ extension YearView: UICollectionViewDataSource {
             return collectionView.kvkDequeueView(indexPath: index) { (headerView: YearHeaderView) in
                 headerView.style = data.style
                 headerView.date = date
+                delegate?.didDisplayHeaderTitle(date, style: style, type: .year)
             }
         }
     }
