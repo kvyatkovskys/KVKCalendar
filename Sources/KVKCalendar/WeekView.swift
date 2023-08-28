@@ -286,9 +286,11 @@ extension WeekView: CalendarSettingProtocol {
                                                          style: style))
         view.dataSource = dataSource
         view.didSelectDate = { [weak self] (date, type) in
+            guard let self = self else { return }
             if let item = date {
-                self?.parameters.data.date = item
-                self?.didSelectDate(item, type: type)
+                self.parameters.data.date = item
+                self.didSelectDate(item, type: type)
+                self.delegate?.didDisplayHeaderTitle(item, style: self.style, type: .day)
             }
         }
         view.didTrackScrollOffset = { [weak self] (offset, stop) in
@@ -327,11 +329,15 @@ extension WeekView: TimelineDelegate {
     }
     
     func nextDate() {
-        parameters.data.date = scrollableWeekView.calculateDateWithOffset(style.week.maxDays, needScrollToDate: true)
+        let date = scrollableWeekView.calculateDateWithOffset(style.week.maxDays, needScrollToDate: true)
+        parameters.data.date = date
+        delegate?.didDisplayHeaderTitle(date, style: style, type: .week)
     }
     
     func previousDate() {
-        parameters.data.date = scrollableWeekView.calculateDateWithOffset(-style.week.maxDays, needScrollToDate: true)
+        let date = scrollableWeekView.calculateDateWithOffset(-style.week.maxDays, needScrollToDate: true)
+        parameters.data.date = date
+        delegate?.didDisplayHeaderTitle(date, style: style, type: .week)
     }
     
     func swipeX(transform: CGAffineTransform, stop: Bool) {

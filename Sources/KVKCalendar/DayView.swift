@@ -98,11 +98,15 @@ extension DayView: TimelineDelegate {
     }
     
     func nextDate() {
-        parameters.data.date = scrollableWeekView.calculateDateWithOffset(1, needScrollToDate: true)
+        let date = scrollableWeekView.calculateDateWithOffset(1, needScrollToDate: true)
+        parameters.data.date = date
+        delegate?.didDisplayHeaderTitle(date, style: style, type: .day)
     }
     
     func previousDate() {
-        parameters.data.date = scrollableWeekView.calculateDateWithOffset(-1, needScrollToDate: true)
+        let date = scrollableWeekView.calculateDateWithOffset(-1, needScrollToDate: true)
+        parameters.data.date = date
+        delegate?.didDisplayHeaderTitle(date, style: style, type: .day)
     }
     
     func didResizeEvent(_ event: Event, startTime: ResizeTime, endTime: ResizeTime) {
@@ -345,9 +349,11 @@ extension DayView: CalendarSettingProtocol {
                                                         style: style))
         view.dataSource = dataSource
         view.didSelectDate = { [weak self] (date, type) in
+            guard let self = self else { return }
             if let item = date {
-                self?.parameters.data.date = item
-                self?.delegate?.didSelectDates([item], type: type, frame: nil)
+                self.parameters.data.date = item
+                self.delegate?.didSelectDates([item], type: type, frame: nil)
+                self.delegate?.didDisplayHeaderTitle(item, style: self.style, type: .day)
             }
         }
         view.didTrackScrollOffset = { [weak self] (offset, stop) in
