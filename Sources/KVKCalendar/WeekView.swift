@@ -290,7 +290,7 @@ extension WeekView: CalendarSettingProtocol {
             if let item = date {
                 self.parameters.data.date = item
                 self.didSelectDate(item, type: type)
-                self.delegate?.didDisplayHeaderTitle(item, style: self.style, type: .day)
+                self.delegate?.didDisplayHeaderTitle(item, style: self.style, type: type)
             }
         }
         view.didTrackScrollOffset = { [weak self] (offset, stop) in
