@@ -340,6 +340,10 @@ extension KVKCalendarView: DisplayDelegate {
         reloadData()
         delegate?.didUpdateStyle(style, type: type)
     }
+    
+    public func didDisplayHeaderTitle(_ date: Date, style: Style, type: CalendarType) {
+        delegate?.didDisplayHeaderTitle(date, style: style, type: type)
+    }
 }
 
 extension KVKCalendarView {

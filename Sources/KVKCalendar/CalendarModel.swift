@@ -560,6 +560,9 @@ public protocol CalendarDelegate: AnyObject {
     func didDeselectEvent(_ event: Event, animated: Bool)
     
     func didUpdateStyle(_ style: Style, type: CalendarType)
+    
+    /// get current displaying header date
+    func didDisplayHeaderTitle(_ date: Date, style: Style, type: CalendarType)
 }
 
 public extension CalendarDelegate {
@@ -592,6 +595,8 @@ public extension CalendarDelegate {
     func didChangeViewerFrame(_ frame: CGRect) {}
     
     func didUpdateStyle(_ style: Style, type: CalendarType) {}
+    
+    func didDisplayHeaderTitle(_ date: Date, style: Style, type: CalendarType) {}
 }
 
 // MARK: - Private Display dataSource
