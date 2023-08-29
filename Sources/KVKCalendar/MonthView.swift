@@ -72,7 +72,7 @@ final class MonthView: UIView {
             headerViewFrame = customHeaderView.frame
             addSubview(customHeaderView)
         } else {
-            setHeaderTitle(date)
+            setHeaderTitleAndNotify(date)
         }
     }
     
@@ -171,7 +171,7 @@ final class MonthView: UIView {
         return newMoveDate
     }
     
-    private func setHeaderTitle(_ date: Date) {
+    private func setHeaderTitleAndNotify(_ date: Date) {
         weekHeaderView.date = date
         delegate?.didDisplayHeaderTitle(date, style: style, type: .month)
     }
@@ -413,7 +413,7 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         guard let index = objectView.indexPathForItem(at: center) else { return }
         
         let month = parameters.monthData.data.months[index.section]
-        setHeaderTitle(month.date)
+        weekHeaderView.date = month.date
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
@@ -423,6 +423,7 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         guard let index = objectView.indexPathForItem(at: center) else { return }
 
         let month = parameters.monthData.data.months[index.section]
+        setHeaderTitleAndNotify(month.date)
         guard style.month.autoSelectionDateWhenScrolling else { return }
         let newDate = parameters.monthData.findNextDateInMonth(month)
         guard parameters.monthData.date != newDate else { return }
@@ -446,7 +447,7 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         }
         
         let month = parameters.monthData.data.months[visibleIndex]
-        setHeaderTitle(month.date)
+        setHeaderTitleAndNotify(month.date)
         guard style.month.autoSelectionDateWhenScrolling else { return }
         let newDate = parameters.monthData.findNextDateInMonth(month)
         guard parameters.monthData.date != newDate else { return }
