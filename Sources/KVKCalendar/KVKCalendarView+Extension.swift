@@ -185,13 +185,18 @@ extension KVKCalendarView {
             completion(access)
         }
         let status = EKEventStore.authorizationStatus(for: .event)
-        if #available(iOS 17.0, *) {
-            store.requestFullAccessToEvents { (access, error) in
-                proxyCompletion(access: access, status: status, error: error)
-            }
-        } else {
-            store.requestAccess(to: .event) { (access, error) in
-                proxyCompletion(access: access, status: status, error: error)
+        switch status {
+        case .fullAccess, .authorized:
+            completion(true)
+        default:
+            if #available(iOS 17.0, *) {
+                store.requestFullAccessToEvents { (access, error) in
+                    proxyCompletion(access: access, status: status, error: error)
+                }
+            } else {
+                store.requestAccess(to: .event) { (access, error) in
+                    proxyCompletion(access: access, status: status, error: error)
+                }
             }
         }
     }
