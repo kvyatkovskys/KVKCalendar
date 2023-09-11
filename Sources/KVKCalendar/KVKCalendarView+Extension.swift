@@ -180,11 +180,24 @@ extension KVKCalendarView {
     private func requestAccessSystemCalendars(_ calendars: Set<String>,
                                               store: EKEventStore,
                                               completion: @escaping (Bool) -> Void) {
-        let status = EKEventStore.authorizationStatus(for: .event)
-        
-        store.requestAccess(to: .event) { (access, error) in
-            print("System calendars = \(calendars) - access = \(access), error = \(error?.localizedDescription ?? "nil"), status = \(status.rawValue)")
+        func proxyCompletion(access: Bool, status: EKAuthorizationStatus, error: Error?) {
+            print("System calendars = \(calendars) - access = \(access), error = \(error?.localizedDescription ?? "nil"), status = \(status)")
             completion(access)
+        }
+        let status = EKEventStore.authorizationStatus(for: .event)
+        switch status {
+        case .fullAccess, .authorized:
+            completion(true)
+        default:
+            if #available(iOS 17.0, *) {
+                store.requestFullAccessToEvents { (access, error) in
+                    proxyCompletion(access: access, status: status, error: error)
+                }
+            } else {
+                store.requestAccess(to: .event) { (access, error) in
+                    proxyCompletion(access: access, status: status, error: error)
+                }
+            }
         }
     }
     
