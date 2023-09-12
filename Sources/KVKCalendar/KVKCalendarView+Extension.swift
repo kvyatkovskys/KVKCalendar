@@ -186,7 +186,7 @@ extension KVKCalendarView {
         }
         let status = EKEventStore.authorizationStatus(for: .event)
         switch status {
-        case .fullAccess, .authorized:
+        case .authorized:
             completion(true)
         default:
             //           temporary disabled
