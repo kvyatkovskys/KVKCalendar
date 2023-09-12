@@ -385,6 +385,8 @@ extension MonthView: UICollectionViewDataSource, UICollectionViewDataSourcePrefe
                     cell.selectDate = parameters.monthData.selectedDates.contains(date) ? date : parameters.monthData.date
                 case .single:
                     cell.selectDate = parameters.monthData.date
+                case .disabled:
+                    break
                 }
                 
                 cell.style = style
@@ -469,6 +471,8 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
             didSelectDates(parameters.monthData.selectedDates.compactMap({ $0 }), indexPath: item.indexPath)
         case .single:
             didSelectDates([date], indexPath: item.indexPath)
+        case .disabled:
+            break
         }
     }
     
