@@ -354,7 +354,7 @@ public struct MonthStyle {
     public var heightSectionHeader: CGFloat = 50
     
     public enum SelectionMode: Int {
-        case single, multiple
+        case single, multiple, disabled
     }
 }
 
