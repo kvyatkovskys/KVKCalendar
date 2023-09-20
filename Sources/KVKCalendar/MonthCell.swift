@@ -40,7 +40,13 @@ final class MonthCell: KVKCollectionViewCell {
         }
     }
     private var allDayStyle = AllDayStyle()
-    
+
+    private lazy var tapGesture: UITapGestureRecognizer = {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(processTapEvent))
+        tapGesture.delegate = self
+        return tapGesture
+    }()
+
     private lazy var panGesture: UIPanGestureRecognizer = {
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(processMovingEvent))
         panGesture.delegate = self
@@ -271,6 +277,7 @@ final class MonthCell: KVKCollectionViewCell {
         if #available(iOS 13.4, *) {
             contentView.addPointInteraction()
         }
+        contentView.addGestureRecognizer(tapGesture)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -289,6 +296,15 @@ final class MonthCell: KVKCollectionViewCell {
             contentView.addSubview(monthLabel)
         } else {
             monthLabel.removeFromSuperview()
+        }
+    }
+
+    @objc private func processTapEvent(gesture: UITapGestureRecognizer) {
+        let view = gesture.view
+        let loc = gesture.location(in: view)
+        let isTapInHeader = loc.y <= dateLabel.frame.size.height
+        if isTapInHeader {
+            delegate?.didSelectDateCell(self)
         }
     }
     
@@ -478,13 +494,13 @@ extension MonthCell: UIGestureRecognizerDelegate {
 
 protocol MonthCellDelegate: AnyObject {
     
+    func didSelectDateCell(_ cell: KVKCollectionViewCell)
     func didSelectEvent(_ event: Event, frame: CGRect?)
     func didSelectMore(_ date: Date, frame: CGRect?)
     func didStartMoveEvent(_ event: EventViewGeneral, snapshot: UIView?, gesture: UILongPressGestureRecognizer)
     func didEndMoveEvent(gesture: UILongPressGestureRecognizer)
     func didChangeMoveEvent(gesture: UIPanGestureRecognizer)
     func dequeueViewEvents(_ events: [Event], date: Date, frame: CGRect) -> UIView?
-    
 }
 
 #endif

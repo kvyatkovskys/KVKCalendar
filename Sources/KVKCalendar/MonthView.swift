@@ -385,6 +385,8 @@ extension MonthView: UICollectionViewDataSource, UICollectionViewDataSourcePrefe
                     cell.selectDate = parameters.monthData.selectedDates.contains(date) ? date : parameters.monthData.date
                 case .single:
                     cell.selectDate = parameters.monthData.date
+                case .disabled:
+                    break
                 }
                 
                 cell.style = style
@@ -458,18 +460,6 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let item = getActualCachedDay(indexPath: indexPath)
-        guard let date = item.day?.date else { return }
-        
-        switch style.month.selectionMode {
-        case .multiple:
-            parameters.monthData.selectedDates = parameters.monthData.updateSelectedDates(parameters.monthData.selectedDates,
-                                                                                          date: date,
-                                                                                          calendar: style.calendar)
-            didSelectDates(parameters.monthData.selectedDates.compactMap({ $0 }), indexPath: item.indexPath)
-        case .single:
-            didSelectDates([date], indexPath: item.indexPath)
-        }
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -548,6 +538,24 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
 // MARK: Month Cell Delegate
 
 extension MonthView: MonthCellDelegate {
+
+    func didSelectDateCell(_ cell: KVKCollectionViewCell) {
+        guard let indexPath = collectionView?.indexPath(for: cell) else { return }
+        let item = getActualCachedDay(indexPath: indexPath)
+        guard let date = item.day?.date else { return }
+        
+        switch style.month.selectionMode {
+        case .multiple:
+            parameters.monthData.selectedDates = parameters.monthData.updateSelectedDates(parameters.monthData.selectedDates,
+                                                                                          date: date,
+                                                                                          calendar: style.calendar)
+            didSelectDates(parameters.monthData.selectedDates.compactMap({ $0 }), indexPath: item.indexPath)
+        case .single:
+            didSelectDates([date], indexPath: item.indexPath)
+        case .disabled:
+            break
+        }
+    }
     
     func dequeueViewEvents(_ events: [Event], date: Date, frame: CGRect) -> UIView? {
         if let item = parameters.monthData.customEventsView[date] {
