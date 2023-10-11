@@ -112,7 +112,9 @@ final class MonthView: UIView {
         guard superview?.superview != nil && collectionView?.dataSource != nil else { return }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
-            guard let self = self, let collectionView = collectionView, collectionView.numberOfSections >= idx else { return }
+            guard let self = self,
+                  let collectionView = self.collectionView,
+                  collectionView.numberOfSections >= idx else { return }
             
             if let attributes = self.collectionView?.layoutAttributesForSupplementaryElement(ofKind: UICollectionView.elementKindSectionHeader, at: IndexPath(row: 0, section: idx)),
                let inset = self.collectionView?.contentInset {
