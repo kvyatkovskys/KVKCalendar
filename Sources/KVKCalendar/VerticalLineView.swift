@@ -24,7 +24,13 @@ final class VerticalLineView: UIView {
 final class VerticalLineLayer: CAShapeLayer {
     let date: Date?
     let lineFrame: CGRect
-    
+
+    override init(layer: Any) {
+        date = nil
+        lineFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
+        super.init(layer: layer)
+    }
+
     init(date: Date? = nil, frame: CGRect, tag: Int, start: CGPoint, end: CGPoint, color: UIColor, width: CGFloat) {
         self.date = date
         self.lineFrame = frame
