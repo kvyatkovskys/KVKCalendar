@@ -26,6 +26,7 @@ public class TimelineLabel: UILabel {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        self.adjustsFontForContentSizeCategory = true
     }
     
     required init?(coder aDecoder: NSCoder) {
