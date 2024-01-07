@@ -511,7 +511,9 @@ final class MonthView: UIView {
         guard superview?.superview != nil && collectionView?.dataSource != nil else { return }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
-            guard let self = self, let collectionView = collectionView, collectionView.numberOfSections >= idx else { return }
+            guard let self = self,
+                  let collectionView = self.collectionView,
+                  collectionView.numberOfSections >= idx else { return }
             
             if let attributes = self.collectionView?.layoutAttributesForSupplementaryElement(ofKind: UICollectionView.elementKindSectionHeader, at: IndexPath(row: 0, section: idx)),
                let inset = self.collectionView?.contentInset {
@@ -784,6 +786,8 @@ extension MonthView: UICollectionViewDataSource, UICollectionViewDataSourcePrefe
                     cell.selectDate = parameters.monthData.selectedDates.contains(date) ? date : parameters.monthData.date
                 case .single:
                     cell.selectDate = parameters.monthData.date
+                case .disabled:
+                    break
                 }
                 
                 cell.style = style
@@ -868,6 +872,8 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
             didSelectDates(parameters.monthData.selectedDates.compactMap({ $0 }), indexPath: item.indexPath)
         case .single:
             didSelectDates([date], indexPath: item.indexPath)
+        case .disabled:
+            break
         }
     }
     
