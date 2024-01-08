@@ -7,13 +7,12 @@
 
 #if os(iOS)
 
-import UIKit
 import SwiftUI
 
-@available(iOS 15.0, *)
+@available(iOS 17.0, *)
 struct YearNewView: View {
     
-    @ObservedObject var data: YearData
+    @StateObject private var data: YearData
     
     private var style: Style {
         data.style
@@ -25,8 +24,8 @@ struct YearNewView: View {
         GridItem(.flexible(), spacing: 5)
     ]
     
-    init(data: CalendarData, style: Style) {
-        self.data = YearData(data: data, date: data.date, style: style)
+    init(data: CalendarData) {
+        _data = StateObject(wrappedValue: YearData(data: data, date: data.date, style: data.style))
     }
     
     var body: some View {
@@ -46,7 +45,7 @@ struct YearNewView: View {
                         } header: {
                             HStack {
                                 Text(section.date.titleForLocale(style.locale, formatter: style.year.titleFormatter))
-                                    .foregroundColor(Date().kvkYear == section.date.kvkYear ? .red : Color(uiColor: style.year.colorTitleHeader))
+                                    .foregroundStyle(Date().kvkYear == section.date.kvkYear ? .red : Color(uiColor: style.year.colorTitleHeader))
                                     .font(Font(style.year.fontTitleHeader))
                                     .padding(5)
                                 Spacer()
@@ -68,22 +67,14 @@ struct YearNewView: View {
     
 }
 
-@available(iOS 15.0, *)
-struct YearNewView_Previews: PreviewProvider {
-    
-    static var previews: some View {
-        let style = Style()
-        let monthData = MonthData(parameters: .init(data: CalendarData(date: Date(), years: 2, style: style), startDay: style.startWeekDay, calendar: style.calendar, style: style))
-        return Group {
-            YearNewView(data: monthData.data, style: Style())
-            YearNewView(data: monthData.data, style: Style())
-                .preferredColorScheme(.dark)
-        }
-    }
-    
+@available(iOS 17.0, *)
+#Preview {
+    let style = Style()
+    let monthData = MonthData(parameters: .init(data: CalendarData(date: Date(), years: 2, style: style)))
+    return YearNewView(data: monthData.data)
 }
 
-@available(iOS 15.0, *)
+@available(iOS 17.0, *)
 private struct YearMonthView: View {
     
     var month: Month
@@ -126,7 +117,7 @@ private struct YearMonthView: View {
                         .background(getCurrentBgTxtColor(date, selectedDay: selectedDate))
                         .clipShape(Circle())
                     } else {
-                        Text("")
+                        EmptyView()
                     }
                 }
             }
@@ -158,7 +149,7 @@ private struct YearMonthView: View {
     
 }
 
-@available(iOS 15.0, *)
+@available(iOS 17.0, *)
 struct WeekTitlesView: View, WeekPreparing {
     
     private var days: [Date] = []
@@ -209,13 +200,9 @@ struct WeekTitlesView: View, WeekPreparing {
     
 }
 
-@available(iOS 15.0, *)
-struct WeekSimpleView_Previews: PreviewProvider {
-    
-    static var previews: some View {
-        WeekTitlesView(style: Style())
-    }
-    
+@available(iOS 17.0, *)
+#Preview {
+    WeekTitlesView(style: Style())
 }
 
 final class YearView: UIView {

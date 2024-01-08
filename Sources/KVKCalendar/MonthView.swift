@@ -7,14 +7,16 @@
 
 #if os(iOS)
 
-import UIKit
 import SwiftUI
 
-@available(iOS 15.0, *)
+@available(iOS 17.0, *)
 struct MonthNewView: View {
     
-    @ObservedObject var vm: MonthData
-    let style: Style
+    @StateObject private var vm: MonthData
+    
+    init(vm: MonthData) {
+        _vm = StateObject(wrappedValue: vm)
+    }
     
     private let columns: [GridItem] = [
         GridItem(.flexible(), spacing: 0),
@@ -33,7 +35,7 @@ struct MonthNewView: View {
     var body: some View {
         ScrollViewReader { (proxy) in
             VStack(spacing: 0) {
-                MonthWeekView(style: style, date: vm.date) {
+                MonthWeekView(style: vm.style, date: vm.date) {
                     vm.date = Date()
                     withAnimation {
                         proxy.scrollTo(vm.date.kvkStartOfMonth, anchor: .top)
@@ -46,7 +48,7 @@ struct MonthNewView: View {
                             ForEach(vm.data.months) { (month) in
                                 Section {
                                     ForEach(month.days) { (day) in
-                                        MonthDayView(day: day, selectedDate: vm.date, style: style, selectedEvent: $vm.selectedEvent)
+                                        MonthDayView(day: day, selectedDate: vm.date, style: vm.style, selectedEvent: $vm.selectedEvent)
                                             .onTapGesture(count: tapCountToSelectDay) {
                                                 withAnimation {
                                                     vm.date = day.date ?? Date()
@@ -72,7 +74,7 @@ struct MonthNewView: View {
     
 }
 
-@available(iOS 15.0, *)
+@available(iOS 17.0, *)
 struct MonthNewView_Previews: PreviewProvider {
     
     static var previews: some View {
@@ -82,12 +84,12 @@ struct MonthNewView_Previews: PreviewProvider {
         var allDayEvent = Event.stub(id: "4")
         allDayEvent.isAllDay = true
         data.months[0].days[0].events = [allDayEvent, .stub(id: "1"), .stub(id: "2"), .stub(id: "3")]
-        return MonthNewView(vm: MonthData(parameters: MonthData.Parameters(data: data, startDay: .sunday, calendar: Calendar.current, style: style)), style: style)
+        return MonthNewView(vm: MonthData(parameters: MonthData.Parameters(data: data)))
     }
     
 }
 
-@available(iOS 15.0, *)
+@available(iOS 17.0, *)
 struct MonthDayView: View {
     
     let day: Day
@@ -235,7 +237,7 @@ struct MonthDayView: View {
     
 }
 
-@available(iOS 15.0, *)
+@available(iOS 17.0, *)
 struct MonthDayView_Previews: PreviewProvider {
     
     static var previews: some View {

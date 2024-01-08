@@ -282,7 +282,7 @@ final class TimelinePageVC: UIPageViewController {
         items.forEach { $0.value.reloadTimeline() }
     }
     
-    @available(iOS 16.0, *)
+    @available(iOS 17.0, *)
     func reloadPages(with params: TimelineViewWrapper.Parameters) {
         pages.forEach { $0.value.reloadTimeline(params: params) }
     }
@@ -412,6 +412,5 @@ extension TimelinePageVC: UIPageViewControllerDataSource, UIPageViewControllerDe
         didSwitchTimelineView?(timelineView, type)
     }
 }
-
 
 #endif

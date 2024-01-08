@@ -7,10 +7,9 @@
 
 #if os(iOS)
 
-import UIKit
 import SwiftUI
 
-@available(iOS 15.0, *)
+@available(iOS 17.0, *)
 public struct ListNewView: View {
     
     private let params: ListView.Parameters
@@ -18,16 +17,16 @@ public struct ListNewView: View {
     @Binding private var event: Event?
     
     private var style: Style {
-        params.style
+        params.data.style
     }
-    @ObservedObject private var vm: ListViewData
+    @StateObject private var vm: ListViewData
     
     public init(params: ListView.Parameters,
                 date: Binding<Date>,
                 event: Binding<Event?>,
                 events: Binding<[Event]>) {
         self.params = params
-        self.vm = params.data
+        _vm = StateObject(wrappedValue: params.data)
         _date = date
         _event = event
         if params.data.sections.isEmpty {
@@ -36,78 +35,61 @@ public struct ListNewView: View {
     }
     
     public var body: some View {
-        bodyView
-    }
-    
-    @ViewBuilder
-    private var bodyView: some View {
-        if #available(iOS 16.0, *) {
-            NavigationStack {
-                listBody
-            }
-        } else {
-            NavigationView {
-                listBody
-            }
-            .navigationViewStyle(.stack)
+        NavigationStack {
+            listBody
         }
     }
     
     private var listBody: some View {
-        List {
-            ForEach(vm.sections) { (section) in
-                Section {
-                    ForEach(section.events) { (event) in
-                        Button {
-                            self.event = event
-                        } label: {
-                            HStack {
-                                Circle()
-                                    .fill(Color(uiColor: event.backgroundColor))
-                                    .frame(width: 30, height: 30)
-                                Text(event.title.list ?? "")
-                                    .padding([.top, .bottom, .trailing], 10)
-                                Spacer()
-                            }
+        List(vm.sections) { (section) in
+            Section {
+                ForEach(section.events) { (event) in
+                    Button {
+                        self.event = event
+                    } label: {
+                        HStack {
+                            Circle()
+                                .fill(Color(uiColor: event.backgroundColor))
+                                .frame(width: 30, height: 30)
+                            Text(event.title.list ?? "")
+                                .padding([.top, .bottom, .trailing], 10)
+                            Spacer()
                         }
                     }
-                } header: {
-                    Button {
-                        date = section.date
-                    } label: {
-                        Text(vm.titleOfHeader(date: section.date, formatter: style.list.headerDateFormatter, locale: style.locale))
-                    }
-                    .foregroundColor(.black)
-                    .padding(5)
                 }
+            } header: {
+                Button {
+                    date = section.date
+                } label: {
+                    Text(vm.titleOfHeader(date: section.date, formatter: style.list.headerDateFormatter, locale: style.locale))
+                }
+                .foregroundColor(.black)
+                .padding(5)
             }
         }
-        .listStyle(PlainListStyle())
+        .listStyle(.plain)
     }
     
 }
 
-@available(iOS 15.0, *)
-struct ListNewView_Preview: PreviewProvider {
-    
-    static var previews: some View {
-        let style = Style()
-        return Group {
-            ListNewView(params: ListView.Parameters(style: style, data: ListViewData(data: CalendarData(date: Date(), years: 4, style: style), style: style)), date: .constant(Date()), event: .constant(nil), events: .constant([.stub(id: "1"), .stub(id: "2"), .stub(id: "3")]))
-            ListNewView(params: ListView.Parameters(style: style, data: ListViewData(date: Date(), sections: [ListViewData.SectionListView(date: Date(), events: [Event.stub()])])), date: .constant(Date()), event: .constant(nil), events: .constant([]))
-        }
-    }
-    
+@available(iOS 17.0, *)
+#Preview {
+    let style = Style()
+    return ListNewView(params: ListView.Parameters(data: ListViewData(data: CalendarData(date: Date(), years: 4, style: style))), date: .constant(Date()), event: .constant(nil), events: .constant([.stub(id: "1"), .stub(id: "2"), .stub(id: "3")]))
+}
+
+@available(iOS 17.0, *)
+#Preview {
+    let style = Style()
+    return ListNewView(params: ListView.Parameters(data: ListViewData(date: Date(), sections: [ListViewData.SectionListView(date: Date(), events: [Event.stub()])])), date: .constant(Date()), event: .constant(nil), events: .constant([]))
 }
 
 open class ListView: UIView, CalendarSettingProtocol {
     
     public struct Parameters {
-        var style: Style
         let data: ListViewData
         
-        public init(style: Style, data: ListViewData) {
-            self.style = style
+        public init(data: ListViewData) {
             self.data = data
         }
     }
@@ -117,10 +99,10 @@ open class ListView: UIView, CalendarSettingProtocol {
     
     var style: Style {
         get {
-            params.style
+            params.data.style
         }
         set {
-            params.style = newValue
+            params.data.style = newValue
         }
     }
     
@@ -138,7 +120,7 @@ open class ListView: UIView, CalendarSettingProtocol {
     }()
     
     private var listStyle: ListViewStyle {
-        params.style.list
+        style.list
     }
     
     public init(parameters: Parameters, frame: CGRect? = nil) {
@@ -244,8 +226,8 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
         } else {
             return tableView.kvkDequeueView { (view: ListViewHeader) in
                 view.title = params.data.titleOfHeader(section: section,
-                                                       formatter: params.style.list.headerDateFormatter,
-                                                       locale: params.style.locale)
+                                                       formatter: listStyle.headerDateFormatter,
+                                                       locale: style.locale)
                 view.didTap = { [weak self] in
                     self?.delegate?.didSelectDates([date], type: .list, frame: view.frame)
                 }
@@ -274,7 +256,7 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
         let date = params.data.sections[section].date
         if let height = delegate?.sizeForHeader(date, type: .list)?.height {
             return height
-        } else if let height = params.style.list.heightHeaderView {
+        } else if let height = listStyle.heightHeaderView {
             return height
         } else {
             return UITableView.automaticDimension

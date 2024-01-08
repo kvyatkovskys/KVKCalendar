@@ -7,7 +7,6 @@
 
 #if os(iOS)
 
-import Foundation
 import SwiftUI
 
 final class YearData: ObservableObject {
@@ -51,7 +50,7 @@ final class YearData: ObservableObject {
     }
     
     func handleSelectedDate(_ date: Date) {
-        var components = DateComponents(year: date.kvkYear, month: date.kvkMonth, day: self.date.kvkDay)
+        let components = DateComponents(year: date.kvkYear, month: date.kvkMonth, day: self.date.kvkDay)
         let dt = style.calendar.date(from: components)
         self.date = dt ?? date
     }

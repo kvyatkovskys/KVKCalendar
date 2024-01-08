@@ -8,9 +8,8 @@
 #if os(iOS)
 
 import SwiftUI
-import UIKit
 
-@available(iOS 16.0, *)
+@available(iOS 17.0, *)
 struct EventNewView: View {
     
     var isSelected: Bool
@@ -35,13 +34,12 @@ struct EventNewView: View {
                         .fill(Color(uiColor: event.color?.value ?? .blue))
                         .frame(minWidth: 3, maxWidth: 3, maxHeight: .infinity)
                     if proxy.frame(in: .local).height >= 10 {
-                        VStack {
-                            Text(event.title.timeline)
-                                .multilineTextAlignment(.leading)
-                                .minimumScaleFactor(0.2)
-                            Spacer()
-                        }
-                        .tint(tintColor)
+                        Text(event.title.timeline)
+                            .foregroundStyle(tintColor)
+                            .multilineTextAlignment(.leading)
+                            .minimumScaleFactor(0.2)
+                            .frame(maxHeight: .infinity, alignment: .topLeading)
+                            .padding([.vertical, .trailing], 2)
                     }
                     Spacer()
                 }
@@ -50,18 +48,13 @@ struct EventNewView: View {
             }
         }
     }
-    
 }
 
-@available(iOS 16.0, *)
-struct EventNewView_Previews: PreviewProvider {
-    
-    static var previews: some View {
-        EventNewView(isSelected: false, event: .stub(), style: Style())
-            .padding()
-            .frame(height: 45)
-    }
-    
+@available(iOS 17.0, *)
+#Preview {
+    EventNewView(isSelected: false, event: .stub(), style: Style())
+        .padding()
+        .frame(height: 100)
 }
 
 final class EventView: EventViewGeneral {

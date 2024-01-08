@@ -15,9 +15,6 @@ final class MonthData: ObservableObject, EventDateProtocol {
     
     struct Parameters {
         let data: CalendarData
-        let startDay: StartDayType
-        let calendar: Calendar
-        let style: Style
     }
     
     var selectedSection: Int = -1
@@ -25,6 +22,7 @@ final class MonthData: ObservableObject, EventDateProtocol {
     @Published var data: CalendarData
     @Published var selectedEvent: Event?
     var daysCount: Int = 0
+    var style: KVKCalendar.Style
     
     let tagEventPagePreview = -20
     let eventPreviewYOffset: CGFloat = 30
@@ -43,18 +41,19 @@ final class MonthData: ObservableObject, EventDateProtocol {
     private let showRecurringEventInPast: Bool
     
     init(parameters: Parameters) {
-        self.date = parameters.data.date
-        self.data = parameters.data
-        self.calendar = parameters.calendar
-        self.scrollDirection = parameters.style.month.scrollDirection
-        self.showRecurringEventInPast = parameters.style.event.showRecurringEventInPast
+        date = parameters.data.date
+        data = parameters.data
+        calendar = parameters.data.style.calendar
+        scrollDirection = parameters.data.style.month.scrollDirection
+        showRecurringEventInPast = parameters.data.style.event.showRecurringEventInPast
+        style = parameters.data.style
         
         let months = parameters.data.months.reduce([], { (acc, month) -> [Month] in
-            var daysTemp = parameters.data.addStartEmptyDays(month.days, startDay: parameters.startDay)
+            var daysTemp = parameters.data.addStartEmptyDays(month.days, startDay: parameters.data.style.startWeekDay)
             
             let boxCount: Int
             switch month.weeks {
-            case 5 where parameters.style.month.scrollDirection == .vertical:
+            case 5 where parameters.data.style.month.scrollDirection == .vertical:
                 boxCount = parameters.data.minBoxCount
             default:
                 boxCount = parameters.data.maxBoxCount

@@ -9,35 +9,35 @@
 import SwiftUI
 import KVKCalendar
 
-final class CalendarViewModel: ObservableObject, KVKCalendarSettings, KVKCalendarDataModel {
+@available(iOS 17.0, *)
+@Observable final class CalendarViewModel: KVKCalendarSettings, KVKCalendarDataModel {
     
-    @Published var type = CalendarType.week
-    @Published var orientation: UIInterfaceOrientation = .unknown
-    @Published var events: [Event] = []
-    @Published var date = Date()
+    var type = CalendarType.week
+    var orientation: UIInterfaceOrientation = .unknown
+    var events: [Event] = []
+    var date = Date()
+    var selectedEvent: KVKCalendar.Event?
     
     var style: Style {
         createCalendarStyle()
     }
     
     init() {
-        _date = Published(initialValue: defaultDate)
+        date = defaultDate
     }
     
-    func loadEvents() {
-        Task {
-            try await Task.sleep(nanoseconds: 300_000_000)
-            
-            await MainActor.run {
-                loadEvents(dateFormat: style.timeSystem.format) { [weak self] (result) in
-                    self?.events = result
-                }
-            }
+    func loadEvents() async {
+        try? await Task.sleep(nanoseconds: 300_000_000)
+        let result = await loadEvents(dateFormat: style.timeSystem.format)
+        await MainActor.run {
+            events = result
         }
     }
     
     func addNewEvent() {
-        guard let newEvent = handleNewEvent(Event(ID: "\(events.count + 1)"), date: date) else { return }
+        var components = DateComponents(year: date.kvkYear, month: date.kvkMonth, day: date.kvkDay)
+        components.minute = date.kvkMinute + 30
+        guard let newEvent = handleNewEvent(Event(ID: "\(events.count + 1)"), date: components.date ?? date) else { return }
         events.append(newEvent)
     }
     

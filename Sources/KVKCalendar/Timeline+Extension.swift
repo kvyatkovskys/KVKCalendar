@@ -7,7 +7,6 @@
 
 #if os(iOS)
 
-import UIKit
 import SwiftUI
 
 extension TimelineView {
@@ -273,7 +272,7 @@ extension TimelineView {
         eventView.deselectEvent()
     }
     
-    @available(iOS 16.0, *)
+    @available(iOS 17.0, *)
     func reloadTimeline(params: TimelineViewWrapper.Parameters) {
         setup(dates: params.dates,
               events: params.events,
@@ -475,7 +474,7 @@ extension TimelineView {
     }
     
     func createAndAddVerticalLine(maxDates: Int,
-                                  date: Date,
+                                  date: Date?,
                                   index: Int,
                                   topLine: UIView?,
                                   bottomLine: UIView?) -> (VerticalLineView, CGFloat) {
@@ -520,9 +519,8 @@ extension TimelineView {
         return line
     }
     
-    @available(iOS 16.0, *)
-    func createAndAddColumn(date: Date,
-                            crossEvents: [TimeInterval: CrossEvent],
+    @available(iOS 17.0, *)
+    func createAndAddColumn(crossEvents: [TimeInterval: CrossEvent],
                             eventsAndRects: [TimelineColumnView.Container],
                             selectedEvent: Binding<Event?>,
                             maxIndex: Int,

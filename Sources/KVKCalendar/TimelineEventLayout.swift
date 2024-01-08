@@ -72,20 +72,20 @@ public extension TimelineEventLayoutContext {
         return newFrame
     }
     
-    func getEventRectNew(start: Date, end: Date, date: Date, style eventStyle: EventStyle?) -> CGRect {
+    func getEventRectNew(start: Date, end: Date, date: Date?, style eventStyle: EventStyle?) -> CGRect {
         var newFrame = pageFrame
         let midnight = 24
         guard let startTime = getTimelineLabel(start.kvkHour),
               let endTime = getTimelineLabel(end.kvkHour) else { return .zero }
         
         // calculate position 'y' event
-        if start.kvkDay == date.kvkDay {
+        if start.kvkDay == date?.kvkDay {
             if startTime.tag == midnight, let newTime = timeLabels.first {
                 newFrame.origin.y = calculatePointYByMinute(start.kvkMinute, newTime)
             } else {
                 newFrame.origin.y = calculatePointYByMinute(start.kvkMinute, startTime)
             }
-        } else if let firstTimeLabel = getTimelineLabel(startHour), start.kvkDay != date.kvkDay {
+        } else if let firstTimeLabel = getTimelineLabel(startHour), start.kvkDay != date?.kvkDay {
             newFrame.origin.y = calculatePointYByMinute(startHour, firstTimeLabel)
         }
         
@@ -94,7 +94,7 @@ public extension TimelineEventLayoutContext {
 //        if let defaultHeight = eventStyle?.defaultHeight {
 //            newFrame.size.height = defaultHeight
 //        } else
-        if end.kvkDay == date.kvkDay {
+        if end.kvkDay == date?.kvkDay {
             // to avoid crash https://github.com/kvyatkovskys/KVKCalendar/issues/237
             if start.kvkDay == end.kvkDay && start.kvkHour == end.kvkHour && start.kvkMinute == end.kvkMinute {
                 newFrame.size.height = 30
@@ -103,7 +103,7 @@ public extension TimelineEventLayoutContext {
             
             let newHeight = calculatePointYByMinute(end.kvkMinute, endTime) - newFrame.origin.y
             newFrame.size.height = newHeight - style.timeline.offsetEvent
-        } else if end.kvkDay != date.kvkDay {
+        } else if end.kvkDay != date?.kvkDay {
             newFrame.size.height = getTimelineLabel(24)?.yTime ?? pageFrame.height
         }
         

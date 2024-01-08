@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-@available(iOS 16.0, *)
+@available(iOS 17.0, *)
 struct TimelineColumnView: View, TimelineEventLayoutProtocol {
     
     struct Container: Identifiable {
@@ -21,7 +21,7 @@ struct TimelineColumnView: View, TimelineEventLayoutProtocol {
     
     @Binding var selectedEvent: Event?
     var items: [TimelineColumnView.Container]
-    var crossEvents: [TimeInterval: CrossEvent]
+    var crossEvents: [TimeInterval: CrossEvent] = [:]
     var style: Style
         
     init(selectedEvent: Binding<Event?>,
@@ -30,11 +30,12 @@ struct TimelineColumnView: View, TimelineEventLayoutProtocol {
          style: Style) {
         _selectedEvent = selectedEvent
         self.items = items
-        self.crossEvents = crossEvents
         self.style = style
         
         if crossEvents.isEmpty {
             self.crossEvents = calculateCrossEvents(forEvents: items.compactMap { $0.event })
+        } else {
+            self.crossEvents = crossEvents
         }
     }
 
@@ -69,28 +70,24 @@ struct TimelineColumnView: View, TimelineEventLayoutProtocol {
     
 }
 
-@available(iOS 16.0, *)
-struct TimelineColumnView_Previews: PreviewProvider {
+@available(iOS 17.0, *)
+#Preview {
+    let items: [TimelineColumnView.Container] = [
+        TimelineColumnView.Container(event: .stub(id: "1", duration: 50), rect: CGRect(x: 0, y: 100, width: 0, height: 350)),
+        TimelineColumnView.Container(event: .stub(id: "2", duration: 5), rect: CGRect(x: 0, y: 100, width: 0, height: 10)),
+        TimelineColumnView.Container(event: .stub(id: "6", startFrom: 20, duration: 30), rect: CGRect(x: 0, y: 120, width: 0, height: 100)),
+        TimelineColumnView.Container(event: .stub(id: "7", startFrom: 20, duration: 30), rect: CGRect(x: 0, y: 120, width: 0, height: 100)),
+        TimelineColumnView.Container(event: .stub(id: "8", startFrom: 20, duration: 30), rect: CGRect(x: 0, y: 120, width: 0, height: 100)),
+        TimelineColumnView.Container(event: .stub(id: "3", startFrom: 30, duration: 55), rect: CGRect(x: 0, y: 270, width: 0, height: 400)),
+        TimelineColumnView.Container(event: .stub(id: "4", startFrom: 80, duration: 30), rect: CGRect(x: 0, y: 500, width: 0, height: 100)),
+        TimelineColumnView.Container(event: .stub(id: "5", startFrom: 80, duration: 30), rect: CGRect(x: 0, y: 500, width: 0, height: 100))
+    ]
+    @State var event: Event? = items.last?.event
     
-    static var previews: some View {
-        let items: [TimelineColumnView.Container] = [
-            TimelineColumnView.Container(event: .stub(id: "1", duration: 50), rect: CGRect(x: 0, y: 100, width: 0, height: 350)),
-            TimelineColumnView.Container(event: .stub(id: "2", duration: 5), rect: CGRect(x: 0, y: 100, width: 0, height: 10)),
-            TimelineColumnView.Container(event: .stub(id: "6", startFrom: 20, duration: 30), rect: CGRect(x: 0, y: 120, width: 0, height: 100)),
-            TimelineColumnView.Container(event: .stub(id: "7", startFrom: 20, duration: 30), rect: CGRect(x: 0, y: 120, width: 0, height: 100)),
-            TimelineColumnView.Container(event: .stub(id: "8", startFrom: 20, duration: 30), rect: CGRect(x: 0, y: 120, width: 0, height: 100)),
-            TimelineColumnView.Container(event: .stub(id: "3", startFrom: 30, duration: 55), rect: CGRect(x: 0, y: 270, width: 0, height: 400)),
-            TimelineColumnView.Container(event: .stub(id: "4", startFrom: 80, duration: 30), rect: CGRect(x: 0, y: 500, width: 0, height: 100)),
-            TimelineColumnView.Container(event: .stub(id: "5", startFrom: 80, duration: 30), rect: CGRect(x: 0, y: 500, width: 0, height: 100))
-        ]
-        return Group {
-            TimelineColumnView(selectedEvent: .constant(nil), items: items, crossEvents: [:], style: Style())
-            TimelineColumnView(selectedEvent: .constant(.stub(id: "1")), items: items, crossEvents: [:], style: Style())
-        }
-    }
+    return TimelineColumnView(selectedEvent: $event, items: items, crossEvents: [:], style: Style())
 }
 
-@available(iOS 16.0, *)
+@available(iOS 17.0, *)
 struct EventStack: Layout {
     
     var items: [TimelineColumnView.Container]

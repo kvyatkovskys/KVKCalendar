@@ -8,58 +8,78 @@
 #if os(iOS)
 
 import SwiftUI
-import UIKit
 import EventKit
 
-@available(iOS 16.0, *)
+@available(iOS 17.0, *)
 public struct KVKCalendarSwiftUIView: View {
+
+    private var type: CalendarType
+    @State private var vm: KVKCalendarViewModel
     
-    @Binding private var type: CalendarType
-    @Binding private var date: Date
-    @Binding private var selectedEvent: Event?
-    @ObservedObject private var vm: KVKCalendarViewModel
-    
-    public init(type: Binding<CalendarType>,
-                date: Binding<Date>,
+    public init(type: CalendarType,
+                date: Date,
                 events: [Event],
-                selectedEvent: Binding<Event?> = .constant(nil),
-                style: KVKCalendar.Style) {
-        _type = type
-        _date = date
-        _selectedEvent = selectedEvent
-        vm = KVKCalendarViewModel(date: date.wrappedValue, events: events, style: style, type: type.wrappedValue)
+                selectedEvent: Event? = nil,
+                style: KVKCalendar.Style = KVKCalendar.Style()) {
+        self.type = type
+        _vm = State(initialValue: KVKCalendarViewModel(date: date, events: events, selectedEvent: selectedEvent, style: style))
     }
     
     public var body: some View {
-        bodyView
-    }
-    
-    @ViewBuilder
-    private var bodyView: some View {
-        switch vm.type {
+        switch type {
         case .day:
-            WeekNewView(vm: vm.dayData)
+            if let item = vm.weekData {
+                WeekNewView(vm: item)
+            } else {
+                EmptyView()
+            }
         case .week:
-            WeekNewView(vm: vm.weekData)
+            if let item = vm.weekData {
+                WeekNewView(vm: item)
+            } else {
+                EmptyView()
+            }
         case .month:
-            MonthNewView(vm: MonthData(parameters: MonthData.Parameters(data: vm.data, startDay: vm.data.style.startWeekDay, calendar: vm.data.style.calendar, style: vm.data.style)), style: vm.data.style)
+            EmptyView() // MonthNewView(vm: vm.monthData)
         case .year:
-            YearNewView(data: vm.data, style: vm.data.style)
+            EmptyView() // YearNewView(data: vm.data)
         case .list:
-            ListNewView(params: ListView.Parameters(style: vm.data.style, data: ListViewData(data: vm.data, style: vm.data.style)), date: $date, event: $selectedEvent, events: .constant([]))
+            EmptyView() // ListNewView(params: vm.listData, date: $vm.date, event: $vm.selectedEvent, events: .constant([]))
         }
     }
 }
 
-@available(iOS 16.0, *)
-struct KVKCalendarSwiftUIView_Previews: PreviewProvider {
+@available(iOS 17.0, *)
+private struct PreviewProxy: View {
+    @State var type = CalendarType.week
+    @State var date = Date()
     
-    @State static var date = Date()
-    
-    static var previews: some View {
-        KVKCalendarSwiftUIView(type: .constant(.week), date: Binding(get: { date }, set: { date = $0 }), events: [], style: KVKCalendar.Style())
+    var body: some View {
+        NavigationStack {
+            KVKCalendarSwiftUIView(type: type, date: date, events: [])
+                .navigationTitle(date.description)
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Picker(type.title, selection: $type) {
+                            ForEach(CalendarType.allCases) { (type) in
+                                Text(type.title)
+                            }
+                        }
+                    }
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Today") {
+                            date = .now
+                        }
+                    }
+                }
+        }
     }
-    
+}
+
+@available(iOS 17.0, *)
+#Preview {
+    PreviewProxy()
 }
 
 @available(swift, deprecated: 0.6.11, obsoleted: 0.6.12, renamed: "KVKCalendarView")
@@ -114,10 +134,7 @@ public final class KVKCalendarView: UIView {
         self.weekView = WeekView(parameters: .init(data: weekData, style: adaptiveStyle), frame: frame)
         
         // month view
-        self.monthData = MonthData(parameters: .init(data: calendarData,
-                                                     startDay: adaptiveStyle.startWeekDay,
-                                                     calendar: adaptiveStyle.calendar,
-                                                     style: adaptiveStyle))
+        self.monthData = MonthData(parameters: .init(data: calendarData))
         self.monthView = MonthView(parameters: .init(monthData: monthData, style: adaptiveStyle), frame: frame)
         
         // year view
@@ -125,8 +142,8 @@ public final class KVKCalendarView: UIView {
         self.yearView = YearView(data: yearData, frame: frame)
         
         // list view
-        self.listData = ListViewData(data: calendarData, style: adaptiveStyle)
-        let params = ListView.Parameters(style: adaptiveStyle, data: listData)
+        self.listData = ListViewData(data: calendarData)
+        let params = ListView.Parameters(data: listData)
         self.listView = ListView(parameters: params, frame: frame)
         
         super.init(frame: frame)

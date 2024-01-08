@@ -7,10 +7,9 @@
 
 #if os(iOS)
 
-import UIKit
 import SwiftUI
 
-@available(iOS 15.0, *)
+@available(iOS 17.0, *)
 struct AllDayEventNewView: View {
     
     let event: Event
@@ -22,7 +21,7 @@ struct AllDayEventNewView: View {
                 .foregroundColor(Color(uiColor: event.textColor))
                 .font(Font(style.fontTitle))
                 .padding(5)
-            Spacer()
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
         .background(Color(uiColor: event.backgroundColor))
         .cornerRadius(style.eventCornersRadius.width)
@@ -31,12 +30,10 @@ struct AllDayEventNewView: View {
     
 }
 
-@available(iOS 15.0, *)
-struct AllDayEventNewView_Preview: PreviewProvider {
-    static var previews: some View {
-        AllDayEventNewView(event: Event.stub(),
-                           style: AllDayStyle())
-    }
+@available(iOS 17.0, *)
+#Preview {
+    AllDayEventNewView(event: Event.stub(), style: AllDayStyle())
+        .padding()
 }
 
 final class AllDayEventView: UIView {

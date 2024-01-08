@@ -10,11 +10,11 @@
 import UIKit
 
 final class VerticalLineView: UIView {
-    private let date: Date
+    private let date: Date?
     private let color: UIColor
     private let width: CGFloat
     
-    init(date: Date, color: UIColor, width: CGFloat, frame: CGRect = .zero) {
+    init(date: Date?, color: UIColor, width: CGFloat, frame: CGRect = .zero) {
         self.date = date
         self.color = color
         self.width = width

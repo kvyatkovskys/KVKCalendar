@@ -8,21 +8,20 @@
 #if os(iOS)
 
 import SwiftUI
-import UIKit
 
-@available(iOS 16.0, *)
+@available(iOS 17.0, *)
 struct WeekNewView: View {
     
-    @ObservedObject var vm: WeekData
+    @State private var vm: WeekNewData
     
-    private var timelineParams: TimelineViewWrapper.Parameters {
-        TimelineViewWrapper.Parameters(style: vm.style, dates: vm.timelineDays, selectedDate: vm.date, events: vm.events, recurringEvents: vm.recurringEvents, selectedEvent: $vm.selectedEvent)
+    init(vm: WeekNewData) {
+        _vm = State(initialValue: vm)
     }
     
     var body: some View {
         VStack(spacing: 0) {
             ScrollableWeekNewView(vm: vm)
-            TimelineNewView(vm: timelineParams, didSwitchDate: { (dt) in
+            TimelineNewView(vm: TimelineViewWrapper.Parameters(style: vm.style, dates: vm.timelineDays, selectedDate: vm.date, events: vm.events, recurringEvents: vm.recurringEvents, selectedEvent: $vm.selectedEvent), didSwitchDate: { (dt) in
                 vm.date = dt
             })
         }
@@ -30,33 +29,42 @@ struct WeekNewView: View {
     
 }
 
-@available(iOS 16.0, *)
-struct WeekNewView_Previews: PreviewProvider {
-    
-    static var previews: some View {
-        var style = Style()
-        style.startWeekDay = .monday
-        let commonData = CalendarData(date: Date(), years: 1, style: style)
-        let events: [Event] = [
-            .stub(id: "1", startFrom: -100, duration: 50),
-            .stub(id: "2", startFrom: -120, duration: 20),
-            .stub(id: "3", startFrom: 30, duration: 55),
-            .stub(id: "4", startFrom: 85, duration: 30),
-            .stub(id: "5", startFrom: 85, duration: 30)
-        ]
-        let vmWeek = WeekData(data: commonData, selectedEvent: .constant(nil))
-        vmWeek.events = events
-        vmWeek.allDayEvents = [.allDayStub(id: "-2")]
-        let vmDay = WeekData(data: commonData, type: .day, selectedEvent: .constant(nil))
-        vmDay.events = events
-        vmDay.allDayEvents = [.allDayStub(id: "-2")]
-        return Group {
-            WeekNewView(vm: vmDay)
-                .previewDisplayName("Day new View")
-            WeekNewView(vm: vmWeek)
-        }
-    }
-    
+@available(iOS 17.0, *)
+#Preview {
+    var style = Style()
+    style.startWeekDay = .monday
+    let commonData = CalendarData(date: Date(), years: 1, style: style)
+    let events: [Event] = [
+        .stub(id: "1", startFrom: -100, duration: 50),
+        .stub(id: "2", startFrom: -120, duration: 20),
+        .stub(id: "3", startFrom: 30, duration: 55),
+        .stub(id: "4", startFrom: 85, duration: 30),
+        .stub(id: "5", startFrom: 85, duration: 30)
+    ]
+    let vmDay = WeekNewData(data: commonData, type: .day)
+    vmDay.events = events
+    vmDay.allDayEvents = [.allDayStub(id: "-2")]
+    return WeekNewView(vm: vmDay)
+        .previewDisplayName("Day new View")
+}
+
+@available(iOS 17.0, *)
+#Preview {
+    var style = Style()
+    style.startWeekDay = .monday
+    let commonData = CalendarData(date: Date(), years: 1, style: style)
+    let events: [Event] = [
+        .stub(id: "1", startFrom: -100, duration: 50),
+        .stub(id: "2", startFrom: -120, duration: 20),
+        .stub(id: "3", startFrom: 30, duration: 55),
+        .stub(id: "4", startFrom: 85, duration: 30),
+        .stub(id: "5", startFrom: 85, duration: 30)
+    ]
+    let vmWeek = WeekNewData(data: commonData)
+    vmWeek.events = events
+    vmWeek.allDayEvents = [.allDayStub(id: "-2")]
+    return WeekNewView(vm: vmWeek)
+        .previewDisplayName("Week new View")
 }
 
 final class WeekView: UIView {
@@ -330,7 +338,7 @@ extension WeekView: CalendarSettingProtocol {
         }
         let view = ScrollableWeekView(parameters: .init(frame: CGRect(x: 0, y: 0,
                                                                        width: frame.width, height: heightView),
-                                                         weeks: parameters.data.daysBySection,
+                                                        weeks: parameters.data.weeks,
                                                          date: parameters.data.date,
                                                          type: .week,
                                                          style: style))

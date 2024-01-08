@@ -7,7 +7,6 @@
 
 #if os(iOS)
 
-import Foundation
 import SwiftUI
 
 open class ListViewData: ObservableObject, EventDateProtocol {
@@ -30,19 +29,19 @@ open class ListViewData: ObservableObject, EventDateProtocol {
     var date: Date
     @Published var isSkeletonVisible = false
     
-    private let style: Style?
+    var style: Style
     private let lastDate: Date?
     
-    init(data: CalendarData, style: Style) {
+    init(data: CalendarData) {
         self.date = data.date
         self.lastDate = data.months.last?.days.filter { $0.type != .empty }.last?.date
-        self.style = style
+        self.style = data.style
     }
     
     public init(date: Date, sections: [SectionListView]) {
         self.date = date
         self.sections = sections
-        self.style = nil
+        self.style = KVKCalendar.Style()
         self.lastDate = nil
     }
     
@@ -62,8 +61,8 @@ open class ListViewData: ObservableObject, EventDateProtocol {
         sectionTmp = events.filter { $0.recurringType != .none }.reduce([], { (acc, event) -> [SectionListView] in
             var accTemp = acc
             
-            if let date = lastDate, let calendar = style?.calendar {
-                let recurringSections = addRecurringEvent(event, lastDate: date, calendar: calendar)
+            if let date = lastDate {
+                let recurringSections = addRecurringEvent(event, lastDate: date, calendar: style.calendar)
                 recurringSections.forEach { (recurringSection) in
                     if let idx = accTemp.firstIndex(where: { $0.date.kvkIsEqual(recurringSection.date) }) {
                         accTemp[idx].events += recurringSection.events
@@ -89,7 +88,7 @@ open class ListViewData: ObservableObject, EventDateProtocol {
                 }
                 
                 for i in 1...offset {
-                    if let newDate = style?.calendar.date(byAdding: .day, value: i, to: event.start) {
+                    if let newDate = style.calendar.date(byAdding: .day, value: i, to: event.start) {
                         var newEvent = event
                         newEvent.start = newDate
                         if let idx = accTemp.firstIndex(where: { compareStartDate($0.date, with: newEvent) }) {

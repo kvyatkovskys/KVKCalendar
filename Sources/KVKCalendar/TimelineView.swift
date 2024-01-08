@@ -7,10 +7,9 @@
 
 #if os(iOS)
 
-import UIKit
 import SwiftUI
 
-@available(iOS 16.0, *)
+@available(iOS 17.0, *)
 struct TimelineNewView: View {
     
     let vm: TimelineViewWrapper.Parameters
@@ -18,42 +17,39 @@ struct TimelineNewView: View {
     var willSwitchDate: ((Date) -> Void)?
     
     var body: some View {
-        VStack(spacing: 0) {
-            GeometryReader { (geometry) in
-                TimelineViewWrapper(params: vm,
-                                    frame: geometry.frame(in: .local),
-                                    didSwitchDate: didSwitchDate,
-                                    willSwitchDate: willSwitchDate)
-                .edgesIgnoringSafeArea(.bottom)
-            }
+        GeometryReader { (geometry) in
+            TimelineViewWrapper(params: vm,
+                                frame: geometry.frame(in: .local),
+                                didSwitchDate: didSwitchDate,
+                                willSwitchDate: willSwitchDate)
+            .edgesIgnoringSafeArea(.bottom)
         }
     }
 }
 
-@available(iOS 16.0, *)
-struct TimelineNewView_Previews: PreviewProvider {
-    static var previews: some View {
-        var style = Style()
-        style.timeline.offsetTimeY = 50
-        let events: [Event] = [
-            .stub(id: "1", startFrom: -50, duration: 50),
-            .stub(id: "2", startFrom: 60, duration: 30),
-            .stub(id: "3", startFrom: -30, duration: 55),
-            .stub(id: "4", startFrom: -80, duration: 30),
-            .stub(id: "5", startFrom: -80, duration: 30)
-        ]
-        return TimelineNewView(vm: TimelineViewWrapper.Parameters(style: style, dates: [Date(), Date(), Date()], selectedDate: Date(), events: events, recurringEvents: [], selectedEvent: .constant(nil)))
-    }
+@available(iOS 17.0, *)
+#Preview {
+    var style = Style()
+    style.timeline.offsetTimeY = 50
+    let events: [Event] = [
+        .stub(id: "1", startFrom: -50, duration: 50),
+        .stub(id: "2", startFrom: 60, duration: 30),
+        .stub(id: "3", startFrom: -30, duration: 55),
+        .stub(id: "4", startFrom: -80, duration: 30),
+        .stub(id: "5", startFrom: -80, duration: 30)
+    ]
+    @State var event: Event?
+    return TimelineNewView(vm: TimelineViewWrapper.Parameters(style: style, dates: [Date(), Date(), Date(), nil], selectedDate: Date(), events: events, recurringEvents: [], selectedEvent: $event))
 }
 
-@available(iOS 16.0, *)
+@available(iOS 17.0, *)
 struct TimelineViewWrapper: UIViewControllerRepresentable {
     
     typealias UIViewControllerType = TimelinePageVC
     
     struct Parameters {
         let style: Style
-        let dates: [Date]
+        let dates: [Date?]
         var selectedDate: Date
         let events: [Event]
         let recurringEvents: [Event]
@@ -66,8 +62,7 @@ struct TimelineViewWrapper: UIViewControllerRepresentable {
     var willSwitchDate: ((Date) -> Void)?
     
     func makeUIViewController(context: Context) -> TimelinePageVC {
-        let page = setupTimelinePageView()
-        return page
+        setupTimelinePageView()
     }
     
     func updateUIViewController(_ uiViewController: TimelinePageVC, context: Context) {
@@ -172,6 +167,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     private(set) var events = [Event]()
     private(set) var recurringEvents = [Event]()
     private(set) var dates = [Date]()
+    private(set) var newDates = [Date?]()
     private(set) var selectedDate: Date
     private(set) var eventLayout: TimelineEventLayout
     
@@ -437,8 +433,8 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         return false
     }
     
-    @available(iOS 16.0, *)
-    func setup(dates: [Date],
+    @available(iOS 17.0, *)
+    func setup(dates: [Date?],
                events: [Event],
                recurringEvents: [Event],
                selectedDate: Date,
@@ -446,7 +442,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         isResizableEventEnable = false
         
         // save parameters
-        self.dates = dates
+        self.newDates = dates
         self.events = events
         self.recurringEvents = recurringEvents
         self.selectedDate = selectedDate
@@ -499,8 +495,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                     return acc + [TimelineColumnView.Container(event: event, rect: rectEvent)]
                 }
                 let crossEvents = context.calculateCrossEvents(forEvents: sortedEventsByDate)
-                createAndAddColumn(date: date,
-                                   crossEvents: crossEvents,
+                createAndAddColumn(crossEvents: crossEvents,
                                    eventsAndRects: eventsAndRects,
                                    selectedEvent: selectedEvent,
                                    maxIndex: dates.count - 1,
@@ -741,9 +736,9 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     
     private func prepareRecurringEvents(_ events: [Event],
                                         eventsByDate: [Event],
-                                        date: Date) -> [Event] {
+                                        date: Date?) -> [Event] {
         let recurringEventsByDate: [Event]
-        if !events.isEmpty {
+        if !events.isEmpty, let date {
             recurringEventsByDate = recurringEvents.reduce([], { (acc, event) -> [Event] in
                 // TODO: need fix
                 // there's still a problem with the second recurring event when an event is created for severel dates

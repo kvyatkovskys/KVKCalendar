@@ -82,21 +82,17 @@ final class DayPhoneNewCell: DayCell {
         let leftDate = dateLabel.leftAnchor.constraint(equalTo: dotView.leftAnchor)
         let rightDate = dateLabel.rightAnchor.constraint(equalTo: dotView.rightAnchor)
         NSLayoutConstraint.activate([topDate, bottomDate, leftDate, rightDate])
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
         
         if let radius = style.headerScroll.dotCornersRadius {
             dotView.setRoundCorners(style.headerScroll.dotCorners, radius: radius)
         } else {
-            let value = dotView.frame.width / 2
+            let value = 35 / 2
             dotView.setRoundCorners(style.headerScroll.dotCorners, radius: CGSize(width: value, height: value))
         }
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
 

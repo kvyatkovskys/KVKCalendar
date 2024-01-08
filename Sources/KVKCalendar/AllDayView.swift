@@ -7,10 +7,9 @@
 
 #if os(iOS)
 
-import UIKit
 import SwiftUI
 
-@available(iOS 15.0, *)
+@available(iOS 17.0, *)
 struct AllDayNewView: View {
     
     struct Parameters {
@@ -25,8 +24,8 @@ struct AllDayNewView: View {
     }
     
     private var columns: [GridItem] = [
-        GridItem(.flexible()),
-        GridItem(.flexible())
+        GridItem(.flexible(), spacing: 5),
+        GridItem(.flexible(), spacing: 5)
     ]
     
     private let parameters: Parameters
@@ -43,9 +42,8 @@ struct AllDayNewView: View {
                 .multilineTextAlignment(.leading)
                 .minimumScaleFactor(0.5)
                 .frame(maxWidth: style.timeline.widthTime, maxHeight: 20)
-                .padding(.trailing, 2)
             ScrollView {
-                LazyVGrid(columns: columns) {
+                LazyVGrid(columns: columns, spacing: 5) {
                     ForEach(parameters.events) { (event) in
                         Button {
                             self.event = event
@@ -53,13 +51,11 @@ struct AllDayNewView: View {
                             AllDayEventNewView(event: event,
                                                style: style.allDay)
                         }
-
                     }
                 }
             }
-            .padding([.top, .bottom, .trailing], 5)
+            .padding(5)
             .frame(maxWidth: .infinity)
-            Spacer()
         }
         .frame(minHeight: style.allDay.height, maxHeight: style.allDay.maxHeight)
         .background(Color(uiColor: style.allDay.backgroundColor))
@@ -67,11 +63,9 @@ struct AllDayNewView: View {
     
 }
 
-@available(iOS 15.0, *)
-struct AllDayNewView_Preview: PreviewProvider {
-    static var previews: some View {
-        AllDayNewView(parameters: AllDayNewView.Parameters(events: [Event.stub(id: "1"), Event.stub(id: "2"), Event.stub(id: "3"), Event.stub(id: "4"), Event.stub(id: "5")], type: .day, style: Style()), event: .constant(nil))
-    }
+@available(iOS 17.0, *)
+#Preview {
+    AllDayNewView(parameters: AllDayNewView.Parameters(events: [Event.stub(id: "1"), Event.stub(id: "2"), Event.stub(id: "3"), Event.stub(id: "4"), Event.stub(id: "5")], type: .day, style: Style()), event: .constant(nil))
 }
 
 final class AllDayView: UIView {

@@ -9,50 +9,50 @@
 import SwiftUI
 import KVKCalendar
 
-@available(iOS 16.0, *)
+@available(iOS 17.0, *)
 struct CalendarView: View {
 
-    @ObservedObject private var vm = CalendarViewModel()
+    @State private var vm = CalendarViewModel()
     
     var body: some View {
         NavigationStack {
             calendarView
                 .task {
-                    vm.loadEvents()
+                    await vm.loadEvents()
                 }
         }
     }
     
     private var calendarView: some View {
-        KVKCalendarSwiftUIView(type: $vm.type,
-                               date: $vm.date,
+        KVKCalendarSwiftUIView(type: vm.type,
+                               date: vm.date,
                                events: vm.events,
+                               selectedEvent: vm.selectedEvent,
                                style: vm.style)
             .kvkOnRotate(action: { (newOrientation) in
                 vm.orientation = newOrientation
             })
-            .navigationBarTitle(vm.date.formatted(), displayMode: .inline)
+            .navigationBarTitle(vm.date.formatted(date: .abbreviated, time: .omitted), displayMode: .inline)
             .toolbar {
-                ToolbarItemGroup(placement: .navigationBarLeading) {
-                    HStack(spacing: 0) {
-                        Picker(vm.type.title, selection: $vm.type) {
-                            ForEach(CalendarType.allCases) { (type) in
-                                Text(type.title)
-                            }
-                        }
-                        .tint(.red)
-                        if UIDevice.current.userInterfaceIdiom == .phone {
-                            Button {
-                                vm.date = Date()
-                            } label: {
-                                Text("Today")
-                                    .font(.headline)
-                            }
-                            .tint(.red)
+                ToolbarItemGroup(placement: .topBarLeading) {
+                    Picker(vm.type.title, selection: $vm.type) {
+                        ForEach(CalendarType.allCases) { (type) in
+                            Text(type.title)
                         }
                     }
+                    .pickerStyle(.menu)
+                    .tint(.red)
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    if UIDevice.current.userInterfaceIdiom == .phone {
+                        Button {
+                            vm.date = Date()
+                        } label: {
+                            Text("Today")
+                                .font(.headline)
+                        }
+                        .tint(.red)
+                    }
                     Button {
                         vm.addNewEvent()
                     } label: {
@@ -65,9 +65,7 @@ struct CalendarView: View {
     
 }
 
-@available(iOS 16.0, *)
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        CalendarView()
-    }
+@available(iOS 17.0, *)
+#Preview {
+    CalendarView()
 }
