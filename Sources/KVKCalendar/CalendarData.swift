@@ -13,7 +13,7 @@ struct CalendarData {
     let style: Style
     let maxBoxCount = 42
     let minBoxCount = 35
-    let date: Date
+    var date: Date
     var months = [Month]()
     var yearsCount = [Int]()
     

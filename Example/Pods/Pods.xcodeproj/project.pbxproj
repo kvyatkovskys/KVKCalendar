@@ -65,6 +65,8 @@
 		F902B98C26A4AAC30004EB05 /* DividerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F902B98B26A4AAC20004EB05 /* DividerView.swift */; };
 		F921AE5E2656EAFD007669C6 /* AllDayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F921AE5D2656EAFD007669C6 /* AllDayView.swift */; };
 		F9230C3E26586394000DD757 /* AllDayEventView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9230C3D26586394000DD757 /* AllDayEventView.swift */; };
+		F924F0D32B542A0800003620 /* ScrollableWeekVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = F924F0D22B542A0800003620 /* ScrollableWeekVM.swift */; };
+		F924F0D52B546C3600003620 /* TimelineNewPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F924F0D42B546C3600003620 /* TimelineNewPageView.swift */; };
 		F9258BCA28037DED00750B5C /* ScrollableWeekHeaderTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9258BC928037DED00750B5C /* ScrollableWeekHeaderTitleView.swift */; };
 		F92966B427773E0B00A0617F /* MonthHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F92966B327773E0B00A0617F /* MonthHeaderView.swift */; };
 		F9535B33272DE8CC008AAC56 /* KVKTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9535B32272DE8CC008AAC56 /* KVKTableViewCell.swift */; };
@@ -175,6 +177,8 @@
 		F902B98B26A4AAC20004EB05 /* DividerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DividerView.swift; path = Sources/KVKCalendar/DividerView.swift; sourceTree = "<group>"; };
 		F921AE5D2656EAFD007669C6 /* AllDayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AllDayView.swift; path = Sources/KVKCalendar/AllDayView.swift; sourceTree = "<group>"; };
 		F9230C3D26586394000DD757 /* AllDayEventView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AllDayEventView.swift; path = Sources/KVKCalendar/AllDayEventView.swift; sourceTree = "<group>"; };
+		F924F0D22B542A0800003620 /* ScrollableWeekVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScrollableWeekVM.swift; path = Sources/KVKCalendar/ScrollableWeekVM.swift; sourceTree = "<group>"; };
+		F924F0D42B546C3600003620 /* TimelineNewPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TimelineNewPageView.swift; path = Sources/KVKCalendar/TimelineNewPageView.swift; sourceTree = "<group>"; };
 		F9258BC928037DED00750B5C /* ScrollableWeekHeaderTitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScrollableWeekHeaderTitleView.swift; path = Sources/KVKCalendar/ScrollableWeekHeaderTitleView.swift; sourceTree = "<group>"; };
 		F92966B327773E0B00A0617F /* MonthHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MonthHeaderView.swift; path = Sources/KVKCalendar/MonthHeaderView.swift; sourceTree = "<group>"; };
 		F9535B32272DE8CC008AAC56 /* KVKTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = KVKTableViewCell.swift; path = Sources/KVKCalendar/KVKTableViewCell.swift; sourceTree = "<group>"; };
@@ -328,6 +332,7 @@
 				F92966B327773E0B00A0617F /* MonthHeaderView.swift */,
 				A09F113E4975793648F12FDC38102325 /* ResizeEventView.swift */,
 				F9D21F7B27FB787D00B1E6D1 /* ScrollableWeekView.swift */,
+				F924F0D22B542A0800003620 /* ScrollableWeekVM.swift */,
 				F9258BC928037DED00750B5C /* ScrollableWeekHeaderTitleView.swift */,
 				68F3F3C241A7A9D06CEE389D078C4101 /* ShadowDayView.swift */,
 				7692433655FAF139DE62DFA36F5714C2 /* StubEventView.swift */,
@@ -340,6 +345,7 @@
 				214D43029377B53F28149D55BC77B66C /* TimelineModel.swift */,
 				63EE0CA36DC0ABE75584606BE749F957 /* TimelinePageView.swift */,
 				1D3A26A4581F2BD9FBA6548A2CF518A5 /* TimelineView.swift */,
+				F924F0D42B546C3600003620 /* TimelineNewPageView.swift */,
 				F9B0264F29FD3D1200980558 /* TimelineColumnView.swift */,
 				D5B9F168F53433DE04559DB38434F9A3 /* VerticalLineView.swift */,
 				97ACC5DCAE8C90FAB8DC57B176151933 /* WeekData.swift */,
@@ -567,6 +573,7 @@
 				09CAF424D1A4FD4B9FBCB85D1FDB1F0E /* EventView.swift in Sources */,
 				0994FFD97BE772178FBD3F135AA5255C /* EventViewGeneral.swift in Sources */,
 				9863CFB5A37B87FC740E7E77C86AA146 /* EventViewList.swift in Sources */,
+				F924F0D52B546C3600003620 /* TimelineNewPageView.swift in Sources */,
 				681E095B5B26C2C43F3712DE60C0EE04 /* KVKCalendar-dummy.m in Sources */,
 				F92966B427773E0B00A0617F /* MonthHeaderView.swift in Sources */,
 				0DCE935431505BA2024E5E218AEE869E /* ListView.swift in Sources */,
@@ -583,6 +590,7 @@
 				F9C481BB26A60F420007A780 /* SkeletonView.swift in Sources */,
 				43A71B0C2D67DDAE6C0D4152B2977C07 /* StubEventView.swift in Sources */,
 				F9F6AFEE2A0983FA0096C150 /* KVKCalendarViewModel.swift in Sources */,
+				F924F0D32B542A0800003620 /* ScrollableWeekVM.swift in Sources */,
 				2D982E68A819D66622F6BD0FE6B13C2B /* StubStackView.swift in Sources */,
 				18E5875BD7D392E12CFD936351479DAE /* Style.swift in Sources */,
 				F9535B33272DE8CC008AAC56 /* KVKTableViewCell.swift in Sources */,

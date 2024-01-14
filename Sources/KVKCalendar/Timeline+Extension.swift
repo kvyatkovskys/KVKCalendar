@@ -273,7 +273,7 @@ extension TimelineView {
     }
     
     @available(iOS 17.0, *)
-    func reloadTimeline(params: TimelineViewWrapper.Parameters) {
+    func reloadTimeline(params: TimelinePageWrapper.Parameters) {
         setup(dates: params.dates,
               events: params.events,
               recurringEvents: params.recurringEvents,
@@ -487,7 +487,12 @@ extension TimelineView {
         view.translatesAutoresizingMaskIntoConstraints = false
         
         let timeOffset = style.timeline.widthTime + style.timeline.offsetTimeX
-        let widthColumn = (frame.width - timeOffset) / CGFloat(maxDates)
+        let widthColumn: CGFloat
+        if frame.width > 0 {
+            widthColumn = (frame.width - timeOffset) / CGFloat(maxDates)
+        } else {
+            widthColumn = 0
+        }
         let top = view.topAnchor.constraint(equalTo: topLine?.topAnchor ?? scrollView.topAnchor)
         
         let leading: NSLayoutConstraint

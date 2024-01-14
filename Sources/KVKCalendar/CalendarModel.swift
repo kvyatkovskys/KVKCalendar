@@ -7,7 +7,7 @@
 
 #if os(iOS)
 
-import UIKit
+import SwiftUI
 import EventKit
 
 @available(swift, deprecated: 0.6.5, obsoleted: 0.6.6, renamed: "CellParameter")
@@ -689,13 +689,64 @@ extension UIView: KVKCalendarHeaderProtocol {}
 
 // MARK: - Scrollable Week settings
 
-protocol ScrollableWeekProtocol: AnyObject {
+protocol ScrollableWeekProtocol: WeekDataProtocol {
     
-    var daysBySection: [[Day]] { get set }
-    
+    var isAutoScrolling: Bool { get set }
+    var date: Date { get set }
+    var style: Style { get set }
+    var scrollId: Int? { get set }
+    var weeks: [[Day]] { get set }
+    var type: KVKCalendar.CalendarType { get set }
 }
 
 extension ScrollableWeekProtocol {
+    
+    func setDateByScrollId(oldValue: Int?, newValue: Int?) {
+        if isAutoScrolling {
+            isAutoScrolling = false
+            return
+        }
+        
+        guard let newIdx = newValue, let oldIdx = oldValue else { return }
+        let value: Int
+        if newIdx > oldIdx {
+            value = type == .day ? 1 : 7
+        } else {
+            value = type == .day ? -1 : -7
+        }
+        guard let newDate = style.calendar.date(byAdding: .day, value: value, to: date) else { return }
+        withAnimation {
+            date = newDate
+        }
+    }
+    
+    func scrollToDate(_ dt: Date = Date(), enableAutoScrolling: Bool = false) {
+        let idx = getIdxByDate(dt)
+        // week is already selected and need to update date if needed
+        if scrollId == idx && dt != date {
+            withAnimation {
+                date = dt
+            }
+            return
+        }
+        
+        if enableAutoScrolling {
+            isAutoScrolling = true
+            date = dt
+        }
+        withAnimation {
+            scrollId = idx
+        }
+    }
+    
+}
+
+protocol WeekDataProtocol: AnyObject {
+    
+    var weeks: [[Day]] { get set }
+}
+
+extension WeekDataProtocol {
     
     func prepareDays(_ days: [Day], maxDayInWeek: Int) -> [[Day]] {
         var daysBySection: [[Day]] = []
@@ -716,6 +767,68 @@ extension ScrollableWeekProtocol {
         }
         
         return daysBySection
+    }
+    
+    func reloadData(_ data: KVKCalendar.CalendarData,
+                    type: KVKCalendar.CalendarType,
+                    startDay: KVKCalendar.StartDayType,
+                    maxDays: Int) -> (days: [KVKCalendar.Day], weeks: [[KVKCalendar.Day]]) {
+        var startDayProxy = startDay
+        if type == .week && maxDays != 7 {
+            startDayProxy = .sunday
+        }
+        let days = getDates(data: data, startDay: startDayProxy, maxDays: maxDays)
+        let weeks = prepareDays(days, maxDayInWeek: maxDays)
+        return (days, weeks)
+    }
+    
+    func getIdxByDate(_ date: Date) -> Int? {
+        weeks.firstIndex(where: { week in
+            week.firstIndex(where: { $0.date?.kvkIsEqual(date) ?? false }) != nil
+        })
+    }
+    
+    func getDaysByDate(_ date: Date, for type: KVKCalendar.CalendarType) -> [Day] {
+        guard let idx = getIdxByDate(date) else { return [] }
+        let week = weeks[idx]
+        switch type {
+        case .day:
+            guard let day = week.first(where: { $0.date?.kvkIsEqual(date) ?? false }) else { return [] }
+            return [day]
+        default:
+            return week
+        }
+    }
+    
+    private func getDates(data: CalendarData, startDay: StartDayType, maxDays: Int) -> [Day] {
+        var tempDays = data.months.reduce([], { $0 + $1.days })
+        let startIdx = tempDays.count > maxDays ? tempDays.count - maxDays : tempDays.count
+        let endWeek = data.addEndEmptyDays(Array(tempDays[startIdx..<tempDays.count]), startDay: startDay)
+        
+        tempDays.removeSubrange(startIdx..<tempDays.count)
+        let defaultDays = data.addStartEmptyDays(tempDays, startDay: startDay) + endWeek
+        var extensionDays: [Day] = []
+        
+        if maxDays != 7,
+           let indexOfInputDate = defaultDays.firstIndex(where: { $0.date?.kvkIsSameDay(otherDate: data.date) ?? false }),
+           let firstDate = defaultDays.first?.date {
+            let extraBufferDays = (defaultDays.count - indexOfInputDate) % maxDays
+            if extraBufferDays > 0 {
+                var i = extraBufferDays
+                while (i > 0) {
+                    if let newDate = firstDate.kvkAddingTo(.day, value: -1 * i) {
+                        extensionDays.append(Day(type: .empty, date: newDate, data: []))
+                    }
+                    i -= 1
+                }
+            }
+        }
+        
+        if extensionDays.isEmpty {
+            return defaultDays
+        } else {
+            return extensionDays + defaultDays
+        }
     }
     
 }

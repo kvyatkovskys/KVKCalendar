@@ -12,47 +12,29 @@ import SwiftUI
 @available(iOS 17.0, *)
 struct ScrollableWeekNewView: View {
     
-    @State var vm: WeekNewData
-    @State private var isAnimated = true
-    
-    private var daySize: CGSize {
-        Platform.currentInterface == .phone ? CGSize(width: 40, height: 40) : CGSize(width: 30, height: 70)
-    }
-    private var spacing: CGFloat {
-        Platform.currentInterface == .phone ? 5 : 0
-    }
-    private var leftPadding: CGFloat {
-        vm.type == .week ? vm.style.timeline.widthTime + vm.style.timeline.offsetTimeX : 0
-    }
-    private var dayShortFormatter: DateFormatter {
-        let format = DateFormatter()
-        format.dateFormat = "EEEEE"
-        return format
-    }
+    @State var vm: ScrollableWeekVM
     
     var body: some View {
-        VStack(spacing: spacing) {
+        VStack(spacing: vm.spacing) {
             if Platform.currentInterface != .phone {
                 HStack {
                     Text(vm.date.titleForLocale(vm.style.locale, formatter: vm.style.headerScroll.titleFormatter))
                         .foregroundColor(Color(uiColor: vm.style.headerScroll.titleDateColor))
                         .font(Font(vm.style.headerScroll.titleDateFont))
                     Spacer()
-                    Button("Today") {
-                        vm.date = Date()
+                    Button("today") {
+                        vm.scrollToDate()
                     }
                     .tint(.red)
                 }
                 .padding([.leading, .trailing])
             } else {
-                WeekTitlesView(style: vm.style, formatter: dayShortFormatter, font: vm.style.headerScroll.fontNameDay)
-                    .padding(.leading, leftPadding)
+                WeekTitlesView(style: vm.style, formatter: vm.dayShortFormatter, font: vm.style.headerScroll.fontNameDay)
+                    .padding(.leading, vm.leftPadding)
             }
             horizontalWeeksView
-//            WeeksHorizontalView(weeks: vm.weeks, style: vm.style, date: $vm.date)
-//                .frame(minHeight: daySize.width,
-//                       maxHeight: daySize.height)
-                .padding(.leading, leftPadding)
+                .padding(.leading, vm.leftPadding)
+                .padding(.vertical, 3)
             if Platform.currentInterface == .phone {
                 HStack {
                     Spacer()
@@ -62,52 +44,55 @@ struct ScrollableWeekNewView: View {
             }
             Divider()
         }
+        .task {
+            await vm.setup()
+        }
     }
     
     private var horizontalWeeksView: some View {
         GeometryReader { geometry in
             ScrollViewReader { proxy in
-                ScrollView(.horizontal) {
-                    HStack(spacing: 0) {
-                        ForEach(vm.weeks.indices, id: \.self) { (idx) in
-                            let week = vm.weeks[idx]
-                            ForEach(week) { (day) in
-                                if let date = day.date {
-                                    Button(action: {
-                                        vm.date = date
-                                    }, label: {
-                                        Text("\(date.kvkDay)")
-                                            .foregroundStyle(getTxtColor(day, selectedDay: vm.date))
-                                            .multilineTextAlignment(.center)
-                                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                    })
-                                    .background(getBgTxtColor(day, selectedDay: vm.date))
-                                    .frame(width: geometry.size.width / 7, height: 40)
-                                    .clipShape(Circle())
-                                    .tag(date.description)
-                                } else {
-                                    EmptyView()
-                                }
-                            }
-                            .background(idx == 0 ? .red : .gray)
-                            .onAppear {
-                                if !week.contains(where: { $0.date?.kvkIsEqual(vm.date) ?? false }), let newDate = Calendar.current.date(byAdding: .day, value: 7, to: vm.date) {
-                                    vm.date = newDate
-                                }
-                            }
-                        }
-                    }
-                }
-                .scrollTargetBehavior(.paging)
-                .scrollIndicators(.never)
-                .onAppear {
-                    withAnimation {
-                        proxy.scrollTo(vm.date.description, anchor: .leading)
-                    }
-                }
+                getScrollView(viewWidth: geometry.frame(in: .local).width)
             }
         }
         .frame(height: 40)
+    }
+    
+    private func getScrollView(viewWidth: CGFloat) -> some View {
+        ScrollView(.horizontal) {
+            LazyHStack(spacing: 0) {
+                ForEach(vm.weeks.indices, id: \.self) { (idx) in
+                    let week = vm.weeks[idx]
+                    HStack(spacing: 0) {
+                        ForEach(week) { (day) in
+                            if let date = day.date {
+                                Button(action: {
+                                    vm.date = date
+                                }, label: {
+                                    Text("\(date.kvkDay)")
+                                        .foregroundStyle(getTxtColor(day, selectedDay: vm.date))
+                                        .multilineTextAlignment(.center)
+                                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                })
+                                .background(getBgTxtColor(day, selectedDay: vm.date))
+                                .frame(width: viewWidth / 7, height: 40)
+                                .clipShape(Circle())
+                            } else {
+                                EmptyView()
+                            }
+                        }
+                    }
+                    .id(idx)
+                }
+            }
+            .scrollTargetLayout()
+        }
+        .scrollTargetBehavior(.paging)
+        .scrollIndicators(.never)
+        .scrollPosition(id: $vm.scrollId)
+        .onChange(of: vm.scrollId) { (oldValue, newValue) in
+            vm.setDateByScrollId(oldValue: oldValue, newValue: newValue)
+        }
     }
     
     private func getBgTxtColor(_ day: Day,
@@ -155,8 +140,14 @@ struct ScrollableWeekNewView: View {
     var style = Style()
     style.startWeekDay = .monday
     let commonData = CalendarData(date: Date(), years: 1, style: style)
-    let weekData = WeekNewData(data: commonData, type: .week)
-    return ScrollableWeekNewView(vm: weekData)
+    let weekData = ScrollableWeekVM(data: commonData, type: .week)
+    return VStack {
+        ScrollableWeekNewView(vm: weekData)
+        Button("Today") {
+            weekData.scrollToDate()
+        }
+        .padding()
+    }
 }
 
 @available(iOS 17.0, *)
@@ -164,8 +155,14 @@ struct ScrollableWeekNewView: View {
     var style = Style()
     style.startWeekDay = .monday
     let commonData = CalendarData(date: Date(), years: 1, style: style)
-    let weekData = WeekNewData(data: commonData, type: .day)
-    return ScrollableWeekNewView(vm: weekData)
+    let weekData = ScrollableWeekVM(data: commonData, type: .day)
+    return VStack {
+        ScrollableWeekNewView(vm: weekData)
+        Button("Today") {
+            weekData.scrollToDate()
+        }
+        .padding()
+    }
 }
 
 struct WeeksHorizontalView: UIViewRepresentable {

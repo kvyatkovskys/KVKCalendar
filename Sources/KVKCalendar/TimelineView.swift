@@ -10,20 +10,19 @@
 import SwiftUI
 
 @available(iOS 17.0, *)
-struct TimelineNewView: View {
+struct TimelineUIKitView: View {
     
-    let vm: TimelineViewWrapper.Parameters
+    let params: TimelinePageWrapper.Parameters
+    let frame: CGRect
     var didSwitchDate: ((Date) -> Void)?
     var willSwitchDate: ((Date) -> Void)?
     
     var body: some View {
-        GeometryReader { (geometry) in
-            TimelineViewWrapper(params: vm,
-                                frame: geometry.frame(in: .local),
-                                didSwitchDate: didSwitchDate,
-                                willSwitchDate: willSwitchDate)
-            .edgesIgnoringSafeArea(.bottom)
-        }
+        TimelinePageWrapper(params: params,
+                            frame: frame,
+                            didSwitchDate: didSwitchDate,
+                            willSwitchDate: willSwitchDate)
+        .ignoresSafeArea(.container, edges: .bottom)
     }
 }
 
@@ -39,11 +38,13 @@ struct TimelineNewView: View {
         .stub(id: "5", startFrom: -80, duration: 30)
     ]
     @State var event: Event?
-    return TimelineNewView(vm: TimelineViewWrapper.Parameters(style: style, dates: [Date(), Date(), Date(), nil], selectedDate: Date(), events: events, recurringEvents: [], selectedEvent: $event))
+    return GeometryReader(content: { geometry in
+        TimelineUIKitView(params: TimelinePageWrapper.Parameters(style: style, dates: Array(repeating: Date(), count: 7), selectedDate: Date(), events: events, recurringEvents: [], selectedEvent: $event), frame: geometry.frame(in: .local))
+    })
 }
 
 @available(iOS 17.0, *)
-struct TimelineViewWrapper: UIViewControllerRepresentable {
+struct TimelinePageWrapper: UIViewControllerRepresentable {
     
     typealias UIViewControllerType = TimelinePageVC
     
@@ -56,13 +57,14 @@ struct TimelineViewWrapper: UIViewControllerRepresentable {
         var selectedEvent: Binding<Event?>
     }
     
-    var params: TimelineViewWrapper.Parameters
+    var params: TimelinePageWrapper.Parameters
     var frame: CGRect
     var didSwitchDate: ((Date) -> Void)?
     var willSwitchDate: ((Date) -> Void)?
     
     func makeUIViewController(context: Context) -> TimelinePageVC {
-        setupTimelinePageView()
+        let page = setupTimelinePageView()
+        return page
     }
     
     func updateUIViewController(_ uiViewController: TimelinePageVC, context: Context) {
@@ -70,15 +72,12 @@ struct TimelineViewWrapper: UIViewControllerRepresentable {
             let date = switchDateBy(type)
             didSwitchDate?(date)
         }
-        uiViewController.willDisplayTimelineView = { (_, type) in
+        uiViewController.willDisplayTimelineView = { (view, type) in
+            view.reloadFrame(frame)
+            view.reloadTimeline(params: params)
             let date = switchDateBy(type)
             willSwitchDate?(date)
         }
-        guard let oldDates = uiViewController.timelineView?.dates,
-              let oldEvents = uiViewController.timelineView?.events else { return }
-        
-        guard oldDates != params.dates || oldEvents != params.events else { return }
-        
         uiViewController.reloadPages(with: params)
     }
     
@@ -109,6 +108,43 @@ struct TimelineViewWrapper: UIViewControllerRepresentable {
                    selectedEvent: params.selectedEvent)
         return view
     }
+}
+
+@available(iOS 17.0, *)
+struct TimelineViewWrapper: UIViewRepresentable {
+
+    typealias UIViewType = TimelineView
+    
+    struct Parameters {
+        let style: Style
+        let dates: [Date?]
+        var selectedDate: Date
+        let events: [Event]
+        let recurringEvents: [Event]
+        var selectedEvent: Binding<Event?>
+    }
+    
+    var params: TimelinePageWrapper.Parameters
+    var frame: CGRect
+    
+    func makeUIView(context: Context) -> TimelineView {
+        createTimelineView()
+    }
+    
+    func updateUIView(_ uiView: TimelineView, context: Context) {
+        uiView.reloadTimeline(params: params)
+    }
+    
+    private func createTimelineView() -> TimelineView {
+        let view = TimelineView(parameters: TimelineView.Parameters(style: params.style, type: .week), frame: frame)
+        view.setup(dates: params.dates,
+                   events: params.events,
+                   recurringEvents: params.recurringEvents,
+                   selectedDate: params.selectedDate,
+                   selectedEvent: params.selectedEvent)
+        return view
+    }
+    
 }
 
 final class TimelineView: UIView, EventDateProtocol, CalendarTimer {

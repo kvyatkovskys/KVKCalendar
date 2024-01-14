@@ -283,8 +283,15 @@ final class TimelinePageVC: UIPageViewController {
     }
     
     @available(iOS 17.0, *)
-    func reloadPages(with params: TimelineViewWrapper.Parameters) {
-        pages.forEach { $0.value.reloadTimeline(params: params) }
+    func reloadPages(with params: TimelinePageWrapper.Parameters, excludeCurrentPage: Bool = false) {
+        var items: [Int: TimelineView]
+        if excludeCurrentPage {
+            items = pages
+            items.removeValue(forKey: currentIndex)
+        } else {
+            items = pages
+        }
+        items.forEach { $0.value.reloadTimeline(params: params) }
     }
     
     func removeAll(excludeCurrentPage: Bool = false) {
@@ -311,12 +318,6 @@ final class TimelinePageVC: UIPageViewController {
     }
     
     func reloadCachedControllers() {
-        pages = pages.reduce([:], { (acc, item) -> [Int: TimelineView] in
-            var accTemp = acc
-            //item.value.reloadFrame(CGRect(origin: .zero, size: bounds.size))
-            accTemp[item.key] = item.value
-            return accTemp
-        })
         dataSource = nil
         dataSource = self
     }

@@ -28,7 +28,7 @@ public struct KVKCalendarSwiftUIView: View {
     public var body: some View {
         switch type {
         case .day:
-            if let item = vm.weekData {
+            if let item = vm.dayData {
                 WeekNewView(vm: item)
             } else {
                 EmptyView()

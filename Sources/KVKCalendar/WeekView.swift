@@ -20,17 +20,20 @@ struct WeekNewView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            ScrollableWeekNewView(vm: vm)
-            TimelineNewView(vm: TimelineViewWrapper.Parameters(style: vm.style, dates: vm.timelineDays, selectedDate: vm.date, events: vm.events, recurringEvents: vm.recurringEvents, selectedEvent: $vm.selectedEvent), didSwitchDate: { (dt) in
-                vm.date = dt
-            })
+            ScrollableWeekNewView(vm: vm.scrollableWeekVM)
+            GeometryReader { (geometry) in
+                TimelineUIKitView(params: TimelinePageWrapper.Parameters(style: vm.style, dates: vm.timelineDays, selectedDate: vm.date, events: vm.events, recurringEvents: vm.recurringEvents, selectedEvent: $vm.selectedEvent), frame: geometry.frame(in: .local), didSwitchDate: vm.setDate)
+            }
+        }
+        .task {
+            await vm.setup()
         }
     }
     
 }
 
 @available(iOS 17.0, *)
-#Preview {
+#Preview("Day View") {
     var style = Style()
     style.startWeekDay = .monday
     let commonData = CalendarData(date: Date(), years: 1, style: style)
@@ -45,11 +48,10 @@ struct WeekNewView: View {
     vmDay.events = events
     vmDay.allDayEvents = [.allDayStub(id: "-2")]
     return WeekNewView(vm: vmDay)
-        .previewDisplayName("Day new View")
 }
 
 @available(iOS 17.0, *)
-#Preview {
+#Preview("Week View") {
     var style = Style()
     style.startWeekDay = .monday
     let commonData = CalendarData(date: Date(), years: 1, style: style)
@@ -60,11 +62,10 @@ struct WeekNewView: View {
         .stub(id: "4", startFrom: 85, duration: 30),
         .stub(id: "5", startFrom: 85, duration: 30)
     ]
-    let vmWeek = WeekNewData(data: commonData)
+    let vmWeek = WeekNewData(data: commonData, type: .week)
     vmWeek.events = events
     vmWeek.allDayEvents = [.allDayStub(id: "-2")]
     return WeekNewView(vm: vmWeek)
-        .previewDisplayName("Week new View")
 }
 
 final class WeekView: UIView {

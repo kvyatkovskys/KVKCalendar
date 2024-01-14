@@ -13,6 +13,7 @@ import Combine
     
     var data: CalendarData
     var weekData: WeekNewData?
+    var dayData: WeekNewData?
     var monthData: MonthData?
     var listData: ListView.Parameters?
     var date: Date
@@ -28,23 +29,15 @@ import Combine
         self.date = date
         self.selectedEvent = selectedEvent
         
-        data = CalendarData(date: date,
-                            years: years,
-                            style: style)
-        weekData = WeekNewData(data: data, events: events)
+        data = CalendarData(date: date, years: years, style: style)
+        dayData = WeekNewData(data: data, events: events, type: .day)
+        weekData = WeekNewData(data: data, events: events, type: .week)
         monthData = MonthData(parameters: MonthData.Parameters(data: data))
         listData = ListView.Parameters(data: ListViewData(data: data))
-        
-//        weekData?.$date
-//            .removeDuplicates()
-//            .sink { [weak self] (dt) in
-//                self?.date = dt
-//            }
-//            .store(in: &cancellable)
     }
     
     func setDate(_ date: Date) {
-        weekData?.date = date
+        weekData?.setDate(date)
     }
     
     func setEvents(_ events: [Event]) {
