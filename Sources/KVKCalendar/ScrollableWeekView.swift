@@ -22,7 +22,7 @@ struct ScrollableWeekNewView: View {
                         .foregroundColor(Color(uiColor: vm.style.headerScroll.titleDateColor))
                         .font(Font(vm.style.headerScroll.titleDateFont))
                     Spacer()
-                    Button("today") {
+                    Button(vm.todayTitle) {
                         vm.scrollToDate()
                     }
                     .tint(.red)
@@ -66,17 +66,9 @@ struct ScrollableWeekNewView: View {
                     HStack(spacing: 0) {
                         ForEach(week) { (day) in
                             if let date = day.date {
-                                Button(action: {
-                                    vm.date = date
-                                }, label: {
-                                    Text("\(date.kvkDay)")
-                                        .foregroundStyle(getTxtColor(day, selectedDay: vm.date))
-                                        .multilineTextAlignment(.center)
-                                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                })
-                                .background(getBgTxtColor(day, selectedDay: vm.date))
-                                .frame(width: viewWidth / 7, height: 40)
-                                .clipShape(Circle())
+                                getBtnViewFor(date,
+                                              width: viewWidth,
+                                              day: day)
                             } else {
                                 EmptyView()
                             }
@@ -93,6 +85,30 @@ struct ScrollableWeekNewView: View {
         .onChange(of: vm.scrollId) { (oldValue, newValue) in
             vm.setDateByScrollId(oldValue: oldValue, newValue: newValue)
         }
+    }
+    
+    private func getBtnViewFor(_ date: Date,
+                               width: CGFloat,
+                               day: Day) -> some View {
+        Button(action: {
+            vm.date = date
+        }, label: {
+            HStack(spacing: date.kvkIsEqual(vm.date) ? nil : 0) {
+                if Platform.currentInterface != .phone {
+                    Text(date.titleForLocale(vm.style.locale, formatter: vm.style.month.weekdayFormatter))
+                        .foregroundStyle(getTitleDayColor(date))
+                        .multilineTextAlignment(.trailing)
+                }
+                Text("\(date.kvkDay)")
+                    .foregroundStyle(getTxtColor(day, selectedDay: vm.date))
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: 35, maxHeight: 35)
+                    .background(getBgTxtColor(day, selectedDay: vm.date))
+                    .clipShape(Circle())
+            }
+        })
+        .frame(width: width / 7, height: 40)
+        .tint(.black)
     }
     
     private func getBgTxtColor(_ day: Day,
@@ -113,6 +129,16 @@ struct ScrollableWeekNewView: View {
         }
     }
     
+    private func getTitleDayColor(_ date: Date) -> Color {
+        if date.isWeekend {
+            return Color(uiColor: vm.style.headerScroll.colorWeekendDate)
+        } else if date.isWeekday {
+            return Color(uiColor: vm.style.headerScroll.colorDate)
+        } else {
+            return .black
+        }
+    }
+    
     private func getTxtColor(_ day: Day,
                              selectedDay: Date) -> Color {
         if day.type == .empty {
@@ -124,12 +150,8 @@ struct ScrollableWeekNewView: View {
             return .white
         } else if date.kvkIsEqual(selectedDay) {
             return .white
-        } else if date.isWeekend {
-            return Color(uiColor: vm.style.headerScroll.colorWeekendDate)
-        } else if date.isWeekday {
-            return Color(uiColor: vm.style.headerScroll.colorDate)
         } else {
-            return .black
+            return getTitleDayColor(date)
         }
     }
     

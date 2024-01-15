@@ -68,7 +68,9 @@ struct TimelinePageWrapper: UIViewControllerRepresentable {
     }
     
     func updateUIViewController(_ uiViewController: TimelinePageVC, context: Context) {
-        uiViewController.didSwitchTimelineView = { (_, type) in
+        uiViewController.didSwitchTimelineView = { [weak uiViewController] (_, type) in
+            let newView = createTimelineView()
+            uiViewController?.addNewTimeline(newView, for: type)
             let date = switchDateBy(type)
             didSwitchDate?(date)
         }

@@ -11,8 +11,13 @@ import SwiftUI
 
 @available(iOS 17.0, *)
 @Observable final class ScrollableWeekVM: EventDateProtocol, ScrollableWeekProtocol {
+    var didSelectDate: ((Date) -> Void)?
     var style: Style
-    var date: Date
+    var date: Date {
+        didSet {
+            didSelectDate?(date)
+        }
+    }
     var weeks: [[Day]] = []
     var scrollId: Int?
     var isAutoScrolling = false
@@ -31,6 +36,9 @@ import SwiftUI
         let format = DateFormatter()
         format.dateFormat = "EEEEE"
         return format
+    }
+    var todayTitle: String {
+        "Today"
     }
         
     init(data: CalendarData, type: CalendarType) {

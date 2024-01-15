@@ -13,13 +13,16 @@ import EventKit
 protocol KVKCalendarDataModel {
     
     var events: [Event] { get set }
-    var style: Style { get }
     
 }
 
 protocol KVKCalendarSettings {}
 
 extension KVKCalendarSettings where Self: KVKCalendarDataModel {
+    
+    var style: Style {
+        createCalendarStyle()
+    }
     
     func handleChangingEvent(_ event: Event, start: Date?, end: Date?) -> (range: Range<Int>, events: [Event])? {
         var eventTemp = event

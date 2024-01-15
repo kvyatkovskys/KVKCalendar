@@ -62,9 +62,7 @@ struct CalendarData {
                 })
             }
             
-            var months = zip(nameMonths, dateMonths).map { Month(name: $0.0,
-                                                                 date: $0.1,
-                                                                 weeks: numberOfWeeksInMonth($0.1, calendar: calendar)) }
+            var months = zip(nameMonths, dateMonths).map { Month(name: $0.0, date: $0.1, weeks: numberOfWeeksInMonth($0.1, calendar: calendar)) }
             
             for (idx, month) in months.enumerated() {
                 let days = getDaysInMonth(month: idx + 1, date: month.date)
@@ -89,7 +87,11 @@ struct CalendarData {
         let formatterDay = DateFormatter()
         formatterDay.dateFormat = "EE"
         formatterDay.locale = Locale(identifier: "en_US")
-        let days = arrDates.map({ Day(type: DayType(rawValue: formatterDay.string(from: $0).uppercased()) ?? .empty, date: $0, data: []) })
+        let days = arrDates.compactMap {
+            Day(type: DayType(rawValue: formatterDay.string(from: $0).uppercased()) ?? .empty,
+                date: $0,
+                data: [])
+        }
         return days
     }
     
@@ -110,7 +112,7 @@ struct CalendarData {
             }
             
             tempDays = Array(0..<endIdx).reversed().compactMap({ (idx) -> Day in
-                var day = Day.empty()
+                var day = Day.empty(uniqID: (firstDay.date?.kvkUniqID ?? 0) + idx)
                 day.date = getOffsetDate(offset: -(idx + 1), to: firstDay.date)
                 return day
             }) + days
@@ -137,7 +139,7 @@ struct CalendarData {
             
             if maxIdx > lastIdx {
                 emptyDays = Array(0..<maxIdx - lastIdx).compactMap({ (idx) -> Day in
-                    var day = Day.empty()
+                    var day = Day.empty(uniqID: (lastDay.date?.kvkUniqID ?? 0) + idx)
                     day.date = getOffsetDate(offset: (idx + 1), to: lastDay.date)
                     return day
                 })
@@ -160,19 +162,18 @@ struct CalendarData {
     
     func getOffsetDate(offset: Int, to date: Date?) -> Date? {
         guard let dateTemp = date else { return nil }
-        
         return style.calendar.date(byAdding: .day, value: offset, to: dateTemp)
     }
     
-    private func addEmptyDayToEnd(days: [Day]) -> [Day] {
-        var days = days
-        if let lastDay = days.last {
-            var emptyDay = Day.empty()
-            emptyDay.date = getOffsetDate(offset: 1, to: lastDay.date)
-            days.append(emptyDay)
-        }
-        return days
-    }
+//    private func addEmptyDayToEnd(days: [Day]) -> [Day] {
+//        var days = days
+//        if let lastDay = days.last {
+//            var emptyDay = Day.empty()
+//            emptyDay.date = getOffsetDate(offset: 1, to: lastDay.date)
+//            days.append(emptyDay)
+//        }
+//        return days
+//    }
 }
 
 struct Month: Identifiable {
@@ -191,21 +192,24 @@ struct Day: Identifiable, Equatable, Hashable {
     let type: DayType
     var date: Date?
     var events: [Event]
+    let uniqID: Int?
     
-    static func empty() -> Day {
-        return self.init()
+    static func empty(uniqID: Int? = nil) -> Day {
+        self.init(uniqID: uniqID)
     }
     
-    private init() {
-        self.date = nil
-        self.events = []
-        self.type = .empty
+    private init(uniqID: Int?) {
+        date = nil
+        events = []
+        type = .empty
+        self.uniqID = -(uniqID ?? 1)
     }
     
     init(type: DayType, date: Date?, data: [Event]) {
         self.type = type
         self.events = data
         self.date = date
+        self.uniqID = date?.kvkUniqID
     }
     
     func hash(into hasher: inout Hasher) {
@@ -213,7 +217,13 @@ struct Day: Identifiable, Equatable, Hashable {
     }
     
     var id: Int {
-        date?.hashValue ?? type.hashValue
+        var dateId: Int
+        if let uniqID {
+            dateId = uniqID
+        } else {
+            dateId = date?.kvkUniqID ?? 0
+        }
+        return dateId + type.id
     }
     
     static func == (lhs: Day, rhs: Day) -> Bool {
@@ -221,7 +231,7 @@ struct Day: Identifiable, Equatable, Hashable {
     }
 }
 
-public enum DayType: String, CaseIterable {
+public enum DayType: String, CaseIterable, Identifiable {
     case monday = "MON"
     case tuesday = "TUE"
     case wednesday = "WED"
@@ -230,6 +240,27 @@ public enum DayType: String, CaseIterable {
     case saturday = "SAT"
     case sunday = "SUN"
     case empty
+    
+    public var id: Int {
+        switch self {
+        case .monday:
+            1
+        case .tuesday:
+            2
+        case .wednesday:
+            3
+        case .thursday:
+            4
+        case .friday:
+            5
+        case .saturday:
+            6
+        case .sunday:
+            7
+        case .empty:
+            8
+        }
+    }
 }
 
 public enum StartDayType: Int {

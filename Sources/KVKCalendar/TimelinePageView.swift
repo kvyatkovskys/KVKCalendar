@@ -215,6 +215,7 @@ extension TimelinePageView: UIPageViewControllerDataSource, UIPageViewController
     }
 }
 
+@available(iOS 17.0, *)
 final class TimelinePageVC: UIPageViewController {
     
     enum SwitchPageType: Int {
@@ -244,7 +245,6 @@ final class TimelinePageVC: UIPageViewController {
     var timelineView: TimelineView? {
         pages[currentIndex]
     }
-    
     var isPagingEnabled = true
     
     init(maxLimit: UInt, pages: [TimelineView]) {
@@ -271,18 +271,6 @@ final class TimelinePageVC: UIPageViewController {
         pages.forEach { $0.value.updateStyle(style, force: force) }
     }
     
-    func reloadPages(excludeCurrentPage: Bool = false) {
-        var items: [Int: TimelineView]
-        if excludeCurrentPage {
-            items = pages
-            items.removeValue(forKey: currentIndex)
-        } else {
-            items = pages
-        }
-        items.forEach { $0.value.reloadTimeline() }
-    }
-    
-    @available(iOS 17.0, *)
     func reloadPages(with params: TimelinePageWrapper.Parameters, excludeCurrentPage: Bool = false) {
         var items: [Int: TimelineView]
         if excludeCurrentPage {
@@ -317,48 +305,55 @@ final class TimelinePageVC: UIPageViewController {
         }
     }
     
-    func reloadCachedControllers() {
-        dataSource = nil
-        dataSource = self
-    }
+//    func reloadCachedControllers() {
+//        dataSource = nil
+//        dataSource = self
+//    }
     
     func addNewTimelineView(_ timeline: TimelineView, to: AddNewTimelineViewType) {
         switch to {
         case .end:
             pages[currentIndex + 1] = timeline
-            
             if pages.count > maxLimit, let firstKey = pages.max(by: { $0.key > $1.key }) {
                 pages.removeValue(forKey: firstKey.key)
             }
         case .begin:
             pages[currentIndex - 1] = timeline
-            
             if pages.count > maxLimit, let lastKey = pages.max(by: { $0.key < $1.key }) {
                 pages.removeValue(forKey: lastKey.key)
             }
         }
     }
     
-    func changePage(_ type: SwitchPageType) {
+    func addNewTimeline(_ newTimeline: TimelineView, for type: SwitchPageType) {
         switch type {
-        case .previous:
-            currentIndex -= 1
         case .next:
-            currentIndex += 1
+            addNewTimelineView(newTimeline, to: .end)
+        case .previous:
+            addNewTimelineView(newTimeline, to: .begin)
         }
-        
-        guard let newTimelineView = pages[currentIndex] else { return }
-        
-        willDisplayTimelineView?(newTimelineView, type)
-        let container = TimelineContainerProxyVC(index: currentIndex, contentView: newTimelineView)
-        setViewControllers([container], direction: type.direction, animated: true, completion: nil)
     }
+    
+//    func changePage(_ type: SwitchPageType) {
+//        switch type {
+//        case .previous:
+//            currentIndex -= 1
+//        case .next:
+//            currentIndex += 1
+//        }
+//        guard let newTimelineView = pages[currentIndex] else { return }
+//        
+//        willDisplayTimelineView?(newTimelineView, type)
+//        let container = TimelineContainerProxyVC(index: currentIndex, contentView: newTimelineView)
+//        setViewControllers([container], direction: type.direction, animated: true, completion: nil)
+//    }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 }
 
+@available(iOS 17.0, *)
 extension TimelinePageVC: UIPageViewControllerDataSource, UIPageViewControllerDelegate {
     
     func pageViewController(_ pageViewController: UIPageViewController, willTransitionTo pendingViewControllers: [UIViewController]) {

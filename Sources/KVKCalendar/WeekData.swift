@@ -42,6 +42,9 @@ import SwiftUI
                               maxDays: data.style.week.maxDays)
         days = item.days
         weeks = item.weeks
+        scrollableWeekVM.didSelectDate = { [weak self] (dt) in
+            self?.date = dt
+        }
     }
     
     func setup() async {

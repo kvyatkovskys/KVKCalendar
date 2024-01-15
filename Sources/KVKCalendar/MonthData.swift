@@ -19,6 +19,7 @@ final class MonthData: ObservableObject, EventDateProtocol {
     
     var selectedSection: Int = -1
     @Published var date: Date
+    @Published var headerDate: Date
     @Published var data: CalendarData
     @Published var selectedEvent: Event?
     var daysCount: Int = 0
@@ -42,6 +43,7 @@ final class MonthData: ObservableObject, EventDateProtocol {
     
     init(parameters: Parameters) {
         date = parameters.data.date
+        headerDate = parameters.data.date
         data = parameters.data
         calendar = parameters.data.style.calendar
         scrollDirection = parameters.data.style.month.scrollDirection
@@ -61,7 +63,7 @@ final class MonthData: ObservableObject, EventDateProtocol {
             
             if let lastDay = daysTemp.last, daysTemp.count < boxCount {
                 let emptyEndDays = Array(1...(boxCount - daysTemp.count)).compactMap { (idx) -> Day in
-                    var day = Day.empty()
+                    var day = Day.empty(uniqID: (lastDay.date?.kvkUniqID ?? 0) + idx)
                     day.date = parameters.data.getOffsetDate(offset: idx, to: lastDay.date)
                     return day
                 }

@@ -13,10 +13,57 @@ import SwiftUI
 struct MonthNewView: View {
     
     @StateObject private var vm: MonthData
+    @State private var scrollId: Date?
     
     init(vm: MonthData) {
         _vm = StateObject(wrappedValue: vm)
     }
+    
+    var body: some View {
+        ScrollViewReader { (proxy) in
+            VStack(spacing: 0) {
+                MonthWeekView(style: vm.style, date: vm.headerDate) {
+                    vm.date = Date()
+//                    withAnimation {
+//                        proxy.scrollTo(vm.date.kvkStartOfMonth, anchor: .top)
+//                    }
+                }
+                .background(.thickMaterial)
+                scrollView
+                    .onAppear {
+//                        withAnimation {
+//                            proxy.scrollTo(vm.date.kvkStartOfMonth, anchor: .top)
+//                        }
+                    }
+            }
+        }
+    }
+    
+    private var scrollView: some View {
+        ScrollView {
+            ContentGrid(data: vm.data,
+                        style: vm.style,
+                        date: $vm.date,
+                        selectedEvent: $vm.selectedEvent)
+            .scrollTargetLayout()
+        }
+        .scrollPosition(id: $scrollId)
+        // .scrollTargetBehavior(.paging)
+        .onChange(of: scrollId) { (_, newValue) in
+            guard let monthDate = newValue?.kvkStartOfMonth else { return }
+            vm.headerDate = monthDate
+        }
+        //                .scrollTargetBehavior(.paging)
+    }
+}
+
+@available(iOS 17.0, *)
+private struct ContentGrid: View {
+    
+    var data: CalendarData
+    var style: Style
+    @Binding var date: Date
+    @Binding var selectedEvent: KVKCalendar.Event?
     
     private let columns: [GridItem] = [
         GridItem(.flexible(), spacing: 0),
@@ -33,60 +80,32 @@ struct MonthNewView: View {
     }
     
     var body: some View {
-        ScrollViewReader { (proxy) in
-            VStack(spacing: 0) {
-                MonthWeekView(style: vm.style, date: vm.date) {
-                    vm.date = Date()
-                    withAnimation {
-                        proxy.scrollTo(vm.date.kvkStartOfMonth, anchor: .top)
-                    }
-                }
-                .background(.thickMaterial)
-                GeometryReader { (geometry) in
-                    ScrollView {
-                        LazyVGrid(columns: columns, spacing: 0) {
-                            ForEach(vm.data.months) { (month) in
-                                Section {
-                                    ForEach(month.days) { (day) in
-                                        MonthDayView(day: day, selectedDate: vm.date, style: vm.style, selectedEvent: $vm.selectedEvent)
-                                            .onTapGesture(count: tapCountToSelectDay) {
-                                                withAnimation {
-                                                    vm.date = day.date ?? Date()
-                                                }
-                                            }
-                                            .disabled(day.type == .empty)
-                                    }
-                                }
-                                .id(month.date.kvkStartOfMonth)
+        LazyVGrid(columns: columns, spacing: 0) {
+            ForEach(data.months) { (month) in
+                ForEach(month.days) { (day) in
+                    MonthDayView(day: day, selectedDate: date, style: style, selectedEvent: $selectedEvent)
+                        .onTapGesture(count: tapCountToSelectDay) {
+                            withAnimation {
+                                date = day.date ?? Date()
                             }
                         }
-                    }
-                    .task {
-                        withAnimation {
-                            proxy.scrollTo(vm.date.kvkStartOfMonth, anchor: .top)
-                        }
-                    }
-                    .edgesIgnoringSafeArea(.bottom)
+                        .disabled(day.type == .empty)
                 }
+                .id(month.date)
             }
         }
     }
-    
 }
 
 @available(iOS 17.0, *)
-struct MonthNewView_Previews: PreviewProvider {
-    
-    static var previews: some View {
-        var style = Style()
-        style.startWeekDay = .sunday
-        var data = CalendarData(date: Date(), years: 1, style: style)
-        var allDayEvent = Event.stub(id: "4")
-        allDayEvent.isAllDay = true
-        data.months[0].days[0].events = [allDayEvent, .stub(id: "1"), .stub(id: "2"), .stub(id: "3")]
-        return MonthNewView(vm: MonthData(parameters: MonthData.Parameters(data: data)))
-    }
-    
+#Preview {
+    var style = Style()
+    style.startWeekDay = .sunday
+    var data = CalendarData(date: Date(), years: 1, style: style)
+    var allDayEvent = Event.stub(id: "4")
+    allDayEvent.isAllDay = true
+    data.months[0].days[0].events = [allDayEvent, .stub(id: "1"), .stub(id: "2"), .stub(id: "3")]
+    return MonthNewView(vm: MonthData(parameters: MonthData.Parameters(data: data)))
 }
 
 @available(iOS 17.0, *)
@@ -133,7 +152,7 @@ struct MonthDayView: View {
                 VStack {
                     if day.date?.kvkDay == 1 {
                         Text(date.titleForLocale(style.locale, formatter: style.month.shortInDayMonthFormatter).capitalized)
-                            .foregroundColor(getTxtHeaderColor(day))
+                            .foregroundStyle(getTxtHeaderColor(day))
                             .minimumScaleFactor(0.9)
                             .font(Font(style.month.fontTitleHeader))
                     }
@@ -148,7 +167,7 @@ struct MonthDayView: View {
                 }
                 VStack {
                     Text(dayTxt)
-                        .foregroundColor(getTxtColor(day, selectedDay: selectedDate, style: style))
+                        .foregroundStyle(getTxtColor(day, selectedDay: selectedDate, style: style))
                         .font(Font(style.month.fontNameDate))
                         .padding(4)
                         .frame(minWidth: 25)
@@ -159,7 +178,7 @@ struct MonthDayView: View {
             }
             if Platform.currentInterface == .phone && !day.events.isEmpty {
                 Circle()
-                    .foregroundColor(.gray)
+                    .foregroundStyle(.gray)
                     .frame(width: 8, height: 8)
                     .fixedSize()
             } else {
@@ -238,18 +257,14 @@ struct MonthDayView: View {
 }
 
 @available(iOS 17.0, *)
-struct MonthDayView_Previews: PreviewProvider {
-    
-    static var previews: some View {
-        var allDayEvent = Event.stub(id: "4")
-        allDayEvent.isAllDay = true
-        let events: [Event] = [allDayEvent, .stub(id: "1"), .stub(id: "2"), .stub(id: "3")]
-        return MonthDayView(day: Day(type: .monday, date: Date(), data: events), selectedDate: Date(), style: Style(), selectedEvent: .constant(nil))
-    }
-    
+#Preview("Month day view") {
+    var allDayEvent = Event.stub(id: "4")
+    allDayEvent.isAllDay = true
+    let events: [Event] = [allDayEvent, .stub(id: "1"), .stub(id: "2"), .stub(id: "3")]
+    return MonthDayView(day: Day(type: .monday, date: Date(), data: events), selectedDate: Date(), style: Style(), selectedEvent: .constant(nil))
 }
 
-@available(iOS 15.0, *)
+@available(iOS 17.0, *)
 struct MonthWeekView: View, WeekPreparing {
     
     private var date: Date
@@ -271,7 +286,7 @@ struct MonthWeekView: View, WeekPreparing {
             if Platform.currentInterface != .phone {
                 HStack {
                     Text(date.titleForLocale(style.locale, formatter: style.month.titleFormatter))
-                        .foregroundColor(getMonthTxtColor(date, style: style))
+                        .foregroundStyle(getMonthTxtColor(date, style: style))
                         .font(Font(style.month.fontTitleHeader))
                     Spacer()
                     Button("Today") {
@@ -281,10 +296,10 @@ struct MonthWeekView: View, WeekPreparing {
                 }
                 .padding([.leading, .trailing])
             }
-            HStack(spacing: 2) {
+            HStack {
                 ForEach(days, id: \.self) { (day) in
                     Text(day.titleForLocale(style.locale, formatter: style.month.weekdayFormatter))
-                        .foregroundColor(getTxtColor(day, style: style))
+                        .foregroundStyle(getTxtColor(day, style: style))
                         .font(Font(style.month.weekFont))
                         .minimumScaleFactor(0.5)
                         .background(getTxtBgColor(day, style: style))
@@ -292,6 +307,7 @@ struct MonthWeekView: View, WeekPreparing {
                                alignment: Platform.currentInterface == .phone ? .center : .trailing)
                 }
             }
+            .padding(.horizontal, 2)
         }
         .padding([.top, .bottom], 10)
     }
@@ -326,18 +342,14 @@ struct MonthWeekView: View, WeekPreparing {
     
 }
 
-@available(iOS 15.0, *)
-struct MonthWeekView_Previews: PreviewProvider {
-    
-    static var previews: some View {
-        var style = Style()
-        style.startWeekDay = .sunday
-        return MonthWeekView(style: style, date: Date())
-    }
-    
+@available(iOS 17.0, *)
+#Preview("Month week view") {
+    var style = Style()
+    style.startWeekDay = .sunday
+    return MonthWeekView(style: style, date: Date())
 }
 
-@available(iOS 15.0, *)
+@available(iOS 17.0, *)
 struct MonthEventView: View {
     var event: Event
     @Binding var selectedEvent: Event?
@@ -351,19 +363,19 @@ struct MonthEventView: View {
             HStack {
                 if event.isAllDay {
                     Text(event.title.month ?? "")
-                        .foregroundColor(txtColor)
+                        .foregroundStyle(txtColor)
                         .lineLimit(1)
                         .padding(2)
                 } else {
                     Circle()
                         .frame(width: 7, height: 7)
-                        .foregroundColor(Color(uiColor: event.backgroundColor))
+                        .foregroundStyle(Color(uiColor: event.backgroundColor))
                     Text(event.title.month ?? "")
-                        .foregroundColor(txtColor)
+                        .foregroundStyle(txtColor)
                         .lineLimit(1)
                     Text(event.start.formatted(.dateTime.hour()))
                         .font(.subheadline)
-                        .foregroundColor(txtTimeColor)
+                        .foregroundStyle(txtTimeColor)
                 }
             }
             .padding([.leading, .trailing], 1)
@@ -396,18 +408,18 @@ struct MonthEventView: View {
     }
 }
 
-@available(iOS 15.0, *)
-struct MonthEventView_Previews: PreviewProvider {
-    static var previews: some View {
-        var event = Event.stub(id: "1")
-        event.isAllDay = false
-        var event2 = Event.stub(id: "2")
-        event2.isAllDay = true
-        return Group {
-            MonthEventView(event: event, selectedEvent: .constant(nil))
-            MonthEventView(event: event2, selectedEvent: .constant(nil))
-        }
-    }
+@available(iOS 17.0, *)
+#Preview("General event") {
+    var event = Event.stub(id: "1")
+    event.isAllDay = false
+    return MonthEventView(event: event, selectedEvent: .constant(nil))
+}
+
+@available(iOS 17.0, *)
+#Preview("All-day event") {
+    var event2 = Event.stub(id: "2")
+    event2.isAllDay = true
+    return MonthEventView(event: event2, selectedEvent: .constant(nil))
 }
 
 final class MonthView: UIView {

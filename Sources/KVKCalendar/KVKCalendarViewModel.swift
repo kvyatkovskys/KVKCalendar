@@ -33,7 +33,7 @@ import Combine
         dayData = WeekNewData(data: data, events: events, type: .day)
         weekData = WeekNewData(data: data, events: events, type: .week)
         monthData = MonthData(parameters: MonthData.Parameters(data: data))
-        listData = ListView.Parameters(data: ListViewData(data: data))
+        // listData = ListView.Parameters(data: ListViewData(data: data))
     }
     
     func setDate(_ date: Date) {

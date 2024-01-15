@@ -21,6 +21,10 @@ public extension Date {
         return formatter.string(from: self)
     }
     
+    var kvkUniqID: Int {
+        timeIntervalSince1970.hashValue
+    }
+        
     var isSunday: Bool {
         kvkWeekday == 1
     }
