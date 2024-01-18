@@ -17,17 +17,14 @@ import KVKCalendar
     var events: [Event] = []
     var date = Date()
     var selectedEvent: KVKCalendar.Event?
-    
-    private var timeFormat: String = ""
-    
+        
     init() {
         date = defaultDate
-        timeFormat = style.timeSystem.format
     }
     
     func loadEvents() async {
         try? await Task.sleep(nanoseconds: 300_000_000)
-        let result = await loadEvents(dateFormat: "h:mm a")
+        let result = await loadEvents(dateFormat: style.timeSystem.format)
         await MainActor.run {
             events = result
         }

@@ -24,10 +24,10 @@ import SwiftUI
     var type: CalendarType
     
     var daySize: CGSize {
-        Platform.currentInterface == .phone ? CGSize(width: 40, height: 40) : CGSize(width: 30, height: 70)
+        Platform.currentDevice == .phone ? CGSize(width: 40, height: 40) : CGSize(width: 30, height: 70)
     }
     var spacing: CGFloat {
-        Platform.currentInterface == .phone ? 5 : 0
+        Platform.currentDevice == .phone ? 5 : 0
     }
     var leftPadding: CGFloat {
         type == .week ? style.timeline.widthTime + style.timeline.offsetTimeX : 0
@@ -51,10 +51,8 @@ import SwiftUI
                            maxDays: data.style.week.maxDays).weeks
     }
     
-    func setup() async {
-        await MainActor.run {
-            scrollToDate(date, enableAutoScrolling: true)
-        }
+    func setup() {
+        scrollToDate(date, enableAutoScrolling: true)
     }
 }
 

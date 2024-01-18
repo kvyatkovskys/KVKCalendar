@@ -45,7 +45,7 @@ struct ScrollableWeekNewView: View {
             Divider()
         }
         .task {
-            await vm.setup()
+            vm.setup()
         }
     }
     
