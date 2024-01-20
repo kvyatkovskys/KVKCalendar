@@ -51,13 +51,12 @@ struct YearNewView: View {
                                 Spacer()
                             }
                             .background(.thickMaterial)
-                            .padding([.top, .bottom], 10)
                         }
                         .id(section.date.kvkYear)
                     }
                 }
             }
-            .task {
+            .onAppear {
                 withAnimation {
                     proxy.scrollTo(data.date.kvkYear, anchor: .top)
                 }
@@ -201,7 +200,7 @@ struct WeekTitlesView: View, WeekPreparing {
 }
 
 @available(iOS 17.0, *)
-#Preview {
+#Preview("Week Title View") {
     WeekTitlesView(style: Style())
 }
 

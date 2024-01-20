@@ -14,7 +14,7 @@ import Combine
     var data: CalendarData
     var weekData: WeekNewData?
     var dayData: WeekNewData?
-    var monthData: MonthData?
+    var monthData: MonthNewData?
     var listData: ListView.Parameters?
     var date: Date
     var selectedEvent: Event?
@@ -32,7 +32,7 @@ import Combine
         data = CalendarData(date: date, years: years, style: style)
         dayData = WeekNewData(data: data, events: events, type: .day)
         weekData = WeekNewData(data: data, events: events, type: .week)
-        monthData = MonthData(parameters: MonthData.Parameters(data: data))
+        monthData = MonthNewData(data: data)
         // listData = ListView.Parameters(data: ListViewData(data: data))
     }
     

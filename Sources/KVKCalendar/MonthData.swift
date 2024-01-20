@@ -9,6 +9,25 @@
 
 import UIKit
 
+@available(iOS 17.0, *)
+@Observable final class MonthNewData: EventDateProtocol {
+    typealias DayOfMonth = (indexPath: IndexPath, day: Day?, weeks: Int)
+    
+    var date: Date
+    var headerDate: Date
+    var data: CalendarData
+    var selectedEvent: Event?
+    var style: KVKCalendar.Style
+    
+    init(data: CalendarData) {
+        date = data.date
+        headerDate = data.date
+        self.data = data
+        style = data.style
+        self.data.months = data.prepareMonths()
+    }
+}
+
 final class MonthData: ObservableObject, EventDateProtocol {
     
     typealias DayOfMonth = (indexPath: IndexPath, day: Day?, weeks: Int)
@@ -49,33 +68,8 @@ final class MonthData: ObservableObject, EventDateProtocol {
         scrollDirection = parameters.data.style.month.scrollDirection
         showRecurringEventInPast = parameters.data.style.event.showRecurringEventInPast
         style = parameters.data.style
-        
-        let months = parameters.data.months.reduce([], { (acc, month) -> [Month] in
-            var daysTemp = parameters.data.addStartEmptyDays(month.days, startDay: parameters.data.style.startWeekDay)
-            
-            let boxCount: Int
-            switch month.weeks {
-            case 5 where parameters.data.style.month.scrollDirection == .vertical:
-                boxCount = parameters.data.minBoxCount
-            default:
-                boxCount = parameters.data.maxBoxCount
-            }
-            
-            if let lastDay = daysTemp.last, daysTemp.count < boxCount {
-                let emptyEndDays = Array(1...(boxCount - daysTemp.count)).compactMap { (idx) -> Day in
-                    var day = Day.empty(uniqID: (lastDay.date?.kvkUniqID ?? 0) + idx)
-                    day.date = parameters.data.getOffsetDate(offset: idx, to: lastDay.date)
-                    return day
-                }
-                
-                daysTemp += emptyEndDays
-            }
-            var monthTemp = month
-            monthTemp.days = daysTemp
-            return acc + [monthTemp]
-        })
-        self.data.months = months
-        self.daysCount = months.reduce(0, { $0 + $1.days.count })
+        data.months = parameters.data.prepareMonths()
+        daysCount = data.months.reduce(0, { $0 + $1.days.count })
     }
     
     private func compareDate(day: Day, date: Date?) -> Bool {

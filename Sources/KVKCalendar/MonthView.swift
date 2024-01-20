@@ -12,28 +12,28 @@ import SwiftUI
 @available(iOS 17.0, *)
 struct MonthNewView: View {
     
-    @StateObject private var vm: MonthData
+    @State private var vm: MonthNewData
     @State private var scrollId: Date?
     
-    init(vm: MonthData) {
-        _vm = StateObject(wrappedValue: vm)
+    init(vm: MonthNewData) {
+        _vm = State(initialValue: vm)
     }
     
     var body: some View {
         ScrollViewReader { (proxy) in
             VStack(spacing: 0) {
                 MonthWeekView(style: vm.style, date: vm.headerDate) {
-                    vm.date = Date()
-//                    withAnimation {
-//                        proxy.scrollTo(vm.date.kvkStartOfMonth, anchor: .top)
-//                    }
+                    vm.date = .now
+                    withAnimation {
+                        scrollId = Date().kvkStartOfMonth
+                    }
                 }
                 .background(.thickMaterial)
                 scrollView
                     .onAppear {
-//                        withAnimation {
-//                            proxy.scrollTo(vm.date.kvkStartOfMonth, anchor: .top)
-//                        }
+                        withAnimation {
+                            scrollId = vm.date.kvkStartOfMonth
+                        }
                     }
             }
         }
@@ -49,11 +49,13 @@ struct MonthNewView: View {
         }
         .scrollPosition(id: $scrollId)
         // .scrollTargetBehavior(.paging)
+        .onChange(of: vm.date) { newValue in
+            vm.headerDate = newValue
+        }
         .onChange(of: scrollId) { (_, newValue) in
             guard let monthDate = newValue?.kvkStartOfMonth else { return }
             vm.headerDate = monthDate
         }
-        //                .scrollTargetBehavior(.paging)
     }
 }
 
@@ -105,7 +107,7 @@ private struct ContentGrid: View {
     var allDayEvent = Event.stub(id: "4")
     allDayEvent.isAllDay = true
     data.months[0].days[0].events = [allDayEvent, .stub(id: "1"), .stub(id: "2"), .stub(id: "3")]
-    return MonthNewView(vm: MonthData(parameters: MonthData.Parameters(data: data)))
+    return MonthNewView(vm: MonthNewData(data: data))
 }
 
 @available(iOS 17.0, *)

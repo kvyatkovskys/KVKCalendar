@@ -73,6 +73,33 @@ struct CalendarData {
         self.months = monthsTemp
     }
     
+    func prepareMonths() -> [Month]{
+        months.reduce([], { (acc, month) -> [Month] in
+            var daysTemp = addStartEmptyDays(month.days, startDay: style.startWeekDay)
+            
+            let boxCount: Int
+            switch month.weeks {
+            case 5 where style.month.scrollDirection == .vertical:
+                boxCount = minBoxCount
+            default:
+                boxCount = maxBoxCount
+            }
+            
+            if let lastDay = daysTemp.last, daysTemp.count < boxCount {
+                let emptyEndDays = Array(1...(boxCount - daysTemp.count)).compactMap { (idx) -> Day in
+                    var day = Day.empty(uniqID: (lastDay.date?.kvkUniqID ?? 0) + idx)
+                    day.date = getOffsetDate(offset: idx, to: lastDay.date)
+                    return day
+                }
+                
+                daysTemp += emptyEndDays
+            }
+            var monthTemp = month
+            monthTemp.days = daysTemp
+            return acc + [monthTemp]
+        })
+    }
+    
     func getDaysInMonth(month: Int, date: Date) -> [Day] {
         let calendar = style.calendar
         var dateComponents = DateComponents(year: date.kvkYear, month: month)
