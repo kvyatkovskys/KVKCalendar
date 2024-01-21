@@ -24,7 +24,7 @@ import UIKit
     var style: KVKCalendar.Style
     var scrollId: Int? {
         didSet {
-            guard let idx = scrollId else { return }
+            guard Platform.currentInterface != .phone, let idx = scrollId else { return }
             headerDate = data.months[idx].date
         }
     }

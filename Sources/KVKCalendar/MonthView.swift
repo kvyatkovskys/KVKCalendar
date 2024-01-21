@@ -35,19 +35,27 @@ struct MonthNewView: View {
     
     private var scrollView: some View {
         ScrollView {
-            LazyVStack(spacing: 0) {
-                ForEach(vm.data.months.indices, id: \.self) { (idx) in
-                    let month = vm.data.months[idx]
-                    ContentGrid(month: month,
-                                style: vm.style,
-                                date: $vm.date,
-                                selectedEvent: $vm.selectedEvent)
-                    .id(idx)
-                }
+            if Platform.currentInterface == .phone {
+                scrollContentView
+            } else {
+                scrollContentView
+                    .scrollTargetLayout()
             }
-            .scrollTargetLayout()
         }
         .scrollPosition(id: $vm.scrollId)
+    }
+    
+    private var scrollContentView: some View {
+        LazyVStack(spacing: 0) {
+            ForEach(vm.data.months.indices, id: \.self) { (idx) in
+                let month = vm.data.months[idx]
+                ContentGrid(month: month,
+                            style: vm.style,
+                            date: $vm.date,
+                            selectedEvent: $vm.selectedEvent)
+                .id(idx)
+            }
+        }
     }
 }
 
@@ -141,6 +149,14 @@ struct MonthDayView: View {
     }
     
     var body: some View {
+        if Platform.currentInterface == .phone {
+            bodyView
+        } else {
+            bodyView.frame(minHeight: 170)
+        }
+    }
+    
+    private var bodyView: some View {
         VStack {
             if day.type != .empty && Platform.currentInterface == .phone {
                 VStack {
@@ -152,7 +168,6 @@ struct MonthDayView: View {
                     }
                 }
                 .frame(height: 14)
-                .fixedSize()
                 Divider()
             }
             HStack {
@@ -186,7 +201,6 @@ struct MonthDayView: View {
             Spacer()
         }
         .background(getBgColor(date, style: style))
-        .frame(minHeight: height)
         .border(borderColor, width: borderWidth)
     }
     

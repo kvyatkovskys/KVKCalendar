@@ -68,12 +68,7 @@ private struct ContentGrid: View {
                 let year = years[idx]
                 Section {
                     ForEach(year.months) { (month) in
-                        Button {
-                            date = month.date
-                        } label: {
-                            YearMonthView(month: month, style: style, selectedDate: date)
-                        }
-                        .tint(.black)
+                        YearMonthView(month: month, style: style, selectedDate: date)
                     }
                 } header: {
                     VStack(alignment: .leading, spacing: 0) {
@@ -126,6 +121,7 @@ private struct YearMonthView: View {
             HStack {
                 Text(month.yearName)
                     .font(Font(style.year.fontTitle))
+                    .bold()
                 Spacer()
             }
             if Platform.currentInterface != .phone {
@@ -135,12 +131,8 @@ private struct YearMonthView: View {
                 ForEach(month.days) { (day) in
                     if let date = day.date {
                         Text(day.type == .empty ? "" : "\(date.kvkDay)")
-                            .foregroundColor(getCurrentTxtColor(date, selectedDay: selectedDate))
                             .font(Platform.currentInterface == .phone ? .caption2 : .subheadline)
-                            .padding(Platform.currentInterface == .phone ? 1 : 5)
-                            .background(getCurrentBgTxtColor(date, selectedDay: selectedDate))
-                            .clipShape(Circle())
-                            .fixedSize()
+                            .padding(.vertical, 1)
                     } else {
                         EmptyView()
                     }
