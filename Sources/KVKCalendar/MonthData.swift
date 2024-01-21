@@ -13,11 +13,23 @@ import UIKit
 @Observable final class MonthNewData: EventDateProtocol {
     typealias DayOfMonth = (indexPath: IndexPath, day: Day?, weeks: Int)
     
-    var date: Date
+    var date: Date {
+        didSet {
+            headerDate = date
+        }
+    }
     var headerDate: Date
     var data: CalendarData
     var selectedEvent: Event?
     var style: KVKCalendar.Style
+    var scrollId: Int? {
+        didSet {
+            guard let idx = scrollId else { return }
+            headerDate = data.months[idx].date
+        }
+    }
+    
+    private(set) var todayIdx: Int?
     
     init(data: CalendarData) {
         date = data.date
@@ -25,6 +37,14 @@ import UIKit
         self.data = data
         style = data.style
         self.data.months = data.prepareMonths()
+        let today = Date()
+        if date.kvkIsEqual(today) {
+            todayIdx = self.data.months.firstIndex(where: { $0.date.kvkMonthIsEqual(date) })
+            scrollId = todayIdx
+        } else {
+            todayIdx = self.data.months.firstIndex(where: { $0.date.kvkMonthIsEqual(.now) })
+            scrollId = self.data.months.firstIndex(where: { $0.date.kvkMonthIsEqual(date) })
+        }
     }
 }
 

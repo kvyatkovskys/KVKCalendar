@@ -12,65 +12,92 @@ import SwiftUI
 @available(iOS 17.0, *)
 struct YearNewView: View {
     
-    @StateObject private var data: YearData
+    @State private var vm: YearNewData
     
     private var style: Style {
-        data.style
+        vm.style
     }
     
-    private let columns: [GridItem] = [
-        GridItem(.flexible(), spacing: 5),
-        GridItem(.flexible(), spacing: 5),
-        GridItem(.flexible(), spacing: 5)
-    ]
-    
-    init(data: CalendarData) {
-        _data = StateObject(wrappedValue: YearData(data: data, date: data.date, style: data.style))
+    init(monthData: MonthNewData) {
+        _vm = State(initialValue: YearNewData(monthData: monthData))
     }
     
     var body: some View {
         ScrollViewReader { (proxy) in
             ScrollView {
-                LazyVGrid(columns: columns, pinnedViews: .sectionHeaders) {
-                    ForEach(data.sections) { (section) in
-                        Section {
-                            ForEach(section.months) { (month) in
-                                Button {
-                                    data.handleSelectedDate(month.date)
-                                } label: {
-                                    YearMonthView(month: month, style: style, selectedDate: data.date)
-                                }
-                                .tint(.black)
-                            }
-                        } header: {
-                            HStack {
-                                Text(section.date.titleForLocale(style.locale, formatter: style.year.titleFormatter))
-                                    .foregroundStyle(Date().kvkYear == section.date.kvkYear ? .red : Color(uiColor: style.year.colorTitleHeader))
-                                    .font(Font(style.year.fontTitleHeader))
-                                    .padding(5)
-                                Spacer()
-                            }
-                            .background(.thickMaterial)
-                        }
-                        .id(section.date.kvkYear)
-                    }
+                LazyVStack {
+                    let date = Binding(
+                        get: { vm.date },
+                        set: { vm.handleSelectedDate($0) })
+                    ContentGrid(years: vm.sections, style: style, date: date)
+                        .padding(.horizontal)
                 }
+                .scrollTargetLayout()
             }
-            .onAppear {
-                withAnimation {
-                    proxy.scrollTo(data.date.kvkYear, anchor: .top)
-                }
-            }
+            .scrollPosition(id: $vm.scrollId)
         }
     }
     
 }
 
 @available(iOS 17.0, *)
+private struct ContentGrid: View {
+    
+    let years: [KVKCalendar.YearSection]
+    let style: KVKCalendar.Style
+    @Binding var date: Date
+    
+    private var columns: [GridItem] = [
+        GridItem(.flexible(), spacing: 10),
+        GridItem(.flexible(), spacing: 10),
+        GridItem(.flexible(), spacing: 10)
+    ]
+    
+    init(years: [KVKCalendar.YearSection], style: KVKCalendar.Style, date: Binding<Date>) {
+        self.years = years
+        self.style = style
+        _date = date
+        if Platform.currentInterface != .phone {
+            columns.append(GridItem(.flexible(), spacing: 10))
+        }
+    }
+    
+    var body: some View {
+        LazyVGrid(columns: columns) {
+            ForEach(years.indices, id: \.self) { (idx) in
+                let year = years[idx]
+                Section {
+                    ForEach(year.months) { (month) in
+                        Button {
+                            date = month.date
+                        } label: {
+                            YearMonthView(month: month, style: style, selectedDate: date)
+                        }
+                        .tint(.black)
+                    }
+                } header: {
+                    VStack(alignment: .leading, spacing: 0) {
+                        HStack {
+                            Text(year.date.titleForLocale(style.locale, formatter: style.year.titleFormatter))
+                                .foregroundStyle(Date().kvkYear == year.date.kvkYear ? .red : Color(uiColor: style.year.colorTitleHeader))
+                                .font(Font(style.year.fontTitleHeader))
+                                .bold()
+                            Spacer()
+                        }
+                        Divider()
+                    }
+                }
+                .id(idx)
+            }
+        }
+    }
+}
+
+@available(iOS 17.0, *)
 #Preview {
     let style = Style()
-    let monthData = MonthData(parameters: .init(data: CalendarData(date: Date(), years: 2, style: style)))
-    return YearNewView(data: monthData.data)
+    let monthData = MonthNewData(data: .init(date: .now, years: 3, style: style))
+    return YearNewView(monthData: monthData)
 }
 
 @available(iOS 17.0, *)
@@ -95,26 +122,25 @@ private struct YearMonthView: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 5) {
+        VStack(spacing: 5) {
             HStack {
-                Text(month.name)
+                Text(month.yearName)
                     .font(Font(style.year.fontTitle))
                 Spacer()
             }
-            WeekTitlesView(style: style)
+            if Platform.currentInterface != .phone {
+                WeekTitlesView(style: style)
+            }
             LazyVGrid(columns: columns) {
                 ForEach(month.days) { (day) in
-                    if let date = day.date, day.type != .empty {
-                        VStack(alignment: .center) {
-                            Text("\(date.kvkDay)")
-                                .foregroundColor(getCurrentTxtColor(date, selectedDay: selectedDate))
-                                .font(Font(style.year.fontDayTitle))
-                                .minimumScaleFactor(0.5)
-                                .frame(width: daySize.width, height: daySize.height)
-                                .fixedSize()
-                        }
-                        .background(getCurrentBgTxtColor(date, selectedDay: selectedDate))
-                        .clipShape(Circle())
+                    if let date = day.date {
+                        Text(day.type == .empty ? "" : "\(date.kvkDay)")
+                            .foregroundColor(getCurrentTxtColor(date, selectedDay: selectedDate))
+                            .font(Platform.currentInterface == .phone ? .caption2 : .subheadline)
+                            .padding(Platform.currentInterface == .phone ? 1 : 5)
+                            .background(getCurrentBgTxtColor(date, selectedDay: selectedDate))
+                            .clipShape(Circle())
+                            .fixedSize()
                     } else {
                         EmptyView()
                     }

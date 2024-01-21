@@ -12,8 +12,7 @@ import SwiftUI
 @available(iOS 17.0, *)
 struct MonthNewView: View {
     
-    @State private var vm: MonthNewData
-    @State private var scrollId: Date?
+    @State private var vm: KVKCalendar.MonthNewData
     
     init(vm: MonthNewData) {
         _vm = State(initialValue: vm)
@@ -25,45 +24,38 @@ struct MonthNewView: View {
                 MonthWeekView(style: vm.style, date: vm.headerDate) {
                     vm.date = .now
                     withAnimation {
-                        scrollId = Date().kvkStartOfMonth
+                        vm.scrollId = vm.todayIdx
                     }
                 }
                 .background(.thickMaterial)
                 scrollView
-                    .onAppear {
-                        withAnimation {
-                            scrollId = vm.date.kvkStartOfMonth
-                        }
-                    }
             }
         }
     }
     
     private var scrollView: some View {
         ScrollView {
-            ContentGrid(data: vm.data,
-                        style: vm.style,
-                        date: $vm.date,
-                        selectedEvent: $vm.selectedEvent)
+            LazyVStack(spacing: 0) {
+                ForEach(vm.data.months.indices, id: \.self) { (idx) in
+                    let month = vm.data.months[idx]
+                    ContentGrid(month: month,
+                                style: vm.style,
+                                date: $vm.date,
+                                selectedEvent: $vm.selectedEvent)
+                    .id(idx)
+                }
+            }
             .scrollTargetLayout()
         }
-        .scrollPosition(id: $scrollId)
-        // .scrollTargetBehavior(.paging)
-        .onChange(of: vm.date) { newValue in
-            vm.headerDate = newValue
-        }
-        .onChange(of: scrollId) { (_, newValue) in
-            guard let monthDate = newValue?.kvkStartOfMonth else { return }
-            vm.headerDate = monthDate
-        }
+        .scrollPosition(id: $vm.scrollId)
     }
 }
 
 @available(iOS 17.0, *)
 private struct ContentGrid: View {
     
-    var data: CalendarData
-    var style: Style
+    var month: KVKCalendar.Month
+    var style: KVKCalendar.Style
     @Binding var date: Date
     @Binding var selectedEvent: KVKCalendar.Event?
     
@@ -83,17 +75,14 @@ private struct ContentGrid: View {
     
     var body: some View {
         LazyVGrid(columns: columns, spacing: 0) {
-            ForEach(data.months) { (month) in
-                ForEach(month.days) { (day) in
-                    MonthDayView(day: day, selectedDate: date, style: style, selectedEvent: $selectedEvent)
-                        .onTapGesture(count: tapCountToSelectDay) {
-                            withAnimation {
-                                date = day.date ?? Date()
-                            }
+            ForEach(month.days) { (day) in
+                MonthDayView(day: day, selectedDate: date, style: style, selectedEvent: $selectedEvent)
+                    .onTapGesture(count: tapCountToSelectDay) {
+                        withAnimation {
+                            date = day.date ?? Date()
                         }
-                        .disabled(day.type == .empty)
-                }
-                .id(month.date)
+                    }
+                    .disabled(day.type == .empty)
             }
         }
     }
@@ -101,9 +90,12 @@ private struct ContentGrid: View {
 
 @available(iOS 17.0, *)
 #Preview {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "dd.MM.yyyy"
+    let date = formatter.date(from: "01.01.2022") ?? Date()
     var style = Style()
     style.startWeekDay = .sunday
-    var data = CalendarData(date: Date(), years: 1, style: style)
+    var data = CalendarData(date: date, years: 1, style: style)
     var allDayEvent = Event.stub(id: "4")
     allDayEvent.isAllDay = true
     data.months[0].days[0].events = [allDayEvent, .stub(id: "1"), .stub(id: "2"), .stub(id: "3")]
@@ -115,8 +107,8 @@ struct MonthDayView: View {
     
     let day: Day
     let selectedDate: Date
-    let style: Style
-    @Binding var selectedEvent: Event?
+    let style: KVKCalendar.Style
+    @Binding var selectedEvent: KVKCalendar.Event?
     
     private var dayTxt: String {
         switch day.type {
@@ -271,10 +263,10 @@ struct MonthWeekView: View, WeekPreparing {
     
     private var date: Date
     private var days: [Date] = []
-    private let style: Style
+    private let style: KVKCalendar.Style
     private var didSelectToday: (() -> Void)?
     
-    init(style: Style,
+    init(style: KVKCalendar.Style,
          date: Date,
          didSelectToday: (() -> Void)? = nil) {
         self.style = style
@@ -353,8 +345,8 @@ struct MonthWeekView: View, WeekPreparing {
 
 @available(iOS 17.0, *)
 struct MonthEventView: View {
-    var event: Event
-    @Binding var selectedEvent: Event?
+    var event: KVKCalendar.Event
+    @Binding var selectedEvent: KVKCalendar.Event?
     
     var body: some View {
         Button {

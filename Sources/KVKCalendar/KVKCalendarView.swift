@@ -46,7 +46,11 @@ public struct KVKCalendarSwiftUIView: View {
                 EmptyView()
             }
         case .year:
-            EmptyView() // YearNewView(data: vm.data)
+            if let item = vm.monthData {
+                YearNewView(monthData: item)
+            } else {
+                EmptyView()
+            }
         case .list:
             EmptyView() // ListNewView(params: vm.listData, date: $vm.date, event: $vm.selectedEvent, events: .constant([]))
         }

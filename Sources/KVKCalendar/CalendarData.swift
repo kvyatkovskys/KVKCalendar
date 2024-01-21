@@ -73,7 +73,19 @@ struct CalendarData {
         self.months = monthsTemp
     }
     
-    func prepareMonths() -> [Month]{
+    func prepareYears(_ months: [Month]) -> [YearSection] {
+        months.reduce([], { (acc, month) -> [YearSection] in
+            var accTemp = acc
+            guard let idx = accTemp.firstIndex(where: { $0.date.kvkYear == month.date.kvkYear }) else {
+                return accTemp + [YearSection(date: month.date, months: [month])]
+            }
+            
+            accTemp[idx].months.append(month)
+            return accTemp
+        })
+    }
+    
+    func prepareMonths() -> [Month] {
         months.reduce([], { (acc, month) -> [Month] in
             var daysTemp = addStartEmptyDays(month.days, startDay: style.startWeekDay)
             
@@ -208,6 +220,19 @@ struct Month: Identifiable {
     let date: Date
     var days: [Day] = []
     var weeks: Int
+    
+    var id: Int {
+        date.hashValue
+    }
+    
+    var yearName: String {
+        Platform.currentInterface == .phone ? String(name.prefix(3)) : name
+    }
+}
+
+struct YearSection: Identifiable {
+    let date: Date
+    var months: [Month]
     
     var id: Int {
         date.hashValue

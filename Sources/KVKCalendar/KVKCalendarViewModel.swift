@@ -15,6 +15,7 @@ import Combine
     var weekData: WeekNewData?
     var dayData: WeekNewData?
     var monthData: MonthNewData?
+    var yearData: YearNewData?
     var listData: ListView.Parameters?
     var date: Date
     var selectedEvent: Event?
