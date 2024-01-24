@@ -49,10 +49,20 @@ struct MonthNewView: View {
         LazyVStack(spacing: 0) {
             ForEach(vm.data.months.indices, id: \.self) { (idx) in
                 let month = vm.data.months[idx]
-                ContentGrid(month: month,
-                            style: vm.style,
-                            date: $vm.date,
-                            selectedEvent: $vm.selectedEvent)
+                SwiftUI.Group {
+                    if Platform.currentInterface == .phone {
+                        ContentGrid(month: month,
+                                    style: vm.style,
+                                    date: $vm.date,
+                                    selectedEvent: $vm.selectedEvent)
+                        .padding(.vertical, 30)
+                    } else {
+                        ContentGrid(month: month,
+                                    style: vm.style,
+                                    date: $vm.date,
+                                    selectedEvent: $vm.selectedEvent)
+                    }
+                }
                 .id(idx)
             }
         }
@@ -113,6 +123,8 @@ private struct ContentGrid: View {
 @available(iOS 17.0, *)
 struct MonthDayView: View {
     
+    @Environment(\.colorScheme) private var colorScheme
+    
     let day: Day
     let selectedDate: Date
     let style: KVKCalendar.Style
@@ -159,31 +171,30 @@ struct MonthDayView: View {
     private var bodyView: some View {
         VStack {
             if day.type != .empty && Platform.currentInterface == .phone {
-                VStack {
-                    if day.date?.kvkDay == 1 {
+                HStack {
+                    if date.kvkDay == 1 {
                         Text(date.titleForLocale(style.locale, formatter: style.month.shortInDayMonthFormatter).capitalized)
-                            .foregroundStyle(getTxtHeaderColor(day))
-                            .minimumScaleFactor(0.9)
-                            .font(Font(style.month.fontTitleHeader))
+                    } else {
+                        Text("")
                     }
                 }
-                .frame(height: 14)
+                .foregroundStyle(getTxtHeaderColor(day))
+                .font(Font(style.month.fontTitleHeader))
+                .frame(height: 15)
+                .fixedSize()
                 Divider()
             }
             HStack {
                 if Platform.currentInterface != .phone {
                     Spacer()
                 }
-                VStack {
-                    Text(dayTxt)
-                        .foregroundStyle(getTxtColor(day, selectedDay: selectedDate, style: style))
-                        .font(Font(style.month.fontNameDate))
-                        .padding(4)
-                        .frame(minWidth: 25)
+                if (day.date?.kvkIsEqual(selectedDate) ?? false)
+                    || (day.date?.kvkIsEqual(Date()) ?? false) {
+                    dayView
+                        .clipShape(.circle)
+                } else {
+                    dayView
                 }
-                .background(getBgTxtColor(day, selectedDay: selectedDate))
-                .clipShape(Capsule())
-                .padding([.top, .trailing], dayPadding)
             }
             if Platform.currentInterface == .phone && !day.events.isEmpty {
                 Circle()
@@ -204,6 +215,18 @@ struct MonthDayView: View {
         .border(borderColor, width: borderWidth)
     }
     
+    private var dayView: some View {
+        VStack {
+            Text(dayTxt)
+                .foregroundStyle(getTxtColor(day, selectedDay: selectedDate, style: style))
+                .font(Font(style.month.fontNameDate))
+                .padding(4)
+                .frame(minWidth: 25)
+        }
+        .background(getBgTxtColor(day, selectedDay: selectedDate))
+        .padding([.top, .trailing], dayPadding)
+    }
+    
     private func getTxtHeaderColor(_ day: Day) -> Color {
         let currentDate = Date()
         if let dt = day.date,
@@ -211,7 +234,7 @@ struct MonthDayView: View {
            dt.kvkMonth == currentDate.kvkMonth {
             return .red
         } else {
-            return .black
+            return colorScheme == .dark ? .white : .black
         }
     }
     
@@ -225,11 +248,11 @@ struct MonthDayView: View {
         if date.kvkIsEqual(selectedDay) && date.kvkIsEqual(Date()) {
             return .red
         } else if date.kvkIsEqual(selectedDay) {
-            return .black
+            return colorScheme == .dark ? .white : .black
         } else if date.isWeekend && Platform.currentInterface != .phone {
             return .clear
         } else {
-            return .white
+            return colorScheme == .dark ? .black : .white
         }
     }
     
@@ -242,23 +265,23 @@ struct MonthDayView: View {
         
         let date = day.date ?? Date()
         if date.kvkIsEqual(Date()) && date.kvkIsEqual(selectedDay) {
-            return .white
+            return colorScheme == .dark ? .black : .white
         } else if date.kvkIsEqual(selectedDay) {
-            return .white
+            return colorScheme == .dark ? .black : .white
         } else if date.isWeekend {
-            return Color(uiColor: style.week.colorWeekendDate)
+            return colorScheme == .dark ? .gray : Color(uiColor: style.week.colorWeekendDate)
         } else if date.isWeekday {
-            return Color(uiColor: style.week.colorDate)
+            return colorScheme == .dark ? .white : Color(uiColor: style.week.colorDate)
         } else {
-            return .black
+            return colorScheme == .dark ? .white : .black
         }
     }
     
     private func getBgColor(_ day: Date, style: Style) -> Color {
         if day.isWeekend {
-            return Color(uiColor: style.month.colorBackgroundWeekendDate)
+            return colorScheme == .dark ? .black : Color(uiColor: style.month.colorBackgroundWeekendDate)
         } else {
-            return Color(uiColor: style.month.colorBackgroundDate)
+            return colorScheme == .dark ? .black : Color(uiColor: style.month.colorBackgroundDate)
         }
     }
     
@@ -274,6 +297,8 @@ struct MonthDayView: View {
 
 @available(iOS 17.0, *)
 struct MonthWeekView: View, WeekPreparing {
+    
+    @Environment(\.colorScheme) private var colorScheme
     
     private var date: Date
     private var days: [Date] = []

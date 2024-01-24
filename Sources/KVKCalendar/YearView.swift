@@ -98,6 +98,8 @@ private struct ContentGrid: View {
 @available(iOS 17.0, *)
 private struct YearMonthView: View {
     
+    @Environment(\.colorScheme) private var colorScheme
+    
     var month: Month
     var style: Style
     var selectedDate: Date
@@ -121,6 +123,7 @@ private struct YearMonthView: View {
             HStack {
                 Text(month.yearName)
                     .font(Font(style.year.fontTitle))
+                    .foregroundStyle(getMonthTxtColor(month.date))
                     .bold()
                 Spacer()
             }
@@ -130,9 +133,18 @@ private struct YearMonthView: View {
             LazyVGrid(columns: columns) {
                 ForEach(month.days) { (day) in
                     if let date = day.date {
-                        Text(day.type == .empty ? "" : "\(date.kvkDay)")
-                            .font(Platform.currentInterface == .phone ? .caption2 : .subheadline)
-                            .padding(.vertical, 1)
+                        if date.kvkIsEqual(.now) {
+                            Text(day.type == .empty ? "" : "\(date.kvkDay)")
+                                .font(Platform.currentInterface == .phone ? .caption2 : .subheadline)
+                                .foregroundStyle(.white)
+                                .padding(.vertical, 1)
+                                .background(.red)
+                                .clipShape(.circle)
+                        } else {
+                            Text(day.type == .empty ? "" : "\(date.kvkDay)")
+                                .font(Platform.currentInterface == .phone ? .caption2 : .subheadline)
+                                .padding(.vertical, 1)
+                        }
                     } else {
                         EmptyView()
                     }
@@ -142,23 +154,25 @@ private struct YearMonthView: View {
         }
     }
     
-    private func getCurrentTxtColor(_ day: Date,
-                                    selectedDay: Date) -> Color {
-        if day.kvkIsEqual(selectedDay) {
-            return .white
-        } else if day.isWeekend {
-            return Color(uiColor: style.week.colorWeekendDate)
+    private func getMonthTxtColor(_ day: Date) -> Color {
+        if day.kvkMonthIsEqual(.now) {
+            return .red
         } else {
-            return .black
+            return colorScheme == .dark ? .white : .black
         }
     }
     
-    private func getCurrentBgTxtColor(_ day: Date,
-                                      selectedDay: Date) -> Color {
-        if day.kvkIsEqual(selectedDay) && day.kvkIsEqual(Date()) {
+    private func getDayTxtColor(_ day: Date) -> Color {
+        if day.kvkIsEqual(.now) {
+            return .white
+        } else {
+            return colorScheme == .dark ? .white : .black
+        }
+    }
+    
+    private func getBgDayTxtColor(_ day: Date) -> Color {
+        if day.kvkIsEqual(.now) {
             return .red
-        } else if day.kvkIsEqual(selectedDay) {
-            return .black
         } else {
             return .clear
         }
@@ -168,6 +182,8 @@ private struct YearMonthView: View {
 
 @available(iOS 17.0, *)
 struct WeekTitlesView: View, WeekPreparing {
+    
+    @Environment(\.colorScheme) private var colorScheme
     
     private var days: [Date] = []
     private let style: Style
