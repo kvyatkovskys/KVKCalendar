@@ -352,6 +352,7 @@ public struct MonthStyle {
     public var isPrefetchingEnabled: Bool = true
     public var isHiddenSectionHeader: Bool = true
     public var heightSectionHeader: CGFloat = 50
+    public var isHiddenTodayButton: Bool = false
     
     public enum SelectionMode: Int {
         case single, multiple, disabled

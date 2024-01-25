@@ -11,7 +11,6 @@ import SwiftUI
 
 @available(iOS 17.0, *)
 struct YearNewView: View {
-    
     @State private var vm: YearNewData
     
     private var style: Style {
@@ -43,6 +42,8 @@ struct YearNewView: View {
 @available(iOS 17.0, *)
 private struct ContentGrid: View {
     
+    @Environment(\.colorScheme) private var colorScheme
+    
     let years: [KVKCalendar.YearSection]
     let style: KVKCalendar.Style
     @Binding var date: Date
@@ -63,27 +64,41 @@ private struct ContentGrid: View {
     }
     
     var body: some View {
+        bodyView
+    }
+    
+    private var bodyView: some View {
         LazyVGrid(columns: columns) {
             ForEach(years.indices, id: \.self) { (idx) in
                 let year = years[idx]
                 Section {
                     ForEach(year.months) { (month) in
-                        YearMonthView(month: month, style: style, selectedDate: date)
+                        YearMonthView(month: month, style: style, selectedDate: $date)
                     }
                 } header: {
-                    VStack(alignment: .leading, spacing: 0) {
+                    VStack(alignment: .leading, spacing: 5) {
                         HStack {
                             Text(year.date.titleForLocale(style.locale, formatter: style.year.titleFormatter))
-                                .foregroundStyle(Date().kvkYear == year.date.kvkYear ? .red : Color(uiColor: style.year.colorTitleHeader))
+                                .foregroundStyle(getYearTxtColor(year.date))
                                 .font(Font(style.year.fontTitleHeader))
                                 .bold()
                             Spacer()
                         }
                         Divider()
                     }
+                    .padding(.vertical)
                 }
                 .id(idx)
             }
+        }
+    }
+    
+    private func getYearTxtColor(_ date: Date) -> Color {
+        switch date.kvkYear {
+        case Date().kvkYear:
+            .red
+        default:
+            colorScheme == .dark ? .white : Color(uiColor: style.year.colorTitleHeader)
         }
     }
 }
@@ -102,7 +117,7 @@ private struct YearMonthView: View {
     
     var month: Month
     var style: Style
-    var selectedDate: Date
+    @Binding var selectedDate: Date
     
     private let columns: [GridItem] = [
         GridItem(.flexible(), spacing: 1),
@@ -119,7 +134,7 @@ private struct YearMonthView: View {
     }
     
     var body: some View {
-        VStack(spacing: 5) {
+        VStack(spacing: 10) {
             HStack {
                 Text(month.yearName)
                     .font(Font(style.year.fontTitle))
@@ -133,17 +148,14 @@ private struct YearMonthView: View {
             LazyVGrid(columns: columns) {
                 ForEach(month.days) { (day) in
                     if let date = day.date {
-                        if date.kvkIsEqual(.now) {
-                            Text(day.type == .empty ? "" : "\(date.kvkDay)")
-                                .font(Platform.currentInterface == .phone ? .caption2 : .subheadline)
-                                .foregroundStyle(.white)
-                                .padding(.vertical, 1)
-                                .background(.red)
+                        if date.kvkIsEqual(.now) || date.kvkIsEqual(selectedDate) {
+                            getDayView(day, date: date)
+                                .background(getBgDayTxtColor(date))
                                 .clipShape(.circle)
+                                .minimumScaleFactor(0.8)
+                                .fixedSize()
                         } else {
-                            Text(day.type == .empty ? "" : "\(date.kvkDay)")
-                                .font(Platform.currentInterface == .phone ? .caption2 : .subheadline)
-                                .padding(.vertical, 1)
+                            getDayView(day, date: date)
                         }
                     } else {
                         EmptyView()
@@ -151,6 +163,25 @@ private struct YearMonthView: View {
                 }
             }
             Spacer()
+        }
+        .onTapGesture {
+            selectedDate = month.date
+        }
+    }
+    
+    @ViewBuilder
+    private func getDayView(_ day: Day,
+                            date: Date) -> some View {
+        if Platform.currentInterface == .phone {
+            Text(day.type == .empty ? "" : "\(date.kvkDay)")
+                .font(Platform.currentInterface == .phone ? .caption2 : .subheadline)
+                .foregroundStyle(getDayTxtColor(date))
+                .padding(.vertical, 1)
+        } else {
+            Text(day.type == .empty ? "" : "\(date.kvkDay)")
+                .font(Platform.currentInterface == .phone ? .caption2 : .subheadline)
+                .foregroundStyle(getDayTxtColor(date))
+                .padding(1)
         }
     }
     
@@ -163,16 +194,22 @@ private struct YearMonthView: View {
     }
     
     private func getDayTxtColor(_ day: Date) -> Color {
-        if day.kvkIsEqual(.now) {
+        if day.kvkIsEqual(.now) && day.kvkIsEqual(selectedDate) {
             return .white
+        } else if day.kvkIsEqual(selectedDate) {
+            return colorScheme == .dark ? .black : .white
+        } else if day.isWeekend {
+            return .gray
         } else {
             return colorScheme == .dark ? .white : .black
         }
     }
     
     private func getBgDayTxtColor(_ day: Date) -> Color {
-        if day.kvkIsEqual(.now) {
+        if day.kvkIsEqual(.now) && day.kvkIsEqual(selectedDate) {
             return .red
+        } else if day.kvkIsEqual(selectedDate) {
+            return colorScheme == .dark ? .white : .black
         } else {
             return .clear
         }
@@ -184,7 +221,6 @@ private struct YearMonthView: View {
 struct WeekTitlesView: View, WeekPreparing {
     
     @Environment(\.colorScheme) private var colorScheme
-    
     private var days: [Date] = []
     private let style: Style
     private let formatter: DateFormatter
@@ -213,9 +249,9 @@ struct WeekTitlesView: View, WeekPreparing {
     
     private func getTxtColor(_ day: Date, style: Style) -> Color {
         if day.isWeekend {
-            return Color(uiColor: style.week.colorWeekendDate)
+            return colorScheme == .dark ? .gray : Color(uiColor: style.week.colorWeekendDate)
         } else if day.isWeekday {
-            return Color(uiColor: style.week.colorDate)
+            return colorScheme == .dark ? .white : Color(uiColor: style.week.colorDate)
         } else {
             return .clear
         }

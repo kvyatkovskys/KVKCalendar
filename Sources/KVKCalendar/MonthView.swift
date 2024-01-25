@@ -49,21 +49,20 @@ struct MonthNewView: View {
         LazyVStack(spacing: 0) {
             ForEach(vm.data.months.indices, id: \.self) { (idx) in
                 let month = vm.data.months[idx]
-                SwiftUI.Group {
-                    if Platform.currentInterface == .phone {
-                        ContentGrid(month: month,
-                                    style: vm.style,
-                                    date: $vm.date,
-                                    selectedEvent: $vm.selectedEvent)
-                        .padding(.vertical, 30)
-                    } else {
-                        ContentGrid(month: month,
-                                    style: vm.style,
-                                    date: $vm.date,
-                                    selectedEvent: $vm.selectedEvent)
-                    }
+                if Platform.currentInterface == .phone {
+                    ContentGrid(month: month,
+                                style: vm.style,
+                                date: $vm.date,
+                                selectedEvent: $vm.selectedEvent)
+                    .padding(.vertical, 30)
+                    .id(idx)
+                } else {
+                    ContentGrid(month: month,
+                                style: vm.style,
+                                date: $vm.date,
+                                selectedEvent: $vm.selectedEvent)
+                    .id(idx)
                 }
-                .id(idx)
             }
         }
     }
@@ -110,7 +109,7 @@ private struct ContentGrid: View {
 #Preview {
     let formatter = DateFormatter()
     formatter.dateFormat = "dd.MM.yyyy"
-    let date = formatter.date(from: "01.01.2022") ?? Date()
+    let date = formatter.date(from: "01.01.2024") ?? Date()
     var style = Style()
     style.startWeekDay = .sunday
     var data = CalendarData(date: date, years: 1, style: style)
@@ -192,8 +191,10 @@ struct MonthDayView: View {
                     || (day.date?.kvkIsEqual(Date()) ?? false) {
                     dayView
                         .clipShape(.circle)
+                        .padding([.top, .trailing], dayPadding)
                 } else {
                     dayView
+                        .padding([.top, .trailing], dayPadding)
                 }
             }
             if Platform.currentInterface == .phone && !day.events.isEmpty {
@@ -224,7 +225,6 @@ struct MonthDayView: View {
                 .frame(minWidth: 25)
         }
         .background(getBgTxtColor(day, selectedDay: selectedDate))
-        .padding([.top, .trailing], dayPadding)
     }
     
     private func getTxtHeaderColor(_ day: Day) -> Color {
@@ -322,10 +322,12 @@ struct MonthWeekView: View, WeekPreparing {
                         .foregroundStyle(getMonthTxtColor(date, style: style))
                         .font(Font(style.month.fontTitleHeader))
                     Spacer()
-                    Button("Today") {
-                        didSelectToday?()
+                    if !style.month.isHiddenTodayButton {
+                        Button("Today") {
+                            didSelectToday?()
+                        }
+                        .tint(.red)
                     }
-                    .tint(.red)
                 }
                 .padding([.leading, .trailing])
             }
