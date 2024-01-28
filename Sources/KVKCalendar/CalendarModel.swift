@@ -158,7 +158,7 @@ public struct Event {
     public var recurringType: Event.RecurringType = .none
     
     ///custom style
-    ///(in-progress) works only with a default (widht & height)
+    ///(in-progress) works only with a default (width & height)
     public var style: EventStyle? = nil
     public var systemEvent: EKEvent? = nil
     
