@@ -199,8 +199,8 @@ public struct TimelineStyle {
     }
     
     public struct Scale {
-        var min: CGFloat
-        var max: CGFloat
+        public var min: CGFloat
+        public var max: CGFloat
     }
     
     public enum DividerType: Int {
