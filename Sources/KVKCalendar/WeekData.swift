@@ -16,35 +16,30 @@ import SwiftUI
     var date: Date
     var timelineDays: [Date?] = []
     var allDayEvents: [Event] = []
-    var selectedEvent: Event?
+    var event: Event?
     var events: [Event]
     var recurringEvents: [Event] = []
     var weeks: [[Day]] = []
     var type: CalendarType
     
-    private(set) var scrollableWeekVM: ScrollableWeekVM
     private let data: KVKCalendar.CalendarData
         
     init(data: KVKCalendar.CalendarData,
          events: [Event] = [],
          type: KVKCalendar.CalendarType,
-         selectedEvent: Event? = nil) {
+         event: Event? = nil) {
         self.data = data
         date = data.date
         self.events = events
         style = data.style
-        self.selectedEvent = selectedEvent
+        self.event = event
         self.type = type
-        scrollableWeekVM = ScrollableWeekVM(data: data, type: type)
         let item = reloadData(data,
                               type: type,
                               startDay: data.style.startWeekDay,
                               maxDays: data.style.week.maxDays)
         days = item.days
         weeks = item.weeks
-        scrollableWeekVM.didSelectDate = { [weak self] (dt) in
-            self?.date = dt
-        }
     }
     
     func setup() async {
@@ -59,11 +54,6 @@ import SwiftUI
                 || checkMultipleDate($0, with: event)
             })
         }
-    }
-    
-    func setDate(_ dt: Date) {
-        date = dt
-        scrollableWeekVM.scrollToDate(dt)
     }
 }
 

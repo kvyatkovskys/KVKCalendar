@@ -148,12 +148,11 @@ private struct YearMonthView: View {
             LazyVGrid(columns: columns) {
                 ForEach(month.days) { (day) in
                     if let date = day.date {
-                        if date.kvkIsEqual(.now) || date.kvkIsEqual(selectedDate) {
+                        if day.type != .empty && (date.kvkIsEqual(.now) || date.kvkIsEqual(selectedDate)) {
                             getDayView(day, date: date)
                                 .background(getBgDayTxtColor(date))
                                 .clipShape(.circle)
                                 .minimumScaleFactor(0.8)
-                                .fixedSize()
                         } else {
                             getDayView(day, date: date)
                         }
@@ -170,19 +169,19 @@ private struct YearMonthView: View {
     }
     
     @ViewBuilder
-    private func getDayView(_ day: Day,
-                            date: Date) -> some View {
-        if Platform.currentInterface == .phone {
-            Text(day.type == .empty ? "" : "\(date.kvkDay)")
-                .font(Platform.currentInterface == .phone ? .caption2 : .subheadline)
-                .foregroundStyle(getDayTxtColor(date))
-                .padding(.vertical, 1)
-        } else {
-            Text(day.type == .empty ? "" : "\(date.kvkDay)")
-                .font(Platform.currentInterface == .phone ? .caption2 : .subheadline)
-                .foregroundStyle(getDayTxtColor(date))
-                .padding(1)
+    private func getDayView(_ day: Day, date: Date) -> some View {
+        Group {
+            if Platform.currentInterface == .phone {
+                Text(day.type == .empty ? "" : "\(date.kvkDay)")
+                    .font(.caption2)
+                    .frame(width: 15, height: 15)
+            } else {
+                Text(day.type == .empty ? "" : "\(date.kvkDay)")
+                    .font(.subheadline)
+                    .padding(3)
+            }
         }
+        .foregroundStyle(getDayTxtColor(date))
     }
     
     private func getMonthTxtColor(_ day: Date) -> Color {

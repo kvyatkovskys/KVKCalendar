@@ -14,39 +14,52 @@ import EventKit
 public struct KVKCalendarSwiftUIView: View {
 
     private var type: CalendarType
-    @State private var vm: KVKCalendarViewModel
+    private var data: CalendarData
+    private var weekData: WeekNewData?
+    private var dayData: WeekNewData?
+    private var monthData: MonthNewData?
+    private var yearData: YearNewData?
+    private var listData: ListView.Parameters?
+    @Binding var date: Date
+    @Binding var event: Event?
     
     public init(type: CalendarType,
-                date: Date,
-                events: [Event],
-                selectedEvent: Event? = nil,
-                style: KVKCalendar.Style = KVKCalendar.Style()) {
+                date: Binding<Date> = .constant(.now),
+                events: [Event] = [],
+                event: Binding<Event?> = .constant(nil),
+                style: KVKCalendar.Style = KVKCalendar.Style(),
+                years: Int = 4) {
         self.type = type
-        _vm = State(initialValue: KVKCalendarViewModel(date: date, events: events, selectedEvent: selectedEvent, style: style))
+        _date = date
+        _event = event
+        data = CalendarData(date: date.wrappedValue, years: years, style: style)
+        dayData = WeekNewData(data: data, events: events, type: .day)
+        weekData = WeekNewData(data: data, events: events, type: .week)
+        monthData = MonthNewData(data: data)
     }
     
     public var body: some View {
         switch type {
         case .day:
-            if let item = vm.dayData {
-                WeekNewView(vm: item)
+            if let item = dayData {
+                WeekNewView(vm: item, date: $date, event: $event)
             } else {
                 EmptyView()
             }
         case .week:
-            if let item = vm.weekData {
-                WeekNewView(vm: item)
+            if let item = weekData {
+                WeekNewView(vm: item, date: $date, event: $event)
             } else {
                 EmptyView()
             }
         case .month:
-            if let item = vm.monthData {
-                MonthNewView(vm: item)
+            if let item = monthData {
+                MonthNewView(vm: item, date: $date, event: $event)
             } else {
                 EmptyView()
             }
         case .year:
-            if let item = vm.monthData {
+            if let item = monthData {
                 YearNewView(monthData: item)
             } else {
                 EmptyView()
@@ -60,11 +73,11 @@ public struct KVKCalendarSwiftUIView: View {
 @available(iOS 17.0, *)
 private struct PreviewProxy: View {
     @State var type = CalendarType.week
-    @State var date = Date()
+    @State var date = Date.now
     
     var body: some View {
         NavigationStack {
-            KVKCalendarSwiftUIView(type: type, date: date, events: [])
+            KVKCalendarSwiftUIView(type: type, date: $date, events: [])
                 .navigationTitle(date.description)
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {

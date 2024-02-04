@@ -13,6 +13,7 @@ import KVKCalendar
 struct CalendarView: View {
 
     @State private var vm = CalendarViewModel()
+    @State private var date = Date()
     
     var body: some View {
         NavigationStack {
@@ -25,14 +26,14 @@ struct CalendarView: View {
     
     private var calendarView: some View {
         KVKCalendarSwiftUIView(type: vm.type,
-                               date: vm.date,
+                               date: $vm.date,
                                events: vm.events,
-                               selectedEvent: vm.selectedEvent,
+                               event: $vm.selectedEvent,
                                style: vm.style)
             .kvkOnRotate(action: { (newOrientation) in
                 vm.orientation = newOrientation
             })
-            .navigationBarTitle(vm.date.formatted(date: .abbreviated, time: .omitted), displayMode: .inline)
+//            .navigationBarTitle(vm.date.formatted(date: .abbreviated, time: .omitted), displayMode: .inline)
             .toolbar {
                 ToolbarItemGroup(placement: .topBarLeading) {
                     Picker(vm.type.title, selection: $vm.type) {
@@ -46,7 +47,7 @@ struct CalendarView: View {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     if UIDevice.current.userInterfaceIdiom == .phone {
                         Button {
-                            vm.date = Date()
+                            vm.date = .now
                         } label: {
                             Text("Today")
                                 .font(.headline)

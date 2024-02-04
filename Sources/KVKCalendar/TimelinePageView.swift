@@ -7,7 +7,7 @@
 
 #if os(iOS)
 
-import UIKit
+import SwiftUI
 
 final class TimelinePageView: UIView {
     
@@ -271,7 +271,10 @@ final class TimelinePageVC: UIPageViewController {
         pages.forEach { $0.value.updateStyle(style, force: force) }
     }
     
-    func reloadPages(with params: TimelinePageWrapper.Parameters, excludeCurrentPage: Bool = false) {
+    func reloadPages(with params: TimelinePageWrapper.Parameters,
+                     date: Date,
+                     event: Binding<KVKCalendar.Event?>,
+                     excludeCurrentPage: Bool = false) {
         var items: [Int: TimelineView]
         if excludeCurrentPage {
             items = pages
@@ -279,7 +282,7 @@ final class TimelinePageVC: UIPageViewController {
         } else {
             items = pages
         }
-        items.forEach { $0.value.reloadTimeline(params: params) }
+        items.forEach { $0.value.reloadTimeline(params: params, date: date, event: event) }
     }
     
     func removeAll(excludeCurrentPage: Bool = false) {

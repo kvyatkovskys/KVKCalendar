@@ -12,11 +12,9 @@ import SwiftUI
 @available(iOS 17.0, *)
 struct MonthNewView: View {
     
-    @State private var vm: KVKCalendar.MonthNewData
-    
-    init(vm: MonthNewData) {
-        _vm = State(initialValue: vm)
-    }
+    @State var vm: KVKCalendar.MonthNewData
+    @Binding var date: Date
+    @Binding var event: KVKCalendar.Event?
     
     var body: some View {
         ScrollViewReader { (proxy) in
@@ -30,6 +28,12 @@ struct MonthNewView: View {
                 .background(.thickMaterial)
                 scrollView
             }
+        }
+        .onChange(of: vm.date) { newValue in
+            date = newValue
+        }
+        .onChange(of: vm.selectedEvent) { newValue in
+            event = newValue
         }
     }
     
@@ -116,14 +120,13 @@ private struct ContentGrid: View {
     var allDayEvent = Event.stub(id: "4")
     allDayEvent.isAllDay = true
     data.months[0].days[0].events = [allDayEvent, .stub(id: "1"), .stub(id: "2"), .stub(id: "3")]
-    return MonthNewView(vm: MonthNewData(data: data))
+    return MonthNewView(vm: MonthNewData(data: data), date: .constant(.now), event: .constant(nil))
 }
 
 @available(iOS 17.0, *)
 struct MonthDayView: View {
     
     @Environment(\.colorScheme) private var colorScheme
-    
     let day: Day
     let selectedDate: Date
     let style: KVKCalendar.Style
@@ -163,7 +166,7 @@ struct MonthDayView: View {
         if Platform.currentInterface == .phone {
             bodyView
         } else {
-            bodyView.frame(minHeight: 170)
+            bodyView.frame(minHeight: 200)
         }
     }
     

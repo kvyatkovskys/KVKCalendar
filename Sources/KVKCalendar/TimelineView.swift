@@ -14,14 +14,16 @@ struct TimelineUIKitView: View {
     
     let params: TimelinePageWrapper.Parameters
     let frame: CGRect
-    var didSwitchDate: ((Date) -> Void)?
-    var willSwitchDate: ((Date) -> Void)?
+    @Binding var date: Date
+    @Binding var willDate: Date
+    @Binding var event: KVKCalendar.Event?
     
     var body: some View {
         TimelinePageWrapper(params: params,
                             frame: frame,
-                            didSwitchDate: didSwitchDate,
-                            willSwitchDate: willSwitchDate)
+                            date: $date,
+                            willDate: $willDate,
+                            event: $event)
         .ignoresSafeArea(.container, edges: .bottom)
     }
 }
@@ -38,8 +40,9 @@ struct TimelineUIKitView: View {
         .stub(id: "5", startFrom: -80, duration: 30)
     ]
     @State var event: Event?
+    @State var date = Date.now
     return GeometryReader(content: { geometry in
-        TimelineUIKitView(params: TimelinePageWrapper.Parameters(style: style, dates: Array(repeating: Date(), count: 7), selectedDate: Date(), events: events, recurringEvents: [], selectedEvent: $event), frame: geometry.frame(in: .local))
+        TimelineUIKitView(params: TimelinePageWrapper.Parameters(style: style, dates: Array(repeating: Date(), count: 7), events: events, recurringEvents: []), frame: geometry.frame(in: .local), date: $date, willDate: .constant(.now), event: $event)
     })
 }
 
@@ -51,44 +54,44 @@ struct TimelinePageWrapper: UIViewControllerRepresentable {
     struct Parameters {
         let style: Style
         let dates: [Date?]
-        var selectedDate: Date
         let events: [Event]
         let recurringEvents: [Event]
-        var selectedEvent: Binding<Event?>
     }
     
     var params: TimelinePageWrapper.Parameters
     var frame: CGRect
-    var didSwitchDate: ((Date) -> Void)?
-    var willSwitchDate: ((Date) -> Void)?
+    @Binding var date: Date
+    @Binding var willDate: Date
+    @Binding var event: KVKCalendar.Event?
     
     func makeUIViewController(context: Context) -> TimelinePageVC {
-        let page = setupTimelinePageView()
-        return page
+        setupTimelinePageView()
     }
     
     func updateUIViewController(_ uiViewController: TimelinePageVC, context: Context) {
         uiViewController.didSwitchTimelineView = { [weak uiViewController] (_, type) in
             let newView = createTimelineView()
             uiViewController?.addNewTimeline(newView, for: type)
-            let date = switchDateBy(type)
-            didSwitchDate?(date)
+            date = switchDateBy(type)
         }
         uiViewController.willDisplayTimelineView = { (view, type) in
             view.reloadFrame(frame)
-            view.reloadTimeline(params: params)
-            let date = switchDateBy(type)
-            willSwitchDate?(date)
+            view.reloadTimeline(params: params,
+                                date: date,
+                                event: $event)
+            willDate = switchDateBy(type)
         }
-        uiViewController.reloadPages(with: params)
+        uiViewController.reloadPages(with: params,
+                                     date: date,
+                                     event: $event)
     }
     
     private func switchDateBy(_ type: TimelinePageVC.SwitchPageType) -> Date {
         switch type {
         case .previous:
-            return params.style.calendar.date(byAdding: .day, value: -params.dates.count, to: params.selectedDate) ?? params.selectedDate
+            return params.style.calendar.date(byAdding: .day, value: -params.dates.count, to: date) ?? date
         case .next:
-            return params.style.calendar.date(byAdding: .day, value: params.dates.count, to: params.selectedDate) ?? params.selectedDate
+            return params.style.calendar.date(byAdding: .day, value: params.dates.count, to: date) ?? date
         }
     }
     
@@ -106,47 +109,10 @@ struct TimelinePageWrapper: UIViewControllerRepresentable {
         view.setup(dates: params.dates,
                    events: params.events,
                    recurringEvents: params.recurringEvents,
-                   selectedDate: params.selectedDate,
-                   selectedEvent: params.selectedEvent)
+                   selectedDate: date,
+                   selectedEvent: $event)
         return view
     }
-}
-
-@available(iOS 17.0, *)
-struct TimelineViewWrapper: UIViewRepresentable {
-
-    typealias UIViewType = TimelineView
-    
-    struct Parameters {
-        let style: Style
-        let dates: [Date?]
-        var selectedDate: Date
-        let events: [Event]
-        let recurringEvents: [Event]
-        var selectedEvent: Binding<Event?>
-    }
-    
-    var params: TimelinePageWrapper.Parameters
-    var frame: CGRect
-    
-    func makeUIView(context: Context) -> TimelineView {
-        createTimelineView()
-    }
-    
-    func updateUIView(_ uiView: TimelineView, context: Context) {
-        uiView.reloadTimeline(params: params)
-    }
-    
-    private func createTimelineView() -> TimelineView {
-        let view = TimelineView(parameters: TimelineView.Parameters(style: params.style, type: .week), frame: frame)
-        view.setup(dates: params.dates,
-                   events: params.events,
-                   recurringEvents: params.recurringEvents,
-                   selectedDate: params.selectedDate,
-                   selectedEvent: params.selectedEvent)
-        return view
-    }
-    
 }
 
 final class TimelineView: UIView, EventDateProtocol, CalendarTimer {

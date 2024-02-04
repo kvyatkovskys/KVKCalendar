@@ -273,12 +273,12 @@ extension TimelineView {
     }
     
     @available(iOS 17.0, *)
-    func reloadTimeline(params: TimelinePageWrapper.Parameters) {
+    func reloadTimeline(params: TimelinePageWrapper.Parameters, date: Date, event: Binding<KVKCalendar.Event?>) {
         setup(dates: params.dates,
               events: params.events,
               recurringEvents: params.recurringEvents,
-              selectedDate: params.selectedDate,
-              selectedEvent: params.selectedEvent)
+              selectedDate: date,
+              selectedEvent: event)
         
     }
     

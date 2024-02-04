@@ -51,7 +51,7 @@ struct TimelineColumnView: View, TimelineEventLayoutProtocol {
                             selectedEvent = item.event
                         }
                     }
-                    .frame(width: getActualWidth(proxy, for: item),
+                    .frame(width: abs(getActualWidth(proxy.size.width, for: item)),
                            height: item.rect.height)
                 }
             }
@@ -59,9 +59,9 @@ struct TimelineColumnView: View, TimelineEventLayoutProtocol {
         }
     }
     
-    private func getActualWidth(_ proxy: GeometryProxy,
+    private func getActualWidth(_ value: CGFloat,
                                 for item: TimelineColumnView.Container) -> CGFloat {
-        var width = proxy.size.width
+        var width = value
         if let crossEvent = crossEvents[item.event.start.timeIntervalSince1970], !crossEvent.events.isEmpty {
             width /= CGFloat(crossEvent.events.count)
         }

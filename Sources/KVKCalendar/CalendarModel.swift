@@ -691,57 +691,20 @@ extension UIView: KVKCalendarHeaderProtocol {}
 
 protocol ScrollableWeekProtocol: WeekDataProtocol {
     
-    var isAutoScrolling: Bool { get set }
     var date: Date { get set }
-    var style: Style { get set }
-    var scrollId: Int? { get set }
     var weeks: [[Day]] { get set }
-    var type: KVKCalendar.CalendarType { get set }
 }
 
 extension ScrollableWeekProtocol {
     
-    func setDateByScrollId(oldValue: Int?, newValue: Int?) {
-        if isAutoScrolling {
-            isAutoScrolling = false
-            return
-        }
-        
-        guard let newIdx = newValue, let oldIdx = oldValue else { return }
-        let value: Int
-        if newIdx > oldIdx {
-            value = type == .day ? 1 : 7
-        } else {
-            value = type == .day ? -1 : -7
-        }
-        guard let newDate = style.calendar.date(byAdding: .day, value: value, to: date) else { return }
-        withAnimation {
-            date = newDate
-        }
+    func getDateByScrollId(newValue: Int?) -> Date? {
+        guard let newIdx = newValue else { return nil }
+        let weekDays = weeks[newIdx]
+        return weekDays.first(where: { $0.date?.kvkWeekday == date.kvkWeekday })?.date
     }
-    
-    func scrollToDate(_ dt: Date = Date(), enableAutoScrolling: Bool = false) {
-        let idx = getIdxByDate(dt)
-        // week is already selected and need to update date if needed
-        if scrollId == idx && dt != date {
-            withAnimation {
-                date = dt
-            }
-            return
-        }
-        
-        if enableAutoScrolling {
-            isAutoScrolling = true
-            date = dt
-        }
-        withAnimation {
-            scrollId = idx
-        }
-    }
-    
 }
 
-protocol WeekDataProtocol: AnyObject {
+protocol WeekDataProtocol {
     
     var weeks: [[Day]] { get set }
 }
