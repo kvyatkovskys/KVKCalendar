@@ -610,7 +610,7 @@ extension TimelineView: EventDelegate {
         eventPreview = nil
         
         if view is EventView {
-            eventPreviewSize = CGSize(width: 150, height: 150)
+            eventPreviewSize = getEventPreviewSize()
             eventPreview = EventView(event: event,
                                      style: style,
                                      frame: CGRect(origin: CGPoint(x: location.x - eventPreviewXOffset,
@@ -797,6 +797,16 @@ extension TimelineView: CalendarSettingProtocol {
         let right = scrollView.rightAnchor.constraint(equalTo: rightAnchor)
         let bottom = scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
         NSLayoutConstraint.activate([top, left, right, bottom])
+    }
+
+    func getEventPreviewSize() -> CGSize {
+        if let styleSize = paramaters.style.timeline.eventPreviewSize {
+            return styleSize
+        }
+        
+        let width = (frame.width - leftOffsetWithAdditionalTime) / CGFloat(dates.count)
+        let height = calculatedTimeY + style.timeline.heightTime
+        return CGSize(width: width, height: height)
     }
 }
 

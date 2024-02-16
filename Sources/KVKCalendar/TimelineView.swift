@@ -36,7 +36,10 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     }
     var eventPreview: UIView?
     var eventResizePreview: ResizeEventView?
-    var eventPreviewSize = CGSize(width: 150, height: 150)
+    lazy var eventPreviewSize: CGSize = {
+        getEventPreviewSize()
+    }()
+
     var isResizableEventEnable = false
     var forceDisableScrollToCurrentTime = false
     var potentiallyCenteredLabel: TimelineLabel?
