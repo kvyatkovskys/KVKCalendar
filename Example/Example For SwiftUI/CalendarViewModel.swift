@@ -6,27 +6,35 @@
 //  Copyright © 2022 CocoaPods. All rights reserved.
 //
 
-import Foundation
+import SwiftUI
 import KVKCalendar
 
-final class CalendarViewModel: ObservableObject, KVKCalendarSettings, KVKCalendarDataModel {
+@available(iOS 17.0, *)
+@Observable final class CalendarViewModel: KVKCalendarSettings, KVKCalendarDataModel {
     
-    // 🤔👹🍻😬🥸
-    // only for example
+    var type = CalendarType.week
+    var orientation: UIInterfaceOrientation = .unknown
     var events: [Event] = []
-    
-    var style: KVKCalendar.Style {
-        createCalendarStyle()
+    var date = Date()
+    var selectedEvent: KVKCalendar.Event?
+        
+    init() {
+        date = defaultDate
     }
     
-    func loadEvents(completion: @escaping ([Event]) -> Void) {
-        DispatchQueue.main.asyncAfter(wallDeadline: .now() + 3) {
-            self.loadEvents(dateFormat: self.style.timeSystem.format, completion: completion)
+    func loadEvents() async {
+        try? await Task.sleep(nanoseconds: 300_000_000)
+        let result = await loadEvents(dateFormat: style.timeSystem.format)
+        await MainActor.run {
+            events = result
         }
     }
     
-    func addNewEvent() -> Event? {
-         handleNewEvent(Event(ID: "-1"), date: Date())
+    func addNewEvent() {
+        var components = DateComponents(year: date.kvkYear, month: date.kvkMonth, day: date.kvkDay)
+        components.minute = date.kvkMinute + 30
+        guard let newEvent = handleNewEvent(Event(ID: "\(events.count + 1)"), date: components.date ?? date) else { return }
+        events.append(newEvent)
     }
     
 }

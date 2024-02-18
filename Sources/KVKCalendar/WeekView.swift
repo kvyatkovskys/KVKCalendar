@@ -7,7 +7,86 @@
 
 #if os(iOS)
 
-import UIKit
+import SwiftUI
+
+@available(iOS 17.0, *)
+struct WeekNewView: View {
+    
+    @State var vm: WeekNewData
+    @Binding var date: Date
+    @Binding var event: KVKCalendar.Event?
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            ScrollableWeekNewView(date: $vm.date, weeks: vm.weeks, type: vm.type, style: vm.style)
+                .padding(.top, 2)
+            TimelineUIKitView(params: TimelinePageWrapper.Parameters(style: vm.style, dates: vm.timelineDays, events: vm.events, recurringEvents: vm.recurringEvents), date: $vm.date, willDate: .constant(.now), event: $vm.event)
+        }
+        .onChange(of: vm.event) { newValue in
+            event = newValue
+        }
+        .onChange(of: vm.date) { newValue in
+            date = newValue
+        }
+        .task {
+            await vm.setup()
+        }
+    }
+    
+}
+
+@available(iOS 17.0, *)
+private struct DayPreviewView: View {
+    @State var date: Date
+    var style: Style
+    let commonData: CalendarData
+    let events: [Event] = [
+        .stub(id: "1", startFrom: -100, duration: 50),
+        .stub(id: "2", startFrom: -120, duration: 20),
+        .stub(id: "3", startFrom: 30, duration: 55),
+        .stub(id: "4", startFrom: 85, duration: 30),
+        .stub(id: "5", startFrom: 85, duration: 30)
+    ]
+    let vmDay: WeekNewData
+    
+    init() {
+        _date = State(initialValue: Date.now)
+        style = Style()
+        style.startWeekDay = .monday
+        let data = CalendarData(date: .now, years: 1, style: style)
+        commonData = data
+        vmDay = WeekNewData(data: data, type: .day)
+        vmDay.events = events
+        vmDay.allDayEvents = [.allDayStub(id: "-2")]
+    }
+    
+    var body: some View {
+        WeekNewView(vm: vmDay, date: $date, event: .constant(nil))
+    }
+}
+
+@available(iOS 17.0, *)
+#Preview("Day View") {
+    DayPreviewView()
+}
+
+@available(iOS 17.0, *)
+#Preview("Week View") {
+    var style = Style()
+    style.startWeekDay = .monday
+    let commonData = CalendarData(date: Date(), years: 1, style: style)
+    let events: [Event] = [
+        .stub(id: "1", startFrom: -100, duration: 50),
+        .stub(id: "2", startFrom: -120, duration: 20),
+        .stub(id: "3", startFrom: 30, duration: 55),
+        .stub(id: "4", startFrom: 85, duration: 30),
+        .stub(id: "5", startFrom: 85, duration: 30)
+    ]
+    let vmWeek = WeekNewData(data: commonData, type: .week)
+    vmWeek.events = events
+    vmWeek.allDayEvents = [.allDayStub(id: "-2")]
+    return WeekNewView(vm: vmWeek, date: .constant(.now), event: .constant(nil))
+}
 
 final class WeekView: UIView {
     
@@ -98,7 +177,7 @@ final class WeekView: UIView {
     }
     
     func updateScrollableWeeks() {
-        scrollableWeekView.updateWeeks(weeks: parameters.data.daysBySection)
+        scrollableWeekView.updateWeeks(weeks: parameters.data.weeks)
     }
 }
 
@@ -280,7 +359,7 @@ extension WeekView: CalendarSettingProtocol {
         }
         let view = ScrollableWeekView(parameters: .init(frame: CGRect(x: 0, y: 0,
                                                                        width: frame.width, height: heightView),
-                                                         weeks: parameters.data.daysBySection,
+                                                        weeks: parameters.data.weeks,
                                                          date: parameters.data.date,
                                                          type: .week,
                                                          style: style))

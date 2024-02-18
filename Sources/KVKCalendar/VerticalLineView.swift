@@ -10,14 +10,31 @@
 import UIKit
 
 final class VerticalLineView: UIView {
-    var date: Date?
+    private let date: Date?
+    private let color: UIColor
+    private let width: CGFloat
     
-    override init(frame: CGRect) {
+    init(date: Date?, color: UIColor, width: CGFloat, frame: CGRect = .zero) {
+        self.date = date
+        self.color = color
+        self.width = width
         super.init(frame: frame)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        let line = VerticalLineLayer(date: date,
+                                     frame: frame,
+                                     tag: tag,
+                                     start: .zero,
+                                     end: CGPoint(x: 0, y: bounds.height),
+                                     color: color,
+                                     width: width)
+        layer.addSublayer(line)
     }
 }
 
@@ -30,8 +47,14 @@ final class VerticalLineLayer: CAShapeLayer {
         lineFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
         super.init(layer: layer)
     }
-
-    init(date: Date? = nil, frame: CGRect, tag: Int, start: CGPoint, end: CGPoint, color: UIColor, width: CGFloat) {
+    
+    init(date: Date? = nil,
+         frame: CGRect = .zero,
+         tag: Int,
+         start: CGPoint = .zero,
+         end: CGPoint = .zero,
+         color: UIColor,
+         width: CGFloat) {
         self.date = date
         self.lineFrame = frame
         super.init()
