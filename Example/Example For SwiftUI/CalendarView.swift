@@ -33,7 +33,6 @@ struct CalendarView: View {
             .kvkOnRotate(action: { (newOrientation) in
                 vm.orientation = newOrientation
             })
-//            .navigationBarTitle(vm.date.formatted(date: .abbreviated, time: .omitted), displayMode: .inline)
             .toolbar {
                 ToolbarItemGroup(placement: .topBarLeading) {
                     Picker(vm.type.title, selection: $vm.type) {
@@ -41,7 +40,6 @@ struct CalendarView: View {
                             Text(type.title)
                         }
                     }
-                    .pickerStyle(.menu)
                     .tint(.red)
                 }
                 ToolbarItemGroup(placement: .topBarTrailing) {

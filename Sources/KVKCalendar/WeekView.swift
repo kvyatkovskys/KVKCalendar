@@ -20,9 +20,7 @@ struct WeekNewView: View {
         VStack(spacing: 0) {
             ScrollableWeekNewView(date: $vm.date, weeks: vm.weeks, type: vm.type, style: vm.style)
                 .padding(.top, 2)
-            GeometryReader { (geometry) in
-                TimelineUIKitView(params: TimelinePageWrapper.Parameters(style: vm.style, dates: vm.timelineDays, events: vm.events, recurringEvents: vm.recurringEvents), frame: geometry.frame(in: .local), date: $vm.date, willDate: .constant(.now), event: $vm.event)
-            }
+            TimelineUIKitView(params: TimelinePageWrapper.Parameters(style: vm.style, dates: vm.timelineDays, events: vm.events, recurringEvents: vm.recurringEvents), date: $vm.date, willDate: .constant(.now), event: $vm.event)
         }
         .onChange(of: vm.event) { newValue in
             event = newValue

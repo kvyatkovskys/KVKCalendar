@@ -28,6 +28,10 @@ import UIKit
             headerDate = data.months[idx].date
         }
     }
+    var days: [IndexPath: DayOfMonth] = [:]
+    var daysCount: Int = 0
+    let rowsInPage = 6
+    let columnsInPage = 7
     
     private(set) var todayIdx: Int?
     
@@ -37,19 +41,40 @@ import UIKit
         self.data = data
         style = data.style
         self.data.months = data.prepareMonths()
-        let today = Date()
-        if date.kvkIsEqual(today) {
-            todayIdx = self.data.months.firstIndex(where: { $0.date.kvkMonthIsEqual(date) })
-            scrollId = todayIdx
+    }
+    
+    func getCurrentID() {
+        if date.kvkIsEqual(.now) {
+            todayIdx = data.months.firstIndex(where: { $0.date.kvkMonthIsEqual(date) })
         } else {
-            todayIdx = self.data.months.firstIndex(where: { $0.date.kvkMonthIsEqual(.now) })
-            scrollId = self.data.months.firstIndex(where: { $0.date.kvkMonthIsEqual(date) })
+            todayIdx = data.months.firstIndex(where: { $0.date.kvkMonthIsEqual(.now) })
         }
+        scrollId = todayIdx
+    }
+    
+    func getDay(indexPath: IndexPath) -> DayOfMonth {
+        // TODO: we got a crash sometime when use a horizontal scroll direction
+        // got index out of array
+        // safe: -> optional subscript
+        let month = data.months[indexPath.section]
+        return (indexPath, month.days[safe: indexPath.row], month.weeks)
     }
 }
 
-final class MonthData: ObservableObject, EventDateProtocol {
-    
+@available(iOS 17.0, *)
+extension MonthNewData {
+    var middleRowInPage: Int {
+        (rowsInPage * columnsInPage) / 2
+    }
+    var columns: Int {
+        ((daysCount / itemsInPage) * columnsInPage) + (daysCount % itemsInPage)
+    }
+    var itemsInPage: Int {
+        columnsInPage * rowsInPage
+    }
+}
+
+final class MonthData: EventDateProtocol {
     typealias DayOfMonth = (indexPath: IndexPath, day: Day?, weeks: Int)
     
     struct Parameters {
@@ -57,10 +82,10 @@ final class MonthData: ObservableObject, EventDateProtocol {
     }
     
     var selectedSection: Int = -1
-    @Published var date: Date
-    @Published var headerDate: Date
-    @Published var data: CalendarData
-    @Published var selectedEvent: Event?
+    var date: Date
+    var headerDate: Date
+    var data: CalendarData
+    var selectedEvent: Event?
     var daysCount: Int = 0
     var style: KVKCalendar.Style
     

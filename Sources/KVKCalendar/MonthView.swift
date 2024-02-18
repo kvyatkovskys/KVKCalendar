@@ -12,9 +12,17 @@ import SwiftUI
 @available(iOS 17.0, *)
 struct MonthNewView: View {
     
-    @State var vm: KVKCalendar.MonthNewData
-    @Binding var date: Date
-    @Binding var event: KVKCalendar.Event?
+    @State private var vm: KVKCalendar.MonthNewData
+    @Binding private var date: Date
+    @Binding private var event: KVKCalendar.Event?
+    
+    init(vm: KVKCalendar.MonthNewData,
+         date: Binding<Date>,
+         event: Binding<KVKCalendar.Event?>) {
+        _vm = State(initialValue: vm)
+        _date = date
+        _event = event
+    }
     
     var body: some View {
         ScrollViewReader { (proxy) in
@@ -29,7 +37,7 @@ struct MonthNewView: View {
                 scrollView
             }
         }
-        .onChange(of: vm.date) { newValue in
+        .onChange(of: vm.date) { newValue  in
             date = newValue
         }
         .onChange(of: vm.selectedEvent) { newValue in
@@ -113,7 +121,7 @@ private struct ContentGrid: View {
 #Preview {
     let formatter = DateFormatter()
     formatter.dateFormat = "dd.MM.yyyy"
-    let date = formatter.date(from: "01.01.2024") ?? Date()
+    let date = Date()
     var style = Style()
     style.startWeekDay = .sunday
     var data = CalendarData(date: date, years: 1, style: style)
@@ -125,8 +133,8 @@ private struct ContentGrid: View {
 
 @available(iOS 17.0, *)
 struct MonthDayView: View {
-    
     @Environment(\.colorScheme) private var colorScheme
+    
     let day: Day
     let selectedDate: Date
     let style: KVKCalendar.Style
@@ -156,17 +164,19 @@ struct MonthDayView: View {
         Platform.currentInterface == .phone ? 0 : 5
     }
     private var borderColor: Color {
-        Platform.currentInterface == .phone ? .clear : Color(uiColor: style.month.colorSeparator)
+        Color(uiColor: style.month.colorSeparator)
     }
     private var borderWidth: CGFloat {
-        Platform.currentInterface == .phone ? 0 : style.month.widthSeparator
+        style.month.widthSeparator
     }
     
     var body: some View {
         if Platform.currentInterface == .phone {
             bodyView
         } else {
-            bodyView.frame(minHeight: 200)
+            bodyView
+                .frame(minHeight: 200)
+                .border(borderColor, width: borderWidth)
         }
     }
     
@@ -216,7 +226,6 @@ struct MonthDayView: View {
             Spacer()
         }
         .background(getBgColor(date, style: style))
-        .border(borderColor, width: borderWidth)
     }
     
     private var dayView: some View {

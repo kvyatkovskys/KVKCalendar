@@ -45,12 +45,12 @@ struct ScrollableWeekNewView: View, ScrollableWeekProtocol {
     var body: some View {
         bodyView
             .onChange(of: date) { oldValue, newValue in
-//                guard !oldValue.kvkIsEqual(newValue) else { return }
-//                let newScrollId = getIdxByDate(newValue)
-//                guard scrollId != newScrollId else { return }
-//                withAnimation {
-//                    scrollId = newScrollId
-//                }
+                guard !oldValue.kvkIsEqual(newValue) else { return }
+                let newScrollId = getIdxByDate(newValue)
+                guard scrollId != newScrollId else { return }
+                // withAnimation {
+                    scrollId = newScrollId
+                // }
             }
             .task {
                 scrollId = getIdxByDate(date)
@@ -230,10 +230,12 @@ private struct WeekPreviewView: View, ScrollableWeekProtocol {
     var body: some View {
         VStack {
             ScrollableWeekNewView(date: $date, weeks: weeks, type: .week, style: style)
-            Button("Today") {
-                date = .now
+            if Platform.currentInterface == .phone {
+                Button("Today") {
+                    date = .now
+                }
+                .padding()
             }
-            .padding()
         }
     }
 }

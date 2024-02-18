@@ -13,18 +13,19 @@ import SwiftUI
 struct TimelineUIKitView: View {
     
     let params: TimelinePageWrapper.Parameters
-    let frame: CGRect
     @Binding var date: Date
     @Binding var willDate: Date
     @Binding var event: KVKCalendar.Event?
     
     var body: some View {
-        TimelinePageWrapper(params: params,
-                            frame: frame,
-                            date: $date,
-                            willDate: $willDate,
-                            event: $event)
-        .ignoresSafeArea(.container, edges: .bottom)
+        GeometryReader { (geometry) in
+            TimelinePageWrapper(params: params,
+                                frame: geometry.frame(in: .local),
+                                date: $date,
+                                willDate: $willDate,
+                                event: $event)
+            .ignoresSafeArea(.container, edges: .bottom)
+        }
     }
 }
 
@@ -41,9 +42,7 @@ struct TimelineUIKitView: View {
     ]
     @State var event: Event?
     @State var date = Date.now
-    return GeometryReader(content: { geometry in
-        TimelineUIKitView(params: TimelinePageWrapper.Parameters(style: style, dates: Array(repeating: Date(), count: 7), events: events, recurringEvents: []), frame: geometry.frame(in: .local), date: $date, willDate: .constant(.now), event: $event)
-    })
+    return TimelineUIKitView(params: TimelinePageWrapper.Parameters(style: style, dates: Array(repeating: Date(), count: 7), events: events, recurringEvents: []), date: $date, willDate: .constant(.now), event: $event)
 }
 
 @available(iOS 17.0, *)
@@ -89,9 +88,9 @@ struct TimelinePageWrapper: UIViewControllerRepresentable {
     private func switchDateBy(_ type: TimelinePageVC.SwitchPageType) -> Date {
         switch type {
         case .previous:
-            return params.style.calendar.date(byAdding: .day, value: -params.dates.count, to: date) ?? date
+            params.style.calendar.date(byAdding: .day, value: -params.dates.count, to: date) ?? date
         case .next:
-            return params.style.calendar.date(byAdding: .day, value: params.dates.count, to: date) ?? date
+            params.style.calendar.date(byAdding: .day, value: params.dates.count, to: date) ?? date
         }
     }
     
