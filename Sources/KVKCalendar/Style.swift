@@ -189,6 +189,7 @@ public struct TimelineStyle {
     public var timeDividerFont: UIFont = .systemFont(ofSize: 10)
     public var scale: Scale? = Scale(min: 1, max: 6)
     public var useDefaultCorderHeader = false
+    public var eventPreviewSize: CGSize? = CGSize(width: 150, height: 150)
     
     public var allLeftOffset: CGFloat {
         widthTime + offsetTimeX + offsetLineLeft
