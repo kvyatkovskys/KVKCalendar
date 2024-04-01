@@ -410,7 +410,9 @@ extension TimelineView {
     
     @objc func addNewEvent(gesture: UILongPressGestureRecognizer) {
         guard !isResizableEventEnable else { return }
-        
+        if gesture.state == .began {
+            eventPreviewSize = getEventPreviewSize()
+        }
         var point = gesture.location(in: scrollView)
         point.y = (point.y - eventPreviewYOffset) - style.timeline.offsetEvent - 6
         let time = movingMinuteLabel.time
