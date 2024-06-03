@@ -728,7 +728,7 @@ extension TimelineView: EventDelegate {
         let firstY = time.frame.origin.y - (calculatedTimeY + style.timeline.heightTime)
         let percent = (pointY - firstY) / (calculatedTimeY + style.timeline.heightTime)
         let newMinute = Int(60.0 * percent)
-        let newHour = time.tag - 1
+        let newHour = time.tag - 1 + style.timeline.startHour
         return (newHour, newMinute)
     }
     
