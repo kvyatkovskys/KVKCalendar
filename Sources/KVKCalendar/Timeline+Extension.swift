@@ -440,7 +440,7 @@ extension TimelineView {
                 break
             }
             
-            newEvent.end = style.calendar.date(byAdding: .minute, value: 15, to: newEvent.start) ?? Date()
+            newEvent.end = style.calendar.date(byAdding: .minute, value: style.event.newEventStep, to: newEvent.start) ?? Date()
             delegate?.didAddNewEvent(newEvent,
                                      minute: time.minute,
                                      hour: time.hour,
