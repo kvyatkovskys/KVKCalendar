@@ -90,7 +90,7 @@ struct CalendarData {
 
         let formatterDay = DateFormatter()
         formatterDay.dateFormat = "EE"
-        formatterDay.locale = Locale(identifier: "en_US")
+        formatterDay.locale = style.locale
         let days = arrDates.map({ Day(type: DayType(rawValue: formatterDay.string(from: $0).uppercased()) ?? .empty, date: $0, data: []) })
         return days
     }

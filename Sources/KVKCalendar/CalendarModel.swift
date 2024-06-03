@@ -399,6 +399,7 @@ extension CalendarSettingProtocol {
     func timeFormatter(date: Date, format: String) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = format
+        formatter.locale = style.locale
         return formatter.string(from: date)
     }
 }

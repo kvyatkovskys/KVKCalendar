@@ -108,6 +108,8 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         self.selectedDate = Date()
         super.init(frame: frame)
         
+        timeLabelFormatter.locale = style.locale
+
         addSubview(scrollView)
         setupConstraints()
         
