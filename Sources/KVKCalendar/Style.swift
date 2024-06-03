@@ -608,6 +608,7 @@ extension Style: Equatable {
         && compare(\.timezone)
         && compare(\.defaultType)
         && compare(\.timeSystem)
+        && compare(\.isEndOfDayZero)
         && compare(\.startWeekDay)
         && compare(\.followInSystemTheme)
         && compare(\.systemCalendars)
