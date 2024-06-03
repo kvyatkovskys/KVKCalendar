@@ -309,7 +309,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         }
         
         // add time label to timeline
-        let labels = createTimesLabel(start: startHour)
+        let labels = createTimesLabel(start: startHour, end: style.timeline.endHour)
         timeLabels = labels.times
         // add separator line
         let horizontalLines = createHorizontalLines(times: timeLabels)

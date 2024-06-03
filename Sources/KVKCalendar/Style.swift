@@ -134,6 +134,7 @@ public struct TimelineStyle {
     public var eventFont: UIFont = .boldSystemFont(ofSize: 12)
     public var offsetEvent: CGFloat = 3
     public var startHour: Int = 0
+    public var endHour: Int = 24
     public var scrollToHour: Int? = nil
     public var movingMinuteLabelRoundUpTime: UInt = 15
     var minuteLabelRoundUpTime: Int {
@@ -839,6 +840,7 @@ extension TimelineStyle: Equatable {
         && compare(\.eventFont)
         && compare(\.offsetEvent)
         && compare(\.startHour)
+        && compare(\.endHour)
         && compare(\.scrollToHour)
         && compare(\.heightLine)
         && compare(\.movingMinuteLabelRoundUpTime)
