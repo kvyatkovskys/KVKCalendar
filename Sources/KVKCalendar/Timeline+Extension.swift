@@ -44,7 +44,7 @@ extension TimelineView: UIScrollViewDelegate {
         }
     }
     
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         addStubForInvisibleEvents()
     }
     
@@ -201,7 +201,7 @@ extension TimelineView {
         enableAllEvents(enable: true)
     }
     
-    private func enableAllEvents(enable: Bool) {
+    public func enableAllEvents(enable: Bool) {
         if style.allDay.isPinned {
             subviews.filter { $0.tag == tagAllDayEventView }.forEach { $0.isUserInteractionEnabled = enable }
         } else {
@@ -316,7 +316,7 @@ extension TimelineView {
         return allDayView
     }
     
-    func getTimelineLabel(hour: Int) -> TimelineLabel? {
+    public func getTimelineLabel(hour: Int) -> TimelineLabel? {
         timeLabels.first(where: { $0.hashTime == hour })
     }
     

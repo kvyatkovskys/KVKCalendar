@@ -9,7 +9,7 @@
 
 import UIKit
 
-final class DayView: UIView {
+public final class DayView: UIView {
     
     private var parameters: Parameters
     private let tagEventViewer = -10
@@ -29,7 +29,7 @@ final class DayView: UIView {
                                                                   type: .day,
                                                                   style: Style()))
     
-    var timelinePage = TimelinePageView(maxLimit: 0, pages: [], frame: .zero)
+    public var timelinePage = TimelinePageView(maxLimit: 0, pages: [], frame: .zero)
     
     private var topBackgroundView = UIView()
     private var isAvailableEventViewer: Bool {

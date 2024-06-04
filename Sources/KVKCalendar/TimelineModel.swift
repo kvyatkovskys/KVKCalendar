@@ -9,9 +9,14 @@
 
 import UIKit
 
-struct TimeContainer {
-    var minute: Int
-    var hour: Int
+public struct TimeContainer {
+    public var minute: Int
+    public var hour: Int
+
+    public init(minute: Int, hour: Int) {
+        self.minute = minute
+        self.hour = hour
+    }
 }
 
 typealias ResizeTime = (hour: Int, minute: Int)
