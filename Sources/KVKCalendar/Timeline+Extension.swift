@@ -409,15 +409,29 @@ extension TimelineView {
     }
     
     @objc func addNewEvent(gesture: UILongPressGestureRecognizer) {
-        guard !isResizableEventEnable else { return }
-        if gesture.state == .began {
-            eventPreviewSize = getEventPreviewSize()
-        }
         var point = gesture.location(in: scrollView)
         point.y = (point.y - eventPreviewYOffset) - style.timeline.offsetEvent - 6
         let time = movingMinuteLabel.time
         var newEvent = Event(ID: Event.idForNewEvent)
         newEvent.title = TextEvent(timeline: style.event.textForNewEvent)
+        
+        switch paramaters.type {
+        case .day:
+            newEvent.start = selectedDate
+        case .week:
+            newEvent.start = shadowView.date ?? Date()
+        default:
+            break
+        }
+        
+        newEvent.end = style.calendar.date(byAdding: .minute, value: 15, to: newEvent.start) ?? Date()
+        
+        guard !isResizableEventEnable && (delegate?.willAddNewEvent(newEvent, minute: time.minute, hour: time.hour, point: point) ?? true) else { return }
+        
+        if gesture.state == .began {
+            eventPreviewSize = getEventPreviewSize()
+        }
+        
         let newEventPreview = getEventView(style: style,
                                            event: newEvent,
                                            frame: CGRect(origin: point, size: eventPreviewSize))
@@ -431,16 +445,6 @@ extension TimelineView {
         case .ended, .failed, .cancelled:
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
             
-            switch paramaters.type {
-            case .day:
-                newEvent.start = selectedDate
-            case .week:
-                newEvent.start = shadowView.date ?? Date()
-            default:
-                break
-            }
-            
-            newEvent.end = style.calendar.date(byAdding: .minute, value: 15, to: newEvent.start) ?? Date()
             delegate?.didAddNewEvent(newEvent,
                                      minute: time.minute,
                                      hour: time.hour,

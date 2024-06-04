@@ -23,6 +23,7 @@ protocol TimelineDelegate: AnyObject {
     func previousDate()
     func swipeX(transform: CGAffineTransform, stop: Bool)
     func didChangeEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint, newDate: Date?)
+    func willAddNewEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint) -> Bool
     func didAddNewEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint)
     func didResizeEvent(_ event: Event, startTime: ResizeTime, endTime: ResizeTime)
     func dequeueTimeLabel(_ label: TimelineLabel) -> (current: TimelineLabel, others: [UILabel])?
