@@ -101,6 +101,10 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         return scroll
     }()
     
+    private(set) lazy var tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(forceDeselectEvent))
+    
+    private(set) lazy var longTapGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(addNewEvent))
+    
     init(parameters: Parameters, frame: CGRect) {
         self.paramaters = parameters
         self.timeSystem = parameters.style.timeSystem
@@ -111,8 +115,10 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         addSubview(scrollView)
         setupConstraints()
         
-        let tap = UITapGestureRecognizer(target: self, action: #selector(forceDeselectEvent))
-        addGestureRecognizer(tap)
+        addGestureRecognizer(tapGestureRecognizer)
+        
+        // long tap to create a new event preview
+        addGestureRecognizer(longTapGestureRecognizer)
         
         if style.timeline.scale != nil {
             let pinch = UIPinchGestureRecognizer(target: self, action: #selector(pinchZooming))

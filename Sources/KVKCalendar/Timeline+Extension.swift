@@ -764,14 +764,10 @@ extension TimelineView: CalendarSettingProtocol {
         
         scrollView.backgroundColor = style.timeline.backgroundColor
         scrollView.isScrollEnabled = style.timeline.scrollDirections.contains(.vertical)
-        gestureRecognizers?.forEach { $0.removeTarget(self, action: #selector(addNewEvent)) }
         
-        if style.timeline.isEnabledCreateNewEvent {
-            // long tap to create a new event preview
-            let longTap = UILongPressGestureRecognizer(target: self, action: #selector(addNewEvent))
-            longTap.minimumPressDuration = style.timeline.minimumPressDuration
-            addGestureRecognizer(longTap)
-        }
+        tapGestureRecognizer.isEnabled = style.timeline.isEnabledDefaultTapGestureRecognizer
+        longTapGestureRecognizer.isEnabled = style.timeline.isEnabledCreateNewEvent
+        longTapGestureRecognizer.minimumPressDuration = style.timeline.minimumPressDuration
     }
     
     func reloadFrame(_ frame: CGRect) {
