@@ -31,7 +31,7 @@ public enum TimeHourSystem: Int {
     case twelve = 12
     case twentyFour = 24
     
-    var hours: [String] {
+    func getHours(isEndOfDayZero: Bool = true) -> [String] {
         switch self {
         case .twelveHour, .twelve:
             let array = ["12"] + Array(1...11).map { String($0) }
@@ -45,7 +45,7 @@ public enum TimeHourSystem: Int {
             return am + pm
         case .twentyFourHour, .twentyFour:
             let array = ["00:00"] + Array(1...24).map { (i) -> String in
-                let i = i % 24
+                let i = isEndOfDayZero ? i % 24 : i 
                 var string = i < 10 ? "0" + "\(i)" : "\(i)"
                 string.append(":00")
                 return string

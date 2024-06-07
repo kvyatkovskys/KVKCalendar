@@ -25,6 +25,8 @@ public struct Style {
     public var timezone = TimeZone.current
     public var defaultType: CalendarType?
     public var timeSystem: TimeHourSystem = .twentyFour
+    /// Only valid in 24-hour format
+    public var isEndOfDayZero: Bool = true
     public var startWeekDay: StartDayType = .monday
     public var followInSystemTheme: Bool = true
     public var systemCalendars: Set<String> = []
@@ -606,6 +608,7 @@ extension Style: Equatable {
         && compare(\.timezone)
         && compare(\.defaultType)
         && compare(\.timeSystem)
+        && compare(\.isEndOfDayZero)
         && compare(\.startWeekDay)
         && compare(\.followInSystemTheme)
         && compare(\.systemCalendars)
