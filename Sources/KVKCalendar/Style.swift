@@ -183,6 +183,7 @@ public struct TimelineStyle {
     public var minimumPressDuration: TimeInterval = 0.5
     public var isHiddenStubEvent: Bool = true
     public var isEnabledCreateNewEvent: Bool = true
+    public var isEnabledDefaultTapGestureRecognizer: Bool = true
     public var maxLimitCachedPages: UInt = 10
     public var scrollDirections: Set<ScrollDirectionType> = Set(ScrollDirectionType.allCases)
     public var dividerType: DividerType? = nil
@@ -874,6 +875,7 @@ extension TimelineStyle: Equatable {
         && compare(\.minimumPressDuration)
         && compare(\.isHiddenStubEvent)
         && compare(\.isEnabledCreateNewEvent)
+        && compare(\.isEnabledDefaultTapGestureRecognizer)
         && compare(\.maxLimitCachedPages)
         && compare(\.scrollDirections)
         && compare(\.dividerType)
