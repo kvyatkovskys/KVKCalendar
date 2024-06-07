@@ -466,6 +466,7 @@ public struct EventStyle {
     public var defaultHeight: CGFloat? = nil
     public var showRecurringEventInPast: Bool = false
     public var textContainerInset: UIEdgeInsets = .zero
+    public var newEventStep: Int = 15
     
     /// work only together with the `Week.viewMode = .list` property
     public var defaultWidth: CGFloat? = nil
@@ -915,6 +916,7 @@ extension EventStyle: Equatable {
         && compare(\.defaultHeight)
         && compare(\.showRecurringEventInPast)
         && compare(\.textContainerInset)
+        && compare(\.newEventStep)
         && compare(\.defaultWidth)
     }
     
