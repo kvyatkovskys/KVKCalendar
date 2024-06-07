@@ -168,7 +168,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             self.currentLineView.valueHash = nextDate.kvkMinute.hashValue
             self.currentLineView.date = nextDate
             
-            if self.isDisplayedTimes {
+            if self.isDisplayedTimes && style.timeline.lineHourStyle == .withTime {
                 if let timeNext = self.getTimelineLabel(hour: nextDate.kvkHour + 1) {
                     timeNext.isHidden = self.currentLineView.frame.intersects(timeNext.frame)
                 }
@@ -196,7 +196,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         scrollView.addSubview(currentLineView)
         movingCurrentLineHour()
         
-        if isDisplayedTimes {
+        if isDisplayedTimes && style.timeline.lineHourStyle == .withTime {
             if let timeNext = getTimelineLabel(hour: date.kvkHour + 1) {
                 timeNext.isHidden = currentLineView.frame.intersects(timeNext.frame)
             }
