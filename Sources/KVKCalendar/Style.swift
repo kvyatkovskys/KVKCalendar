@@ -168,6 +168,7 @@ public struct TimelineStyle {
     public var widthEventViewer: CGFloat? = nil
     public var showLineHourMode: CurrentLineHourShowMode = .today
     public var scrollLineHourMode: CurrentLineHourScrollMode = .today
+    public var lineHourStyle: CurrentLineHourStyle = .withTime
     public var currentLineHourFont: UIFont = .systemFont(ofSize: 12)
     public var currentLineHourColor: UIColor = .red
     public var currentLineHourDotSize: CGSize = CGSize(width: 5, height: 5)
@@ -225,6 +226,11 @@ public struct TimelineStyle {
         case vertical, horizontal
     }
     
+    public enum CurrentLineHourStyle: Equatable {
+        case withTime
+        case onlyLine
+    }
+
     public enum CurrentLineHourShowMode: Equatable {
         case always, today, forDate(Date), never
         
@@ -857,6 +863,7 @@ extension TimelineStyle: Equatable {
         && compare(\.widthEventViewer)
         && compare(\.showLineHourMode)
         && compare(\.scrollLineHourMode)
+        && compare(\.lineHourStyle)
         && compare(\.currentLineHourFont)
         && compare(\.currentLineHourColor)
         && compare(\.currentLineHourDotSize)
