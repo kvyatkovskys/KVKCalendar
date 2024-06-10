@@ -414,7 +414,7 @@ extension TimelineView {
             eventPreviewSize = getEventPreviewSize()
         }
         var point = gesture.location(in: scrollView)
-        if !style.event.states.contains(.move) {
+        if style.timeline.createEventAtTouch && !style.event.states.contains(.move) {
             let offset = eventPreviewYOffset - style.timeline.offsetEvent - 6
             showChangingMinute(pointY: point.y, offset: offset)
         }
