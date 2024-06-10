@@ -25,8 +25,8 @@ extension KVKCalendarSettings where Self: KVKCalendarDataModel {
         var eventTemp = event
         guard let startTemp = start, let endTemp = end else { return nil }
         
-        let startTime = timeFormatter(date: startTemp, format: style.timeSystem.format)
-        let endTime = timeFormatter(date: endTemp, format: style.timeSystem.format)
+        let startTime = timeFormatter(date: startTemp, format: style.timeSystem.format, local: style.locale)
+        let endTime = timeFormatter(date: endTemp, format: style.timeSystem.format, local: style.locale)
         eventTemp.start = startTemp
         eventTemp.end = endTemp
         eventTemp.title = TextEvent(timeline: "\(startTime) - \(endTime)\n new time",
@@ -59,8 +59,8 @@ extension KVKCalendarSettings where Self: KVKCalendarDataModel {
         guard let start = date,
               let end = Calendar.current.date(byAdding: .minute, value: 30, to: start) else { return nil }
         
-        let startTime = timeFormatter(date: start, format: style.timeSystem.format)
-        let endTime = timeFormatter(date: end, format: style.timeSystem.format)
+        let startTime = timeFormatter(date: start, format: style.timeSystem.format, local: style.locale)
+        let endTime = timeFormatter(date: end, format: style.timeSystem.format, local: style.locale)
         newEvent.start = start
         newEvent.end = end
         newEvent.ID = "\(events.count + 1)"
@@ -73,8 +73,8 @@ extension KVKCalendarSettings where Self: KVKCalendarDataModel {
     func handleEvents(systemEvents: [EKEvent]) -> [Event] {
         // if you want to get a system events, you need to set style.systemCalendars = ["test"]
         let mappedEvents = systemEvents.compactMap { (event) -> Event in
-            let startTime = timeFormatter(date: event.startDate, format: style.timeSystem.format)
-            let endTime = timeFormatter(date: event.endDate, format: style.timeSystem.format)
+            let startTime = timeFormatter(date: event.startDate, format: style.timeSystem.format, local: style.locale)
+            let endTime = timeFormatter(date: event.endDate, format: style.timeSystem.format, local: style.locale)
             event.title = "\(startTime) - \(endTime)\n\(event.title ?? "")"
             
             return Event(event: event)
@@ -91,11 +91,11 @@ extension KVKCalendarSettings where Self: KVKCalendarDataModel {
               let result = try? decoder.decode(ItemData.self, from: data) else { return }
         
         let events = result.data.compactMap({ (item) -> Event in
-            let startDate = formatter(date: item.start)
-            let endDate = formatter(date: item.end)
-            let startTime = timeFormatter(date: startDate, format: dateFormat)
-            let endTime = timeFormatter(date: endDate, format: dateFormat)
-            
+            let startDate = formatter(date: item.start, local: style.locale)
+            let endDate = formatter(date: item.end, local: style.locale)
+            let startTime = timeFormatter(date: startDate, format: dateFormat, local: style.locale)
+            let endTime = timeFormatter(date: endDate, format: dateFormat, local: style.locale)
+
             var event = Event(ID: item.id)
             event.start = startDate
             event.end = endDate
@@ -203,16 +203,18 @@ extension KVKCalendarSettings {
         style.timeline.useDefaultCorderHeader = true
         return style
     }
-    
-    func timeFormatter(date: Date, format: String) -> String {
+
+    func timeFormatter(date: Date, format: String, local: Locale) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = format
+        formatter.locale = local
         return formatter.string(from: date)
     }
     
-    func formatter(date: String) -> Date {
+    func formatter(date: String, local: Locale) -> Date {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        formatter.locale = local
         return formatter.date(from: date) ?? Date()
     }
     

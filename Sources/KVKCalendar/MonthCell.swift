@@ -31,6 +31,7 @@ final class MonthCell: KVKCollectionViewCell {
     private func timeFormatter(date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = style.timeSystem.format
+        formatter.locale = style.locale
         return formatter.string(from: date)
     }
     

@@ -52,6 +52,7 @@ final class CurrentLineView: UIView {
         self.parameters = parameters
         super.init(frame: frame)
         isUserInteractionEnabled = false
+        formatter.locale = style.locale
         setUI()
     }
     
@@ -81,7 +82,14 @@ extension CurrentLineView: CalendarSettingProtocol {
         
         timeLabel.textColor = style.timeline.currentLineHourColor
         timeLabel.font = style.timeline.currentLineHourFont
-
+        
+        switch style.timeline.lineHourStyle {
+        case .withTime:
+            timeLabel.isHidden = false
+        case .onlyLine:
+            timeLabel.isHidden = true
+        }
+        
         timeLabel.frame = CGRect(x: 0, y: 0,
                                  width: style.timeline.currentLineHourWidth,
                                  height: frame.height)
