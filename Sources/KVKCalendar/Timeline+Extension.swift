@@ -323,7 +323,7 @@ extension TimelineView {
     func createTimesLabel(start: Int, end: Int) -> (times: [TimelineLabel], items: [UILabel]) {
         var times = [TimelineLabel]()
         var otherTimes = [UILabel]()
-        for (idx, txtHour) in timeSystem.hours.enumerated() where idx >= start && idx <= end {
+        for (idx, txtHour) in timeSystem.getHours(isEndOfDayZero: style.isEndOfDayZero).enumerated() where idx >= start && idx <= end {
             let yTime = (calculatedTimeY + style.timeline.heightTime) * CGFloat(idx - start)
             let time = TimelineLabel(frame: CGRect(x: leftOffsetWithAdditionalTime,
                                                    y: yTime,
@@ -333,7 +333,7 @@ extension TimelineView {
             time.textAlignment = style.timeline.timeAlignment
             time.textColor = style.timeline.timeColor
             time.text = txtHour
-            let hourTmp = TimeHourSystem.twentyFour.hours[idx]
+            let hourTmp = TimeHourSystem.twentyFour.getHours(isEndOfDayZero: style.isEndOfDayZero)[idx]
             let hour = timeLabelFormatter.date(from: hourTmp)?.kvkHour ?? 0
             time.hashTime = hour
             time.tag = idx - start
@@ -440,7 +440,7 @@ extension TimelineView {
                 break
             }
             
-            newEvent.end = style.calendar.date(byAdding: .minute, value: 15, to: newEvent.start) ?? Date()
+            newEvent.end = style.calendar.date(byAdding: .minute, value: style.event.newEventStep, to: newEvent.start) ?? Date()
             delegate?.didAddNewEvent(newEvent,
                                      minute: time.minute,
                                      hour: time.hour,
@@ -764,14 +764,10 @@ extension TimelineView: CalendarSettingProtocol {
         
         scrollView.backgroundColor = style.timeline.backgroundColor
         scrollView.isScrollEnabled = style.timeline.scrollDirections.contains(.vertical)
-        gestureRecognizers?.forEach { $0.removeTarget(self, action: #selector(addNewEvent)) }
         
-        if style.timeline.isEnabledCreateNewEvent {
-            // long tap to create a new event preview
-            let longTap = UILongPressGestureRecognizer(target: self, action: #selector(addNewEvent))
-            longTap.minimumPressDuration = style.timeline.minimumPressDuration
-            addGestureRecognizer(longTap)
-        }
+        tapGestureRecognizer.isEnabled = style.timeline.isEnabledDefaultTapGestureRecognizer
+        longTapGestureRecognizer.isEnabled = style.timeline.isEnabledCreateNewEvent
+        longTapGestureRecognizer.minimumPressDuration = style.timeline.minimumPressDuration
     }
     
     func reloadFrame(_ frame: CGRect) {

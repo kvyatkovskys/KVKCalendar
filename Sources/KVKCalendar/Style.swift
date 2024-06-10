@@ -25,6 +25,8 @@ public struct Style {
     public var timezone = TimeZone.current
     public var defaultType: CalendarType?
     public var timeSystem: TimeHourSystem = .twentyFour
+    /// Only valid in 24-hour format
+    public var isEndOfDayZero: Bool = true
     public var startWeekDay: StartDayType = .monday
     public var followInSystemTheme: Bool = true
     public var systemCalendars: Set<String> = []
@@ -169,6 +171,7 @@ public struct TimelineStyle {
     public var widthEventViewer: CGFloat? = nil
     public var showLineHourMode: CurrentLineHourShowMode = .today
     public var scrollLineHourMode: CurrentLineHourScrollMode = .today
+    public var lineHourStyle: CurrentLineHourStyle = .withTime
     public var currentLineHourFont: UIFont = .systemFont(ofSize: 12)
     public var currentLineHourColor: UIColor = .red
     public var currentLineHourDotSize: CGSize = CGSize(width: 5, height: 5)
@@ -182,6 +185,7 @@ public struct TimelineStyle {
     public var minimumPressDuration: TimeInterval = 0.5
     public var isHiddenStubEvent: Bool = true
     public var isEnabledCreateNewEvent: Bool = true
+    public var isEnabledDefaultTapGestureRecognizer: Bool = true
     public var maxLimitCachedPages: UInt = 10
     public var scrollDirections: Set<ScrollDirectionType> = Set(ScrollDirectionType.allCases)
     public var dividerType: DividerType? = nil
@@ -226,6 +230,11 @@ public struct TimelineStyle {
         case vertical, horizontal
     }
     
+    public enum CurrentLineHourStyle: Equatable {
+        case withTime
+        case onlyLine
+    }
+
     public enum CurrentLineHourShowMode: Equatable {
         case always, today, forDate(Date), never
         
@@ -465,6 +474,7 @@ public struct EventStyle {
     public var defaultHeight: CGFloat? = nil
     public var showRecurringEventInPast: Bool = false
     public var textContainerInset: UIEdgeInsets = .zero
+    public var newEventStep: Int = 15
     
     /// work only together with the `Week.viewMode = .list` property
     public var defaultWidth: CGFloat? = nil
@@ -607,6 +617,7 @@ extension Style: Equatable {
         && compare(\.timezone)
         && compare(\.defaultType)
         && compare(\.timeSystem)
+        && compare(\.isEndOfDayZero)
         && compare(\.startWeekDay)
         && compare(\.followInSystemTheme)
         && compare(\.systemCalendars)
@@ -859,6 +870,7 @@ extension TimelineStyle: Equatable {
         && compare(\.widthEventViewer)
         && compare(\.showLineHourMode)
         && compare(\.scrollLineHourMode)
+        && compare(\.lineHourStyle)
         && compare(\.currentLineHourFont)
         && compare(\.currentLineHourColor)
         && compare(\.currentLineHourDotSize)
@@ -872,6 +884,7 @@ extension TimelineStyle: Equatable {
         && compare(\.minimumPressDuration)
         && compare(\.isHiddenStubEvent)
         && compare(\.isEnabledCreateNewEvent)
+        && compare(\.isEnabledDefaultTapGestureRecognizer)
         && compare(\.maxLimitCachedPages)
         && compare(\.scrollDirections)
         && compare(\.dividerType)
@@ -914,6 +927,7 @@ extension EventStyle: Equatable {
         && compare(\.defaultHeight)
         && compare(\.showRecurringEventInPast)
         && compare(\.textContainerInset)
+        && compare(\.newEventStep)
         && compare(\.defaultWidth)
     }
     
