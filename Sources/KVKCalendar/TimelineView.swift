@@ -101,6 +101,10 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         return scroll
     }()
     
+    private(set) lazy var tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(forceDeselectEvent))
+    
+    private(set) lazy var longTapGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(addNewEvent))
+    
     init(parameters: Parameters, frame: CGRect) {
         self.paramaters = parameters
         self.timeSystem = parameters.style.timeSystem
@@ -108,11 +112,15 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         self.selectedDate = Date()
         super.init(frame: frame)
         
+        timeLabelFormatter.locale = style.locale
+
         addSubview(scrollView)
         setupConstraints()
         
-        let tap = UITapGestureRecognizer(target: self, action: #selector(forceDeselectEvent))
-        addGestureRecognizer(tap)
+        addGestureRecognizer(tapGestureRecognizer)
+        
+        // long tap to create a new event preview
+        addGestureRecognizer(longTapGestureRecognizer)
         
         if style.timeline.scale != nil {
             let pinch = UIPinchGestureRecognizer(target: self, action: #selector(pinchZooming))
@@ -160,7 +168,7 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             self.currentLineView.valueHash = nextDate.kvkMinute.hashValue
             self.currentLineView.date = nextDate
             
-            if self.isDisplayedTimes {
+            if self.isDisplayedTimes && style.timeline.lineHourStyle == .withTime {
                 if let timeNext = self.getTimelineLabel(hour: nextDate.kvkHour + 1) {
                     timeNext.isHidden = self.currentLineView.frame.intersects(timeNext.frame)
                 }
@@ -188,7 +196,7 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         scrollView.addSubview(currentLineView)
         movingCurrentLineHour()
         
-        if isDisplayedTimes {
+        if isDisplayedTimes && style.timeline.lineHourStyle == .withTime {
             if let timeNext = getTimelineLabel(hour: date.kvkHour + 1) {
                 timeNext.isHidden = currentLineView.frame.intersects(timeNext.frame)
             }
