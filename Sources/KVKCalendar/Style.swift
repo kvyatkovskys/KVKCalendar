@@ -194,7 +194,9 @@ public struct TimelineStyle {
     public var scale: Scale? = Scale(min: 1, max: 6)
     public var useDefaultCorderHeader = false
     public var eventPreviewSize: CGSize? = CGSize(width: 150, height: 150)
-    
+    /// Takes effect when `style.event.states` does not contain `.move`. `true`: create a new event at the long press; `false`: create at the start time.
+    public var createEventAtTouch = false
+
     public var allLeftOffset: CGFloat {
         widthTime + offsetTimeX + offsetLineLeft
     }
@@ -889,6 +891,7 @@ extension TimelineStyle: Equatable {
         && compare(\.timeDividerColor)
         && compare(\.timeDividerFont)
         && compare(\.scale)
+        && compare(\.createEventAtTouch)
     }
     
 }
