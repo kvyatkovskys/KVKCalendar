@@ -44,7 +44,7 @@ extension TimelineView: UIScrollViewDelegate {
         }
     }
     
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         addStubForInvisibleEvents()
     }
     
@@ -201,7 +201,7 @@ extension TimelineView {
         enableAllEvents(enable: true)
     }
     
-    private func enableAllEvents(enable: Bool) {
+    public func enableAllEvents(enable: Bool) {
         if style.allDay.isPinned {
             subviews.filter { $0.tag == tagAllDayEventView }.forEach { $0.isUserInteractionEnabled = enable }
         } else {
@@ -316,7 +316,7 @@ extension TimelineView {
         return allDayView
     }
     
-    func getTimelineLabel(hour: Int) -> TimelineLabel? {
+    public func getTimelineLabel(hour: Int) -> TimelineLabel? {
         timeLabels.first(where: { $0.hashTime == hour })
     }
     
@@ -409,10 +409,6 @@ extension TimelineView {
     }
     
     @objc func addNewEvent(gesture: UILongPressGestureRecognizer) {
-        guard !isResizableEventEnable else { return }
-        if gesture.state == .began {
-            eventPreviewSize = getEventPreviewSize()
-        }
         var point = gesture.location(in: scrollView)
         if style.timeline.createEventAtTouch && !style.event.states.contains(.move) {
             let offset = eventPreviewYOffset - style.timeline.offsetEvent - 6
@@ -423,6 +419,24 @@ extension TimelineView {
         let time = movingMinuteLabel.time
         var newEvent = Event(ID: Event.idForNewEvent)
         newEvent.title = TextEvent(timeline: style.event.textForNewEvent)
+        
+        switch paramaters.type {
+        case .day:
+            newEvent.start = selectedDate
+        case .week:
+            newEvent.start = shadowView.date ?? Date()
+        default:
+            break
+        }
+        
+        newEvent.end = style.calendar.date(byAdding: .minute, value: style.event.newEventStep, to: newEvent.start) ?? Date()
+
+        guard !isResizableEventEnable && (delegate?.willAddNewEvent(newEvent, minute: time.minute, hour: time.hour, point: point) ?? true) else { return }
+        
+        if gesture.state == .began {
+            eventPreviewSize = getEventPreviewSize()
+        }
+        
         let newEventPreview = getEventView(style: style,
                                            event: newEvent,
                                            frame: CGRect(origin: point, size: eventPreviewSize))
@@ -436,16 +450,6 @@ extension TimelineView {
         case .ended, .failed, .cancelled:
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
             
-            switch paramaters.type {
-            case .day:
-                newEvent.start = selectedDate
-            case .week:
-                newEvent.start = shadowView.date ?? Date()
-            default:
-                break
-            }
-            
-            newEvent.end = style.calendar.date(byAdding: .minute, value: style.event.newEventStep, to: newEvent.start) ?? Date()
             delegate?.didAddNewEvent(newEvent,
                                      minute: time.minute,
                                      hour: time.hour,

@@ -542,6 +542,9 @@ public protocol CalendarDelegate: AnyObject {
     /// drag & drop events and resize
     func didChangeEvent(_ event: Event, start: Date?, end: Date?)
     
+    /// Controls whether event can be added
+    func willAddNewEvent(_ event: Event, _ date: Date?) -> Bool
+
     /// add new event
     func didAddNewEvent(_ event: Event, _ date: Date?)
     
@@ -582,7 +585,9 @@ public extension CalendarDelegate {
     func eventViewerFrame(_ frame: CGRect) {}
     
     func didChangeEvent(_ event: Event, start: Date?, end: Date?) {}
-        
+    
+    func willAddNewEvent(_ event: Event, _ date: Date?) -> Bool { true }
+    
     func didAddNewEvent(_ event: Event, _ date: Date?) {}
     
     func didDisplayEvents(_ events: [Event], dates: [Date?]) {}

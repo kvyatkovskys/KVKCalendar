@@ -9,7 +9,7 @@
 
 import UIKit
 
-final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
+public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     
     struct Parameters {
         var style: Style
@@ -61,7 +61,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     private let tagBackgroundView = -50
     private(set) var tagAllDayEventView = -70
     private(set) var tagStubEvent = -80
-    private(set) var timeLabels = [TimelineLabel]()
+    public private(set) var timeLabels = [TimelineLabel]()
     private(set) var timeSystem: TimeHourSystem
     private let timerKey = "CurrentHourTimerKey"
     private(set) var events = [Event]()
@@ -78,7 +78,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         return view
     }()
     
-    private(set) lazy var movingMinuteLabel: TimelineLabel = {
+    public private(set) lazy var movingMinuteLabel: TimelineLabel = {
         let label = TimelineLabel()
         label.adjustsFontSizeToFitWidth = true
         label.textColor = style.timeline.movingMinutesColor
@@ -95,7 +95,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         return view
     }()
     
-    private(set) lazy var scrollView: UIScrollView = {
+    public private(set) lazy var scrollView: UIScrollView = {
         let scroll = UIScrollView()
         scroll.delegate = self
         return scroll
