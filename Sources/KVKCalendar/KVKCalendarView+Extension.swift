@@ -189,16 +189,15 @@ extension KVKCalendarView {
         case .authorized:
             completion(true)
         default:
-            //           temporary disabled
-            //            if #available(iOS 17.0, *) {
-            //                store.requestFullAccessToEvents { (access, error) in
-            //                    proxyCompletion(access: access, status: status, error: error)
-            //                }
-            //            } else {
-            store.requestAccess(to: .event) { (access, error) in
-                proxyCompletion(access: access, status: status, error: error)
+            if #available(iOS 17.0, *) {
+                store.requestFullAccessToEvents { (access, error) in
+                    proxyCompletion(access: access, status: status, error: error)
+                }
+            } else {
+                store.requestAccess(to: .event) { (access, error) in
+                    proxyCompletion(access: access, status: status, error: error)
+                }
             }
-            //            }
         }
     }
     
