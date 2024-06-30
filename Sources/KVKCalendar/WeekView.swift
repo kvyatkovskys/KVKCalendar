@@ -62,6 +62,7 @@ final class WeekView: UIView {
     }
     
     func reloadData(_ events: [Event]) {
+        scrollableWeekView.reloadCustomCornerHeaderViewIfNeeded()
         parameters.data.recurringEvents = events.filter { $0.recurringType != .none }
         parameters.data.events = parameters.data.filterEvents(events, dates: parameters.visibleDates)
         timelinePage.timelineView?.create(dates: parameters.visibleDates,
