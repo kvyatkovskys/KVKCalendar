@@ -390,7 +390,7 @@ extension UITableView: KVKDequeueProxyProtocol {}
 extension UICollectionView: KVKDequeueProxyProtocol {}
 
 @available(iOS 13.4, *)
-extension UIView: @retroactive UIPointerInteractionDelegate {
+extension UIView: UIPointerInteractionDelegate {
     
     func addPointInteraction() {
         let interaction = UIPointerInteraction(delegate: self)
