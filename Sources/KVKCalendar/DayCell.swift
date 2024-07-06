@@ -14,13 +14,13 @@ class DayCell: UICollectionViewCell {
     private(set) var heightDate: CGFloat = 35
     private(set) var heightTitle: CGFloat = 25
     
-    lazy var titleLabel: UILabel = {
+    let titleLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
         return label
     }()
     
-    lazy var dateLabel: UILabel = {
+    let dateLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
         label.clipsToBounds = true
@@ -148,7 +148,6 @@ class DayCell: UICollectionViewCell {
             dateLabel.textColor = colorText
             dotView.backgroundColor = .clear
         }
-        isSelected = false
     }
 }
 

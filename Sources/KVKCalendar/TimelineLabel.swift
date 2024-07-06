@@ -12,6 +12,7 @@ import UIKit
 public class TimelineLabel: UILabel {
     
     public var hashTime: Int = 0
+    public var yTime: CGFloat = 0
     
     var time: TimeContainer = TimeContainer(minute: 0, hour: 0) {
         didSet {
