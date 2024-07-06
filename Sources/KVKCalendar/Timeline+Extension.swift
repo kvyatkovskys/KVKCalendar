@@ -44,7 +44,7 @@ extension TimelineView: UIScrollViewDelegate {
         }
     }
     
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         addStubForInvisibleEvents()
     }
     
@@ -201,7 +201,7 @@ extension TimelineView {
         enableAllEvents(enable: true)
     }
     
-    private func enableAllEvents(enable: Bool) {
+    public func enableAllEvents(enable: Bool) {
         if style.allDay.isPinned {
             subviews.filter { $0.tag == tagAllDayEventView }.forEach { $0.isUserInteractionEnabled = enable }
         } else {
@@ -326,7 +326,7 @@ extension TimelineView {
         return allDayView
     }
     
-    func getTimelineLabel(hour: Int) -> TimelineLabel? {
+    public func getTimelineLabel(hour: Int) -> TimelineLabel? {
         timeLabels.first(where: { $0.hashTime == hour })
     }
     
@@ -334,10 +334,10 @@ extension TimelineView {
         timeLabelsDict[hour]
     }
     
-    func createTimesLabel(start: Int) -> (times: [TimelineLabel], items: [UILabel]) {
+    func createTimesLabel(start: Int, end: Int) -> (times: [TimelineLabel], items: [UILabel]) {
         var times = [TimelineLabel]()
         var otherTimes = [UILabel]()
-        for (idx, txtHour) in timeSystem.hours.enumerated() where idx >= start {
+        for (idx, txtHour) in timeSystem.getHours(isEndOfDayZero: style.isEndOfDayZero).enumerated() where idx >= start && idx <= end {
             let yTime = (calculatedTimeY + style.timeline.heightTime) * CGFloat(idx - start)
             let time = TimelineLabel(frame: CGRect(x: leftOffsetWithAdditionalTime,
                                                    y: yTime,
@@ -347,7 +347,7 @@ extension TimelineView {
             time.textAlignment = style.timeline.timeAlignment
             time.textColor = style.timeline.timeColor
             time.text = txtHour
-            let hourTmp = TimeHourSystem.twentyFour.hours[idx]
+            let hourTmp = TimeHourSystem.twentyFour.getHours(isEndOfDayZero: style.isEndOfDayZero)[idx]
             let hour = timeLabelFormatter.date(from: hourTmp)?.kvkHour ?? 0
             time.hashTime = hour
             time.tag = idx - start
@@ -363,18 +363,18 @@ extension TimelineView {
         return (times, otherTimes)
     }
     
-    func createAndAddTimesLabel(start: Int) -> (times: [TimelineLabel], items: [UILabel]) {
+    func createAndAddTimesLabel(start: Int, end: Int) -> (times: [TimelineLabel], items: [UILabel]) {
         var times = [TimelineLabel]()
         var otherTimes = [UILabel]()
         var allHeight: CGFloat = 0
-        for (idx, txtHour) in timeSystem.hours.enumerated() where idx >= start {
+        for (idx, txtHour) in timeSystem.getHours(isEndOfDayZero: style.isEndOfDayZero).enumerated() where idx >= start {
             let yTime = (calculatedTimeY + style.timeline.heightTime) * CGFloat(idx - start)
             let time = TimelineLabel()
             time.font = style.timeline.timeFont
             time.textAlignment = style.timeline.timeAlignment
             time.textColor = style.timeline.timeColor
             time.text = txtHour
-            let hourTmp = TimeHourSystem.twentyFour.hours[idx]
+            let hourTmp = TimeHourSystem.twentyFour.getHours(isEndOfDayZero: style.isEndOfDayZero)[idx]
             let hour = timeLabelFormatter.date(from: hourTmp)?.kvkHour ?? 0
             time.hashTime = hour
             time.tag = idx - start
@@ -568,13 +568,34 @@ extension TimelineView {
     }
     
     @objc func addNewEvent(gesture: UILongPressGestureRecognizer) {
-        guard !isResizableEventEnable else { return }
-        
         var point = gesture.location(in: scrollView)
+        if style.timeline.createEventAtTouch && !style.event.states.contains(.move) {
+            let offset = eventPreviewYOffset - style.timeline.offsetEvent - 6
+            showChangingMinute(pointY: point.y, offset: offset)
+        }
         point.y = (point.y - eventPreviewYOffset) - style.timeline.offsetEvent - 6
+
         let time = movingMinuteLabel.time
         var newEvent = Event(ID: Event.idForNewEvent)
         newEvent.title = TextEvent(timeline: style.event.textForNewEvent)
+        
+        switch paramaters.type {
+        case .day:
+            newEvent.start = selectedDate
+        case .week:
+            newEvent.start = shadowView.date ?? Date()
+        default:
+            break
+        }
+        
+        newEvent.end = style.calendar.date(byAdding: .minute, value: style.event.newEventStep, to: newEvent.start) ?? Date()
+
+        guard !isResizableEventEnable && (delegate?.willAddNewEvent(newEvent, minute: time.minute, hour: time.hour, point: point) ?? true) else { return }
+        
+        if gesture.state == .began {
+            eventPreviewSize = getEventPreviewSize()
+        }
+        
         let newEventPreview = getEventView(style: style,
                                            event: newEvent,
                                            frame: CGRect(origin: point, size: eventPreviewSize))
@@ -588,16 +609,6 @@ extension TimelineView {
         case .ended, .failed, .cancelled:
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
             
-            switch paramaters.type {
-            case .day:
-                newEvent.start = selectedDate
-            case .week:
-                newEvent.start = shadowView.date ?? Date()
-            default:
-                break
-            }
-            
-            newEvent.end = style.calendar.date(byAdding: .minute, value: 15, to: newEvent.start) ?? Date()
             delegate?.didAddNewEvent(newEvent,
                                      minute: time.minute,
                                      hour: time.hour,
@@ -885,7 +896,7 @@ extension TimelineView: EventDelegate {
         let firstY = time.frame.origin.y - (calculatedTimeY + style.timeline.heightTime)
         let percent = (pointY - firstY) / (calculatedTimeY + style.timeline.heightTime)
         let newMinute = Int(60.0 * percent)
-        let newHour = time.tag - 1
+        let newHour = time.tag - 1 + style.timeline.startHour
         return (newHour, newMinute)
     }
     
@@ -921,14 +932,10 @@ extension TimelineView: CalendarSettingProtocol {
         
         scrollView.backgroundColor = style.timeline.backgroundColor
         scrollView.isScrollEnabled = style.timeline.scrollDirections.contains(.vertical)
-        gestureRecognizers?.forEach { $0.removeTarget(self, action: #selector(addNewEvent)) }
         
-        if style.timeline.isEnabledCreateNewEvent {
-            // long tap to create a new event preview
-            let longTap = UILongPressGestureRecognizer(target: self, action: #selector(addNewEvent))
-            longTap.minimumPressDuration = style.timeline.minimumPressDuration
-            addGestureRecognizer(longTap)
-        }
+        tapGestureRecognizer.isEnabled = style.timeline.isEnabledDefaultTapGestureRecognizer
+        longTapGestureRecognizer.isEnabled = style.timeline.isEnabledCreateNewEvent
+        longTapGestureRecognizer.minimumPressDuration = style.timeline.minimumPressDuration
     }
     
     func reloadFrame(_ frame: CGRect) {

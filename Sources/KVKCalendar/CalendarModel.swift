@@ -35,7 +35,7 @@ public enum TimeHourSystem: Int, Identifiable {
         self
     }
     
-    var hours: [String] {
+    func getHours(isEndOfDayZero: Bool = true) -> [String] {
         switch self {
         case .twelveHour, .twelve:
             let array = ["12"] + Array(1...11).map { String($0) }
@@ -49,7 +49,7 @@ public enum TimeHourSystem: Int, Identifiable {
             return am + pm
         case .twentyFourHour, .twentyFour:
             let array = ["00:00"] + Array(1...24).map { (i) -> String in
-                let i = i % 24
+                let i = isEndOfDayZero ? i % 24 : i 
                 var string = i < 10 ? "0" + "\(i)" : "\(i)"
                 string.append(":00")
                 return string
@@ -439,6 +439,7 @@ extension CalendarSettingProtocol {
     func timeFormatter(date: Date, format: String) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = format
+        formatter.locale = style.locale
         return formatter.string(from: date)
     }
 }
@@ -581,6 +582,9 @@ public protocol CalendarDelegate: AnyObject {
     /// drag & drop events and resize
     func didChangeEvent(_ event: Event, start: Date?, end: Date?)
     
+    /// Controls whether event can be added
+    func willAddNewEvent(_ event: Event, _ date: Date?) -> Bool
+
     /// add new event
     func didAddNewEvent(_ event: Event, _ date: Date?)
     
@@ -621,7 +625,9 @@ public extension CalendarDelegate {
     func eventViewerFrame(_ frame: CGRect) {}
     
     func didChangeEvent(_ event: Event, start: Date?, end: Date?) {}
-        
+    
+    func willAddNewEvent(_ event: Event, _ date: Date?) -> Bool { true }
+    
     func didAddNewEvent(_ event: Event, _ date: Date?) {}
     
     func didDisplayEvents(_ events: [Event], dates: [Date?]) {}

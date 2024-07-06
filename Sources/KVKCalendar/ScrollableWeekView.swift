@@ -500,7 +500,7 @@ final class ScrollableWeekView: UIView {
         layout.scrollDirection = .horizontal
         return layout
     }()
-    
+    private let customCornerHeaderViewTag = -1001
     private var titleView: ScrollableWeekHeaderTitleView?
     private let bottomLineView = UIView()
     private let cornerBtn: UIButton = {
@@ -618,7 +618,7 @@ extension ScrollableWeekView: CalendarSettingProtocol {
         }
     }
     
-    func setUI(relad: Bool = false) {
+    func setUI(reload: Bool = false) {
         bottomLineView.backgroundColor = params.style.headerScroll.bottomLineColor
         
         subviews.forEach { $0.removeFromSuperview() }
@@ -654,17 +654,36 @@ extension ScrollableWeekView: CalendarSettingProtocol {
         scrollToDate(date, animated: true)
     }
     
+    func reloadCustomCornerHeaderViewIfNeeded() {
+        if let cornerHeader = dataSource?.dequeueCornerHeader(
+            date: date,
+            frame: CGRect(x: 0, y: 0,
+                          width: leftOffsetWithAdditionalTime,
+                          height: bounds.height),
+            type: type
+        ) {
+            cornerHeader.tag = customCornerHeaderViewTag
+            for subview in subviews where subview.tag == customCornerHeaderViewTag {
+                subview.removeFromSuperview()
+            }
+            addSubview(cornerHeader)
+        }
+    }
+    
     private func setupViews(mainFrame: inout CGRect) {
         if let customView = dataSource?.willDisplayHeaderView(date: date, frame: mainFrame, type: type) {
             params.weeks = []
             collectionView.reloadData()
             addSubview(customView)
         } else {
-            if let cornerHeader = dataSource?.dequeueCornerHeader(date: date,
-                                                                  frame: CGRect(x: 0, y: 0,
-                                                                                width: leftOffsetWithAdditionalTime,
-                                                                                height: bounds.height),
-                                                                  type: type) {
+            if let cornerHeader = dataSource?.dequeueCornerHeader(
+                date: date,
+                frame: CGRect(x: 0, y: 0,
+                              width: leftOffsetWithAdditionalTime,
+                              height: bounds.height),
+                type: type
+            ) {
+                cornerHeader.tag = customCornerHeaderViewTag
                 addSubview(cornerHeader)
                 mainFrame.origin.x = cornerHeader.frame.width
                 mainFrame.size.width -= cornerHeader.frame.width

@@ -473,6 +473,7 @@ extension YearView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
         let index = getIndexForDirection(data.style.year.scrollDirection, indexPath: indexPath)
         let date = data.sections[index.section].months[index.row].date
         let formatter = DateFormatter()
+        formatter.locale = style.locale
         formatter.dateFormat = "dd.MM.yyyy"
         let newDate = formatter.date(from: "\(data.date.kvkDay).\(date.kvkMonth).\(date.kvkYear)")
         data.date = newDate ?? Date()

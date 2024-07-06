@@ -52,6 +52,7 @@ final class CurrentLineView: UIView {
         self.parameters = parameters
         super.init(frame: frame)
         isUserInteractionEnabled = false
+        formatter.locale = style.locale
         setUI()
     }
     

@@ -135,7 +135,7 @@ public final class KVKCalendarView: UIView {
     private(set) var yearData: YearData
     private let listData: ListViewData
     
-    private(set) var dayView: DayView
+    public private(set) var dayView: DayView
     private(set) var weekView: WeekView
     private(set) var monthView: MonthView
     private(set) var yearView: YearView

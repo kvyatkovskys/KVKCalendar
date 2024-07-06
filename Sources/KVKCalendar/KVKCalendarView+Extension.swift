@@ -330,6 +330,10 @@ extension KVKCalendarView: DisplayDelegate {
         delegate?.didSelectMore(date, frame: frame)
     }
     
+    public func willAddNewEvent(_ event: Event, _ date: Date?) -> Bool {
+        delegate?.willAddNewEvent(event, date) ?? true
+    }
+
     public func didAddNewEvent(_ event: Event, _ date: Date?) {
         delegate?.didAddNewEvent(event, date)
     }
