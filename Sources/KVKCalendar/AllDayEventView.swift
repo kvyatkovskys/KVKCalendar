@@ -18,7 +18,7 @@ struct AllDayEventNewView: View {
     var body: some View {
         HStack {
             Text(event.title.timeline)
-                .foregroundColor(Color(uiColor: event.textColor))
+                .foregroundStyle(event.textColor.suiColor)
                 .font(Font(style.fontTitle))
                 .padding(5)
                 .frame(maxWidth: .infinity, alignment: .leading)

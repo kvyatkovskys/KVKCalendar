@@ -8,6 +8,7 @@
 #if os(iOS)
 
 import UIKit
+import SwiftUI
 
 enum Platform: Int {
     case phone, pad, mac, none
@@ -403,6 +404,13 @@ extension UIView: UIPointerInteractionDelegate {
         return pointerStyle
     }
     
+}
+
+extension UIColor {
+    @available(iOS 15.0, *)
+    var suiColor: Color {
+        Color(uiColor: self)
+    }
 }
 
 #endif

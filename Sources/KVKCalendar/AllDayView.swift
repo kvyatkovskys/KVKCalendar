@@ -54,11 +54,11 @@ struct AllDayNewView: View {
                     }
                 }
             }
-            .padding(5)
             .frame(maxWidth: .infinity)
+            .contentMargins(5, for: .scrollContent)
         }
         .frame(minHeight: style.allDay.height, maxHeight: style.allDay.maxHeight)
-        .background(Color(uiColor: style.allDay.backgroundColor))
+        .background(style.allDay.backgroundColor.suiColor)
     }
     
 }
