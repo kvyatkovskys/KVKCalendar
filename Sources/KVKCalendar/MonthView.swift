@@ -428,12 +428,11 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
 
         let month = parameters.monthData.data.months[index.section]
         setHeaderTitleAndNotify(month.date)
-        guard style.month.autoSelectionDateWhenScrolling else { return }
         let newDate = parameters.monthData.findNextDateInMonth(month)
-        guard parameters.monthData.date != newDate else { return }
-
-        parameters.monthData.date = newDate
         willSelectDate?(newDate)
+        
+        guard style.month.autoSelectionDateWhenScrolling && parameters.monthData.date != newDate else { return }
+        parameters.monthData.date = newDate
         reload()
     }
     
@@ -452,12 +451,11 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         
         let month = parameters.monthData.data.months[visibleIndex]
         setHeaderTitleAndNotify(month.date)
-        guard style.month.autoSelectionDateWhenScrolling else { return }
         let newDate = parameters.monthData.findNextDateInMonth(month)
-        guard parameters.monthData.date != newDate else { return }
-        
-        parameters.monthData.date = newDate
         willSelectDate?(newDate)
+        
+        guard style.month.autoSelectionDateWhenScrolling && parameters.monthData.date != newDate else { return }
+        parameters.monthData.date = newDate
         reload()
     }
     
