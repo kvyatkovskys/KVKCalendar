@@ -268,10 +268,6 @@ final class MonthCell: KVKCollectionViewCell {
         dateLabel.frame = dateFrame
         dateLabel.tag = defaultTagView
         contentView.addSubview(dateLabel)
-                
-        if #available(iOS 13.4, *) {
-            contentView.addPointInteraction()
-        }
     }
     
     required init?(coder aDecoder: NSCoder) {
