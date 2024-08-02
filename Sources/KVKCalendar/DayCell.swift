@@ -152,4 +152,22 @@ class DayCell: UICollectionViewCell {
     }
 }
 
+@available(iOS 13.4, *)
+extension DayCell: UIPointerInteractionDelegate {
+    func addPointInteraction() {
+        let interaction = UIPointerInteraction(delegate: self)
+        addInteraction(interaction)
+    }
+    
+    public func pointerInteraction(_ interaction: UIPointerInteraction, styleFor region: UIPointerRegion) -> UIPointerStyle? {
+        var pointerStyle: UIPointerStyle?
+        
+        if let interactionView = interaction.view {
+            let targetedPreview = UITargetedPreview(view: interactionView)
+            pointerStyle = UIPointerStyle(effect: .highlight(targetedPreview))
+        }
+        return pointerStyle
+    }
+}
+
 #endif
