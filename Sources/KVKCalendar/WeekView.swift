@@ -366,7 +366,7 @@ extension WeekView: TimelineDelegate {
         delegate?.didChangeEvent(event, start: startDate, end: endDate)
     }
     
-    func willAddNewEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint) -> Bool {
+    func willAddNewEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint) -> Event? {
         var components = DateComponents()
         components.year = event.start.kvkYear
         components.month = event.start.kvkMonth
@@ -374,7 +374,7 @@ extension WeekView: TimelineDelegate {
         components.hour = hour
         components.minute = minute
         let newDate = style.calendar.date(from: components)
-        return delegate?.willAddNewEvent(event, newDate) ?? true
+        return delegate?.willAddNewEvent(event, newDate) ?? event
     }
 
     func didAddNewEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint) {

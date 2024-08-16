@@ -130,7 +130,7 @@ extension DayView: TimelineDelegate {
         delegate?.didChangeEvent(event, start: startDate, end: endDate)
     }
     
-    func willAddNewEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint) -> Bool {
+    func willAddNewEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint) -> Event? {
         var components = DateComponents()
         components.year = parameters.data.date.kvkYear
         components.month = parameters.data.date.kvkMonth
@@ -138,7 +138,7 @@ extension DayView: TimelineDelegate {
         components.hour = hour
         components.minute = minute
         let date = style.calendar.date(from: components)
-        return delegate?.willAddNewEvent(event, date) ?? true
+        return delegate?.willAddNewEvent(event, date) ?? event
     }
     
     func didAddNewEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint) {
