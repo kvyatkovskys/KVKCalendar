@@ -42,6 +42,7 @@ public struct Style {
         if Platform.currentInterface == .phone {
             timeline.offsetTimeX = 2
             timeline.offsetLineLeft = 2
+            timeline.offsetLineRight = 0
             headerScroll.titleDateAlignment = .center
             headerScroll.isAnimateTitleDate = true
             headerScroll.heightHeaderWeek = 70
