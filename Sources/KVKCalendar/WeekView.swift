@@ -251,6 +251,8 @@ extension WeekView: CalendarSettingProtocol {
             timelineFrame.size.height -= scrollableWeekView.frame.height
         }
         
+        timelineFrame.origin.y += style.timeline.offsetTop
+        
         let timelineViews = Array(0..<style.timeline.maxLimitCachedPages).reduce([]) { (acc, _) -> [TimelineView] in
             return acc + [createTimelineView(frame: timelineFrame)]
         }
