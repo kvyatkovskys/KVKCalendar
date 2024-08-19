@@ -355,7 +355,7 @@ extension TimelineView {
             let idx = item.offset
             let lineFrame = CGRect(x: leftOffsetWithAdditionalTime,
                                    y: time.center.y,
-                                   width: frame.width - leftOffsetWithAdditionalTime,
+                                   width: frame.width - leftOffsetWithAdditionalTime - style.timeline.offsetLineRight,
                                    height: style.timeline.heightLine)
             let line = UIView(frame: lineFrame)
             line.backgroundColor = style.timeline.separatorLineColor
