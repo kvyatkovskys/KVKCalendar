@@ -42,6 +42,7 @@ public struct Style {
         if Platform.currentInterface == .phone {
             timeline.offsetTimeX = 2
             timeline.offsetLineLeft = 2
+            timeline.offsetLineRight = 0
             headerScroll.titleDateAlignment = .center
             headerScroll.isAnimateTitleDate = true
             headerScroll.heightHeaderWeek = 70
@@ -158,6 +159,7 @@ public struct TimelineStyle {
         return 0.5
 #endif
     }()
+    public var offsetTop: CGFloat = 0
     public var offsetLineLeft: CGFloat = 10
     public var offsetLineRight: CGFloat = 10
     public var backgroundColor: UIColor = .white
@@ -859,6 +861,7 @@ extension TimelineStyle: Equatable {
         && compare(\.movingMinuteLabelRoundUpTime)
         && compare(\.minuteLabelRoundUpTime)
         && compare(\.widthLine)
+        && compare(\.offsetTop)
         && compare(\.offsetLineLeft)
         && compare(\.offsetLineRight)
         && compare(\.backgroundColor)
