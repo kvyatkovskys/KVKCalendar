@@ -328,6 +328,8 @@ extension DayView: CalendarSettingProtocol {
             timelineFrame.size.height -= scrollableWeekView.frame.height
         }
         
+        timelineFrame.origin.y += style.timeline.offsetTop
+        
         if isAvailableEventViewer {
             if UIApplication.shared.orientation.isPortrait {
                 timelineFrame.size.width = UIScreen.main.bounds.width * 0.5
