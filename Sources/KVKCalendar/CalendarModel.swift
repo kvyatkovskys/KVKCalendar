@@ -596,8 +596,10 @@ public extension CalendarDelegate {
     
     func willAddNewEvent(_ event: Event, _ date: Date?) -> Bool { true }
     
-    func willAddNewEvent(_ event: Event, _ date: Date?) -> Event? { event }
-    
+    func willAddNewEvent(_ event: Event, _ date: Date?) -> Event? {
+        return willAddNewEvent(event, date) ? event : nil
+    }
+
     func didAddNewEvent(_ event: Event, _ date: Date?) {}
     
     func didDisplayEvents(_ events: [Event], dates: [Date?]) {}
