@@ -48,10 +48,20 @@ public final class KVKCalendarView: UIView {
     private(set) var yearView: YearView
     private(set) var listView: ListView
     
-    public init(frame: CGRect, date: Date? = nil, style: Style = Style(), years: Int = 4) {
+    public convenience init(frame: CGRect, date: Date? = nil, style: Style = Style(), years: Int = 4) {
+        let calendarData = CalendarData(date: date ?? Date(), years: years, style: style.adaptiveStyle)
+        self.init(frame: frame, date: date, style: style, calendarData: calendarData)
+    }
+    
+    public convenience init(frame: CGRect, date: Date? = nil, style: Style = Style(), startYear: Int, endYear: Int) {
+        let calendarData = CalendarData(date: date ?? Date(), style: style.adaptiveStyle, startYear: startYear, endYear: endYear)
+        self.init(frame: frame, date: date, style: style, calendarData: calendarData)
+    }
+    
+    private init(frame: CGRect, date: Date?, style: Style, calendarData: CalendarData) {
         let adaptiveStyle = style.adaptiveStyle
         self.parameters = .init(type: style.defaultType ?? .day, style: adaptiveStyle)
-        self.calendarData = CalendarData(date: date ?? Date(), years: years, style: adaptiveStyle)
+        self.calendarData = calendarData
         
         // day view
         self.dayData = DayData(data: calendarData, startDay: adaptiveStyle.startWeekDay)
@@ -81,6 +91,14 @@ public final class KVKCalendarView: UIView {
         
         super.init(frame: frame)
         
+        setup(with: date)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func setup(with date: Date?) {
         dayView.scrollableWeekView.dataSource = self
         dayView.dataSource = self
         dayView.delegate = self
@@ -103,17 +121,12 @@ public final class KVKCalendarView: UIView {
         
         viewCaches = [.day: dayView, .week: weekView, .month: monthView, .year: yearView, .list: listView]
         
-        if let defaultType = adaptiveStyle.defaultType {
+        if let defaultType = style.adaptiveStyle.defaultType {
             parameters.type = defaultType
         }
         set(type: parameters.type, date: date)
-        reloadAllStyles(adaptiveStyle, force: true)
+        reloadAllStyles(style.adaptiveStyle, force: true)
     }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
 }
 
 #endif
