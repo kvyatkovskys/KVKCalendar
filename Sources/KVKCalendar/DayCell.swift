@@ -65,18 +65,19 @@ class DayCell: UICollectionViewCell {
             }
             
             dateLabel.text = "\(tempDay)"
-            guard day.type != .empty else {
-                titleLabel.text = day.date?.titleForLocale(style.locale, formatter: style.headerScroll.weekdayFormatter).capitalized
-                dateLabel.textColor = style.headerScroll.colorNameEmptyDay
-                titleLabel.textColor = style.headerScroll.colorNameEmptyDay
-                return
-            }
             
             if !style.headerScroll.titleDays.isEmpty, let title = style.headerScroll.titleDays[safe: day.date?.kvkWeekday ?? 0] {
                 titleLabel.text = title
             } else {
                 titleLabel.text = day.date?.titleForLocale(style.locale, formatter: style.headerScroll.weekdayFormatter).capitalized
             }
+            
+            guard day.type != .empty else {
+                dateLabel.textColor = style.headerScroll.colorNameEmptyDay
+                titleLabel.textColor = style.headerScroll.colorNameEmptyDay
+                return
+            }
+            
             populateCell(day)
         }
     }
