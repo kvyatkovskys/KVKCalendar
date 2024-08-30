@@ -96,7 +96,7 @@ open class EventViewGeneral: UIView, CalendarTimer {
         }
     }
     
-    @objc public func editEvent(gesture: UILongPressGestureRecognizer) {
+    @objc public func editEvent(gesture: UIGestureRecognizer) {
         let location = gesture.location(in: self)
         
         switch gesture.state {
@@ -197,11 +197,11 @@ extension EventViewGeneral {
 
 protocol EventDelegate: AnyObject {
     
-    func didStartResizeEvent(_ event: Event, gesture: UILongPressGestureRecognizer, view: UIView)
-    func didEndResizeEvent(_ event: Event, gesture: UILongPressGestureRecognizer)
-    func didStartMovingEvent(_ event: Event, gesture: UILongPressGestureRecognizer, view: UIView)
-    func didEndMovingEvent(_ event: Event, gesture: UILongPressGestureRecognizer)
-    func didChangeMovingEvent(_ event: Event, gesture: UILongPressGestureRecognizer)
+    func didStartResizeEvent(_ event: Event, gesture: UIGestureRecognizer, view: UIView)
+    func didEndResizeEvent(_ event: Event, gesture: UIGestureRecognizer)
+    func didStartMovingEvent(_ event: Event, gesture: UIGestureRecognizer, view: UIView)
+    func didEndMovingEvent(_ event: Event, gesture: UIGestureRecognizer)
+    func didChangeMovingEvent(_ event: Event, gesture: UIGestureRecognizer)
     func didSelectEvent(_ event: Event, gesture: UITapGestureRecognizer)
     func deselectEvent(_ event: Event)
     
