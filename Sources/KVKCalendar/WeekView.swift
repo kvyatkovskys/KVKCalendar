@@ -139,6 +139,8 @@ extension WeekView: CalendarSettingProtocol {
             timelineFrame.size.height = frame.height
         }
         
+        timelineFrame.size.height -= style.timeline.offsetTop
+        
         timelinePage.frame = timelineFrame
         timelinePage.timelineView?.reloadFrame(CGRect(origin: .zero, size: timelineFrame.size))
         timelinePage.timelineView?.create(dates: parameters.visibleDates,
