@@ -187,7 +187,9 @@ public struct TimelineStyle {
     public var minimumPressDuration: TimeInterval = 0.5
     public var isHiddenStubEvent: Bool = true
     public var isEnabledCreateNewEvent: Bool = true
+    public var isEnabledForceDeselectEvent: Bool = true
     public var isEnabledDefaultTapGestureRecognizer: Bool = true
+    public var createNewEventMethod: CreateNewEventMethod = .longTap
     public var maxLimitCachedPages: UInt = 10
     public var scrollDirections: Set<ScrollDirectionType> = Set(ScrollDirectionType.allCases)
     public var dividerType: DividerType? = nil
@@ -274,6 +276,10 @@ public struct TimelineStyle {
                 return false
             }
         }
+    }
+
+    public enum CreateNewEventMethod: Equatable {
+        case tap, longTap
     }
 }
 
@@ -897,6 +903,8 @@ extension TimelineStyle: Equatable {
         && compare(\.timeDividerFont)
         && compare(\.scale)
         && compare(\.createEventAtTouch)
+        && compare(\.createNewEventMethod)
+        && compare(\.isEnabledForceDeselectEvent)
     }
     
 }
