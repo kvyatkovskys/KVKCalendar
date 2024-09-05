@@ -205,6 +205,8 @@ extension DayView: CalendarSettingProtocol {
             timelineFrame.size.height = frame.height
         }
         
+        timelineFrame.size.height -= style.timeline.offsetTop
+        
         if isAvailableEventViewer {
             if let defaultWidth = style.timeline.widthEventViewer {
                 timelineFrame.size.width = frame.width - defaultWidth
