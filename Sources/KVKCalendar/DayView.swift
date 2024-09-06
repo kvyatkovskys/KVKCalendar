@@ -138,7 +138,9 @@ extension DayView: TimelineDelegate {
         components.hour = hour
         components.minute = minute
         let date = style.calendar.date(from: components)
-        return delegate?.willAddNewEvent(event, date) ?? event
+
+        guard let delegate else { return event }
+        return delegate.willAddNewEvent(event, date)
     }
     
     func didAddNewEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint) {
@@ -202,6 +204,8 @@ extension DayView: CalendarSettingProtocol {
         } else {
             timelineFrame.size.height = frame.height
         }
+        
+        timelineFrame.size.height -= style.timeline.offsetTop
         
         if isAvailableEventViewer {
             if let defaultWidth = style.timeline.widthEventViewer {
