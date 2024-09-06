@@ -28,11 +28,13 @@ struct CalendarData {
     init(date: Date, style: Style, startYear: Int, endYear: Int) {
         let currentYear = Date().kvkYear
         
-        // 2024 - 2024 -> (left: 0, right: 0)
-        // 2024 - 2026 -> (left: 0, right: 2)
-        // 2023 - 2026 -> (left: 1, right: 2)
-        // 2022 - 2026 -> (left: 2, right: 2)
-        let leftCount = currentYear - min(startYear, currentYear)
+        // 2024 - 2024 -> (left: 1, right: 0)
+        // 2024 - 2026 -> (left: 1, right: 2)
+        // 2023 - 2026 -> (left: 2, right: 2)
+        // 2022 - 2026 -> (left: 3, right: 2)
+        
+        // +1 means adding the current year to the data
+        let leftCount = currentYear - min(startYear, currentYear) + 1
         let rightCount = max(endYear, currentYear) - currentYear
         
         let left = [Int](repeating: 0, count: leftCount)
