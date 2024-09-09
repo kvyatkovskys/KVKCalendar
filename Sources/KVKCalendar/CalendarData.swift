@@ -25,6 +25,10 @@ struct CalendarData {
         self.init(date: date, style: style, indexesYear: indexesYear)
     }
 
+    init<R: YearRange>(date: Date, style: Style, yearRange: R) where R.Bound == Int {
+        self.init(date: date, style: style, startYear: yearRange.lowerBound, endYear: yearRange.upperBound)
+    }
+
     init(date: Date, style: Style, startYear: Int, endYear: Int) {
         let currentYear = Date().kvkYear
         

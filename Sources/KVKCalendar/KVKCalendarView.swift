@@ -53,6 +53,10 @@ public final class KVKCalendarView: UIView {
         self.init(frame: frame, date: date, style: style, calendarData: calendarData)
     }
     
+    public convenience init<R: YearRange>(frame: CGRect, date: Date? = nil, style: Style = Style(), yearRange: R) where R.Bound == Int {
+        self.init(frame: frame, date: date, style: style, startYear: yearRange.lowerBound, endYear: yearRange.upperBound)
+    }
+    
     public convenience init(frame: CGRect, date: Date? = nil, style: Style = Style(), startYear: Int, endYear: Int) {
         let calendarData = CalendarData(date: date ?? Date(), style: style.adaptiveStyle, startYear: startYear, endYear: endYear)
         self.init(frame: frame, date: date, style: style, calendarData: calendarData)
