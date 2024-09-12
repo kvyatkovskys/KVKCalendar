@@ -19,14 +19,43 @@ struct CalendarData {
     var yearsCount = [Int]()
     
     init(date: Date, years: Int, style: Style) {
-        self.date = date
-        self.style = style
-        
         // count years for calendar
         let indexesYear = [Int](repeating: 0, count: years).split(half: years / 2)
+        
+        self.init(date: date, style: style, indexesYear: indexesYear)
+    }
+
+    init<R: YearRange>(date: Date, style: Style, yearRange: R) where R.Bound == Int {
+        self.init(date: date, style: style, startYear: yearRange.lowerBound, endYear: yearRange.upperBound)
+    }
+
+    init(date: Date, style: Style, startYear: Int, endYear: Int) {
+        let currentYear = Date().kvkYear
+        
+        // 2024 - 2024 -> (left: 1, right: 0)
+        // 2024 - 2026 -> (left: 1, right: 2)
+        // 2023 - 2026 -> (left: 2, right: 2)
+        // 2022 - 2026 -> (left: 3, right: 2)
+        
+        // +1 means adding the current year to the data
+        let leftCount = currentYear - min(startYear, currentYear) + 1
+        let rightCount = max(endYear, currentYear) - currentYear
+        
+        let left = [Int](repeating: 0, count: leftCount)
+        let right = [Int](repeating: 0, count: rightCount)
+        
+        self.init(date: date, style: style, indexesYear: (left, right))
+    }
+    
+    private init(date: Date, style: Style, indexesYear: (left: [Int], right: [Int])) {
+        self.date = date
+        self.style = style
+
         let lastYear = indexesYear.left
         let nextYear = indexesYear.right
-                
+        
+        let years = lastYear.count + nextYear.count
+        
         // last years
         for lastIdx in lastYear.indices.reversed() where years > 1 {
             yearsCount.append(-lastIdx)
