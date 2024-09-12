@@ -84,7 +84,12 @@ class DayCell: UICollectionViewCell {
     
     var selectDate: Date = Date() {
         didSet {
-            guard day.type != .empty else { return }
+            guard day.type != .empty else {
+                titleLabel.textColor = style.headerScroll.colorNameEmptyDay
+                dotView.backgroundColor = .clear
+                isSelected = false
+                return
+            }
             
             let nowDate = Date()
             guard nowDate.kvkMonth != day.date?.kvkMonth else {
