@@ -386,31 +386,10 @@ public extension KVKDequeueProxyProtocol where Self: UICollectionView {
 extension UITableView: KVKDequeueProxyProtocol {}
 extension UICollectionView: KVKDequeueProxyProtocol {}
 
-@available(iOS 13.4, *)
-extension UIView: UIPointerInteractionDelegate {
-    
-    func addPointInteraction() {
-        let interaction = UIPointerInteraction(delegate: self)
-        addInteraction(interaction)
-    }
-    
-    public func pointerInteraction(_ interaction: UIPointerInteraction, styleFor region: UIPointerRegion) -> UIPointerStyle? {
-        var pointerStyle: UIPointerStyle?
-        
-        if let interactionView = interaction.view {
-            let targetedPreview = UITargetedPreview(view: interactionView)
-            pointerStyle = UIPointerStyle(effect: .highlight(targetedPreview))
-        }
-        return pointerStyle
-    }
-    
-}
-
 extension UIColor {
     @available(iOS 15.0, *)
     var suiColor: Color {
         Color(uiColor: self)
     }
 }
-
 #endif

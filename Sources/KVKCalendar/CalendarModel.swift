@@ -582,8 +582,16 @@ public protocol CalendarDelegate: AnyObject {
     /// drag & drop events and resize
     func didChangeEvent(_ event: Event, start: Date?, end: Date?)
     
-    /// Controls whether event can be added
+    /** The method is **DEPRECATED**
+        Use a new **willAddNewEvent(_: _:)** that returns `Event?`
+     */
+    @available(*, deprecated, message: "Use the `willAddNewEvent(_: _:)` method that returns `Event?` instead.")
     func willAddNewEvent(_ event: Event, _ date: Date?) -> Bool
+
+    /// Controls whether event can be added
+    ///
+    /// Returns the modified Event object. `nil` means the event will not be added.
+    func willAddNewEvent(_ event: Event, _ date: Date?) -> Event?
 
     /// add new event
     func didAddNewEvent(_ event: Event, _ date: Date?)
@@ -626,8 +634,10 @@ public extension CalendarDelegate {
     
     func didChangeEvent(_ event: Event, start: Date?, end: Date?) {}
     
-    func willAddNewEvent(_ event: Event, _ date: Date?) -> Bool { true }
+    func willAddNewEvent(_ event: Event, _ date: Date?) -> Bool { false }
     
+    func willAddNewEvent(_ event: Event, _ date: Date?) -> Event? { nil }
+
     func didAddNewEvent(_ event: Event, _ date: Date?) {}
     
     func didDisplayEvents(_ events: [Event], dates: [Date?]) {}

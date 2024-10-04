@@ -218,6 +218,8 @@ extension WeekView: CalendarSettingProtocol {
             timelineFrame.size.height = frame.height
         }
         
+        timelineFrame.size.height -= style.timeline.offsetTop
+        
         timelinePage.frame = timelineFrame
         timelinePage.timelineView?.reloadFrame(CGRect(origin: .zero, size: timelineFrame.size))
         timelinePage.timelineView?.create(dates: parameters.visibleDates,
@@ -329,6 +331,8 @@ extension WeekView: CalendarSettingProtocol {
             timelineFrame.origin.y = scrollableWeekView.frame.height
             timelineFrame.size.height -= scrollableWeekView.frame.height
         }
+        
+        timelineFrame.origin.y += style.timeline.offsetTop
         
         let timelineViews = Array(0..<style.timeline.maxLimitCachedPages).reduce([]) { (acc, _) -> [TimelineView] in
             return acc + [createTimelineView(frame: timelineFrame)]
@@ -445,7 +449,7 @@ extension WeekView: TimelineDelegate {
         delegate?.didChangeEvent(event, start: startDate, end: endDate)
     }
     
-    func willAddNewEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint) -> Bool {
+    func willAddNewEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint) -> Event? {
         var components = DateComponents()
         components.year = event.start.kvkYear
         components.month = event.start.kvkMonth
@@ -453,7 +457,9 @@ extension WeekView: TimelineDelegate {
         components.hour = hour
         components.minute = minute
         let newDate = style.calendar.date(from: components)
-        return delegate?.willAddNewEvent(event, newDate) ?? true
+
+        guard let delegate else { return event }
+        return delegate.willAddNewEvent(event, newDate)
     }
 
     func didAddNewEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint) {

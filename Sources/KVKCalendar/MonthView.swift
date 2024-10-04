@@ -888,12 +888,11 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
 
         let month = parameters.monthData.data.months[index.section]
         setHeaderTitleAndNotify(month.date)
-        guard style.month.autoSelectionDateWhenScrolling else { return }
         let newDate = parameters.monthData.findNextDateInMonth(month)
-        guard parameters.monthData.date != newDate else { return }
-
-        parameters.monthData.date = newDate
         willSelectDate?(newDate)
+        
+        guard style.month.autoSelectionDateWhenScrolling && parameters.monthData.date != newDate else { return }
+        parameters.monthData.date = newDate
         reload()
     }
     
@@ -912,12 +911,11 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         
         let month = parameters.monthData.data.months[visibleIndex]
         setHeaderTitleAndNotify(month.date)
-        guard style.month.autoSelectionDateWhenScrolling else { return }
         let newDate = parameters.monthData.findNextDateInMonth(month)
-        guard parameters.monthData.date != newDate else { return }
-        
-        parameters.monthData.date = newDate
         willSelectDate?(newDate)
+        
+        guard style.month.autoSelectionDateWhenScrolling && parameters.monthData.date != newDate else { return }
+        parameters.monthData.date = newDate
         reload()
     }
     
@@ -927,9 +925,11 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         
         switch style.month.selectionMode {
         case .multiple:
-            parameters.monthData.selectedDates = parameters.monthData.updateSelectedDates(parameters.monthData.selectedDates,
-                                                                                          date: date,
-                                                                                          calendar: style.calendar)
+            parameters.monthData.selectedDates = parameters.monthData.updateSelectedDates(
+                parameters.monthData.selectedDates,
+                date: date,
+                calendar: style.calendar
+            )
             didSelectDates(parameters.monthData.selectedDates.compactMap({ $0 }), indexPath: item.indexPath)
         case .single:
             didSelectDates([date], indexPath: item.indexPath)
@@ -947,7 +947,6 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         
         let width: CGFloat
         let height: CGFloat
-        
         let heightSectionHeader = style.month.heightSectionHeader
         switch style.month.scrollDirection {
         case .horizontal:
@@ -963,17 +962,14 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
             } else {
                 width = 0
             }
-            
             var superViewHeight = collectionView.bounds.height
             if !style.month.isHiddenSectionHeader && superViewHeight >= heightSectionHeader {
                 superViewHeight -= heightSectionHeader
             }
-            
             height = superViewHeight / CGFloat(item.weeks)
         @unknown default:
             fatalError()
         }
-        
         return CGSize(width: width, height: height)
     }
     
@@ -994,7 +990,6 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         guard !style.month.isHiddenSectionHeader else { return .zero }
         
         let item = getActualCachedDay(indexPath: IndexPath(row: 0, section: section))
-        
         if let date = item.day?.date, let size = delegate?.sizeForHeader(date, type: .month) {
             return size
         } else {

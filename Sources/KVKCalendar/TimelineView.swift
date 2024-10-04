@@ -215,8 +215,8 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         return scroll
     }()
     
-    private(set) lazy var tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(forceDeselectEvent))
-    
+    private(set) lazy var tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleDefaultTapGesture(gesture:)))
+
     private(set) lazy var longTapGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(addNewEvent))
     
     init(parameters: Parameters,
