@@ -7,7 +7,278 @@
 
 #if os(iOS)
 
-import UIKit
+import SwiftUI
+
+@available(iOS 17.0, *)
+struct YearNewView: View {
+    @State private var vm: YearNewData
+    
+    private var style: Style {
+        vm.style
+    }
+    
+    init(monthData: MonthNewData) {
+        _vm = State(initialValue: YearNewData(monthData: monthData))
+    }
+    
+    var body: some View {
+        bodyView
+            .task {
+                await vm.getScrollId()
+            }
+    }
+    
+    private var bodyView: some View {
+        ScrollViewReader { (proxy) in
+            ScrollView {
+                LazyVStack {
+                    let date = Binding(
+                        get: { vm.date },
+                        set: { vm.handleSelectedDate($0) })
+                    ContentGrid(years: vm.sections, style: style, date: date)
+                        .padding(.horizontal)
+                }
+                .scrollTargetLayout()
+            }
+            .scrollPosition(id: $vm.scrollId, anchor: .top)
+        }
+    }
+    
+}
+
+@available(iOS 17.0, *)
+private struct ContentGrid: View {
+    
+    @Environment(\.colorScheme) private var colorScheme
+    
+    let years: [KVKCalendar.YearSection]
+    let style: KVKCalendar.Style
+    @Binding var date: Date
+    
+    private var columns: [GridItem] = [
+        GridItem(.flexible(), spacing: 10),
+        GridItem(.flexible(), spacing: 10),
+        GridItem(.flexible(), spacing: 10)
+    ]
+    
+    init(years: [KVKCalendar.YearSection], style: KVKCalendar.Style, date: Binding<Date>) {
+        self.years = years
+        self.style = style
+        _date = date
+        if Platform.currentInterface != .phone {
+            columns.append(GridItem(.flexible(), spacing: 10))
+        }
+    }
+    
+    var body: some View {
+        bodyView
+    }
+    
+    private var bodyView: some View {
+        LazyVGrid(columns: columns) {
+            ForEach(years.indices, id: \.self) { (idx) in
+                let year = years[idx]
+                Section {
+                    ForEach(year.months) { (month) in
+                        YearMonthView(month: month, style: style, selectedDate: $date)
+                    }
+                } header: {
+                    VStack(alignment: .leading, spacing: 5) {
+                        HStack {
+                            Text(year.date.titleForLocale(style.locale, formatter: style.year.titleFormatter))
+                                .foregroundStyle(getYearTxtColor(year.date))
+                                .font(Font(style.year.fontTitleHeader))
+                                .bold()
+                            Spacer()
+                        }
+                        Divider()
+                    }
+                    .padding(.vertical)
+                }
+                .id(idx)
+            }
+        }
+    }
+    
+    private func getYearTxtColor(_ date: Date) -> Color {
+        switch date.kvkYear {
+        case Date().kvkYear:
+            .red
+        default:
+            colorScheme == .dark ? .white :  style.year.colorTitleHeader.suiColor
+        }
+    }
+}
+
+@available(iOS 17.0, *)
+#Preview {
+    let style = Style()
+    let monthData = MonthNewData(data: .init(date: .now, years: 4, style: style))
+    return YearNewView(monthData: monthData)
+}
+
+@available(iOS 17.0, *)
+private struct YearMonthView: View {
+    
+    @Environment(\.colorScheme) private var colorScheme
+    
+    var month: Month
+    var style: Style
+    @Binding var selectedDate: Date
+    
+    private let columns: [GridItem] = [
+        GridItem(.flexible(), spacing: 1),
+        GridItem(.flexible(), spacing: 1),
+        GridItem(.flexible(), spacing: 1),
+        GridItem(.flexible(), spacing: 1),
+        GridItem(.flexible(), spacing: 1),
+        GridItem(.flexible(), spacing: 1),
+        GridItem(.flexible(), spacing: 1)
+    ]
+    
+    private var daySize: CGSize {
+        Platform.currentInterface == .phone ? CGSize(width: 15, height: 15) : CGSize(width: 30, height: 30)
+    }
+    
+    var body: some View {
+        VStack(spacing: 10) {
+            HStack {
+                Text(month.yearName)
+                    .font(Font(style.year.fontTitle))
+                    .foregroundStyle(getMonthTxtColor(month.date))
+                    .bold()
+                Spacer()
+            }
+            if Platform.currentInterface != .phone {
+                WeekTitlesView(style: style)
+            }
+            LazyVGrid(columns: columns) {
+                ForEach(month.days) { (day) in
+                    if let date = day.date {
+                        if day.type != .empty && (date.kvkIsEqual(.now) || date.kvkIsEqual(selectedDate)) {
+                            getDayView(day, date: date)
+                                .background(getBgDayTxtColor(date))
+                                .clipShape(.circle)
+                                .minimumScaleFactor(0.8)
+                        } else {
+                            getDayView(day, date: date)
+                        }
+                    } else {
+                        EmptyView()
+                    }
+                }
+            }
+            Spacer()
+        }
+        .onTapGesture {
+            selectedDate = month.date
+        }
+    }
+    
+    @ViewBuilder
+    private func getDayView(_ day: Day, date: Date) -> some View {
+        Group {
+            if Platform.currentInterface == .phone {
+                Text(day.type == .empty ? "" : "\(date.kvkDay)")
+                    .font(.caption2)
+                    .frame(width: 15, height: 15)
+            } else {
+                Text(day.type == .empty ? "" : "\(date.kvkDay)")
+                    .font(.subheadline)
+                    .padding(3)
+            }
+        }
+        .foregroundStyle(getDayTxtColor(date))
+    }
+    
+    private func getMonthTxtColor(_ day: Date) -> Color {
+        if day.kvkMonthIsEqual(.now) {
+            return .red
+        } else {
+            return colorScheme == .dark ? .white : .black
+        }
+    }
+    
+    private func getDayTxtColor(_ day: Date) -> Color {
+        if day.kvkIsEqual(.now) && day.kvkIsEqual(selectedDate) {
+            return .white
+        } else if day.kvkIsEqual(selectedDate) {
+            return colorScheme == .dark ? .black : .white
+        } else if day.isWeekend {
+            return .gray
+        } else {
+            return colorScheme == .dark ? .white : .black
+        }
+    }
+    
+    private func getBgDayTxtColor(_ day: Date) -> Color {
+        if day.kvkIsEqual(.now) && day.kvkIsEqual(selectedDate) {
+            return .red
+        } else if day.kvkIsEqual(selectedDate) {
+            return colorScheme == .dark ? .white : .black
+        } else {
+            return .clear
+        }
+    }
+    
+}
+
+@available(iOS 17.0, *)
+struct WeekTitlesView: View, WeekPreparing {
+    
+    @Environment(\.colorScheme) private var colorScheme
+    private var days: [Date] = []
+    private let style: Style
+    private let formatter: DateFormatter
+    private let font: UIFont
+    
+    init(style: Style, formatter: DateFormatter? = nil, font: UIFont? = nil) {
+        self.style = style
+        self.formatter = formatter ?? style.year.weekdayFormatter
+        self.font = font ?? style.year.weekFont
+        days = getWeekDays(style: style)
+    }
+    
+    var body: some View {
+        HStack(spacing: 2) {
+            ForEach(days, id: \.self) { (day) in
+                Text(day.titleForLocale(style.locale, formatter: formatter))
+                    .minimumScaleFactor(0.5)
+                    .lineLimit(1)
+                    .foregroundColor(getTxtColor(day, style: style))
+                    .font(Font(font))
+                    .background(getTxtBgColor(day, style: style))
+                    .frame(maxWidth: .infinity)
+            }
+        }
+    }
+    
+    private func getTxtColor(_ day: Date, style: Style) -> Color {
+        if day.isWeekend {
+            return colorScheme == .dark ? .gray : Color(uiColor: style.week.colorWeekendDate)
+        } else if day.isWeekday {
+            return colorScheme == .dark ? .white : Color(uiColor: style.week.colorDate)
+        } else {
+            return .clear
+        }
+    }
+    
+    private func getTxtBgColor(_ day: Date, style: Style) -> Color {
+        if day.isWeekend {
+            return Color(uiColor: style.week.colorWeekendBackground)
+        } else if day.isWeekday {
+            return Color(uiColor: style.week.colorWeekdayBackground)
+        } else {
+            return .clear
+        }
+    }
+    
+}
+
+@available(iOS 17.0, *)
+#Preview("Week Title View") {
+    WeekTitlesView(style: Style())
+}
 
 final class YearView: UIView {
     private var data: YearData

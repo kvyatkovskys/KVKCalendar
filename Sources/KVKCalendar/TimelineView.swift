@@ -7,7 +7,112 @@
 
 #if os(iOS)
 
-import UIKit
+import SwiftUI
+
+@available(iOS 17.0, *)
+struct TimelineUIKitView: View {
+    
+    let params: TimelinePageWrapper.Parameters
+    @Binding var date: Date
+    @Binding var willDate: Date
+    @Binding var event: KVKCalendar.Event?
+    
+    var body: some View {
+        GeometryReader { (geometry) in
+            TimelinePageWrapper(params: params,
+                                frame: geometry.frame(in: .local),
+                                date: $date,
+                                willDate: $willDate,
+                                event: $event)
+            .ignoresSafeArea(.container, edges: .bottom)
+        }
+    }
+}
+
+@available(iOS 17.0, *)
+#Preview {
+    var style = Style()
+    style.timeline.offsetTimeY = 50
+    let events: [Event] = [
+        .stub(id: "1", startFrom: -50, duration: 50),
+        .stub(id: "2", startFrom: 60, duration: 30),
+        .stub(id: "3", startFrom: -30, duration: 55),
+        .stub(id: "4", startFrom: -80, duration: 30),
+        .stub(id: "5", startFrom: -80, duration: 30)
+    ]
+    @State var event: Event?
+    @State var date = Date.now
+    return TimelineUIKitView(params: TimelinePageWrapper.Parameters(style: style, dates: Array(repeating: Date(), count: 7), events: events, recurringEvents: []), date: $date, willDate: .constant(.now), event: $event)
+}
+
+@available(iOS 17.0, *)
+struct TimelinePageWrapper: UIViewControllerRepresentable {
+    
+    typealias UIViewControllerType = TimelinePageVC
+    
+    struct Parameters {
+        let style: Style
+        let dates: [Date?]
+        let events: [Event]
+        let recurringEvents: [Event]
+    }
+    
+    var params: TimelinePageWrapper.Parameters
+    var frame: CGRect
+    @Binding var date: Date
+    @Binding var willDate: Date
+    @Binding var event: KVKCalendar.Event?
+    
+    func makeUIViewController(context: Context) -> TimelinePageVC {
+        setupTimelinePageView()
+    }
+    
+    func updateUIViewController(_ uiViewController: TimelinePageVC, context: Context) {
+        uiViewController.didSwitchTimelineView = { [weak uiViewController] (_, type) in
+            let newView = createTimelineView()
+            uiViewController?.addNewTimeline(newView, for: type)
+            date = switchDateBy(type)
+        }
+        uiViewController.willDisplayTimelineView = { (view, type) in
+            view.reloadFrame(frame)
+            view.reloadTimeline(params: params,
+                                date: date,
+                                event: $event)
+            willDate = switchDateBy(type)
+        }
+        uiViewController.reloadPages(with: params,
+                                     date: date,
+                                     event: $event)
+    }
+    
+    private func switchDateBy(_ type: TimelinePageVC.SwitchPageType) -> Date {
+        switch type {
+        case .previous:
+            params.style.calendar.date(byAdding: .day, value: -params.dates.count, to: date) ?? date
+        case .next:
+            params.style.calendar.date(byAdding: .day, value: params.dates.count, to: date) ?? date
+        }
+    }
+    
+    private func setupTimelinePageView() -> TimelinePageVC {
+        let timelineViews = Array(0..<params.style.timeline.maxLimitCachedPages).reduce([]) { (acc, _) -> [TimelineView] in
+            acc + [createTimelineView()]
+        }
+        let page = TimelinePageVC(maxLimit: params.style.timeline.maxLimitCachedPages,
+                                  pages: timelineViews)
+        return page
+    }
+    
+    private func createTimelineView() -> TimelineView {
+        let view = TimelineView(parameters: TimelineView.Parameters(style: params.style, type: .week), frame: frame)
+        view.setup(dates: params.dates,
+                   events: params.events,
+                   recurringEvents: params.recurringEvents,
+                   selectedDate: date,
+                   selectedEvent: $event)
+        return view
+    }
+}
 
 public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     
@@ -15,7 +120,7 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         var style: Style
         var type: CalendarType
         var scale: CGFloat = 1
-        var scrollToCurrentTimeOnlyOnInit: Bool?
+        var scrollToCurrentTimeOnlyOnInit: Bool? = false
     }
     
     weak var delegate: TimelineDelegate?
@@ -62,11 +167,13 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     private(set) var tagAllDayEventView = -70
     private(set) var tagStubEvent = -80
     public private(set) var timeLabels = [TimelineLabel]()
+    var timeLabelsDict = [Int: TimelineLabel]()
     private(set) var timeSystem: TimeHourSystem
     private let timerKey = "CurrentHourTimerKey"
     private(set) var events = [Event]()
     private(set) var recurringEvents = [Event]()
     private(set) var dates = [Date]()
+    private(set) var newDates = [Date?]()
     private(set) var selectedDate: Date
     private(set) var eventLayout: TimelineEventLayout
     
@@ -95,6 +202,13 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         return view
     }()
     
+    private var centerYCurrentLine = NSLayoutConstraint()
+    private(set) lazy var currentLine: CurrentLineView = {
+        let view = CurrentLineView(parameters: .init(style: style))
+        view.tag = tagCurrentHourLine
+        return view
+    }()
+    
     public private(set) lazy var scrollView: UIScrollView = {
         let scroll = UIScrollView()
         scroll.delegate = self
@@ -105,7 +219,9 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
 
     private(set) lazy var longTapGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(addNewEvent))
     
-    init(parameters: Parameters, frame: CGRect) {
+    init(parameters: Parameters,
+         frame: CGRect = .zero,
+         newFlow: Bool = false) {
         self.paramaters = parameters
         self.timeSystem = parameters.style.timeSystem
         self.eventLayout = parameters.style.timeline.eventLayout
@@ -147,6 +263,39 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         }
     }
     
+    private func setupCurrentLineConstraints(pointY: CGFloat, time: TimelineLabel) {
+        currentLine.removeFromSuperview()
+        scrollView.addSubview(currentLine)
+        currentLine.translatesAutoresizingMaskIntoConstraints = false
+        let leading = currentLine.leadingAnchor.constraint(equalTo: leadingAnchor)
+        let centerY = currentLine.centerYAnchor.constraint(equalTo: time.centerYAnchor, constant: pointY)
+        let height = currentLine.heightAnchor.constraint(equalToConstant: 14)
+        let trailing = currentLine.trailingAnchor.constraint(equalTo: trailingAnchor)
+        NSLayoutConstraint.activate([leading, centerY, height, trailing])
+        currentLine.setNeedsLayout()
+    }
+    
+    private func movingCurrentLine() {
+        guard !isValidTimer(timerKey) && isDisplayedCurrentTime else { return }
+        
+        func action() {
+            let nextDate = Date().kvkConvertTimeZone(TimeZone.current, to: style.timezone)
+            guard currentLine.valueHash != nextDate.kvkMinute.hashValue,
+                  let time = getTimeLabel(hour: nextDate.kvkHour) else { return }
+            
+            let pointY = calculateYByMinute(nextDate.kvkMinute, time: time)
+            setupCurrentLineConstraints(pointY: pointY, time: time)
+            currentLine.valueHash = nextDate.kvkMinute.hashValue
+            currentLine.date = nextDate
+            
+            if isDisplayedTimes {
+                time.isHidden = time.yTime == currentLineView.frame.origin.y
+            }
+        }
+        
+        startTimer(timerKey, repeats: true, addToRunLoop: true, action: action)
+    }
+    
     private func movingCurrentLineHour() {
         guard !isValidTimer(timerKey) && isDisplayedCurrentTime else { return }
         
@@ -177,6 +326,16 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         }
         
         startTimer(timerKey, repeats: true, addToRunLoop: true, action: action)
+    }
+    
+    private func showCurrentLine() {
+        stopTimer(timerKey)
+        currentLine.valueHash = nil
+        currentLine.isHidden = !isDisplayedCurrentTime
+        guard style.timeline.showLineHourMode.showForDates(dates) else { return }
+        
+        currentLine.updateStyle(style, force: true)
+        movingCurrentLine()
     }
     
     private func showCurrentLineHour() {
@@ -221,44 +380,54 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         return pointY
     }
     
+    private func calculateYInTimeline(_ minute: Int, time: TimelineLabel) -> CGFloat {
+        switch minute {
+        case let x where 1...59 ~= x:
+            let minutePercent = 59.0 / CGFloat(minute)
+            let newY = (calculatedTimeY + style.timeline.heightTime) / minutePercent
+            return time.yTime + newY
+        default:
+            return time.yTime
+        }
+    }
+    
+    private func calculateYByMinute(_ minute: Int, time: TimelineLabel) -> CGFloat {
+        if 1...59 ~= minute {
+            let minutePercent = 59.0 / CGFloat(minute)
+            return (calculatedTimeY + style.timeline.heightTime) / minutePercent
+        } else {
+            return 0
+        }
+    }
+    
     private func scrollToCurrentTime(_ startHour: Int) {
         guard style.timeline.scrollLineHourMode.scrollForDates(dates) && isDisplayedCurrentTime else { return }
-        
+
         let date = Date()
-        guard let time = getTimelineLabel(hour: date.kvkHour)else {
+        guard let time = getTimeLabel(hour: date.kvkHour)else {
             scrollView.setContentOffset(.zero, animated: true)
             return
         }
-        
-        var frame = scrollView.frame
-        frame.origin.y = time.frame.origin.y - 10
-        
+
         if let value = paramaters.scrollToCurrentTimeOnlyOnInit {
             if value {
                 paramaters.scrollToCurrentTimeOnlyOnInit = false
                 // some delay to save a visible scrolling
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    self.scrollView.scrollRectToVisible(frame, animated: true)
+                    self.scrollView.setContentOffset(time.frame.origin, animated: true)
                 }
             }
         } else {
-            scrollView.scrollRectToVisible(frame, animated: true)
+            scrollView.setContentOffset(time.frame.origin, animated: true)
         }
     }
     
     private func scrollToHour(_ hour: Int) {
-        guard let time = getTimelineLabel(hour: hour) else {
+        guard let time = getTimeLabel(hour: hour) else {
             scrollView.setContentOffset(.zero, animated: true)
             return
         }
-        
-        var frame = scrollView.frame
-        if style.allDay.isPinned {
-            frame.origin.y = time.frame.origin.y - 60
-        } else {
-            frame.origin.y = time.frame.origin.y - 10
-        }
-        scrollView.scrollRectToVisible(frame, animated: true)
+        scrollView.setContentOffset(time.frame.origin, animated: true)
     }
     
     private typealias EventOrder = (Event, Event) -> Bool
@@ -276,6 +445,88 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             return predicate(lhs, rhs)
         }
         return false
+    }
+    
+    @available(iOS 17.0, *)
+    func setup(dates: [Date?],
+               events: [Event],
+               recurringEvents: [Event],
+               selectedDate: Date,
+               selectedEvent: Binding<Event?>) {
+        isResizableEventEnable = false
+        
+        // save parameters
+        self.newDates = dates
+        self.events = events
+        self.recurringEvents = recurringEvents
+        self.selectedDate = selectedDate
+        
+        // calculate a start hour
+        let startHour: Int
+        if !style.timeline.startFromFirstEvent {
+            startHour = style.timeline.startHour
+        } else {
+            if dates.count > 1 {
+                startHour = events
+                    .sorted(by: { $0.start.kvkHour < $1.start.kvkHour })
+                    .first?.start.kvkHour ?? style.timeline.startHour
+            } else {
+                startHour = events
+                    .filter { compareStartDate(selectedDate, with: $0) }
+                    .sorted(by: { $0.start.kvkHour < $1.start.kvkHour })
+                    .first?.start.kvkHour ?? style.timeline.startHour
+            }
+        }
+        
+        scrollView.subviews.forEach { $0.removeFromSuperview() }
+        // add time label to timeline
+        let labels = createAndAddTimesLabel(start: startHour, end: style.timeline.endHour)
+        // add horizontal separator lines
+        let lines = createAndAddHorizontalLines(times: labels.times)
+        // show current line if needed
+        showCurrentLine()
+        
+        dates.enumerated().forEach { (item) in
+            let date = item.element
+            let index = item.offset
+            // add vertical separator line
+            let item = createAndAddVerticalLine(maxDates: dates.count, date: date, index: index, topLine: lines.first, bottomLine: lines.last)
+            
+            let eventsByDate = events
+                .filter {
+                    compareStartDate(date, with: $0)
+                    || compareEndDate(date, with: $0)
+                    || checkMultipleDate(date, with: $0)
+                }
+                .sorted(by: sortedEvent(_:rhs:))
+            let recurringEventsByDate = prepareRecurringEvents(recurringEvents, eventsByDate: events, date: date)
+            let sortedEventsByDate = (eventsByDate + recurringEventsByDate).sorted(by: { $0.start < $1.start })
+            do {
+                let pageFrame = CGRect(origin: frame.origin, size: CGSize(width: item.1, height: frame.height))
+                let context = TimelineEventLayoutContext(style: style, type: paramaters.type, pageFrame: pageFrame, startHour: startHour, timeLabels: labels.times, calculatedTimeY: calculatedTimeY, calculatePointYByMinute: calculateYInTimeline(_:time:), getTimelineLabel: getTimeLabel(hour:))
+                let eventsAndRects: [TimelineColumnView.Container] = sortedEventsByDate.reduce([]) { (acc, event) in
+                    let rectEvent = context.getEventRectNew(start: event.start, end: event.end, date: date, style: event.style)
+                    return acc + [TimelineColumnView.Container(event: event, rect: rectEvent)]
+                }
+                let crossEvents = context.calculateCrossEvents(forEvents: sortedEventsByDate)
+                createAndAddColumn(crossEvents: crossEvents,
+                                   eventsAndRects: eventsAndRects,
+                                   selectedEvent: selectedEvent,
+                                   maxIndex: dates.count - 1,
+                                   index: index,
+                                   width: item.1,
+                                   vLine: item.0)
+            }
+        }
+        
+        // scroll to specific position if needed
+        if !forceDisableScrollToCurrentTime {
+            if let preferredHour = style.timeline.scrollToHour, !style.timeline.startFromFirstEvent {
+                scrollToHour(preferredHour)
+            } else {
+                scrollToCurrentTime(startHour)
+            }
+        }
     }
     
     func create(dates: [Date], events: [Event], recurringEvents: [Event], selectedDate: Date) {
@@ -368,7 +619,7 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                 recurringEventsByDate = recurringEvents.reduce([], { (acc, event) -> [Event] in
                     // TODO: need fix
                     // there's still a problem with the second recurring event when an event is created for severel dates
-                    guard !eventsByDate.contains(where: { $0.ID == event.ID })
+                    guard !eventsByDate.contains(where: { $0.id == event.id })
                             && (date.compare(event.start) == .orderedDescending
                                 || style.event.showRecurringEventInPast) else { return acc }
                     
@@ -401,15 +652,7 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                                       width: widthPage))
             
             do {
-                let context = TimelineEventLayoutContext(style: style,
-                                                         type: paramaters.type,
-                                                         pageFrame: .init(x: pointX, y: 0,
-                                                                          width: widthPage, height: heightPage),
-                                                         startHour: startHour,
-                                                         timeLabels: timeLabels,
-                                                         calculatedTimeY: calculatedTimeY,
-                                                         calculatePointYByMinute: calculatePointYByMinute(_:time:),
-                                                         getTimelineLabel: getTimelineLabel(hour:))
+                let context = TimelineEventLayoutContext(style: style, type: paramaters.type, pageFrame: .init(x: pointX, y: 0, width: widthPage, height: heightPage), startHour: startHour, timeLabels: timeLabels, calculatedTimeY: calculatedTimeY, calculatePointYByMinute: calculatePointYByMinute(_:time:), getTimelineLabel: getTimelineLabel(hour:))
                 let rects = eventLayout.getEventRects(forEvents: sortedEventsByDate,
                                                       date: date,
                                                       context: context)
@@ -503,6 +746,36 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         
         showCurrentLineHour()
         addStubForInvisibleEvents()
+    }
+    
+    private func prepareRecurringEvents(_ events: [Event],
+                                        eventsByDate: [Event],
+                                        date: Date?) -> [Event] {
+        let recurringEventsByDate: [Event]
+        if !events.isEmpty, let date {
+            recurringEventsByDate = recurringEvents.reduce([], { (acc, event) -> [Event] in
+                // TODO: need fix
+                // there's still a problem with the second recurring event when an event is created for severel dates
+                guard !eventsByDate.contains(where: { $0.id == event.id })
+                        && (date.compare(event.start) == .orderedDescending
+                            || style.event.showRecurringEventInPast) else { return acc }
+                
+                guard let recurringEvent = event.updateDate(newDate: date, calendar: style.calendar) else {
+                    return acc
+                }
+                
+                var result = [recurringEvent]
+                let previousDate = style.calendar.date(byAdding: .day, value: -1, to: date)
+                if recurringEvent.start.kvkDay != recurringEvent.end.kvkDay,
+                   let recurringPrevEvent = event.updateDate(newDate: previousDate ?? date, calendar: style.calendar) {
+                    result.append(recurringPrevEvent)
+                }
+                return acc + result
+            })
+        } else {
+            recurringEventsByDate = []
+        }
+        return recurringEventsByDate
     }
 }
 

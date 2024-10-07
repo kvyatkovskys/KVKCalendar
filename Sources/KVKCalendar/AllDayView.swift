@@ -7,7 +7,66 @@
 
 #if os(iOS)
 
-import UIKit
+import SwiftUI
+
+@available(iOS 17.0, *)
+struct AllDayNewView: View {
+    
+    struct Parameters {
+        let events: [Event]
+        let type: CalendarType
+        var style: Style
+        weak var delegate: TimelineDelegate?
+    }
+    
+    private var style: Style {
+        parameters.style
+    }
+    
+    private var columns: [GridItem] = [
+        GridItem(.flexible(), spacing: 5),
+        GridItem(.flexible(), spacing: 5)
+    ]
+    
+    private let parameters: Parameters
+    @Binding private var event: Event?
+    
+    init(parameters: Parameters, event: Binding<Event?>) {
+        self.parameters = parameters
+        _event = event
+    }
+    
+    var body: some View {
+        HStack(spacing: 0) {
+            Text(style.allDay.titleText)
+                .multilineTextAlignment(.leading)
+                .minimumScaleFactor(0.5)
+                .frame(maxWidth: style.timeline.widthTime, maxHeight: 20)
+            ScrollView {
+                LazyVGrid(columns: columns, spacing: 5) {
+                    ForEach(parameters.events) { (event) in
+                        Button {
+                            self.event = event
+                        } label: {
+                            AllDayEventNewView(event: event,
+                                               style: style.allDay)
+                        }
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .contentMargins(5, for: .scrollContent)
+        }
+        .frame(minHeight: style.allDay.height, maxHeight: style.allDay.maxHeight)
+        .background(style.allDay.backgroundColor.suiColor)
+    }
+    
+}
+
+@available(iOS 17.0, *)
+#Preview {
+    AllDayNewView(parameters: AllDayNewView.Parameters(events: [Event.stub(id: "1"), Event.stub(id: "2"), Event.stub(id: "3"), Event.stub(id: "4"), Event.stub(id: "5")], type: .day, style: Style()), event: .constant(nil))
+}
 
 final class AllDayView: UIView {
     
@@ -169,7 +228,7 @@ final class AllDayView: UIView {
     
     private func createVerticalLine(pointX: CGFloat) -> VerticalLineView {
         let frame = CGRect(x: pointX, y: 0, width: params.style.timeline.widthLine, height: bounds.height)
-        let line = VerticalLineView(frame: frame)
+        let line = VerticalLineView(date: Date(), color: params.style.timeline.separatorLineColor, width: params.style.timeline.widthLine, frame: frame)
         line.backgroundColor = params.style.timeline.separatorLineColor
         line.isHidden = !params.style.week.showVerticalDayDivider
         return line

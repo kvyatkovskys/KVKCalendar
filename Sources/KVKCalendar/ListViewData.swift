@@ -7,11 +7,11 @@
 
 #if os(iOS)
 
-import Foundation
+import SwiftUI
 
-open class ListViewData: EventDateProtocol {
+open class ListViewData: ObservableObject, EventDateProtocol {
     
-    public struct SectionListView {
+    public struct SectionListView: Identifiable {
         let date: Date
         var events: [Event]
         
@@ -19,26 +19,29 @@ open class ListViewData: EventDateProtocol {
             self.date = date
             self.events = events
         }
+        
+        public var id: Date {
+            date
+        }
     }
     
-    var sections: [SectionListView]
+    @Published var sections: [SectionListView] = []
     var date: Date
-    var isSkeletonVisible = false
+    @Published var isSkeletonVisible = false
     
-    private let style: Style?
+    var style: Style
     private let lastDate: Date?
     
-    init(data: CalendarData, style: Style) {
+    init(data: CalendarData) {
         self.date = data.date
         self.lastDate = data.months.last?.days.filter { $0.type != .empty }.last?.date
-        self.style = style
-        self.sections = []
+        self.style = data.style
     }
     
     public init(date: Date, sections: [SectionListView]) {
         self.date = date
         self.sections = sections
-        self.style = nil
+        self.style = KVKCalendar.Style()
         self.lastDate = nil
     }
     
@@ -48,12 +51,18 @@ open class ListViewData: EventDateProtocol {
         return formatter.string(from: dateSection)
     }
     
+    func titleOfHeader(date: Date, formatter: DateFormatter, locale: Locale) -> String {
+        formatter.locale = locale
+        return formatter.string(from: date)
+    }
+    
     func reloadEvents(_ events: [Event]) {
-        sections = events.filter { $0.recurringType != .none }.reduce([], { (acc, event) -> [SectionListView] in
+        var sectionTmp = [SectionListView]()
+        sectionTmp = events.filter { $0.recurringType != .none }.reduce([], { (acc, event) -> [SectionListView] in
             var accTemp = acc
             
-            if let date = lastDate, let calendar = style?.calendar {
-                let recurringSections = addRecurringEvent(event, lastDate: date, calendar: calendar)
+            if let date = lastDate {
+                let recurringSections = addRecurringEvent(event, lastDate: date, calendar: style.calendar)
                 recurringSections.forEach { (recurringSection) in
                     if let idx = accTemp.firstIndex(where: { $0.date.kvkIsEqual(recurringSection.date) }) {
                         accTemp[idx].events += recurringSection.events
@@ -67,7 +76,7 @@ open class ListViewData: EventDateProtocol {
             return accTemp
         })
         
-        sections += events.filter { $0.recurringType == .none }.reduce([], { (acc, event) -> [SectionListView] in
+        sectionTmp += events.filter { $0.recurringType == .none }.reduce([], { (acc, event) -> [SectionListView] in
             var accTemp = acc
             
             if event.start.kvkDay != event.end.kvkDay {
@@ -79,7 +88,7 @@ open class ListViewData: EventDateProtocol {
                 }
                 
                 for i in 1...offset {
-                    if let newDate = style?.calendar.date(byAdding: .day, value: i, to: event.start) {
+                    if let newDate = style.calendar.date(byAdding: .day, value: i, to: event.start) {
                         var newEvent = event
                         newEvent.start = newDate
                         if let idx = accTemp.firstIndex(where: { compareStartDate($0.date, with: newEvent) }) {
@@ -108,7 +117,7 @@ open class ListViewData: EventDateProtocol {
             return accTemp
         })
         
-        sections = sections.sorted(by: { $0.date < $1.date })
+        sections = sectionTmp.sorted(by: { $0.date < $1.date })
     }
     
     func event(indexPath: IndexPath) -> Event {

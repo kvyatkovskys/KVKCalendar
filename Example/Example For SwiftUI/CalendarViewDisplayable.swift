@@ -17,9 +17,6 @@ struct CalendarViewDisplayable: UIViewRepresentable, KVKCalendarSettings, KVKCal
     @Binding var updatedDate: Date?
     @Binding var orientation: UIInterfaceOrientation
     
-    var style: Style {
-        createCalendarStyle()
-    }
     var selectDate = Date()
 
     private var calendar = KVKCalendarView(frame: .zero)

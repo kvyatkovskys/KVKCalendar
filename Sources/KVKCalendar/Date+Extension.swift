@@ -21,6 +21,10 @@ public extension Date {
         return formatter.string(from: self)
     }
     
+    var kvkUniqID: Int {
+        timeIntervalSince1970.hashValue
+    }
+        
     var isSunday: Bool {
         kvkWeekday == 1
     }
@@ -166,7 +170,11 @@ public extension Date {
     }
     
     func kvkIsEqual(_ date: Date) -> Bool {
-        date.kvkYear == kvkYear && date.kvkMonth == kvkMonth && date.kvkDay == kvkDay
+        kvkMonthIsEqual(date) && date.kvkDay == kvkDay
+    }
+    
+    func kvkMonthIsEqual(_ date: Date) -> Bool {
+        date.kvkYear == kvkYear && date.kvkMonth == kvkMonth
     }
     
     var kvkIsFebruary: Bool {

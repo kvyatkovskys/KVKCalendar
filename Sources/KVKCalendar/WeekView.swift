@@ -7,7 +7,95 @@
 
 #if os(iOS)
 
-import UIKit
+import SwiftUI
+
+@available(iOS 18.0, *)
+struct WeekNewView: View {
+    @Bindable var vm: WeekNewData
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            ScrollableWeekNewView(
+                date: $vm.date,
+                weeks: vm.weeks,
+                type: vm.type,
+                style: vm.style
+            )
+            .padding(.top, 5)
+            Divider()
+                .padding(.top, 5)
+            TimelineUIKitView(
+                params: TimelinePageWrapper.Parameters(
+                    style: vm.style,
+                    dates: vm.timelineDays,
+                    events: vm.events,
+                    recurringEvents: vm.recurringEvents
+                ),
+                date: $vm.date,
+                willDate: .constant(.now),
+                event: $vm.event
+            )
+        }
+        .task {
+            await vm.setup()
+        }
+    }
+    
+}
+
+@available(iOS 18.0, *)
+private struct WeekPreviewView: View {
+    var style: Style
+    let commonData: CalendarData
+    let events: [Event] = [
+        .stub(id: "1", startFrom: -100, duration: 50),
+        .stub(id: "2", startFrom: -120, duration: 20),
+        .stub(id: "3", startFrom: 30, duration: 55),
+        .stub(id: "4", startFrom: 85, duration: 30),
+        .stub(id: "5", startFrom: 85, duration: 30)
+    ]
+    @State var vm: WeekNewData
+    
+    init(type: KVKCalendar.CalendarType) {
+        style = Style()
+        style.startWeekDay = .monday
+        let data = CalendarData(date: .now, years: 1, style: style)
+        commonData = data
+        _vm = State(
+            initialValue: WeekNewData(
+                data: data,
+                type: type
+            )
+        )
+        vm.events = events
+        vm.allDayEvents = [.allDayStub(id: "-2")]
+    }
+    
+    var body: some View {
+        NavigationStack {
+            WeekNewView(vm: vm)
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            vm.date = .now
+                        } label: {
+                            Text("Today")
+                        }
+                    }
+                }
+        }
+    }
+}
+
+@available(iOS 18.0, *)
+#Preview("Day View") {
+    WeekPreviewView(type: .day)
+}
+
+@available(iOS 18.0, *)
+#Preview("Week View") {
+    WeekPreviewView(type: .week)
+}
 
 final class WeekView: UIView {
     
@@ -99,7 +187,7 @@ final class WeekView: UIView {
     }
     
     func updateScrollableWeeks() {
-        scrollableWeekView.updateWeeks(weeks: parameters.data.daysBySection)
+        scrollableWeekView.updateWeeks(weeks: parameters.data.weeks)
     }
 }
 
@@ -285,7 +373,7 @@ extension WeekView: CalendarSettingProtocol {
         }
         let view = ScrollableWeekView(parameters: .init(frame: CGRect(x: 0, y: 0,
                                                                        width: frame.width, height: heightView),
-                                                         weeks: parameters.data.daysBySection,
+                                                        weeks: parameters.data.weeks,
                                                          date: parameters.data.date,
                                                          type: .week,
                                                          style: style))

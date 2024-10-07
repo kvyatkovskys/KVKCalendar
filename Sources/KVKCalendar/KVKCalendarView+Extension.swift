@@ -186,7 +186,7 @@ extension KVKCalendarView {
         }
         let status = EKEventStore.authorizationStatus(for: .event)
         switch status {
-        case .authorized:
+        case .fullAccess, .authorized:
             completion(true)
         default:
             if #available(iOS 17.0, *) {
