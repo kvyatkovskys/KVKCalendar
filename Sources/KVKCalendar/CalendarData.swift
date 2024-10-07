@@ -20,7 +20,6 @@ struct CalendarData {
     init(date: Date, years: Int, style: Style) {
         // count years for calendar
         let indexesYear = [Int](repeating: 0, count: years).split(half: years / 2)
-        
         self.init(date: date, style: style, indexesYear: indexesYear)
     }
 
@@ -114,29 +113,25 @@ struct CalendarData {
         })
     }
     
-    func prepareMonths() -> [Month] {
+    func prepareMonths() async -> [Month] {
+        prepareMonthsOld()
+    }
+    
+    func prepareMonthsOld() -> [Month] {
         months.reduce([], { (acc, month) -> [Month] in
-            var daysTemp = addStartEmptyDays(month.days, startDay: style.startWeekDay)
+            let daysTemp = addStartEmptyDays(month.days, startDay: style.startWeekDay)
             
-            let boxCount: Int
-            switch month.weeks {
-            case 5 where style.month.scrollDirection == .vertical:
-                boxCount = minBoxCount
-            default:
-                boxCount = maxBoxCount
-            }
+//            let boxCount: Int
+//            switch month.weeks {
+//            case 5 where style.month.scrollDirection == .vertical:
+//                boxCount = minBoxCount
+//            default:
+//                boxCount = maxBoxCount
+//            }
             
-            if let lastDay = daysTemp.last, daysTemp.count < boxCount {
-                let emptyEndDays = Array(1...(boxCount - daysTemp.count)).compactMap { (idx) -> Day in
-                    var day = Day.empty(uniqID: (lastDay.date?.kvkUniqID ?? 0) + idx)
-                    day.date = getOffsetDate(offset: idx, to: lastDay.date)
-                    return day
-                }
-                
-                daysTemp += emptyEndDays
-            }
+            let resultDays = addEndEmptyDays(daysTemp, startDay: style.startWeekDay)
             var monthTemp = month
-            monthTemp.days = daysTemp
+            monthTemp.days = resultDays
             return acc + [monthTemp]
         })
     }
@@ -178,6 +173,10 @@ struct CalendarData {
                 }
             case .sunday:
                 endIdx -= 1
+                if endIdx <= 0 {
+                    // full empty week
+                    endIdx = 7
+                }
             }
             
             tempDays = Array(0..<endIdx).reversed().compactMap({ (idx) -> Day in
@@ -251,8 +250,8 @@ struct Month: Identifiable {
     var days: [Day] = []
     var weeks: Int
     
-    var id: Int {
-        date.hashValue
+    var id: Date {
+        date
     }
     
     var yearName: String {

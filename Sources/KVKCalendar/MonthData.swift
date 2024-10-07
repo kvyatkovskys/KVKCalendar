@@ -22,10 +22,10 @@ import UIKit
     var data: CalendarData
     var selectedEvent: Event?
     var style: KVKCalendar.Style
-    var scrollId: Int? {
+    var scrollId: Date? {
         didSet {
-            guard Platform.currentInterface != .phone, let idx = scrollId else { return }
-            headerDate = data.months[idx].date
+//            guard Platform.currentInterface != .phone, let idx = scrollId else { return }
+//            headerDate = data.months[idx].date
         }
     }
     var days: [IndexPath: DayOfMonth] = [:]
@@ -33,23 +33,31 @@ import UIKit
     let rowsInPage = 6
     let columnsInPage = 7
     
-    private(set) var todayIdx: Int?
+    private(set) var todayIdx: Date?
     
     init(data: CalendarData) {
         date = data.date
         headerDate = data.date
         self.data = data
         style = data.style
-        self.data.months = data.prepareMonths()
     }
     
-    func getCurrentID() {
-        if date.kvkIsEqual(.now) {
-            todayIdx = data.months.firstIndex(where: { $0.date.kvkMonthIsEqual(date) })
-        } else {
-            todayIdx = data.months.firstIndex(where: { $0.date.kvkMonthIsEqual(.now) })
+    func setup() async {
+        let months = await data.prepareMonths()
+        await MainActor.run {
+            data.months = months
         }
-        scrollId = todayIdx
+    }
+    
+    func getCurrentID() async {
+        if date.kvkIsEqual(.now) {
+            todayIdx = data.months.first(where: { $0.date.kvkMonthIsEqual(date) })?.date
+        } else {
+            todayIdx = data.months.first(where: { $0.date.kvkMonthIsEqual(.now) })?.date
+        }
+        await MainActor.run {
+            scrollId = todayIdx
+        }
     }
     
     func getDay(indexPath: IndexPath) -> DayOfMonth {
@@ -113,7 +121,7 @@ final class MonthData: EventDateProtocol {
         scrollDirection = parameters.data.style.month.scrollDirection
         showRecurringEventInPast = parameters.data.style.event.showRecurringEventInPast
         style = parameters.data.style
-        data.months = parameters.data.prepareMonths()
+        data.months = parameters.data.prepareMonthsOld()
         daysCount = data.months.reduce(0, { $0 + $1.days.count })
     }
     

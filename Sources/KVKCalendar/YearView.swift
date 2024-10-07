@@ -22,6 +22,13 @@ struct YearNewView: View {
     }
     
     var body: some View {
+        bodyView
+            .task {
+                await vm.getScrollId()
+            }
+    }
+    
+    private var bodyView: some View {
         ScrollViewReader { (proxy) in
             ScrollView {
                 LazyVStack {
@@ -33,7 +40,7 @@ struct YearNewView: View {
                 }
                 .scrollTargetLayout()
             }
-            .scrollPosition(id: $vm.scrollId)
+            .scrollPosition(id: $vm.scrollId, anchor: .top)
         }
     }
     
@@ -98,7 +105,7 @@ private struct ContentGrid: View {
         case Date().kvkYear:
             .red
         default:
-            colorScheme == .dark ? .white : Color(uiColor: style.year.colorTitleHeader)
+            colorScheme == .dark ? .white :  style.year.colorTitleHeader.suiColor
         }
     }
 }
@@ -106,7 +113,7 @@ private struct ContentGrid: View {
 @available(iOS 17.0, *)
 #Preview {
     let style = Style()
-    let monthData = MonthNewData(data: .init(date: .now, years: 3, style: style))
+    let monthData = MonthNewData(data: .init(date: .now, years: 4, style: style))
     return YearNewView(monthData: monthData)
 }
 

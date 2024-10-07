@@ -9,7 +9,7 @@
 import SwiftUI
 import KVKCalendar
 
-@available(iOS 17.0, *)
+@available(iOS 18.0, *)
 struct CalendarView: View {
 
     @State private var vm = CalendarViewModel()
@@ -64,7 +64,7 @@ struct CalendarView: View {
     
 }
 
-@available(iOS 17.0, *)
+@available(iOS 18.0, *)
 #Preview {
     CalendarView()
 }

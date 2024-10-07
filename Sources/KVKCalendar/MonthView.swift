@@ -9,73 +9,59 @@
 
 import SwiftUI
 
-@available(iOS 17.0, *)
+@available(iOS 18.0, *)
 struct MonthNewView: View {
-    
-    @State private var vm: KVKCalendar.MonthNewData
-    @Binding private var date: Date
-    @Binding private var event: KVKCalendar.Event?
-    
-    init(vm: KVKCalendar.MonthNewData,
-         date: Binding<Date>,
-         event: Binding<KVKCalendar.Event?>) {
-        _vm = State(initialValue: vm)
-        _date = date
-        _event = event
-    }
+    @Bindable var vm: KVKCalendar.MonthNewData
     
     var body: some View {
-        ScrollViewReader { (proxy) in
-            VStack(spacing: 0) {
-                MonthWeekView(style: vm.style, date: vm.headerDate) {
-                    vm.date = .now
-                    withAnimation {
-                        vm.scrollId = vm.todayIdx
-                    }
-                }
-                .background(.thickMaterial)
-                scrollView
+        bodyView
+            .task {
+                await vm.setup()
+                await vm.getCurrentID()
             }
-        }
-        .onChange(of: vm.date) { newValue  in
-            date = newValue
-        }
-        .onChange(of: vm.selectedEvent) { newValue in
-            event = newValue
+    }
+    
+    private var bodyView: some View {
+        VStack(spacing: 0) {
+            MonthWeekView(style: vm.style, date: vm.headerDate) {
+                vm.date = .now
+                withAnimation {
+                    vm.scrollId = .now
+                }
+            }
+            .background(.thickMaterial)
+            scrollView
         }
     }
     
     private var scrollView: some View {
         ScrollView {
-            if Platform.currentInterface == .phone {
-                scrollContentView
-            } else {
-                scrollContentView
-                    .scrollTargetLayout()
-            }
-        }
-        .scrollPosition(id: $vm.scrollId)
-    }
-    
-    private var scrollContentView: some View {
-        LazyVStack(spacing: 0) {
-            ForEach(vm.data.months.indices, id: \.self) { (idx) in
-                let month = vm.data.months[idx]
-                if Platform.currentInterface == .phone {
-                    ContentGrid(month: month,
-                                style: vm.style,
-                                date: $vm.date,
-                                selectedEvent: $vm.selectedEvent)
-                    .padding(.vertical, 30)
-                    .id(idx)
-                } else {
-                    ContentGrid(month: month,
-                                style: vm.style,
-                                date: $vm.date,
-                                selectedEvent: $vm.selectedEvent)
-                    .id(idx)
+            LazyVStack(spacing: 0) {
+                ForEach(vm.data.months) { (month) in
+                    if Platform.currentInterface == .phone {
+                        ContentGrid(
+                            month: month,
+                            style: vm.style,
+                            date: $vm.date,
+                            selectedEvent: $vm.selectedEvent
+                        )
+                        .padding(.vertical, 20)
+                    } else {
+                        ContentGrid(
+                            month: month,
+                            style: vm.style,
+                            date: $vm.date,
+                            selectedEvent: $vm.selectedEvent
+                        )
+                    }
                 }
             }
+            .scrollTargetLayout()
+        }
+        .scrollPosition(id: $vm.scrollId, anchor: .top)
+        .onScrollTargetVisibilityChange(idType: Date.self) { dates in
+            guard let dt = dates.last else { return }
+            vm.headerDate = dt
         }
     }
 }
@@ -105,19 +91,22 @@ private struct ContentGrid: View {
     var body: some View {
         LazyVGrid(columns: columns, spacing: 0) {
             ForEach(month.days) { (day) in
-                MonthDayView(day: day, selectedDate: date, style: style, selectedEvent: $selectedEvent)
-                    .onTapGesture(count: tapCountToSelectDay) {
-                        withAnimation {
-                            date = day.date ?? Date()
-                        }
-                    }
-                    .disabled(day.type == .empty)
+                MonthDayView(
+                    day: day,
+                    selectedDate: date,
+                    style: style,
+                    selectedEvent: $selectedEvent
+                )
+                .onTapGesture(count: tapCountToSelectDay) {
+                    date = day.date ?? Date()
+                }
+                .disabled(day.type == .empty)
             }
         }
     }
 }
 
-@available(iOS 17.0, *)
+@available(iOS 18.0, *)
 #Preview {
     let formatter = DateFormatter()
     formatter.dateFormat = "dd.MM.yyyy"
@@ -128,7 +117,7 @@ private struct ContentGrid: View {
     var allDayEvent = Event.stub(id: "4")
     allDayEvent.isAllDay = true
     data.months[0].days[0].events = [allDayEvent, .stub(id: "1"), .stub(id: "2"), .stub(id: "3")]
-    return MonthNewView(vm: MonthNewData(data: data), date: .constant(.now), event: .constant(nil))
+    return MonthNewView(vm: MonthNewData(data: data))
 }
 
 @available(iOS 17.0, *)
@@ -155,9 +144,9 @@ struct MonthDayView: View {
     private var height: CGFloat {
         switch Platform.currentInterface {
         case .phone:
-            return 80
+            80
         default:
-            return 180
+            180
         }
     }
     private var dayPadding: CGFloat {
@@ -175,7 +164,7 @@ struct MonthDayView: View {
             bodyView
         } else {
             bodyView
-                .frame(minHeight: 200)
+                .frame(height: 150)
                 .border(borderColor, width: borderWidth)
         }
     }
@@ -186,8 +175,6 @@ struct MonthDayView: View {
                 HStack {
                     if date.kvkDay == 1 {
                         Text(date.titleForLocale(style.locale, formatter: style.month.shortInDayMonthFormatter).capitalized)
-                    } else {
-                        Text("")
                     }
                 }
                 .foregroundStyle(getTxtHeaderColor(day))
@@ -291,9 +278,9 @@ struct MonthDayView: View {
     
     private func getBgColor(_ day: Date, style: Style) -> Color {
         if day.isWeekend {
-            return colorScheme == .dark ? .black : Color(uiColor: style.month.colorBackgroundWeekendDate)
+            colorScheme == .dark ? .black : style.month.colorBackgroundWeekendDate.suiColor
         } else {
-            return colorScheme == .dark ? .black : Color(uiColor: style.month.colorBackgroundDate)
+            colorScheme == .dark ? .black : style.month.colorBackgroundDate.suiColor
         }
     }
     
@@ -335,7 +322,7 @@ struct MonthWeekView: View, WeekPreparing {
                         .font(Font(style.month.fontTitleHeader))
                     Spacer()
                     if !style.month.isHiddenTodayButton {
-                        Button("Today") {
+                        Button("today") {
                             didSelectToday?()
                         }
                         .tint(.red)
@@ -361,29 +348,29 @@ struct MonthWeekView: View, WeekPreparing {
     
     private func getMonthTxtColor(_ date: Date, style: Style) -> Color {
         if Date().kvkYear == date.kvkYear && Date().kvkMonth == date.kvkMonth {
-            return Color(uiColor: style.month.colorTitleCurrentDate)
+            style.month.colorTitleCurrentDate.suiColor
         } else {
-            return Color(uiColor: style.month.colorTitleHeader)
+            style.month.colorTitleHeader.suiColor
         }
     }
     
     private func getTxtColor(_ day: Date, style: Style) -> Color {
         if day.isWeekend {
-            return Color(uiColor: style.week.colorWeekendDate)
+            style.week.colorWeekendDate.suiColor
         } else if day.isWeekday {
-            return Color(uiColor: style.week.colorDate)
+            style.week.colorDate.suiColor
         } else {
-            return .clear
+             .clear
         }
     }
     
     private func getTxtBgColor(_ day: Date, style: Style) -> Color {
         if day.isWeekend {
-            return Color(uiColor: style.week.colorWeekendBackground)
+            style.week.colorWeekendBackground.suiColor
         } else if day.isWeekday {
-            return Color(uiColor: style.week.colorWeekdayBackground)
+            style.week.colorWeekdayBackground.suiColor
         } else {
-            return .clear
+            .clear
         }
     }
     

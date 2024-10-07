@@ -43,7 +43,7 @@ import SwiftUI
     }
     
     func setup() async {
-        timelineDays = getDaysByDate(date, for: type).map { $0.date }
+        timelineDays = await getDaysByDate(date, for: type).map { $0.date }
     }
     
     func filterEvents(_ events: [Event], dates: [Date]) -> [Event] {

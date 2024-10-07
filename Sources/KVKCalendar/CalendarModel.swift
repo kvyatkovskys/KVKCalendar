@@ -713,8 +713,8 @@ protocol ScrollableWeekProtocol: WeekDataProtocol {
 
 extension ScrollableWeekProtocol {
     
-    func getDateByScrollId(newValue: Int?) -> Date? {
-        guard let newIdx = newValue else { return nil }
+    func getDateByScrollId(newValue: Int?) async -> Date? {
+        guard let newIdx = newValue, weeks.endIndex > newIdx else { return nil }
         let weekDays = weeks[newIdx]
         return weekDays.first(where: { $0.date?.kvkWeekday == date.kvkWeekday })?.date
     }
@@ -761,14 +761,14 @@ extension WeekDataProtocol {
         return (days, weeks)
     }
     
-    func getIdxByDate(_ date: Date) -> Int? {
+    func getIdxByDate(_ date: Date) async -> Int? {
         weeks.firstIndex(where: { week in
             week.firstIndex(where: { $0.date?.kvkIsEqual(date) ?? false }) != nil
         })
     }
     
-    func getDaysByDate(_ date: Date, for type: KVKCalendar.CalendarType) -> [Day] {
-        guard let idx = getIdxByDate(date) else { return [] }
+    func getDaysByDate(_ date: Date, for type: KVKCalendar.CalendarType) async -> [Day] {
+        guard let idx = await getIdxByDate(date) else { return [] }
         let week = weeks[idx]
         switch type {
         case .day:

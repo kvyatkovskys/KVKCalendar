@@ -21,7 +21,15 @@ import SwiftUI
         date = monthData.date
         style = monthData.style
         sections = monthData.data.prepareYears(monthData.data.months)
-        scrollId = sections.firstIndex(where: { $0.date.kvkYear == date.kvkYear })
+    }
+    
+    func getScrollId() async {
+        let id = sections.firstIndex(where: { $0.date.kvkYear == date.kvkYear })
+        await MainActor.run {
+            withAnimation {
+                scrollId = id
+            }
+        }
     }
     
     func handleSelectedDate(_ date: Date) {

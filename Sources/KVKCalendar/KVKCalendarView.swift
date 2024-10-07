@@ -10,76 +10,73 @@
 import SwiftUI
 import EventKit
 
-@available(iOS 17.0, *)
+@available(iOS 18.0, *)
 public struct KVKCalendarSwiftUIView: View {
 
     private var type: CalendarType
     private var data: CalendarData
-    private var weekData: WeekNewData?
-    private var dayData: WeekNewData?
-    private var monthData: MonthNewData?
+    @State private var weekData: WeekNewData
+    @State private var dayData: WeekNewData
+    private var monthData: MonthNewData
     private var yearData: YearNewData?
     private var listData: ListView.Parameters?
     @Binding var date: Date
     @Binding var event: Event?
     
     public init(type: CalendarType,
-                date: Binding<Date> = .constant(.now),
+                date: Binding<Date>,
                 events: [Event] = [],
                 event: Binding<Event?> = .constant(nil),
                 style: KVKCalendar.Style = KVKCalendar.Style(),
-                years: Int = 4) {
+                years: Int = 1) {
         self.type = type
         _date = date
         _event = event
         data = CalendarData(date: date.wrappedValue, years: years, style: style)
-        dayData = WeekNewData(data: data, events: events, type: .day)
-        weekData = WeekNewData(data: data, events: events, type: .week)
+        _dayData = State(initialValue: WeekNewData(data: data, events: events, type: .day))
+        _weekData = State(initialValue: WeekNewData(data: data, events: events, type: .week))
         monthData = MonthNewData(data: data)
     }
     
     public var body: some View {
+        bodyView
+            .onChange(of: weekData.date) { oldValue, newValue in
+                if !date.kvkIsEqual(newValue) {
+                    date = newValue
+                }
+            }
+            .onChange(of: date) { oldValue, newValue in
+                if !newValue.kvkIsEqual(weekData.date) {
+                    weekData.date = newValue
+                }
+            }
+    }
+    
+    @ViewBuilder
+    private var bodyView: some View {
         switch type {
         case .day:
-            if let item = dayData {
-                WeekNewView(vm: item, date: $date, event: $event)
-            } else {
-                EmptyView()
-            }
+            WeekNewView(vm: dayData)
         case .week:
-            if let item = weekData {
-                WeekNewView(vm: item, date: $date, event: $event)
-            } else {
-                EmptyView()
-            }
+            WeekNewView(vm: weekData)
         case .month:
-            if let item = monthData {
-                MonthNewView(vm: item, date: $date, event: $event)
-            } else {
-                EmptyView()
-            }
+            MonthNewView(vm: monthData)
         case .year:
-            if let item = monthData {
-                YearNewView(monthData: item)
-            } else {
-                EmptyView()
-            }
+            YearNewView(monthData: monthData)
         case .list:
             EmptyView() // ListNewView(params: vm.listData, date: $vm.date, event: $vm.selectedEvent, events: .constant([]))
         }
     }
 }
 
-@available(iOS 17.0, *)
+@available(iOS 18.0, *)
 private struct PreviewProxy: View {
     @State var type = CalendarType.week
     @State var date = Date.now
     
     var body: some View {
         NavigationStack {
-            KVKCalendarSwiftUIView(type: type, date: $date, events: [])
-                .navigationTitle(date.description)
-                .navigationBarTitleDisplayMode(.inline)
+            KVKCalendarSwiftUIView(type: type, date: $date)
                 .toolbar {
                     ToolbarItem(placement: .topBarLeading) {
                         Picker(type.title, selection: $type) {
@@ -98,7 +95,7 @@ private struct PreviewProxy: View {
     }
 }
 
-@available(iOS 17.0, *)
+@available(iOS 18.0, *)
 #Preview {
     PreviewProxy()
 }
