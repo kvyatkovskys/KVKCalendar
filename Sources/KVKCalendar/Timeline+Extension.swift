@@ -346,9 +346,7 @@ extension TimelineView {
             time.textAlignment = style.timeline.timeAlignment
             time.textColor = style.timeline.timeColor
             time.text = txtHour
-            let hourTmp = TimeHourSystem.twentyFour.getHours(isEndOfDayZero: style.isEndOfDayZero)[idx]
-            let hour = timeLabelFormatter.date(from: hourTmp)?.kvkHour ?? 0
-            time.hashTime = hour
+            time.hashTime = idx
             time.tag = idx - start
             time.isHidden = !isDisplayedTimes
             
