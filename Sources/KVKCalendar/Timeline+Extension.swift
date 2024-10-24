@@ -442,14 +442,13 @@ extension TimelineView {
         
         newEvent.end = style.calendar.date(byAdding: .minute, value: style.event.newEventStep, to: newEvent.start) ?? Date()
 
-        guard  !isResizableEventEnable else { return }
-
-        if let delegate {
-            if let tmpNewEvent = delegate.willAddNewEvent(newEvent, minute: time.minute, hour: time.hour, point: point) {
-                newEvent = tmpNewEvent
-            } else {
-                return
-            }
+        guard !isResizableEventEnable else { return }
+        
+        if let tmpNewEvent = delegate?.willAddNewEvent(newEvent, minute: time.minute, hour: time.hour, point: point) {
+            newEvent = tmpNewEvent
+        } else {
+            // no need to add preview of new event
+            return
         }
         
         if gesture.state == .began {
