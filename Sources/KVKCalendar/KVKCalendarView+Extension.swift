@@ -331,7 +331,7 @@ extension KVKCalendarView: DisplayDelegate {
     }
     
     public func willAddNewEvent(_ event: Event, _ date: Date?) -> Event? {
-        delegate?.willAddNewEvent(event, date) ?? event
+        delegate?.willAddNewEvent(event, date)
     }
 
     public func didAddNewEvent(_ event: Event, _ date: Date?) {

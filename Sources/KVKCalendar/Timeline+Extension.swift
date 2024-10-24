@@ -446,6 +446,9 @@ extension TimelineView {
         
         if let tmpNewEvent = delegate?.willAddNewEvent(newEvent, minute: time.minute, hour: time.hour, point: point) {
             newEvent = tmpNewEvent
+        } else {
+            // no need to add preview of new event
+            return
         }
         
         if gesture.state == .began {

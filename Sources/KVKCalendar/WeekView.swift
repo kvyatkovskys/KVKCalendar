@@ -378,7 +378,7 @@ extension WeekView: TimelineDelegate {
         components.hour = hour
         components.minute = minute
         let newDate = style.calendar.date(from: components)
-        return delegate?.willAddNewEvent(event, newDate) ?? event
+        return delegate?.willAddNewEvent(event, newDate)
     }
 
     func didAddNewEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint) {
