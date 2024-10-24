@@ -138,9 +138,7 @@ extension DayView: TimelineDelegate {
         components.hour = hour
         components.minute = minute
         let date = style.calendar.date(from: components)
-
-        guard let delegate else { return event }
-        return delegate.willAddNewEvent(event, date)
+        return delegate?.willAddNewEvent(event, date)
     }
     
     func didAddNewEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint) {
@@ -172,7 +170,6 @@ extension DayView: TimelineDelegate {
         endComponents.hour = hour + hourOffset
         endComponents.minute = minute + minuteOffset
         let endDate = style.calendar.date(from: endComponents)
-        
         delegate?.didChangeEvent(event, start: startDate, end: endDate)
     }
     

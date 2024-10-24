@@ -360,9 +360,7 @@ extension TimelineView {
             time.textAlignment = style.timeline.timeAlignment
             time.textColor = style.timeline.timeColor
             time.text = txtHour
-            let hourTmp = TimeHourSystem.twentyFour.getHours(isEndOfDayZero: style.isEndOfDayZero)[idx]
-            let hour = timeLabelFormatter.date(from: hourTmp)?.kvkHour ?? 0
-            time.hashTime = hour
+            time.hashTime = idx
             time.tag = idx - start
             time.isHidden = !isDisplayedTimes
             
@@ -603,14 +601,13 @@ extension TimelineView {
         
         newEvent.end = style.calendar.date(byAdding: .minute, value: style.event.newEventStep, to: newEvent.start) ?? Date()
 
-        guard  !isResizableEventEnable else { return }
-
-        if let delegate {
-            if let tmpNewEvent = delegate.willAddNewEvent(newEvent, minute: time.minute, hour: time.hour, point: point) {
-                newEvent = tmpNewEvent
-            } else {
-                return
-            }
+        guard !isResizableEventEnable else { return }
+        
+        if let tmpNewEvent = delegate?.willAddNewEvent(newEvent, minute: time.minute, hour: time.hour, point: point) {
+            newEvent = tmpNewEvent
+        } else {
+            // no need to add preview of new event
+            return
         }
         
         if gesture.state == .began {
