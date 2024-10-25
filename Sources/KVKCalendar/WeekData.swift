@@ -19,7 +19,7 @@ import SwiftUI
     var event: Event?
     var events: [Event]
     var recurringEvents: [Event] = []
-    var weeks: [[Day]] = []
+    var weeks: [WeekItem] = []
     var type: CalendarType
     
     private let data: KVKCalendar.CalendarData
@@ -70,7 +70,7 @@ final class WeekData: EventDateProtocol, ScrollableWeekProtocol {
     var allDayEvents: [Event] = []
     var events: [Event]
     var recurringEvents: [Event] = []
-    var weeks: [[Day]] = []
+    var weeks: [WeekItem] = []
     
     @available(swift, deprecated: 0.6.13, renamed: "weeks")
     var daysBySection: [[Day]] = []
@@ -90,13 +90,13 @@ final class WeekData: EventDateProtocol, ScrollableWeekProtocol {
     
     private func getIdxByDate(_ date: Date) -> Int? {
         weeks.firstIndex(where: { week in
-            week.firstIndex(where: { $0.date?.kvkIsEqual(date) ?? false }) != nil
+            week.days.firstIndex(where: { $0.date?.kvkIsEqual(date) ?? false }) != nil
         })
     }
     
     private func getDaysByDate(_ date: Date) -> [Day] {
         guard let idx = getIdxByDate(date) else { return [] }
-        return weeks[idx]
+        return weeks[idx].days
     }
     
     func filterEvents(_ events: [Event], dates: [Date]) -> [Event] {

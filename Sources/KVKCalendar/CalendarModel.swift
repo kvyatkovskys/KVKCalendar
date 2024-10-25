@@ -708,27 +708,26 @@ extension UIView: KVKCalendarHeaderProtocol {}
 protocol ScrollableWeekProtocol: WeekDataProtocol {
     
     var date: Date { get set }
-    var weeks: [[Day]] { get set }
+    var weeks: [WeekItem] { get set }
 }
 
 extension ScrollableWeekProtocol {
     
     func getDateByScrollId(newValue: Int?) async -> Date? {
         guard let newIdx = newValue, weeks.endIndex > newIdx else { return nil }
-        let weekDays = weeks[newIdx]
+        let weekDays = weeks[newIdx].days
         return weekDays.first(where: { $0.date?.kvkWeekday == date.kvkWeekday })?.date
     }
 }
 
 protocol WeekDataProtocol {
-    
-    var weeks: [[Day]] { get set }
+    var weeks: [WeekItem] { get set }
 }
 
 extension WeekDataProtocol {
     
-    func prepareDays(_ days: [Day], maxDayInWeek: Int) -> [[Day]] {
-        var daysBySection: [[Day]] = []
+    func prepareDays(_ days: [Day], maxDayInWeek: Int) -> [WeekItem] {
+        var weeks: [WeekItem] = []
         var idx = 0
         var stop = false
         
@@ -738,20 +737,24 @@ extension WeekDataProtocol {
                 endIdx = days.count
             }
             let items = Array(days[idx..<endIdx])
-            daysBySection.append(items)
+            weeks.append(
+                WeekItem(
+                    identifier: weeks.endIndex - 1,
+                    days: items
+                )
+            )
             idx += maxDayInWeek
             if idx > days.count - 1 {
                 stop = true
             }
         }
-        
-        return daysBySection
+        return weeks
     }
     
     func reloadData(_ data: KVKCalendar.CalendarData,
                     type: KVKCalendar.CalendarType,
                     startDay: KVKCalendar.StartDayType,
-                    maxDays: Int) -> (days: [KVKCalendar.Day], weeks: [[KVKCalendar.Day]]) {
+                    maxDays: Int) -> (days: [KVKCalendar.Day], weeks: [WeekItem]) {
         var startDayProxy = startDay
         if type == .week && maxDays != 7 {
             startDayProxy = .sunday
@@ -763,7 +766,7 @@ extension WeekDataProtocol {
     
     func getIdxByDate(_ date: Date) async -> Int? {
         weeks.firstIndex(where: { week in
-            week.firstIndex(where: { $0.date?.kvkIsEqual(date) ?? false }) != nil
+            week.days.firstIndex(where: { $0.date?.kvkIsEqual(date) ?? false }) != nil
         })
     }
     
@@ -772,10 +775,10 @@ extension WeekDataProtocol {
         let week = weeks[idx]
         switch type {
         case .day:
-            guard let day = week.first(where: { $0.date?.kvkIsEqual(date) ?? false }) else { return [] }
+            guard let day = week.days.first(where: { $0.date?.kvkIsEqual(date) ?? false }) else { return [] }
             return [day]
         default:
-            return week
+            return week.days
         }
     }
     

@@ -14,13 +14,13 @@ final class DayData: EventDateProtocol, ScrollableWeekProtocol {
     var isAutoScrolling: Bool = false
     var style: Style
     var scrollId: Int?
-    var weeks: [[Day]] = []
+    var weeks: [WeekItem] = []
     
     let days: [Day]
     var date: Date
     var events: [Event] = []
     var recurringEvents: [Event] = []
-    var daysBySection: [[Day]] = []
+    var daysBySection: [WeekItem] = []
     
     init(data: CalendarData, startDay: StartDayType) {
         self.date = data.date
