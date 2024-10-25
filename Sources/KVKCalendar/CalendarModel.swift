@@ -79,6 +79,15 @@ public enum TimeHourSystem: Int {
         }
     }
     
+    public var formatWithoutSymbols: String {
+        switch self {
+        case .twelveHour, .twelve:
+            return "h:mm"
+        case .twentyFourHour, .twentyFour:
+            return "HH:mm"
+        }
+    }
+    
     public var shortFormat: String {
         switch self {
         case .twelveHour, .twelve:

@@ -132,6 +132,18 @@ public struct HeaderScrollStyle {
 
 // MARK: Timeline style
 
+public protocol CurrentLineStyleDisplayable: Equatable {
+    var lineHourStyle: TimelineStyle.CurrentLineHourStyle { get set }
+    var currentLineTimeFont: UIFont { get set }
+    var currentLineColor: UIColor { get set }
+    var currentLineTimeColor: UIColor { get set }
+    var currentLineTimeDotSize: CGSize { get set }
+    var currentLineDotCornersRadius: CGSize { get set }
+    var currentLineTimeCornersRadius: CGSize { get set }
+    var currentLineTimeWidth: CGFloat { get set }
+    var currentLineHeight: CGFloat { get set }
+}
+
 public struct TimelineStyle {
     public var startFromFirstEvent: Bool = false
     public var eventFont: UIFont = .boldSystemFont(ofSize: 12)
@@ -173,13 +185,31 @@ public struct TimelineStyle {
     public var widthEventViewer: CGFloat? = nil
     public var showLineHourMode: CurrentLineHourShowMode = .today
     public var scrollLineHourMode: CurrentLineHourScrollMode = .today
+    
+    @available(swift, deprecated: 0.6.28, message: "Use `currentLineHourStyle` instead.", renamed: "currentLineHourStyle")
     public var lineHourStyle: CurrentLineHourStyle = .withTime
+    
+    @available(swift, deprecated: 0.6.28, message: "Use `currentLineHourStyle` instead.", renamed: "currentLineHourStyle")
     public var currentLineHourFont: UIFont = .systemFont(ofSize: 12)
+    
+    @available(swift, deprecated: 0.6.28, message: "Use `currentLineHourStyle` instead.", renamed: "currentLineHourStyle")
     public var currentLineHourColor: UIColor = .red
+    
+    @available(swift, deprecated: 0.6.28, message: "Use `currentLineHourStyle` instead.", renamed: "currentLineHourStyle")
     public var currentLineHourDotSize: CGSize = CGSize(width: 5, height: 5)
+    
+    @available(swift, deprecated: 0.6.28, message: "Use `currentLineHourStyle` instead.", renamed: "currentLineHourStyle")
     public var currentLineHourDotCornersRadius: CGSize = CGSize(width: 2.5, height: 2.5)
+    
+    @available(swift, deprecated: 0.6.28, message: "Use `currentLineHourStyle` instead.", renamed: "currentLineHourStyle")
     public var currentLineHourWidth: CGFloat = 40
+    
+    @available(swift, deprecated: 0.6.28, message: "Use `currentLineHourStyle` instead.", renamed: "currentLineHourStyle")
     public var currentLineHourHeight: CGFloat = 1
+
+    /// to use the previous style set `.old(OldCurrentLineStyle())`
+    public var currentLineHourStyle: TimelineStyle.CurrentLineStyleType = .custom(DefaultCurrentLineStyle())
+    
     public var separatorLineColor: UIColor = .gray
     public var movingMinutesColor: UIColor = .systemBlue
     public var shadowColumnColor: UIColor = .systemTeal
@@ -208,6 +238,47 @@ public struct TimelineStyle {
     
     public enum ViewMode: Int {
         case `default`, list
+    }
+    
+    public enum CurrentLineStyleType {
+        case custom(any CurrentLineStyleDisplayable)
+        case old(any CurrentLineStyleDisplayable)
+        
+        var style: any CurrentLineStyleDisplayable {
+            switch self {
+            case .custom(let item):
+                item
+            case .old(let item):
+                item
+            }
+        }
+    }
+    
+    // default style like in iOS 18
+    public struct DefaultCurrentLineStyle: CurrentLineStyleDisplayable {
+        public var lineHourStyle: CurrentLineHourStyle = .withTime
+        public var currentLineTimeFont: UIFont = .systemFont(ofSize: 12)
+        public var currentLineColor: UIColor = .red
+        public var currentLineTimeColor: UIColor = .white
+        /// not used here
+        public var currentLineDotCornersRadius: CGSize = .zero
+        public var currentLineTimeDotSize: CGSize = .zero
+
+        public var currentLineTimeCornersRadius: CGSize = CGSize(width: 5, height: 5)
+        public var currentLineTimeWidth: CGFloat = 40
+        public var currentLineHeight: CGFloat = 1
+    }
+    
+    public struct OldCurrentLineStyle: CurrentLineStyleDisplayable {
+        public var lineHourStyle: CurrentLineHourStyle = .withTime
+        public var currentLineTimeFont: UIFont = .systemFont(ofSize: 12)
+        public var currentLineColor: UIColor = .red
+        public var currentLineTimeColor: UIColor = .white
+        public var currentLineTimeDotSize: CGSize = CGSize(width: 5, height: 5)
+        public var currentLineDotCornersRadius: CGSize = CGSize(width: 5, height: 5)
+        public var currentLineTimeCornersRadius: CGSize = CGSize(width: 2.5, height: 2.5)
+        public var currentLineTimeWidth: CGFloat = 40
+        public var currentLineHeight: CGFloat = 1
     }
     
     public struct Scale {
