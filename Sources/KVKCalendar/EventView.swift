@@ -7,7 +7,55 @@
 
 #if os(iOS)
 
-import UIKit
+import SwiftUI
+
+@available(iOS 17.0, *)
+struct EventNewView: View {
+    
+    var isSelected: Bool
+    var event: Event
+    var style: Style
+    var didSelect: (() -> Void)?
+    
+    private var bgColor: Color {
+        Color(uiColor: isSelected ? (event.color?.value ?? .blue) : event.backgroundColor)
+    }
+    private var tintColor: Color {
+        Color(uiColor: isSelected ? .white : event.textColor)
+    }
+    
+    var body: some View {
+        GeometryReader { (proxy) in
+            Button {
+                didSelect?()
+            } label: {
+                HStack(spacing: 3) {
+                    Rectangle()
+                        .fill(Color(uiColor: event.color?.value ?? .blue))
+                        .frame(minWidth: 3, maxWidth: 3, maxHeight: .infinity)
+                    if proxy.frame(in: .local).height >= 10 {
+                        Text(event.title.timeline)
+                            .foregroundStyle(tintColor)
+                            .multilineTextAlignment(.leading)
+                            .minimumScaleFactor(0.2)
+                            .frame(maxHeight: .infinity, alignment: .topLeading)
+                            .padding([.vertical, .trailing], 2)
+                    }
+                    Spacer()
+                }
+                .background(bgColor)
+                .cornerRadius(style.event.eventCornersRadius.width)
+            }
+        }
+    }
+}
+
+@available(iOS 17.0, *)
+#Preview {
+    EventNewView(isSelected: false, event: .stub(), style: Style())
+        .padding()
+        .frame(height: 100)
+}
 
 final class EventView: EventViewGeneral {
     private let pointX: CGFloat = 5

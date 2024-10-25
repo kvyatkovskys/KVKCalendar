@@ -8,6 +8,14 @@
 #if os(iOS)
 
 import UIKit
+import SwiftUI
+
+extension Task where Success == Never, Failure == Never {
+    static func sleep(seconds: Double) async throws {
+        let duration = UInt64(seconds * 1_000_000_000)
+        try await Task.sleep(nanoseconds: duration)
+    }
+}
 
 enum Platform: Int {
     case phone, pad, mac, none
@@ -28,12 +36,8 @@ enum Platform: Int {
     static var currentInterface: Platform {
         switch currentDevice {
         case .pad:
-            if let vc = UIApplication.shared.windows.first(where: { $0.isKeyWindow })?.rootViewController {
-                if vc.view.bounds.width < 600 {
-                    return .phone
-                } else {
-                    return .pad
-                }
+            if UIScreen.main.bounds.width < 600 {
+                return .phone
             } else {
                 return .pad
             }
@@ -389,4 +393,10 @@ public extension KVKDequeueProxyProtocol where Self: UICollectionView {
 extension UITableView: KVKDequeueProxyProtocol {}
 extension UICollectionView: KVKDequeueProxyProtocol {}
 
+extension UIColor {
+    @available(iOS 15.0, *)
+    var suiColor: Color {
+        Color(uiColor: self)
+    }
+}
 #endif

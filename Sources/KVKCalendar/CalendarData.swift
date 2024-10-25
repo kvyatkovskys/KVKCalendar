@@ -10,18 +10,16 @@
 import Foundation
 
 struct CalendarData {
-    private let style: Style
-    
+    let style: Style
     let maxBoxCount = 42
     let minBoxCount = 35
-    let date: Date
+    var date: Date
     var months = [Month]()
     var yearsCount = [Int]()
     
     init(date: Date, years: Int, style: Style) {
         // count years for calendar
         let indexesYear = [Int](repeating: 0, count: years).split(half: years / 2)
-        
         self.init(date: date, style: style, indexesYear: indexesYear)
     }
 
@@ -92,10 +90,7 @@ struct CalendarData {
                 })
             }
             
-            var months = zip(nameMonths, dateMonths).map { Month(name: $0.0,
-                                                                 date: $0.1,
-                                                                 days: [],
-                                                                 weeks: numberOfWeeksInMonth($0.1, calendar: calendar)) }
+            var months = zip(nameMonths, dateMonths).map { Month(name: $0.0, date: $0.1, weeks: numberOfWeeksInMonth($0.1, calendar: calendar)) }
             
             for (idx, month) in months.enumerated() {
                 let days = getDaysInMonth(month: idx + 1, date: month.date)
@@ -104,6 +99,41 @@ struct CalendarData {
             monthsTemp += months
         }
         self.months = monthsTemp
+    }
+    
+    func prepareYears(_ months: [Month]) -> [YearSection] {
+        months.reduce([], { (acc, month) -> [YearSection] in
+            var accTemp = acc
+            guard let idx = accTemp.firstIndex(where: { $0.date.kvkYear == month.date.kvkYear }) else {
+                return accTemp + [YearSection(date: month.date, months: [month])]
+            }
+            
+            accTemp[idx].months.append(month)
+            return accTemp
+        })
+    }
+    
+    func prepareMonths() async -> [Month] {
+        prepareMonthsOld()
+    }
+    
+    func prepareMonthsOld() -> [Month] {
+        months.reduce([], { (acc, month) -> [Month] in
+            let daysTemp = addStartEmptyDays(month.days, startDay: style.startWeekDay)
+            
+//            let boxCount: Int
+//            switch month.weeks {
+//            case 5 where style.month.scrollDirection == .vertical:
+//                boxCount = minBoxCount
+//            default:
+//                boxCount = maxBoxCount
+//            }
+            
+            let resultDays = addEndEmptyDays(daysTemp, startDay: style.startWeekDay)
+            var monthTemp = month
+            monthTemp.days = resultDays
+            return acc + [monthTemp]
+        })
     }
     
     func getDaysInMonth(month: Int, date: Date) -> [Day] {
@@ -121,7 +151,11 @@ struct CalendarData {
         formatterDay.dateFormat = "EE"
         // MARK: here we have to use `en_US` locale
         formatterDay.locale = Locale(identifier: "en_US")
-        let days = arrDates.map({ Day(type: DayType(rawValue: formatterDay.string(from: $0).uppercased()) ?? .empty, date: $0, data: []) })
+        let days = arrDates.compactMap {
+            Day(type: DayType(rawValue: formatterDay.string(from: $0).uppercased()) ?? .empty,
+                date: $0,
+                data: [])
+        }
         return days
     }
     
@@ -139,10 +173,14 @@ struct CalendarData {
                 }
             case .sunday:
                 endIdx -= 1
+                if endIdx <= 0 {
+                    // full empty week
+                    endIdx = 7
+                }
             }
             
             tempDays = Array(0..<endIdx).reversed().compactMap({ (idx) -> Day in
-                var day = Day.empty()
+                var day = Day.empty(uniqID: (firstDay.date?.kvkUniqID ?? 0) + idx)
                 day.date = getOffsetDate(offset: -(idx + 1), to: firstDay.date)
                 return day
             }) + days
@@ -169,7 +207,7 @@ struct CalendarData {
             
             if maxIdx > lastIdx {
                 emptyDays = Array(0..<maxIdx - lastIdx).compactMap({ (idx) -> Day in
-                    var day = Day.empty()
+                    var day = Day.empty(uniqID: (lastDay.date?.kvkUniqID ?? 0) + idx)
                     day.date = getOffsetDate(offset: (idx + 1), to: lastDay.date)
                     return day
                 })
@@ -192,51 +230,89 @@ struct CalendarData {
     
     func getOffsetDate(offset: Int, to date: Date?) -> Date? {
         guard let dateTemp = date else { return nil }
-        
         return style.calendar.date(byAdding: .day, value: offset, to: dateTemp)
     }
     
-    private func addEmptyDayToEnd(days: [Day]) -> [Day] {
-        var days = days
-        if let lastDay = days.last {
-            var emptyDay = Day.empty()
-            emptyDay.date = getOffsetDate(offset: 1, to: lastDay.date)
-            days.append(emptyDay)
-        }
-        return days
+//    private func addEmptyDayToEnd(days: [Day]) -> [Day] {
+//        var days = days
+//        if let lastDay = days.last {
+//            var emptyDay = Day.empty()
+//            emptyDay.date = getOffsetDate(offset: 1, to: lastDay.date)
+//            days.append(emptyDay)
+//        }
+//        return days
+//    }
+}
+
+struct Month: Identifiable {
+    let name: String
+    let date: Date
+    var days: [Day] = []
+    var weeks: Int
+    
+    var id: Date {
+        date
+    }
+    
+    var yearName: String {
+        Platform.currentInterface == .phone ? String(name.prefix(3)) : name
     }
 }
 
-struct Month {
-    let name: String
+struct YearSection: Identifiable {
     let date: Date
-    var days: [Day]
-    var weeks: Int
+    var months: [Month]
+    
+    var id: Int {
+        date.hashValue
+    }
 }
 
-struct Day {
+struct Day: Identifiable, Equatable, Hashable {
+    
     let type: DayType
     var date: Date?
     var events: [Event]
+    let uniqID: Int?
     
-    static func empty() -> Day {
-        return self.init()
+    static func empty(uniqID: Int? = nil) -> Day {
+        self.init(uniqID: uniqID)
     }
     
-    private init() {
-        self.date = nil
-        self.events = []
-        self.type = .empty
+    private init(uniqID: Int?) {
+        date = nil
+        events = []
+        type = .empty
+        self.uniqID = -(uniqID ?? 1)
     }
     
     init(type: DayType, date: Date?, data: [Event]) {
         self.type = type
         self.events = data
         self.date = date
+        self.uniqID = date?.kvkUniqID
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(date)
+    }
+    
+    var id: Int {
+        var dateId: Int
+        if let uniqID {
+            dateId = uniqID
+        } else {
+            dateId = date?.kvkUniqID ?? 0
+        }
+        return dateId + type.id
+    }
+    
+    static func == (lhs: Day, rhs: Day) -> Bool {
+        lhs.date == rhs.date
     }
 }
 
-public enum DayType: String, CaseIterable {
+public enum DayType: String, CaseIterable, Identifiable {
     case monday = "MON"
     case tuesday = "TUE"
     case wednesday = "WED"
@@ -245,10 +321,48 @@ public enum DayType: String, CaseIterable {
     case saturday = "SAT"
     case sunday = "SUN"
     case empty
+    
+    public var id: Int {
+        switch self {
+        case .monday:
+            1
+        case .tuesday:
+            2
+        case .wednesday:
+            3
+        case .thursday:
+            4
+        case .friday:
+            5
+        case .saturday:
+            6
+        case .sunday:
+            7
+        case .empty:
+            8
+        }
+    }
 }
 
 public enum StartDayType: Int {
     case monday, sunday
+}
+
+protocol WeekPreparing {}
+
+extension WeekPreparing {
+    
+    func getWeekDays(style: Style) -> [Date] {
+        let startWeekDate = style.startWeekDay == .sunday ? Date().kvkStartSundayOfWeek : Date().kvkStartMondayOfWeek
+        return Array(0..<7).compactMap { date -> Date? in
+            guard let dateTemp = startWeekDate else { return nil }
+            
+            return style.calendar.date(byAdding: .day,
+                                       value: date,
+                                       to: dateTemp)
+        }
+    }
+    
 }
 
 #endif

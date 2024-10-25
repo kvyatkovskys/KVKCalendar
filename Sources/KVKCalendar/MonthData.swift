@@ -9,21 +9,93 @@
 
 import UIKit
 
-final class MonthData: EventDateProtocol {
+@available(iOS 17.0, *)
+@Observable final class MonthNewData: EventDateProtocol {
+    typealias DayOfMonth = (indexPath: IndexPath, day: Day?, weeks: Int)
     
+    var date: Date {
+        didSet {
+            headerDate = date
+        }
+    }
+    var headerDate: Date
+    var data: CalendarData
+    var selectedEvent: Event?
+    var style: KVKCalendar.Style
+    var scrollId: Date? {
+        didSet {
+//            guard Platform.currentInterface != .phone, let idx = scrollId else { return }
+//            headerDate = data.months[idx].date
+        }
+    }
+    var days: [IndexPath: DayOfMonth] = [:]
+    var daysCount: Int = 0
+    let rowsInPage = 6
+    let columnsInPage = 7
+    
+    private(set) var todayIdx: Date?
+    
+    init(data: CalendarData) {
+        date = data.date
+        headerDate = data.date
+        self.data = data
+        style = data.style
+    }
+    
+    func setup() async {
+        let months = await data.prepareMonths()
+        await MainActor.run {
+            data.months = months
+        }
+    }
+    
+    func getCurrentID() async {
+        if date.kvkIsEqual(.now) {
+            todayIdx = data.months.first(where: { $0.date.kvkMonthIsEqual(date) })?.date
+        } else {
+            todayIdx = data.months.first(where: { $0.date.kvkMonthIsEqual(.now) })?.date
+        }
+        await MainActor.run {
+            scrollId = todayIdx
+        }
+    }
+    
+    func getDay(indexPath: IndexPath) -> DayOfMonth {
+        // TODO: we got a crash sometime when use a horizontal scroll direction
+        // got index out of array
+        // safe: -> optional subscript
+        let month = data.months[indexPath.section]
+        return (indexPath, month.days[safe: indexPath.row], month.weeks)
+    }
+}
+
+@available(iOS 17.0, *)
+extension MonthNewData {
+    var middleRowInPage: Int {
+        (rowsInPage * columnsInPage) / 2
+    }
+    var columns: Int {
+        ((daysCount / itemsInPage) * columnsInPage) + (daysCount % itemsInPage)
+    }
+    var itemsInPage: Int {
+        columnsInPage * rowsInPage
+    }
+}
+
+final class MonthData: EventDateProtocol {
     typealias DayOfMonth = (indexPath: IndexPath, day: Day?, weeks: Int)
     
     struct Parameters {
         let data: CalendarData
-        let startDay: StartDayType
-        let calendar: Calendar
-        let style: Style
     }
     
     var selectedSection: Int = -1
     var date: Date
+    var headerDate: Date
     var data: CalendarData
-    let daysCount: Int
+    var selectedEvent: Event?
+    var daysCount: Int = 0
+    var style: KVKCalendar.Style
     
     let tagEventPagePreview = -20
     let eventPreviewYOffset: CGFloat = 30
@@ -42,38 +114,15 @@ final class MonthData: EventDateProtocol {
     private let showRecurringEventInPast: Bool
     
     init(parameters: Parameters) {
-        self.data = parameters.data
-        self.calendar = parameters.calendar
-        self.scrollDirection = parameters.style.month.scrollDirection
-        self.showRecurringEventInPast = parameters.style.event.showRecurringEventInPast
-        
-        let months = parameters.data.months.reduce([], { (acc, month) -> [Month] in
-            var daysTemp = parameters.data.addStartEmptyDays(month.days, startDay: parameters.startDay)
-            
-            let boxCount: Int
-            switch month.weeks {
-            case 5 where parameters.style.month.scrollDirection == .vertical:
-                boxCount = parameters.data.minBoxCount
-            default:
-                boxCount = parameters.data.maxBoxCount
-            }
-            
-            if let lastDay = daysTemp.last, daysTemp.count < boxCount {
-                let emptyEndDays = Array(1...(boxCount - daysTemp.count)).compactMap { (idx) -> Day in
-                    var day = Day.empty()
-                    day.date = parameters.data.getOffsetDate(offset: idx, to: lastDay.date)
-                    return day
-                }
-                
-                daysTemp += emptyEndDays
-            }
-            var monthTemp = month
-            monthTemp.days = daysTemp
-            return acc + [monthTemp]
-        })
-        self.data.months = months
-        self.date = parameters.data.date
-        self.daysCount = months.reduce(0, { $0 + $1.days.count })
+        date = parameters.data.date
+        headerDate = parameters.data.date
+        data = parameters.data
+        calendar = parameters.data.style.calendar
+        scrollDirection = parameters.data.style.month.scrollDirection
+        showRecurringEventInPast = parameters.data.style.event.showRecurringEventInPast
+        style = parameters.data.style
+        data.months = parameters.data.prepareMonthsOld()
+        daysCount = data.months.reduce(0, { $0 + $1.days.count })
     }
     
     private func compareDate(day: Day, date: Date?) -> Bool {

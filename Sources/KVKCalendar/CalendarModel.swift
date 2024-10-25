@@ -7,7 +7,7 @@
 
 #if os(iOS)
 
-import UIKit
+import SwiftUI
 import EventKit
 
 @available(swift, deprecated: 0.6.5, obsoleted: 0.6.6, renamed: "CellParameter")
@@ -22,7 +22,7 @@ public struct CellParameter {
     public var events: [Event] = []
 }
 
-public enum TimeHourSystem: Int {
+public enum TimeHourSystem: Int, Identifiable {
     @available(swift, deprecated: 0.3.6, obsoleted: 0.3.7, renamed: "twelve")
     case twelveHour = 0
     @available(swift, deprecated: 0.3.6, obsoleted: 0.3.7, renamed: "twentyFour")
@@ -30,6 +30,10 @@ public enum TimeHourSystem: Int {
     
     case twelve = 12
     case twentyFour = 24
+    
+    public var id: TimeHourSystem {
+        self
+    }
     
     func getHours(isEndOfDayZero: Bool = true) -> [String] {
         switch self {
@@ -131,11 +135,11 @@ public struct TextEvent {
     }
 }
 
-public struct Event {
+public struct Event: Identifiable {
     static let idForNewEvent = "-999"
     
     /// unique identifier of Event
-    public var ID: String
+    public var uniqID: String
     public var title: TextEvent = TextEvent()
     
     public var start: Date = Date()
@@ -163,7 +167,7 @@ public struct Event {
     public var systemEvent: EKEvent? = nil
     
     public init(ID: String) {
-        self.ID = ID
+        self.uniqID = ID
         
         if let tempColor = color {
             let value = prepareColor(tempColor)
@@ -173,7 +177,7 @@ public struct Event {
     }
     
     public init(event: EKEvent, monthTitle: String? = nil, listTitle: String? = nil) {
-        ID = event.eventIdentifier
+        uniqID = event.eventIdentifier
         title = TextEvent(timeline: event.title,
                           month: monthTitle ?? event.title,
                           list: listTitle ?? event.title)
@@ -204,6 +208,32 @@ public struct Event {
 
 extension Event {
     
+    public var id: String {
+        uniqID
+    }
+    
+    static func stub(id: String? = nil, startFrom: Int? = nil, duration: Int? = nil) -> Event {
+        var event = Event(ID: id ?? "-1")
+        event.start = Calendar.current.date(byAdding: .minute, value: startFrom ?? 0, to: Date()) ?? Date()
+        event.end = Calendar.current.date(byAdding: .minute, value: duration ?? 30, to: event.start) ?? Date()
+        event.title = TextEvent(timeline: "Text event number 10",
+                                month: "Text event number 10",
+                                list: "Text event number 10")
+        return event
+    }
+    
+    static func allDayStub(id: String? = nil) -> Event {
+        var event = Event(ID: id ?? "-1")
+        event.title = TextEvent(timeline: "Text event number 10",
+                                month: "Text event number 10",
+                                list: "Text event number 10")
+        return event
+    }
+    
+}
+
+extension Event {
+    
     enum EventType: String {
         case allDay, usual
     }
@@ -212,13 +242,13 @@ extension Event {
 
 extension Event {
     var hash: Int {
-        ID.hashValue
+        id.hashValue
     }
 }
 
 public extension Event {
     var isNew: Bool {
-        ID == Event.idForNewEvent
+        uniqID == Event.idForNewEvent
     }
     
     enum RecurringType: Int {
@@ -318,6 +348,14 @@ extension Event {
     }
 }
 
+extension Event: Equatable {
+    
+    public static func == (lhs: Event, rhs: Event) -> Bool {
+        lhs.id == rhs.id
+    }
+    
+}
+
 // MARK: - Event protocol
 
 public protocol EventProtocol {
@@ -326,7 +364,7 @@ public protocol EventProtocol {
 
 // MARK: - Settings protocol
 
-protocol CalendarSettingProtocol: AnyObject {
+protocol CalendarSettingProtocol {
     
     var style: Style { get set }
     
@@ -339,6 +377,8 @@ protocol CalendarSettingProtocol: AnyObject {
 
 extension CalendarSettingProtocol {
     
+    func reloadFrame(_ frame: CGRect) {}
+    func updateStyle(_ style: Style, force: Bool) {}
     func reloadData(_ events: [Event]) {}
     func setDate(_ date: Date, animated: Bool) {}
     func setUI(reload: Bool = false) {}
@@ -665,16 +705,29 @@ extension UIView: KVKCalendarHeaderProtocol {}
 
 // MARK: - Scrollable Week settings
 
-protocol ScrollableWeekProtocol: AnyObject {
+protocol ScrollableWeekProtocol: WeekDataProtocol {
     
-    var daysBySection: [[Day]] { get set }
-    
+    var date: Date { get set }
+    var weeks: [WeekItem] { get set }
 }
 
 extension ScrollableWeekProtocol {
     
-    func prepareDays(_ days: [Day], maxDayInWeek: Int) -> [[Day]] {
-        var daysBySection: [[Day]] = []
+    func getDateByScrollId(newValue: Int?) async -> Date? {
+        guard let newIdx = newValue, weeks.endIndex > newIdx else { return nil }
+        let weekDays = weeks[newIdx].days
+        return weekDays.first(where: { $0.date?.kvkWeekday == date.kvkWeekday })?.date
+    }
+}
+
+protocol WeekDataProtocol {
+    var weeks: [WeekItem] { get set }
+}
+
+extension WeekDataProtocol {
+    
+    func prepareDays(_ days: [Day], maxDayInWeek: Int) -> [WeekItem] {
+        var weeks: [WeekItem] = []
         var idx = 0
         var stop = false
         
@@ -684,14 +737,80 @@ extension ScrollableWeekProtocol {
                 endIdx = days.count
             }
             let items = Array(days[idx..<endIdx])
-            daysBySection.append(items)
+            weeks.append(
+                WeekItem(
+                    identifier: weeks.endIndex - 1,
+                    days: items
+                )
+            )
             idx += maxDayInWeek
             if idx > days.count - 1 {
                 stop = true
             }
         }
+        return weeks
+    }
+    
+    func reloadData(_ data: KVKCalendar.CalendarData,
+                    type: KVKCalendar.CalendarType,
+                    startDay: KVKCalendar.StartDayType,
+                    maxDays: Int) -> (days: [KVKCalendar.Day], weeks: [WeekItem]) {
+        var startDayProxy = startDay
+        if type == .week && maxDays != 7 {
+            startDayProxy = .sunday
+        }
+        let days = getDates(data: data, startDay: startDayProxy, maxDays: maxDays)
+        let weeks = prepareDays(days, maxDayInWeek: maxDays)
+        return (days, weeks)
+    }
+    
+    func getIdxByDate(_ date: Date) async -> Int? {
+        weeks.firstIndex(where: { week in
+            week.days.firstIndex(where: { $0.date?.kvkIsEqual(date) ?? false }) != nil
+        })
+    }
+    
+    func getDaysByDate(_ date: Date, for type: KVKCalendar.CalendarType) async -> [Day] {
+        guard let idx = await getIdxByDate(date) else { return [] }
+        let week = weeks[idx]
+        switch type {
+        case .day:
+            guard let day = week.days.first(where: { $0.date?.kvkIsEqual(date) ?? false }) else { return [] }
+            return [day]
+        default:
+            return week.days
+        }
+    }
+    
+    private func getDates(data: CalendarData, startDay: StartDayType, maxDays: Int) -> [Day] {
+        var tempDays = data.months.reduce([], { $0 + $1.days })
+        let startIdx = tempDays.count > maxDays ? tempDays.count - maxDays : tempDays.count
+        let endWeek = data.addEndEmptyDays(Array(tempDays[startIdx..<tempDays.count]), startDay: startDay)
         
-        return daysBySection
+        tempDays.removeSubrange(startIdx..<tempDays.count)
+        let defaultDays = data.addStartEmptyDays(tempDays, startDay: startDay) + endWeek
+        var extensionDays: [Day] = []
+        
+        if maxDays != 7,
+           let indexOfInputDate = defaultDays.firstIndex(where: { $0.date?.kvkIsSameDay(otherDate: data.date) ?? false }),
+           let firstDate = defaultDays.first?.date {
+            let extraBufferDays = (defaultDays.count - indexOfInputDate) % maxDays
+            if extraBufferDays > 0 {
+                var i = extraBufferDays
+                while (i > 0) {
+                    if let newDate = firstDate.kvkAddingTo(.day, value: -1 * i) {
+                        extensionDays.append(Day(type: .empty, date: newDate, data: []))
+                    }
+                    i -= 1
+                }
+            }
+        }
+        
+        if extensionDays.isEmpty {
+            return defaultDays
+        } else {
+            return extensionDays + defaultDays
+        }
     }
     
 }

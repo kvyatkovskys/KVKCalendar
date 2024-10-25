@@ -32,10 +32,10 @@ public struct Style {
     public var systemCalendars: Set<String> = []
     /// Linux timezone identifiers
     public var timeZoneIds: [String] = ["America/New_York", "Europe/London", "Europe/Moscow", "Asia/Tokyo"]
-    public var selectedTimeZones: [TimeZone]
+    public var selectedTimeZones: [TimeZone] = []
     
     public init(configureAsDefaultCalendar: Bool = true) {
-        selectedTimeZones = [timezone]
+        //selectedTimeZones = [timezone]
         
         guard configureAsDefaultCalendar else { return }
         
@@ -103,7 +103,7 @@ public struct HeaderScrollStyle {
     public var titleDateColor: UIColor = .black
     public var titleDateColorCorner: UIColor = .red
     public var colorDate: UIColor = .black
-    public var fontDate: UIFont = .systemFont(ofSize: 17)
+    public var fontDate: UIFont = .boldSystemFont(ofSize: 17)
     public var colorNameDay: UIColor = .black
     public var fontNameDay: UIFont = .systemFont(ofSize: 10)
     public var colorCurrentDate: UIColor = .white
@@ -135,7 +135,7 @@ public struct HeaderScrollStyle {
 public struct TimelineStyle {
     public var startFromFirstEvent: Bool = false
     public var eventFont: UIFont = .boldSystemFont(ofSize: 12)
-    public var offsetEvent: CGFloat = 3
+    public var offsetEvent: CGFloat = 2
     public var startHour: Int = 0
     public var endHour: Int = 24
     public var scrollToHour: Int? = nil
@@ -373,6 +373,7 @@ public struct MonthStyle {
     public var isPrefetchingEnabled: Bool = true
     public var isHiddenSectionHeader: Bool = true
     public var heightSectionHeader: CGFloat = 50
+    public var isHiddenTodayButton: Bool = false
     
     public enum SelectionMode: Int {
         case single, multiple, disabled

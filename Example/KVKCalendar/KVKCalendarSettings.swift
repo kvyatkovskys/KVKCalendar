@@ -13,13 +13,16 @@ import EventKit
 protocol KVKCalendarDataModel {
     
     var events: [Event] { get set }
-    var style: Style { get }
     
 }
 
 protocol KVKCalendarSettings {}
 
 extension KVKCalendarSettings where Self: KVKCalendarDataModel {
+    
+    var style: Style {
+        createCalendarStyle()
+    }
     
     func handleChangingEvent(_ event: Event, start: Date?, end: Date?) -> (range: Range<Int>, events: [Event])? {
         var eventTemp = event
@@ -63,7 +66,7 @@ extension KVKCalendarSettings where Self: KVKCalendarDataModel {
         let endTime = timeFormatter(date: end, format: style.timeSystem.format, local: style.locale)
         newEvent.start = start
         newEvent.end = end
-        newEvent.ID = "\(events.count + 1)"
+        newEvent.uniqID = "\(events.count + 1)"
         newEvent.title = TextEvent(timeline: "\(startTime) - \(endTime)\n new time",
                                    month: "\(startTime) - \(endTime)\n new time",
                                    list: "\(startTime) - \(endTime)\n new time")
@@ -84,18 +87,26 @@ extension KVKCalendarSettings where Self: KVKCalendarDataModel {
     }
     
     func loadEvents(dateFormat: String, completion: ([Event]) -> Void) {
+        completion(prepareEvents(dateFormat: dateFormat))
+    }
+    
+    func loadEvents(dateFormat: String) async -> [Event] {
+        prepareEvents(dateFormat: dateFormat)
+    }
+    
+    private func prepareEvents(dateFormat: String) -> [Event] {
         let decoder = JSONDecoder()
         
         guard let path = Bundle.main.path(forResource: "events", ofType: "json"),
               let data = try? Data(contentsOf: URL(fileURLWithPath: path), options: .mappedIfSafe),
-              let result = try? decoder.decode(ItemData.self, from: data) else { return }
+              let result = try? decoder.decode(ItemData.self, from: data) else { return [] }
         
-        let events = result.data.compactMap({ (item) -> Event in
+        return result.data.compactMap({ (item) -> Event in
             let startDate = formatter(date: item.start, local: style.locale)
             let endDate = formatter(date: item.end, local: style.locale)
             let startTime = timeFormatter(date: startDate, format: dateFormat, local: style.locale)
             let endTime = timeFormatter(date: endDate, format: dateFormat, local: style.locale)
-
+            
             var event = Event(ID: item.id)
             event.start = startDate
             event.end = endDate
@@ -127,15 +138,13 @@ extension KVKCalendarSettings where Self: KVKCalendarDataModel {
             }
             return event
         })
-        completion(events)
     }
-    
 }
 
 extension KVKCalendarSettings {
     
     var defaultStringDate: String {
-        "14.11.2022"
+        "14.11.2024"
     }
     
     var defaultDate: Date {
@@ -149,7 +158,7 @@ extension KVKCalendarSettings {
     }
     
     func handleCustomEventView(event: Event, style: Style, frame: CGRect) -> EventViewGeneral? {
-        switch event.ID {
+        switch event.uniqID {
         case "2":
             return CustomViewEvent(style: style, event: event, frame: frame)
         case "1400":

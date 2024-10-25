@@ -10,14 +10,21 @@
 import Foundation
 
 final class DayData: EventDateProtocol, ScrollableWeekProtocol {
+    var type: CalendarType = .day
+    var isAutoScrolling: Bool = false
+    var style: Style
+    var scrollId: Int?
+    var weeks: [WeekItem] = []
+    
     let days: [Day]
     var date: Date
     var events: [Event] = []
     var recurringEvents: [Event] = []
-    var daysBySection: [[Day]] = []
+    var daysBySection: [WeekItem] = []
     
     init(data: CalendarData, startDay: StartDayType) {
         self.date = data.date
+        style = data.style
         var tempDays = data.months.reduce([], { $0 + $1.days })
         let startIdx = tempDays.count > 7 ? tempDays.count - 7 : tempDays.count
         let endWeek = data.addEndEmptyDays(Array(tempDays[startIdx..<tempDays.count]), startDay: startDay)

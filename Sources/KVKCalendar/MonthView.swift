@@ -7,7 +7,454 @@
 
 #if os(iOS)
 
-import UIKit
+import SwiftUI
+
+@available(iOS 18.0, *)
+struct MonthNewView: View {
+    @Bindable var vm: KVKCalendar.MonthNewData
+    
+    var body: some View {
+        bodyView
+            .task {
+                await vm.setup()
+                await vm.getCurrentID()
+            }
+    }
+    
+    private var bodyView: some View {
+        VStack(spacing: 0) {
+            MonthWeekView(style: vm.style, date: vm.headerDate) {
+                vm.date = .now
+                withAnimation {
+                    vm.scrollId = .now
+                }
+            }
+            .background(.thickMaterial)
+            scrollView
+        }
+    }
+    
+    private var scrollView: some View {
+        ScrollView {
+            LazyVStack(spacing: 0) {
+                ForEach(vm.data.months) { (month) in
+                    if Platform.currentInterface == .phone {
+                        ContentGrid(
+                            month: month,
+                            style: vm.style,
+                            date: $vm.date,
+                            selectedEvent: $vm.selectedEvent
+                        )
+                        .padding(.vertical, 20)
+                    } else {
+                        ContentGrid(
+                            month: month,
+                            style: vm.style,
+                            date: $vm.date,
+                            selectedEvent: $vm.selectedEvent
+                        )
+                    }
+                }
+            }
+            .scrollTargetLayout()
+        }
+        .scrollPosition(id: $vm.scrollId, anchor: .top)
+        .onScrollTargetVisibilityChange(idType: Date.self) { dates in
+            guard let dt = dates.last else { return }
+            vm.headerDate = dt
+        }
+    }
+}
+
+@available(iOS 17.0, *)
+private struct ContentGrid: View {
+    
+    var month: KVKCalendar.Month
+    var style: KVKCalendar.Style
+    @Binding var date: Date
+    @Binding var selectedEvent: KVKCalendar.Event?
+    
+    private let columns: [GridItem] = [
+        GridItem(.flexible(), spacing: 0),
+        GridItem(.flexible(), spacing: 0),
+        GridItem(.flexible(), spacing: 0),
+        GridItem(.flexible(), spacing: 0),
+        GridItem(.flexible(), spacing: 0),
+        GridItem(.flexible(), spacing: 0),
+        GridItem(.flexible(), spacing: 0)
+    ]
+    
+    private var tapCountToSelectDay: Int {
+        Platform.currentInterface == .phone ? 1 : 2
+    }
+    
+    var body: some View {
+        LazyVGrid(columns: columns, spacing: 0) {
+            ForEach(month.days) { (day) in
+                MonthDayView(
+                    day: day,
+                    selectedDate: date,
+                    style: style,
+                    selectedEvent: $selectedEvent
+                )
+                .onTapGesture(count: tapCountToSelectDay) {
+                    date = day.date ?? Date()
+                }
+                .disabled(day.type == .empty)
+            }
+        }
+    }
+}
+
+@available(iOS 18.0, *)
+#Preview {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "dd.MM.yyyy"
+    let date = Date()
+    var style = Style()
+    style.startWeekDay = .sunday
+    var data = CalendarData(date: date, years: 1, style: style)
+    var allDayEvent = Event.stub(id: "4")
+    allDayEvent.isAllDay = true
+    data.months[0].days[0].events = [allDayEvent, .stub(id: "1"), .stub(id: "2"), .stub(id: "3")]
+    return MonthNewView(vm: MonthNewData(data: data))
+}
+
+@available(iOS 17.0, *)
+struct MonthDayView: View {
+    @Environment(\.colorScheme) private var colorScheme
+    
+    let day: Day
+    let selectedDate: Date
+    let style: KVKCalendar.Style
+    @Binding var selectedEvent: KVKCalendar.Event?
+    
+    private var dayTxt: String {
+        switch day.type {
+        case .empty:
+            return ""
+        default:
+            guard let dt = day.date else { return "" }
+            return "\(dt.kvkDay)"
+        }
+    }
+    private var date: Date {
+        day.date ?? Date()
+    }
+    private var height: CGFloat {
+        switch Platform.currentInterface {
+        case .phone:
+            80
+        default:
+            180
+        }
+    }
+    private var dayPadding: CGFloat {
+        Platform.currentInterface == .phone ? 0 : 5
+    }
+    private var borderColor: Color {
+        Color(uiColor: style.month.colorSeparator)
+    }
+    private var borderWidth: CGFloat {
+        style.month.widthSeparator
+    }
+    
+    var body: some View {
+        if Platform.currentInterface == .phone {
+            bodyView
+        } else {
+            bodyView
+                .frame(height: 150)
+                .border(borderColor, width: borderWidth)
+        }
+    }
+    
+    private var bodyView: some View {
+        VStack {
+            if day.type != .empty && Platform.currentInterface == .phone {
+                HStack {
+                    if date.kvkDay == 1 {
+                        Text(date.titleForLocale(style.locale, formatter: style.month.shortInDayMonthFormatter).capitalized)
+                    }
+                }
+                .foregroundStyle(getTxtHeaderColor(day))
+                .font(Font(style.month.fontTitleHeader))
+                .frame(height: 15)
+                .fixedSize()
+                Divider()
+            }
+            HStack {
+                if Platform.currentInterface != .phone {
+                    Spacer()
+                }
+                if (day.date?.kvkIsEqual(selectedDate) ?? false)
+                    || (day.date?.kvkIsEqual(Date()) ?? false) {
+                    dayView
+                        .clipShape(.circle)
+                        .padding([.top, .trailing], dayPadding)
+                } else {
+                    dayView
+                        .padding([.top, .trailing], dayPadding)
+                }
+            }
+            if Platform.currentInterface == .phone && !day.events.isEmpty {
+                Circle()
+                    .foregroundStyle(.gray)
+                    .frame(width: 8, height: 8)
+                    .fixedSize()
+            } else {
+                VStack(spacing: 4) {
+                    ForEach(day.events.prefix(4)) { (event) in
+                        MonthEventView(event: event, selectedEvent: $selectedEvent)
+                    }
+                }
+                .padding([.leading, .trailing], 2)
+            }
+            Spacer()
+        }
+        .background(getBgColor(date, style: style))
+    }
+    
+    private var dayView: some View {
+        VStack {
+            Text(dayTxt)
+                .foregroundStyle(getTxtColor(day, selectedDay: selectedDate, style: style))
+                .font(Font(style.month.fontNameDate))
+                .padding(4)
+                .frame(minWidth: 25)
+        }
+        .background(getBgTxtColor(day, selectedDay: selectedDate))
+    }
+    
+    private func getTxtHeaderColor(_ day: Day) -> Color {
+        let currentDate = Date()
+        if let dt = day.date,
+           dt.kvkYear == currentDate.kvkYear,
+           dt.kvkMonth == currentDate.kvkMonth {
+            return .red
+        } else {
+            return colorScheme == .dark ? .white : .black
+        }
+    }
+    
+    private func getBgTxtColor(_ day: Day,
+                               selectedDay: Date) -> Color {
+        if day.type == .empty {
+            return .clear
+        }
+        
+        let date = day.date ?? Date()
+        if date.kvkIsEqual(selectedDay) && date.kvkIsEqual(Date()) {
+            return .red
+        } else if date.kvkIsEqual(selectedDay) {
+            return colorScheme == .dark ? .white : .black
+        } else if date.isWeekend && Platform.currentInterface != .phone {
+            return .clear
+        } else {
+            return colorScheme == .dark ? .black : .white
+        }
+    }
+    
+    private func getTxtColor(_ day: Day,
+                             selectedDay: Date,
+                             style: Style) -> Color {
+        if day.type == .empty {
+            return .clear
+        }
+        
+        let date = day.date ?? Date()
+        if date.kvkIsEqual(Date()) && date.kvkIsEqual(selectedDay) {
+            return colorScheme == .dark ? .black : .white
+        } else if date.kvkIsEqual(selectedDay) {
+            return colorScheme == .dark ? .black : .white
+        } else if date.isWeekend {
+            return colorScheme == .dark ? .gray : Color(uiColor: style.week.colorWeekendDate)
+        } else if date.isWeekday {
+            return colorScheme == .dark ? .white : Color(uiColor: style.week.colorDate)
+        } else {
+            return colorScheme == .dark ? .white : .black
+        }
+    }
+    
+    private func getBgColor(_ day: Date, style: Style) -> Color {
+        if day.isWeekend {
+            colorScheme == .dark ? .black : style.month.colorBackgroundWeekendDate.suiColor
+        } else {
+            colorScheme == .dark ? .black : style.month.colorBackgroundDate.suiColor
+        }
+    }
+    
+}
+
+@available(iOS 17.0, *)
+#Preview("Month day view") {
+    var allDayEvent = Event.stub(id: "4")
+    allDayEvent.isAllDay = true
+    let events: [Event] = [allDayEvent, .stub(id: "1"), .stub(id: "2"), .stub(id: "3")]
+    return MonthDayView(day: Day(type: .monday, date: Date(), data: events), selectedDate: Date(), style: Style(), selectedEvent: .constant(nil))
+}
+
+@available(iOS 17.0, *)
+struct MonthWeekView: View, WeekPreparing {
+    
+    @Environment(\.colorScheme) private var colorScheme
+    
+    private var date: Date
+    private var days: [Date] = []
+    private let style: KVKCalendar.Style
+    private var didSelectToday: (() -> Void)?
+    
+    init(style: KVKCalendar.Style,
+         date: Date,
+         didSelectToday: (() -> Void)? = nil) {
+        self.style = style
+        self.date = date
+        self.didSelectToday = didSelectToday
+        days = getWeekDays(style: style)
+    }
+    
+    var body: some View {
+        VStack(spacing: 10) {
+            if Platform.currentInterface != .phone {
+                HStack {
+                    Text(date.titleForLocale(style.locale, formatter: style.month.titleFormatter))
+                        .foregroundStyle(getMonthTxtColor(date, style: style))
+                        .font(Font(style.month.fontTitleHeader))
+                    Spacer()
+                    if !style.month.isHiddenTodayButton {
+                        Button("today") {
+                            didSelectToday?()
+                        }
+                        .tint(.red)
+                    }
+                }
+                .padding([.leading, .trailing])
+            }
+            HStack {
+                ForEach(days, id: \.self) { (day) in
+                    Text(day.titleForLocale(style.locale, formatter: style.month.weekdayFormatter))
+                        .foregroundStyle(getTxtColor(day, style: style))
+                        .font(Font(style.month.weekFont))
+                        .minimumScaleFactor(0.5)
+                        .background(getTxtBgColor(day, style: style))
+                        .frame(maxWidth: .infinity,
+                               alignment: Platform.currentInterface == .phone ? .center : .trailing)
+                }
+            }
+            .padding(.horizontal, 2)
+        }
+        .padding([.top, .bottom], 10)
+    }
+    
+    private func getMonthTxtColor(_ date: Date, style: Style) -> Color {
+        if Date().kvkYear == date.kvkYear && Date().kvkMonth == date.kvkMonth {
+            style.month.colorTitleCurrentDate.suiColor
+        } else {
+            style.month.colorTitleHeader.suiColor
+        }
+    }
+    
+    private func getTxtColor(_ day: Date, style: Style) -> Color {
+        if day.isWeekend {
+            style.week.colorWeekendDate.suiColor
+        } else if day.isWeekday {
+            style.week.colorDate.suiColor
+        } else {
+             .clear
+        }
+    }
+    
+    private func getTxtBgColor(_ day: Date, style: Style) -> Color {
+        if day.isWeekend {
+            style.week.colorWeekendBackground.suiColor
+        } else if day.isWeekday {
+            style.week.colorWeekdayBackground.suiColor
+        } else {
+            .clear
+        }
+    }
+    
+}
+
+@available(iOS 17.0, *)
+#Preview("Month week view") {
+    var style = Style()
+    style.startWeekDay = .sunday
+    return MonthWeekView(style: style, date: Date())
+}
+
+@available(iOS 17.0, *)
+struct MonthEventView: View {
+    var event: KVKCalendar.Event
+    @Binding var selectedEvent: KVKCalendar.Event?
+    
+    var body: some View {
+        Button {
+            withAnimation {
+                selectedEvent = event
+            }
+        } label: {
+            HStack {
+                if event.isAllDay {
+                    Text(event.title.month ?? "")
+                        .foregroundStyle(txtColor)
+                        .lineLimit(1)
+                        .padding(2)
+                } else {
+                    Circle()
+                        .frame(width: 7, height: 7)
+                        .foregroundStyle(Color(uiColor: event.backgroundColor))
+                    Text(event.title.month ?? "")
+                        .foregroundStyle(txtColor)
+                        .lineLimit(1)
+                    Text(event.start.formatted(.dateTime.hour()))
+                        .font(.subheadline)
+                        .foregroundStyle(txtTimeColor)
+                }
+            }
+            .padding([.leading, .trailing], 1)
+        }
+        .tint(.black)
+        .background(bgColor)
+        .cornerRadius(radius)
+    }
+    
+    private var radius: CGFloat {
+        if event.uniqID == selectedEvent?.uniqID {
+            return 5
+        }
+        return event.isAllDay ? 5 : 0
+    }
+    
+    private var txtColor: Color {
+        event.uniqID == selectedEvent?.uniqID ? .white : .black
+    }
+    
+    private var txtTimeColor: Color {
+        event.uniqID == selectedEvent?.uniqID ? .white : .gray
+    }
+    
+    private var bgColor: Color {
+        if event.uniqID == selectedEvent?.uniqID {
+            return Color(uiColor: event.color?.value ?? event.backgroundColor)
+        }
+        return event.isAllDay ? Color(uiColor: event.backgroundColor) : .clear
+    }
+}
+
+@available(iOS 17.0, *)
+#Preview("General event") {
+    var event = Event.stub(id: "1")
+    event.isAllDay = false
+    return MonthEventView(event: event, selectedEvent: .constant(nil))
+}
+
+@available(iOS 17.0, *)
+#Preview("All-day event") {
+    var event2 = Event.stub(id: "2")
+    event2.isAllDay = true
+    return MonthEventView(event: event2, selectedEvent: .constant(nil))
+}
 
 final class MonthView: UIView {
     

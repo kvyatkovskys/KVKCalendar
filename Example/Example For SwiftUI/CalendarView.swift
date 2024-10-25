@@ -9,70 +9,62 @@
 import SwiftUI
 import KVKCalendar
 
-@available(iOS 14.0, *)
+@available(iOS 18.0, *)
 struct CalendarView: View {
-    
-    @State private var typeCalendar = CalendarType.day
-    @State private var events: [Event] = []
-    @State private var updatedDate: Date?
-    @State private var orientation: UIInterfaceOrientation = .unknown
-    @ObservedObject private var viewModel = CalendarViewModel()
+
+    @State private var vm = CalendarViewModel()
+    @State private var date = Date()
     
     var body: some View {
-        kvkHandleNavigationView(calendarView)
+        NavigationStack {
+            calendarView
+                .task {
+                    await vm.loadEvents()
+                }
+        }
     }
     
     private var calendarView: some View {
-        CalendarViewDisplayable(events: $events,
-                                type: $typeCalendar,
-                                updatedDate: $updatedDate,
-                                orientation: $orientation)
-        .kvkOnRotate(action: { (newOrientation) in
-            orientation = newOrientation
-        })
-        .onAppear {
-            viewModel.loadEvents { (items) in
-                events = items
-            }
-        }
-        .navigationBarTitle("KVKCalendar", displayMode: .inline)
-        .edgesIgnoringSafeArea(.bottom)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                HStack {
-                    ItemsMenu<CalendarType>(type: $typeCalendar,
-                                            items: CalendarType.allCases,
-                                            showCheckmark: true,
-                                            showDropDownIcon: true)
-                    
+        KVKCalendarSwiftUIView(type: vm.type,
+                               date: $vm.date,
+                               events: vm.events,
+                               event: $vm.selectedEvent,
+                               style: vm.style)
+            .kvkOnRotate(action: { (newOrientation) in
+                vm.orientation = newOrientation
+            })
+            .toolbar {
+                ToolbarItemGroup(placement: .topBarLeading) {
+                    Picker(vm.type.title, selection: $vm.type) {
+                        ForEach(CalendarType.allCases) { (type) in
+                            Text(type.title)
+                        }
+                    }
+                    .tint(.red)
+                }
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    if UIDevice.current.userInterfaceIdiom == .phone {
+                        Button {
+                            vm.date = .now
+                        } label: {
+                            Text("Today")
+                                .font(.headline)
+                        }
+                        .tint(.red)
+                    }
                     Button {
-                        updatedDate = Date()
+                        vm.addNewEvent()
                     } label: {
-                        Text("Today")
-                            .font(.headline)
-                            .foregroundColor(.red)
+                        Image(systemName: "plus")
                     }
+                    .tint(.red)
                 }
             }
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button {
-                    if let event = viewModel.addNewEvent() {
-                        events.append(event)
-                    }
-                } label: {
-                    Image(systemName: "plus")
-                        .foregroundColor(.red)
-                }
-                
-            }
-        }
     }
     
 }
 
-@available(iOS 14.0, *)
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        CalendarView()
-    }
+@available(iOS 18.0, *)
+#Preview {
+    CalendarView()
 }

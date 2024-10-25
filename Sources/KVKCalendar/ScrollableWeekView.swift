@@ -7,7 +7,463 @@
 
 #if os(iOS)
 
-import UIKit
+import SwiftUI
+
+struct WeekItem: Identifiable {
+    let identifier: Int
+    let days: [KVKCalendar.Day]
+    
+    var id: Int { identifier }
+}
+
+@available(iOS 18.0, *)
+struct ScrollableWeekNewView: View, ScrollableWeekProtocol {
+    @Binding var date: Date
+    var weeks: [WeekItem]
+    var type: CalendarType
+    var style: Style
+    @State private var isScrolling: Bool = false
+    
+    private var daySize: CGSize {
+        Platform.currentDevice == .phone ? CGSize(width: 40, height: 40) : CGSize(width: 30, height: 70)
+    }
+    private var spacing: CGFloat {
+        Platform.currentDevice == .phone ? 5 : 0
+    }
+    private var leftPadding: CGFloat {
+        type == .week ? style.timeline.widthTime + style.timeline.offsetTimeX : 0
+    }
+    private var dayShortFormatter: DateFormatter {
+        let format = DateFormatter()
+        format.dateFormat = "EEEEE"
+        return format
+    }
+    private var todayTitle: String {
+        "Today"
+    }
+    
+    init(
+        date: Binding<Date>,
+        weeks: [WeekItem],
+        type: CalendarType,
+        style: Style
+    ) {
+        _date = date
+        self.weeks = weeks
+        self.type = type
+        self.style = style
+    }
+    
+    var body: some View {
+        bodyView
+    }
+    
+    private var bodyView: some View {
+        VStack(spacing: spacing) {
+            if Platform.currentInterface != .phone {
+                HStack {
+                    Text(
+                        date.titleForLocale(
+                            style.locale,
+                            formatter: style.headerScroll.titleFormatter
+                        )
+                    )
+                    .foregroundStyle(style.headerScroll.titleDateColor.suiColor)
+                    .font(Font(style.headerScroll.titleDateFont))
+                    Spacer()
+                    Button(todayTitle) {
+                        date = .now
+                    }
+                    .tint(.red)
+                }
+                .padding([.leading, .trailing])
+            } else {
+                WeekTitlesView(
+                    style: style,
+                    formatter: dayShortFormatter,
+                    font: style.headerScroll.fontNameDay
+                )
+                .padding(.leading, leftPadding)
+            }
+            horizontalUIKitWeeksView
+                .padding(.leading, leftPadding)
+                .padding(.vertical, 3)
+            if Platform.currentInterface == .phone {
+                HStack {
+                    Spacer()
+                    Text(
+                        date.titleForLocale(
+                            style.locale,
+                            formatter: style.headerScroll.titleFormatter
+                        )
+                    )
+                    Spacer()
+                }
+            }
+        }
+    }
+    
+    private var horizontalUIKitWeeksView: some View {
+        WeeksHorizontalView(weeks: weeks, style: style, date: $date) { day in
+            if let date = day.date {
+                getBtnViewFor(date, day: day)
+            } else {
+                EmptyView()
+            }
+        }
+        .frame(height: 43)
+    }
+    
+    private func getBtnViewFor(
+        _ dt: Date,
+        day: Day
+    ) -> some View {
+        Button(action: {
+            date = dt
+        }, label: {
+            HStack(spacing: dt.kvkIsEqual(date) ? nil : 0) {
+                if Platform.currentInterface != .phone {
+                    Text(dt.titleForLocale(
+                        style.locale,
+                        formatter: style.month.weekdayFormatter)
+                    )
+                    .foregroundStyle(getTitleDayColor(dt))
+                    .multilineTextAlignment(.trailing)
+                }
+                Group {
+                    if day.date?.kvkIsEqual(date) ?? false {
+                        Text("\(dt.kvkDay)")
+                            .bold()
+                            .minimumScaleFactor(0.8)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(
+                                getBgTxtColor(
+                                    day,
+                                    selectedDay: date
+                                )
+                            )
+                            .clipShape(Circle())
+                    } else {
+                        Text("\(dt.kvkDay)")
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
+                }
+                .foregroundStyle(
+                    getTxtColor(
+                        day,
+                        selectedDay: date
+                    )
+                )
+                .multilineTextAlignment(.center)
+            }
+        })
+        .tint(.black)
+    }
+    
+    private func getBgTxtColor(
+        _ day: Day,
+        selectedDay: Date
+    ) -> Color {
+        if day.type == .empty {
+            return .clear
+        }
+        
+        let date = day.date ?? .now
+        if date.kvkIsEqual(selectedDay) && date.kvkIsEqual(.now) {
+            return .red
+        } else if date.kvkIsEqual(selectedDay) {
+            return .black
+        } else if date.isWeekend && Platform.currentInterface != .phone {
+            return .clear
+        } else {
+            return .white
+        }
+    }
+    
+    private func getTitleDayColor(_ date: Date) -> Color {
+        if date.isWeekend {
+            style.headerScroll.colorWeekendDate.suiColor
+        } else if date.isWeekday {
+            style.headerScroll.colorDate.suiColor
+        } else {
+            .black
+        }
+    }
+    
+    private func getTxtColor(
+        _ day: Day,
+        selectedDay: Date
+    ) -> Color {
+        if day.type == .empty {
+            return .clear
+        }
+        let date = day.date ?? .now
+        if date.kvkIsEqual(.now) && date.kvkIsEqual(selectedDay) {
+            return .white
+        } else if date.kvkIsEqual(selectedDay) {
+            return .white
+        } else {
+            return getTitleDayColor(date)
+        }
+    }
+}
+
+@available(iOS 18.0, *)
+private struct WeekPreviewView: View, ScrollableWeekProtocol {
+    var scrollId: Int?
+    var type: CalendarType
+    @State var date: Date
+    var style: Style
+    var weeks: [WeekItem] = []
+    
+    init(type: CalendarType) {
+        _date = State(initialValue: Date.now)
+        style = Style()
+        style.startWeekDay = .sunday
+        self.type = type
+        let data = CalendarData(date: .now, years: 1, style: style)
+        weeks = reloadData(data,
+                           type: type,
+                           startDay: data.style.startWeekDay,
+                           maxDays: data.style.week.maxDays).weeks
+    }
+    
+    var body: some View {
+        VStack {
+            ScrollableWeekNewView(
+                date: $date,
+                weeks: weeks,
+                type: type,
+                style: style
+            )
+            Divider()
+            if Platform.currentInterface == .phone {
+                Button("Today") {
+                    date = .now
+                }
+                .padding()
+            }
+        }
+    }
+}
+
+@available(iOS 18.0, *)
+#Preview("Week") {
+    WeekPreviewView(type: .week)
+}
+
+@available(iOS 18.0, *)
+#Preview("Day") {
+    WeekPreviewView(type: .day)
+}
+
+@available(iOS 18.0, *)
+struct WeeksHorizontalView<Cell: View>: UIViewRepresentable {
+    
+    typealias UIViewType = UICollectionView
+    
+    private let weeks: [WeekItem]
+    private let style: Style
+    @Binding private var date: Date
+    private var cellContent: (KVKCalendar.Day) -> Cell
+    private let layout: UICollectionViewFlowLayout = {
+        let layout = UICollectionViewFlowLayout()
+        layout.minimumLineSpacing = 0
+        layout.minimumInteritemSpacing = 0
+        layout.scrollDirection = .horizontal
+        return layout
+    }()
+    
+    let collectionView: UICollectionView
+    
+    init(
+        weeks: [WeekItem],
+        style: Style,
+        date: Binding<Date>,
+        @ViewBuilder cell: @escaping (KVKCalendar.Day) -> Cell
+    ) {
+        self.weeks = weeks
+        self.style = style
+        _date = date
+        self.cellContent = cell
+        collectionView = UICollectionView(frame: .zero,
+                                          collectionViewLayout: layout)
+    }
+    
+    func makeUIView(
+        context: UIViewRepresentableContext<WeeksHorizontalView>
+    ) -> UICollectionView {
+        collectionView.isPagingEnabled = true
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.backgroundColor = .clear
+        collectionView.isScrollEnabled = style.headerScroll.isScrollEnabled
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.dataSource = context.coordinator
+        collectionView.delegate = context.coordinator
+        return collectionView
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    func updateUIView(
+        _ uiView: UICollectionView,
+        context: UIViewRepresentableContext<WeeksHorizontalView>
+    ) {
+        context.coordinator.selectedDate = date
+        uiView.reloadData()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            context.coordinator.scrollToDate(animated: true)
+        }
+    }
+    
+    final class Coordinator: NSObject, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+        var selectedDate: Date
+        private var parent: WeeksHorizontalView
+        private var lastContentOffset: CGFloat = 0
+        private var trackingTranslation: CGFloat?
+        
+        private var maxDays: Int {
+            parent.style.week.maxDays
+        }
+        
+        private var isFullyWeek: Bool {
+            maxDays == 7
+        }
+        
+        init(_ parent: WeeksHorizontalView) {
+            self.parent = parent
+            self.selectedDate = parent.date
+        }
+        
+        func scrollToDate(animated: Bool, isDelay: Bool = true) {
+            Task {
+                guard let scrollDate = getScrollDate(selectedDate),
+                      let idx = await getIdxByDate(scrollDate) else { return }
+                
+                if isDelay {
+                    try await Task.sleep(seconds: 0.1)
+                    await MainActor.run {
+                        parent.collectionView.scrollToItem(
+                            at: IndexPath(row: 0, section: idx),
+                            at: .left,
+                            animated: animated
+                        )
+                    }
+                } else {
+                    await MainActor.run {
+                        parent.collectionView.scrollToItem(
+                            at: IndexPath(row: 0, section: idx),
+                            at: .left,
+                            animated: animated
+                        )
+                    }
+                }
+                try await Task.sleep(seconds: 0.5)
+                await MainActor.run {
+                    lastContentOffset = parent.collectionView.contentOffset.x
+                }
+            }
+        }
+        
+        private func getIdxByDate(_ date: Date) async -> Int? {
+            parent.weeks.firstIndex(where: { week in
+                week.days.firstIndex(where: { $0.date?.kvkIsEqual(date) ?? false }) != nil
+            })
+        }
+        
+        private func getScrollDate(_ date: Date) -> Date? {
+            guard isFullyWeek else {
+                return date
+            }
+            return parent.style.startWeekDay == .sunday ? date.kvkStartSundayOfWeek : date.kvkStartMondayOfWeek
+        }
+        
+        private func calculateDateWithOffset(_ offset: Int) -> Date {
+            parent.style.calendar.date(
+                byAdding: .day,
+                value: offset,
+                to: parent.date
+            ) ?? parent.date
+        }
+        
+        // MARK: UICollectionViewDataSource
+        func numberOfSections(in collectionView: UICollectionView) -> Int {
+            parent.weeks.count
+        }
+        
+        func collectionView(
+            _ collectionView: UICollectionView,
+            numberOfItemsInSection section: Int
+        ) -> Int {
+            parent.weeks[section].days.count
+        }
+        
+        func collectionView(
+            _ collectionView: UICollectionView,
+            cellForItemAt indexPath: IndexPath
+        ) -> UICollectionViewCell {
+            let day = parent.weeks[indexPath.section].days[indexPath.row]
+            return collectionView.kvkDequeueCell(
+                id: "day.collection.cell",
+                indexPath: indexPath
+            ) { (cell: UICollectionViewCell) in
+                cell.translatesAutoresizingMaskIntoConstraints = false
+                cell.contentConfiguration = UIHostingConfiguration { parent.cellContent(day) }
+            }
+        }
+        
+        // MARK: UICollectionViewDelegateFlowLayout
+        
+        func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+            guard let dateNew = parent.weeks[indexPath.section].days[indexPath.row].date else { return }
+            parent.date = dateNew
+        }
+        
+        func collectionView(
+            _ collectionView: UICollectionView,
+            layout collectionViewLayout: UICollectionViewLayout,
+            sizeForItemAt indexPath: IndexPath
+        ) -> CGSize {
+            let width = collectionView.bounds.width / CGFloat(maxDays)
+            return CGSize(width: width, height: collectionView.bounds.height)
+        }
+        
+        func scrollViewDidScroll(_ scrollView: UIScrollView) {
+            let translation = scrollView.panGestureRecognizer.translation(in: parent.collectionView)
+            
+            if trackingTranslation != translation.x {
+                trackingTranslation = translation.x
+                if parent.style.headerScroll.shouldTimelineTrackScroll {
+                    print(translation)
+                }
+            }
+        }
+        
+        func scrollViewWillEndDragging(
+            _ scrollView: UIScrollView,
+            withVelocity velocity: CGPoint,
+            targetContentOffset: UnsafeMutablePointer<CGPoint>
+        ) {
+            let translation = scrollView.panGestureRecognizer.translation(in: parent.collectionView)
+            trackingTranslation = translation.x
+            
+            let targetOffset = targetContentOffset.pointee
+            if targetOffset.x == lastContentOffset {
+                if parent.style.headerScroll.shouldTimelineTrackScroll {
+                    print(translation)
+                }
+            } else if targetOffset.x < lastContentOffset {
+                parent.date = calculateDateWithOffset(-maxDays)
+                
+            } else if targetOffset.x > lastContentOffset {
+                parent.date = calculateDateWithOffset(maxDays)
+            }
+            lastContentOffset = targetOffset.x
+        }
+    }
+}
 
 final class ScrollableWeekView: UIView {
     
@@ -18,7 +474,7 @@ final class ScrollableWeekView: UIView {
     
     struct Parameters {
         let frame: CGRect
-        var weeks: [[Day]]
+        var weeks: [WeekItem]
         var date: Date
         let type: CalendarType
         var style: Style
@@ -30,11 +486,11 @@ final class ScrollableWeekView: UIView {
     private var lastContentOffset: CGFloat = 0
     private var trackingTranslation: CGFloat?
     
-    private var weeks: [[Day]] {
+    private var weeks: [WeekItem] {
         params.weeks
     }
     private var formattedDays: [Day] {
-        params.weeks.flatMap { $0 }
+        params.weeks.flatMap { $0.days }
     }
     private var calendar: Calendar {
         params.style.calendar
@@ -97,20 +553,20 @@ final class ScrollableWeekView: UIView {
         setUI()
     }
     
-    func updateWeeks(weeks: [[Day]]) {
+    func updateWeeks(weeks: [WeekItem]) {
         params.weeks = weeks
     }
     
     func getIdxByDate(_ date: Date) -> Int? {
         weeks.firstIndex(where: { week in
-            week.firstIndex(where: { $0.date?.kvkIsEqual(date) ?? false }) != nil
+            week.days.firstIndex(where: { $0.date?.kvkIsEqual(date) ?? false }) != nil
         })
     }
     
     func getDatesByDate(_ date: Date) -> [Day] {
         guard let idx = getIdxByDate(date) else { return [] }
         
-        return weeks[idx]
+        return weeks[idx].days
     }
     
     func scrollHeaderByTransform(_ transform: CGAffineTransform) {
@@ -149,7 +605,7 @@ final class ScrollableWeekView: UIView {
         let startRect = CGRect(origin: collectionView.contentOffset, size: collectionView.bounds.size)
         guard let indexPath = collectionView.indexPathForItem(at: CGPoint(x: startRect.origin.x + pointX, y: startRect.midY)) else { return nil }
         
-        let day = weeks[indexPath.section][indexPath.row]
+        let day = weeks[indexPath.section].days[indexPath.row]
         return day.date
     }
     
@@ -391,11 +847,11 @@ extension ScrollableWeekView: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        weeks[section].count
+        weeks[section].days.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let day = weeks[indexPath.section][indexPath.row]
+        let day = weeks[indexPath.section].days[indexPath.row]
         
         if let cell = dataSource?.dequeueCell(parameter: .init(date: day.date, type: day.type, events: day.events), type: type, view: collectionView, indexPath: indexPath) as? UICollectionViewCell {
             return cell
@@ -460,12 +916,11 @@ extension ScrollableWeekView: UICollectionViewDelegate, UICollectionViewDelegate
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let dateNew = weeks[indexPath.section][indexPath.row].date else { return }
+        guard let dateNew = weeks[indexPath.section].days[indexPath.row].date else { return }
         
         switch type {
         case .day:
-            guard date != weeks[indexPath.section][indexPath.row].date else { return }
-            
+            guard date != dateNew else { return }
             date = dateNew
         case .week:
             date = dateNew

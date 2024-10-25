@@ -7,7 +7,34 @@
 
 #if os(iOS)
 
-import UIKit
+import SwiftUI
+
+@available(iOS 17.0, *)
+struct AllDayEventNewView: View {
+    
+    let event: Event
+    let style: AllDayStyle
+    
+    var body: some View {
+        HStack {
+            Text(event.title.timeline)
+                .foregroundStyle(event.textColor.suiColor)
+                .font(Font(style.fontTitle))
+                .padding(5)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .background(Color(uiColor: event.backgroundColor))
+        .cornerRadius(style.eventCornersRadius.width)
+        .hoverEffect(.automatic)
+    }
+    
+}
+
+@available(iOS 17.0, *)
+#Preview {
+    AllDayEventNewView(event: Event.stub(), style: AllDayStyle())
+        .padding()
+}
 
 final class AllDayEventView: UIView {
     

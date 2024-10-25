@@ -53,4 +53,47 @@ final class DayPhoneCell: DayCell {
     }
 }
 
+final class DayPhoneNewCell: DayCell {
+    
+    var phoneStyle: Style? {
+        didSet {
+            guard let newStyle = phoneStyle else { return }
+            
+            style = newStyle
+        }
+    }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+
+        dotView.addSubview(dateLabel)
+        contentView.addSubview(dotView)
+        
+        dotView.translatesAutoresizingMaskIntoConstraints = false
+        let centerYDot = dotView.centerYAnchor.constraint(equalTo: centerYAnchor)
+        let centerXDot = dotView.centerXAnchor.constraint(equalTo: centerXAnchor)
+        let widthDot = dotView.widthAnchor.constraint(equalToConstant: 35)
+        let heightDot = dotView.heightAnchor.constraint(equalToConstant: 35)
+        NSLayoutConstraint.activate([centerYDot, centerXDot, widthDot, heightDot])
+        
+        dateLabel.translatesAutoresizingMaskIntoConstraints = false
+        let topDate = dateLabel.topAnchor.constraint(equalTo: dotView.topAnchor)
+        let bottomDate = dateLabel.bottomAnchor.constraint(equalTo: dotView.bottomAnchor)
+        let leftDate = dateLabel.leftAnchor.constraint(equalTo: dotView.leftAnchor)
+        let rightDate = dateLabel.rightAnchor.constraint(equalTo: dotView.rightAnchor)
+        NSLayoutConstraint.activate([topDate, bottomDate, leftDate, rightDate])
+        
+        if let radius = style.headerScroll.dotCornersRadius {
+            dotView.setRoundCorners(style.headerScroll.dotCorners, radius: radius)
+        } else {
+            let value = 35 / 2
+            dotView.setRoundCorners(style.headerScroll.dotCorners, radius: CGSize(width: value, height: value))
+        }
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
 #endif
