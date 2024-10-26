@@ -284,11 +284,9 @@ public struct TimelineStyle {
         public var timeFont: UIFont = .systemFont(ofSize: 13, weight: .semibold)
         public var lineColor: UIColor = .red
         public var timeColor: UIColor = .white
-        /// not used here
         public var timeDotSize: CGSize = CGSize(width: 6, height: 6)
         public var dotCornersRadius: CGSize = CGSize(width: 3, height: 3)
-        
-        public var timeCornersRadius: CGSize = CGSize(width: 2.5, height: 2.5)
+        public var timeCornersRadius: CGSize = CGSize(width: 5, height: 5)
         public var timeWidth: CGFloat = 40
         public var lineHeight: CGFloat = 2
         public var dateFormatter: DateFormatter?
