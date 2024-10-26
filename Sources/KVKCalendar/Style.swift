@@ -280,29 +280,77 @@ public struct TimelineStyle {
     
     // default style like in iOS 18
     public struct DefaultCurrentLineStyle: CurrentLineStyleDisplayable {
-        public var lineHourStyle: CurrentLineHourStyle = .withTime
-        public var timeFont: UIFont = .systemFont(ofSize: 13, weight: .semibold)
-        public var lineColor: UIColor = .red
-        public var timeColor: UIColor = .white
-        public var timeDotSize: CGSize = CGSize(width: 6, height: 6)
-        public var dotCornersRadius: CGSize = CGSize(width: 3, height: 3)
-        public var timeCornersRadius: CGSize = CGSize(width: 5, height: 5)
-        public var timeWidth: CGFloat = 40
-        public var lineHeight: CGFloat = 2
+        public var lineHourStyle: CurrentLineHourStyle
+        public var timeFont: UIFont
+        public var lineColor: UIColor
+        public var timeColor: UIColor
+        public var timeDotSize: CGSize
+        public var dotCornersRadius: CGSize
+        public var timeCornersRadius: CGSize
+        public var timeWidth: CGFloat
+        public var lineHeight: CGFloat
         public var dateFormatter: DateFormatter?
+        
+        public init(
+            lineHourStyle: CurrentLineHourStyle = .withTime,
+            timeFont: UIFont = .systemFont(ofSize: 13, weight: .semibold),
+            lineColor: UIColor = .red,
+            timeColor: UIColor = .white,
+            timeDotSize: CGSize = CGSize(width: 6, height: 6),
+            dotCornersRadius: CGSize = CGSize(width: 3, height: 3),
+            timeCornersRadius: CGSize = CGSize(width: 5, height: 5),
+            timeWidth: CGFloat = 40,
+            lineHeight: CGFloat = 2,
+            dateFormatter: DateFormatter? = nil
+        ) {
+            self.lineHourStyle = lineHourStyle
+            self.timeFont = timeFont
+            self.lineColor = lineColor
+            self.timeColor = timeColor
+            self.timeDotSize = timeDotSize
+            self.dotCornersRadius = dotCornersRadius
+            self.timeCornersRadius = timeCornersRadius
+            self.timeWidth = timeWidth
+            self.lineHeight = lineHeight
+            self.dateFormatter = dateFormatter
+        }
     }
     
     public struct OldCurrentLineStyle: CurrentLineStyleDisplayable {
-        public var lineHourStyle: CurrentLineHourStyle = .withTime
-        public var timeFont: UIFont = .systemFont(ofSize: 12)
-        public var lineColor: UIColor = .red
-        public var timeColor: UIColor = .white
-        public var timeDotSize: CGSize = CGSize(width: 5, height: 5)
-        public var dotCornersRadius: CGSize = CGSize(width: 5, height: 5)
-        public var timeCornersRadius: CGSize = CGSize(width: 2.5, height: 2.5)
-        public var timeWidth: CGFloat = 40
-        public var lineHeight: CGFloat = 1
+        public var lineHourStyle: CurrentLineHourStyle
+        public var timeFont: UIFont
+        public var lineColor: UIColor
+        public var timeColor: UIColor
+        public var timeDotSize: CGSize
+        public var dotCornersRadius: CGSize
+        public var timeCornersRadius: CGSize
+        public var timeWidth: CGFloat
+        public var lineHeight: CGFloat
         public var dateFormatter: DateFormatter?
+        
+        public init(
+            lineHourStyle: CurrentLineHourStyle = .withTime,
+            timeFont: UIFont = .systemFont(ofSize: 12),
+            lineColor: UIColor = .red,
+            timeColor: UIColor = .white,
+            timeDotSize: CGSize = CGSize(width: 5, height: 5),
+            dotCornersRadius: CGSize = CGSize(width: 5, height: 5),
+            timeCornersRadius: CGSize = CGSize(width: 2.5, height: 2.5),
+            timeWidth: CGFloat = 40,
+            lineHeight: CGFloat = 1,
+            dateFormatter: DateFormatter? = nil
+        ) {
+            self.lineHourStyle = lineHourStyle
+            self.timeFont = timeFont
+            self.lineColor = lineColor
+            self.timeColor = timeColor
+            self.timeDotSize = timeDotSize
+            self.dotCornersRadius = dotCornersRadius
+            self.timeCornersRadius = timeCornersRadius
+            self.timeWidth = timeWidth
+            self.lineHeight = lineHeight
+            self.dateFormatter = dateFormatter
+        }
     }
     
     public struct Scale {
