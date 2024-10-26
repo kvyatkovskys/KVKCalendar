@@ -20,6 +20,9 @@ public class TimelineLabel: UILabel {
                 return
             }
             
+            if oldValue.minute != time.minute {
+                UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+            }
             text = ":\(time.minute)"
         }
     }
