@@ -132,6 +132,19 @@ public struct HeaderScrollStyle {
 
 // MARK: Timeline style
 
+public protocol CurrentLineStyleDisplayable {
+    var lineHourStyle: TimelineStyle.CurrentLineHourStyle { get set }
+    var timeFont: UIFont { get set }
+    var lineColor: UIColor { get set }
+    var timeColor: UIColor { get set }
+    var timeDotSize: CGSize { get set }
+    var dotCornersRadius: CGSize { get set }
+    var timeCornersRadius: CGSize { get set }
+    var timeWidth: CGFloat { get set }
+    var lineHeight: CGFloat { get set }
+    var dateFormatter: DateFormatter? { get set }
+}
+
 public struct TimelineStyle {
     public var startFromFirstEvent: Bool = false
     public var eventFont: UIFont = .boldSystemFont(ofSize: 12)
@@ -168,18 +181,39 @@ public struct TimelineStyle {
     public var offsetTimeX: CGFloat = 10
     public var offsetTimeY: CGFloat = 25
     public var timeColor: UIColor = .systemGray
+    public var timeSuffixColor: UIColor = .systemGray3
     public var timeAlignment: NSTextAlignment = .center
-    public var timeFont: UIFont = .systemFont(ofSize: 12)
+    public var timeFont: UIFont = .systemFont(ofSize: 13, weight: .medium)
+    public var timeSuffixFont: UIFont = .systemFont(ofSize: 9, weight: .light)
+    public var isHiddenTimeIfCurrentCrossed: Bool = true
     public var widthEventViewer: CGFloat? = nil
     public var showLineHourMode: CurrentLineHourShowMode = .today
     public var scrollLineHourMode: CurrentLineHourScrollMode = .today
+    
+    @available(swift, deprecated: 0.6.28, message: "Use `currentLineHourStyle` instead.", renamed: "currentLineHourStyle")
     public var lineHourStyle: CurrentLineHourStyle = .withTime
+    
+    @available(swift, deprecated: 0.6.28, message: "Use `currentLineHourStyle` instead.", renamed: "currentLineHourStyle")
     public var currentLineHourFont: UIFont = .systemFont(ofSize: 12)
+    
+    @available(swift, deprecated: 0.6.28, message: "Use `currentLineHourStyle` instead.", renamed: "currentLineHourStyle")
     public var currentLineHourColor: UIColor = .red
+    
+    @available(swift, deprecated: 0.6.28, message: "Use `currentLineHourStyle` instead.", renamed: "currentLineHourStyle")
     public var currentLineHourDotSize: CGSize = CGSize(width: 5, height: 5)
+    
+    @available(swift, deprecated: 0.6.28, message: "Use `currentLineHourStyle` instead.", renamed: "currentLineHourStyle")
     public var currentLineHourDotCornersRadius: CGSize = CGSize(width: 2.5, height: 2.5)
+    
+    @available(swift, deprecated: 0.6.28, message: "Use `currentLineHourStyle` instead.", renamed: "currentLineHourStyle")
     public var currentLineHourWidth: CGFloat = 40
+    
+    @available(swift, deprecated: 0.6.28, message: "Use `currentLineHourStyle` instead.", renamed: "currentLineHourStyle")
     public var currentLineHourHeight: CGFloat = 1
+
+    /// to use the previous style set `.old(OldCurrentLineStyle())`
+    public var currentLineHourStyle: TimelineStyle.CurrentLineStyleType = .custom(DefaultCurrentLineStyle())
+    
     public var separatorLineColor: UIColor = .gray
     public var movingMinutesColor: UIColor = .systemBlue
     public var shadowColumnColor: UIColor = .systemTeal
@@ -208,6 +242,68 @@ public struct TimelineStyle {
     
     public enum ViewMode: Int {
         case `default`, list
+    }
+    
+    public enum CurrentLineStyleType: Equatable {
+        case custom(any CurrentLineStyleDisplayable)
+        case old(any CurrentLineStyleDisplayable)
+        
+        var style: any CurrentLineStyleDisplayable {
+            switch self {
+            case .custom(let item):
+                item
+            case .old(let item):
+                item
+            }
+        }
+        
+        public static func == (
+            lhs: TimelineStyle.CurrentLineStyleType,
+            rhs: TimelineStyle.CurrentLineStyleType
+        ) -> Bool {
+            func compare<E: Equatable>(_ kp: KeyPath<TimelineStyle.CurrentLineStyleType, E>) -> Bool {
+                lhs[keyPath: kp] == rhs[keyPath: kp]
+            }
+            return compare(\.style.lineHourStyle)
+            && compare(\.style.timeFont)
+            && compare(\.style.lineColor)
+            && compare(\.style.timeColor)
+            && compare(\.style.dotCornersRadius)
+            && compare(\.style.timeDotSize)
+            && compare(\.style.timeCornersRadius)
+            && compare(\.style.timeWidth)
+            && compare(\.style.lineHeight)
+            && compare(\.style.dateFormatter)
+        }
+    }
+    
+    // default style like in iOS 18
+    public struct DefaultCurrentLineStyle: CurrentLineStyleDisplayable {
+        public var lineHourStyle: CurrentLineHourStyle = .withTime
+        public var timeFont: UIFont = .systemFont(ofSize: 13, weight: .semibold)
+        public var lineColor: UIColor = .red
+        public var timeColor: UIColor = .white
+        /// not used here
+        public var dotCornersRadius: CGSize = .zero
+        public var timeDotSize: CGSize = .zero
+
+        public var timeCornersRadius: CGSize = CGSize(width: 5, height: 5)
+        public var timeWidth: CGFloat = 40
+        public var lineHeight: CGFloat = 2
+        public var dateFormatter: DateFormatter?
+    }
+    
+    public struct OldCurrentLineStyle: CurrentLineStyleDisplayable {
+        public var lineHourStyle: CurrentLineHourStyle = .withTime
+        public var timeFont: UIFont = .systemFont(ofSize: 12)
+        public var lineColor: UIColor = .red
+        public var timeColor: UIColor = .white
+        public var timeDotSize: CGSize = CGSize(width: 5, height: 5)
+        public var dotCornersRadius: CGSize = CGSize(width: 5, height: 5)
+        public var timeCornersRadius: CGSize = CGSize(width: 2.5, height: 2.5)
+        public var timeWidth: CGFloat = 40
+        public var lineHeight: CGFloat = 1
+        public var dateFormatter: DateFormatter?
     }
     
     public struct Scale {
@@ -538,8 +634,26 @@ extension Style {
         // timeline
         newStyle.timeline.backgroundColor = UIColor.useForStyle(dark: .black, white: newStyle.timeline.backgroundColor)
         newStyle.timeline.timeColor = UIColor.useForStyle(dark: .systemGray, white: newStyle.timeline.timeColor)
-        newStyle.timeline.currentLineHourColor = UIColor.useForStyle(dark: .systemRed,
-                                                                     white: newStyle.timeline.currentLineHourColor)
+        newStyle.timeline.timeSuffixColor = UIColor.useForStyle(dark: .systemGray2, white: newStyle.timeline.timeColor)
+        
+        switch newStyle.timeline.currentLineHourStyle {
+        case .custom(var item):
+            item.lineColor = UIColor.useForStyle(
+                dark: .systemRed,
+                white: newStyle.timeline.currentLineHourStyle.style.lineColor
+            )
+            item.timeColor = UIColor.useForStyle(
+                dark: .white,
+                white: newStyle.timeline.currentLineHourStyle.style.timeColor
+            )
+            newStyle.timeline.currentLineHourStyle = .custom(item)
+        case .old(var item):
+            item.lineColor = UIColor.useForStyle(
+                dark: .systemRed,
+                white: newStyle.timeline.currentLineHourStyle.style.lineColor
+            )
+            newStyle.timeline.currentLineHourStyle = .old(item)
+        }
         
         // week
         newStyle.week.colorBackground = UIColor.useForStyle(dark: .black, white: newStyle.week.colorBackground)
@@ -881,13 +995,7 @@ extension TimelineStyle: Equatable {
         && compare(\.widthEventViewer)
         && compare(\.showLineHourMode)
         && compare(\.scrollLineHourMode)
-        && compare(\.lineHourStyle)
-        && compare(\.currentLineHourFont)
-        && compare(\.currentLineHourColor)
-        && compare(\.currentLineHourDotSize)
-        && compare(\.currentLineHourDotCornersRadius)
-        && compare(\.currentLineHourWidth)
-        && compare(\.currentLineHourHeight)
+        && compare(\.currentLineHourStyle)
         && compare(\.separatorLineColor)
         && compare(\.movingMinutesColor)
         && compare(\.shadowColumnColor)

@@ -336,16 +336,31 @@ extension TimelineView {
     func createTimesLabel(start: Int, end: Int) -> (times: [TimelineLabel], items: [UILabel]) {
         var times = [TimelineLabel]()
         var otherTimes = [UILabel]()
-        for (idx, txtHour) in timeSystem.getHours(isEndOfDayZero: style.isEndOfDayZero).enumerated() where idx >= start && idx <= end {
+        for (idx, item) in timeSystem.getHours(isEndOfDayZero: style.isEndOfDayZero).enumerated() where idx >= start && idx <= end {
             let yTime = (calculatedTimeY + style.timeline.heightTime) * CGFloat(idx - start)
             let time = TimelineLabel(frame: CGRect(x: leftOffsetWithAdditionalTime,
                                                    y: yTime,
                                                    width: style.timeline.widthTime,
                                                    height: style.timeline.heightTime))
-            time.font = style.timeline.timeFont
             time.textAlignment = style.timeline.timeAlignment
-            time.textColor = style.timeline.timeColor
-            time.text = txtHour
+            let hourAttr = NSMutableAttributedString(
+                string: item.hour,
+                attributes: [
+                    .font: style.timeline.timeFont,
+                    .foregroundColor: style.timeline.timeColor
+                ]
+            )
+            if let suffix = item.suffix {
+                let suffixAttr = NSAttributedString(
+                    string: " \(suffix)",
+                    attributes: [
+                        .font: style.timeline.timeSuffixFont,
+                        .foregroundColor: style.timeline.timeSuffixColor
+                    ]
+                )
+                hourAttr.append(suffixAttr)
+            }
+            time.attributedText = hourAttr
             time.hashTime = idx
             time.tag = idx - start
             time.isHidden = !isDisplayedTimes

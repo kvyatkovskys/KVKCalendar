@@ -150,30 +150,21 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     private func movingCurrentLineHour() {
         guard !isValidTimer(timerKey) && isDisplayedCurrentTime else { return }
         
-        let action = { [weak self] in
-            guard let self = self else { return }
-            
-            let nextDate = Date().kvkConvertTimeZone(TimeZone.current, to: self.style.timezone)
-            guard self.currentLineView.valueHash != nextDate.kvkMinute.hashValue,
-                  let time = self.getTimelineLabel(hour: nextDate.kvkHour) else { return }
+        func action() {
+            let nextDate = Date().kvkConvertTimeZone(TimeZone.current, to: style.timezone)
+            guard currentLineView.valueHash != nextDate.kvkMinute.hashValue,
+                  let time = getTimelineLabel(hour: nextDate.kvkHour) else { return }
             
             var pointY = time.frame.origin.y
-            if !self.subviews.filter({ $0.tag == self.tagAllDayEventView }).isEmpty, self.style.allDay.isPinned {
-                pointY -= self.style.allDay.height
+            if !subviews.filter({ $0.tag == tagAllDayEventView }).isEmpty && style.allDay.isPinned {
+                pointY -= style.allDay.height
             }
             
-            pointY = self.calculatePointYByMinute(nextDate.kvkMinute, time: time)
-            
-            self.currentLineView.frame.origin.y = pointY - (self.currentLineView.frame.height * 0.5)
-            self.currentLineView.valueHash = nextDate.kvkMinute.hashValue
-            self.currentLineView.date = nextDate
-            
-            if self.isDisplayedTimes && style.timeline.lineHourStyle == .withTime {
-                if let timeNext = self.getTimelineLabel(hour: nextDate.kvkHour + 1) {
-                    timeNext.isHidden = self.currentLineView.frame.intersects(timeNext.frame)
-                }
-                time.isHidden = time.frame.intersects(self.currentLineView.frame)
-            }
+            pointY = calculatePointYByMinute(nextDate.kvkMinute, time: time)
+            currentLineView.frame.origin.y = pointY - (currentLineView.frame.height * 0.5)
+            currentLineView.valueHash = nextDate.kvkMinute.hashValue
+            currentLineView.date = nextDate
+            checkVisibleTimeIfNeeded(date: nextDate, time: time)
         }
         
         startTimer(timerKey, repeats: true, addToRunLoop: true, action: action)
@@ -195,8 +186,13 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         currentLineView.frame.origin.y = pointY - (currentLineView.frame.height * 0.5)
         scrollView.addSubview(currentLineView)
         movingCurrentLineHour()
-        
-        if isDisplayedTimes && style.timeline.lineHourStyle == .withTime {
+        checkVisibleTimeIfNeeded(date: date, time: time)
+    }
+    
+    private func checkVisibleTimeIfNeeded(date: Date, time: TimelineLabel) {
+        if style.timeline.isHiddenTimeIfCurrentCrossed
+            && isDisplayedTimes
+            && style.timeline.currentLineHourStyle.style.lineHourStyle == .withTime {
             if let timeNext = getTimelineLabel(hour: date.kvkHour + 1) {
                 timeNext.isHidden = currentLineView.frame.intersects(timeNext.frame)
             }
