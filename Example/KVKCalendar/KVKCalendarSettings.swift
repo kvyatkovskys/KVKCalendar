@@ -72,12 +72,13 @@ extension KVKCalendarSettings where Self: KVKCalendarDataModel {
     
     func handleEvents(systemEvents: [EKEvent]) -> [Event] {
         // if you want to get a system events, you need to set style.systemCalendars = ["test"]
-        let mappedEvents = systemEvents.compactMap { (event) -> Event in
+        let mappedEvents = systemEvents.compactMap { (event) -> Event? in
             let startTime = timeFormatter(date: event.startDate, format: style.timeSystem.format, local: style.locale)
             let endTime = timeFormatter(date: event.endDate, format: style.timeSystem.format, local: style.locale)
             event.title = "\(startTime) - \(endTime)\n\(event.title ?? "")"
             
-            return Event(event: event)
+            guard let item = Event(event: event) else { return nil }
+            return item
         }
         
         return events + mappedEvents
