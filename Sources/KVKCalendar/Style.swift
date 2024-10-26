@@ -235,6 +235,7 @@ public struct TimelineStyle {
     public var eventPreviewSize: CGSize? = CGSize(width: 150, height: 150)
     /// Takes effect when `style.event.states` does not contain `.move`. `true`: create a new event at the long press; `false`: create at the start time.
     public var createEventAtTouch = false
+    public var isHiddenTimeVerticalSeparateLine = true
 
     public var allLeftOffset: CGFloat {
         widthTime + offsetTimeX + offsetLineLeft
@@ -284,10 +285,10 @@ public struct TimelineStyle {
         public var lineColor: UIColor = .red
         public var timeColor: UIColor = .white
         /// not used here
-        public var dotCornersRadius: CGSize = .zero
-        public var timeDotSize: CGSize = .zero
-
-        public var timeCornersRadius: CGSize = CGSize(width: 5, height: 5)
+        public var timeDotSize: CGSize = CGSize(width: 6, height: 6)
+        public var dotCornersRadius: CGSize = CGSize(width: 3, height: 3)
+        
+        public var timeCornersRadius: CGSize = CGSize(width: 2.5, height: 2.5)
         public var timeWidth: CGFloat = 40
         public var lineHeight: CGFloat = 2
         public var dateFormatter: DateFormatter?
