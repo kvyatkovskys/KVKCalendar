@@ -23,40 +23,35 @@ public struct CellParameter {
 }
 
 public enum TimeHourSystem: Int {
-    @available(swift, deprecated: 0.3.6, obsoleted: 0.3.7, renamed: "twelve")
-    case twelveHour = 0
-    @available(swift, deprecated: 0.3.6, obsoleted: 0.3.7, renamed: "twentyFour")
-    case twentyFourHour = 1
-    
     case twelve = 12
     case twentyFour = 24
     
-    func getHours(isEndOfDayZero: Bool = true) -> [String] {
+    typealias Item = (hour: String, suffix: String?)
+    func getHours(isEndOfDayZero: Bool = true) -> [TimeHourSystem.Item] {
         switch self {
-        case .twelveHour, .twelve:
+        case .twelve:
             let array = ["12"] + Array(1...11).map { String($0) }
-            let am = array.map { $0 + " AM" } + ["Noon"]
-            var pm = array.map { $0 + " PM" }
-            
+            var am = array.compactMap {
+                TimeHourSystem.Item($0, "AM")
+            }
+            am.append(TimeHourSystem.Item("Noon", nil))
+            var pm = array.compactMap {
+                TimeHourSystem.Item($0, "PM")
+            }
             pm.removeFirst()
             if let item = am.first {
                 pm.append(item)
             }
             return am + pm
-        case .twentyFourHour, .twentyFour:
-            let array = ["00:00"] + Array(1...24).map { (i) -> String in
-                let i = isEndOfDayZero ? i % 24 : i 
+        case .twentyFour:
+            let array = [TimeHourSystem.Item("00:00", nil)] + Array(1...24).map { (i) -> TimeHourSystem.Item in
+                let i = isEndOfDayZero ? i % 24 : i
                 var string = i < 10 ? "0" + "\(i)" : "\(i)"
                 string.append(":00")
-                return string
+                return TimeHourSystem.Item(string, nil)
             }
             return array
         }
-    }
-    
-    @available(swift, deprecated: 0.5.8, obsoleted: 0.5.9, renamed: "current")
-    public static var currentSystemOnDevice: TimeHourSystem? {
-        current
     }
     
     public static var current: TimeHourSystem? {
@@ -72,28 +67,28 @@ public enum TimeHourSystem: Int {
     
     public var format: String {
         switch self {
-        case .twelveHour, .twelve:
-            return "h:mm a"
-        case .twentyFourHour, .twentyFour:
-            return "HH:mm"
+        case .twelve:
+            "h:mm a"
+        case .twentyFour:
+            "HH:mm"
         }
     }
     
     public var formatWithoutSymbols: String {
         switch self {
-        case .twelveHour, .twelve:
-            return "h:mm"
-        case .twentyFourHour, .twentyFour:
-            return "HH:mm"
+        case .twelve:
+            "h:mm"
+        case .twentyFour:
+            "HH:mm"
         }
     }
     
     public var shortFormat: String {
         switch self {
-        case .twelveHour, .twelve:
-            return "h a"
-        case .twentyFourHour, .twentyFour:
-            return "HH:mm"
+        case .twelve:
+            "h a"
+        case .twentyFour:
+            "HH:mm"
         }
     }
 }
@@ -116,17 +111,6 @@ extension CalendarType: Identifiable {
 }
 
 // MARK: Event model
-
-@available(swift, deprecated: 0.4.1, obsoleted: 0.4.2, renamed: "Event.Color")
-public struct EventColor {
-    let value: UIColor
-    let alpha: CGFloat
-    
-    public init(_ color: UIColor, alpha: CGFloat = 0.3) {
-        self.value = color
-        self.alpha = alpha
-    }
-}
 
 public struct TextEvent {
     public let timeline: String
@@ -267,11 +251,6 @@ public extension Event {
             self.alpha = alpha
         }
     }
-}
-
-@available(swift, deprecated: 0.4.1, obsoleted: 0.4.2, renamed: "Event.RecurringType")
-public enum RecurringType: Int {
-    case everyDay, everyWeek, everyMonth, everyYear, none
 }
 
 extension Event: EventProtocol {
@@ -642,23 +621,6 @@ extension DisplayDelegate {
     public func willSelectDate(_ date: Date, type: CalendarType) {}
     
     func deselectEvent(_ event: Event, animated: Bool) {}
-}
-
-// MARK: - EKEvent
-
-public extension EKEvent {
-    @available(swift, deprecated: 0.5.8, obsoleted: 0.5.9, message: "Please use a constructor Event(event: _)")
-    func transform(text: String? = nil, textForMonth: String? = nil, textForList: String? = nil) -> Event {
-        var event = Event(ID: eventIdentifier)
-        event.title = TextEvent(timeline: text ?? title,
-                                month: textForMonth ?? title,
-                                list: textForList ?? title)
-        event.start = startDate
-        event.end = endDate
-        event.color = Event.Color(UIColor(cgColor: calendar.cgColor))
-        event.isAllDay = isAllDay
-        return event
-    }
 }
 
 // MARK: - Protocols to customize calendar
