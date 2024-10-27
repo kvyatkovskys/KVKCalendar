@@ -1,5 +1,3 @@
-<img src="Screenshots/iphone_day.png" width="140" height="300" align="top">
-
 [![Version](https://img.shields.io/cocoapods/v/KVKCalendar.svg?style=flat)](https://cocoapods.org/pods/KVKCalendar)
 [![SwiftPM compatible](https://img.shields.io/badge/SwiftPM-compatible-orange.svg)](https://swiftpackageindex.com/kvyatkovskys/KVKCalendar)
 [![Platform](https://img.shields.io/cocoapods/p/KVKCalendar.svg?style=flat)](https://cocoapods.org/pods/KVKCalendar)
@@ -22,6 +20,10 @@
 - [x] [Supporting Multiple Windows on iPad](https://developer.apple.com/design/human-interface-guidelines/ios/system-capabilities/multitasking/)
 - [x] UIMenu supports in event view (iOS and Mac Catalyst 14.0+)
 - [x] [Ability to configure the frame for viewing events](https://github.com/kvyatkovskys/KVKCalendar/pull/198)
+
+
+<img src="Screenshots/iphone_day.png" width="250" height="600">
+
 
 ## Need Help?
 
