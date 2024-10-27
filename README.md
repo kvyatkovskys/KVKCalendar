@@ -22,7 +22,7 @@
 - [x] [Ability to configure the frame for viewing events](https://github.com/kvyatkovskys/KVKCalendar/pull/198)
 
 
-<img src="Screenshots/iphone_day.png" width="250" height="600">
+<img src="Screenshots/iphone_day.png" width="350" height="650">
 
 
 ## Need Help?
