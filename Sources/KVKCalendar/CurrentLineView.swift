@@ -88,7 +88,7 @@ extension CurrentLineView: CalendarSettingProtocol {
             height: frame.height
         )
         switch style.timeline.currentLineHourStyle {
-        case .old(let item):
+        case .ios17AndLower(let item):
             lineView.backgroundColor = item.lineColor
             if let timeFormatter = item.dateFormatter {
                 formatter = timeFormatter
@@ -113,7 +113,7 @@ extension CurrentLineView: CalendarSettingProtocol {
             
             [timeLabel, lineView, dotView].forEach({ addSubview($0) })
             dotView.setRoundCorners(radius: item.dotCornersRadius)
-        case .custom(let item):
+        case .ios18AndHigher(let item):
             if let timeFormatter = item.dateFormatter {
                 formatter = timeFormatter
             } else {

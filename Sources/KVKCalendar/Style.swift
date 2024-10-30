@@ -212,7 +212,7 @@ public struct TimelineStyle {
     public var currentLineHourHeight: CGFloat = 1
 
     /// to use the previous style set `.old(OldCurrentLineStyle())`
-    public var currentLineHourStyle: TimelineStyle.CurrentLineStyleType = .custom(DefaultCurrentLineStyle())
+    public var currentLineHourStyle: TimelineStyle.CurrentLineStyleType = .ios18AndHigher(DefaultCurrentLineStyle())
     
     public var separatorLineColor: UIColor = .gray
     public var movingMinutesColor: UIColor = .systemBlue
@@ -246,14 +246,14 @@ public struct TimelineStyle {
     }
     
     public enum CurrentLineStyleType: Equatable {
-        case custom(any CurrentLineStyleDisplayable)
-        case old(any CurrentLineStyleDisplayable)
+        case ios18AndHigher(any CurrentLineStyleDisplayable)
+        case ios17AndLower(any CurrentLineStyleDisplayable)
         
         var style: any CurrentLineStyleDisplayable {
             switch self {
-            case .custom(let item):
+            case .ios18AndHigher(let item):
                 item
-            case .old(let item):
+            case .ios17AndLower(let item):
                 item
             }
         }
@@ -684,7 +684,7 @@ extension Style {
         newStyle.timeline.timeSuffixColor = UIColor.useForStyle(dark: .systemGray2, white: newStyle.timeline.timeColor)
         
         switch newStyle.timeline.currentLineHourStyle {
-        case .custom(var item):
+        case .ios18AndHigher(var item):
             item.lineColor = UIColor.useForStyle(
                 dark: .systemRed,
                 white: newStyle.timeline.currentLineHourStyle.style.lineColor
@@ -693,13 +693,13 @@ extension Style {
                 dark: .white,
                 white: newStyle.timeline.currentLineHourStyle.style.timeColor
             )
-            newStyle.timeline.currentLineHourStyle = .custom(item)
-        case .old(var item):
+            newStyle.timeline.currentLineHourStyle = .ios18AndHigher(item)
+        case .ios17AndLower(var item):
             item.lineColor = UIColor.useForStyle(
                 dark: .systemRed,
                 white: newStyle.timeline.currentLineHourStyle.style.lineColor
             )
-            newStyle.timeline.currentLineHourStyle = .old(item)
+            newStyle.timeline.currentLineHourStyle = .ios17AndLower(item)
         }
         
         // week
