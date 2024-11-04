@@ -200,6 +200,7 @@ extension KVKCalendarSettings {
         style.timeline.showLineHourMode = .always
         style.month.autoSelectionDateWhenScrolling = true
         style.timeline.useDefaultCorderHeader = true
+        style.timeline.currentLineHourStyle = .ios17AndLower(TimelineStyle.OldCurrentLineStyle())
         return style
     }
 

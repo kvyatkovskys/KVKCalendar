@@ -166,7 +166,9 @@ extension CurrentLineView: CalendarSettingProtocol {
     }
     
     func setLineWidth(_ width: CGFloat, offset: CGFloat?) {
-        guard let offset, parameters.type == .week else { return }
+        guard let offset,
+              parameters.type == .week,
+              parameters.style.timeline.currentLineHourStyle.isIos18AndHigher else { return }
         
         dotView.frame = CGRect(
             x: offset - style.timeline.currentLineHourStyle.style.dotCornersRadius.width,

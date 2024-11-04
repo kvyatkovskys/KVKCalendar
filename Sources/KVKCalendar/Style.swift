@@ -258,6 +258,15 @@ public struct TimelineStyle {
             }
         }
         
+        var isIos18AndHigher: Bool {
+            switch self {
+            case .ios18AndHigher:
+                true
+            case .ios17AndLower:
+                false
+            }
+        }
+        
         public static func == (
             lhs: TimelineStyle.CurrentLineStyleType,
             rhs: TimelineStyle.CurrentLineStyleType
