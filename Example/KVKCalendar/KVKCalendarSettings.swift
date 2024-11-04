@@ -76,9 +76,7 @@ extension KVKCalendarSettings where Self: KVKCalendarDataModel {
             let startTime = timeFormatter(date: event.startDate, format: style.timeSystem.format, local: style.locale)
             let endTime = timeFormatter(date: event.endDate, format: style.timeSystem.format, local: style.locale)
             event.title = "\(startTime) - \(endTime)\n\(event.title ?? "")"
-            
-            guard let item = Event(event: event) else { return nil }
-            return item
+            return Event(event: event)
         }
         
         return events + mappedEvents

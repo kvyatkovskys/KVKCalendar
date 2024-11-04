@@ -165,10 +165,8 @@ public struct Event {
         }
     }
     
-    // optinal: to avoid crash when `eventIdentifier` is nil
-    public init?(event: EKEvent, monthTitle: String? = nil, listTitle: String? = nil) {
-        guard let identifier = event.eventIdentifier else { return nil }
-        ID = identifier
+    public init(event: EKEvent, monthTitle: String? = nil, listTitle: String? = nil) {
+        ID = event.eventIdentifier ?? UUID().uuidString
         title = TextEvent(timeline: event.title,
                           month: monthTitle ?? event.title,
                           list: listTitle ?? event.title)
