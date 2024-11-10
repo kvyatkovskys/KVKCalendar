@@ -450,7 +450,8 @@ extension TimelineView {
         case .day:
             newEvent.start = selectedDate
         case .week:
-            newEvent.start = shadowView.date ?? Date()
+            let value = moveShadowView(pointX: point.x)
+            newEvent.start = shadowView.date ?? value?.date ?? Date()
         default:
             break
         }
