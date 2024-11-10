@@ -40,7 +40,7 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         getEventPreviewSize()
     }()
 
-    var isResizableEventEnable = false
+    var isChangingEventEnable = false
     var forceDisableScrollToCurrentTime = false
     var potentiallyCenteredLabel: TimelineLabel?
     
@@ -101,9 +101,15 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         return scroll
     }()
     
-    private(set) lazy var tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleDefaultTapGesture(gesture:)))
+    private(set) lazy var tapGestureRecognizer = UITapGestureRecognizer(
+        target: self,
+        action: #selector(handleDefaultTapGesture)
+    )
 
-    private(set) lazy var longTapGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(addNewEvent))
+    private(set) lazy var longTapGestureRecognizer = UILongPressGestureRecognizer(
+        target: self,
+        action: #selector(addNewEvent)
+    )
     
     init(parameters: Parameters, frame: CGRect) {
         self.paramaters = parameters
@@ -113,14 +119,14 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         super.init(frame: frame)
         
         timeLabelFormatter.locale = style.locale
-
         addSubview(scrollView)
         setupConstraints()
         
         addGestureRecognizer(tapGestureRecognizer)
-        
-        // long tap to create a new event preview
-        addGestureRecognizer(longTapGestureRecognizer)
+        if style.timeline.createNewEventMethod == .longTap {
+            // long tap to create a new event preview
+            addGestureRecognizer(longTapGestureRecognizer)
+        }
         
         if style.timeline.scale != nil {
             let pinch = UIPinchGestureRecognizer(target: self, action: #selector(pinchZooming))
@@ -280,7 +286,7 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     }
     
     func create(dates: [Date], events: [Event], recurringEvents: [Event], selectedDate: Date) {
-        isResizableEventEnable = false
+        isChangingEventEnable = false
         delegate?.didDisplayEvents(events, dates: dates)
         
         self.dates = dates
@@ -340,10 +346,9 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             let pointX: CGFloat
             if idx == 0 {
                 pointX = leftOffset
-                if !style.timeline.isHiddenTimeVerticalSeparateLine {
-                    let verticalLine = createVerticalLine(pointX: pointX, date: date)
-                    layer.addSublayer(verticalLine)
-                }
+                let verticalLine = createVerticalLine(pointX: pointX, date: date)
+                verticalLine.isHidden = style.timeline.isHiddenTimeVerticalSeparateLine
+                layer.addSublayer(verticalLine)
             } else {
                 pointX = CGFloat(idx) * widthPage + leftOffset
                 let verticalLine = createVerticalLine(pointX: pointX, date: date)

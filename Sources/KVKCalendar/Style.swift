@@ -233,8 +233,11 @@ public struct TimelineStyle {
     public var scale: Scale? = Scale(min: 1, max: 6)
     public var useDefaultCorderHeader = false
     public var eventPreviewSize: CGSize? = CGSize(width: 150, height: 150)
+    
     /// Takes effect when `style.event.states` does not contain `.move`. `true`: create a new event at the long press; `false`: create at the start time.
+    @available(swift, deprecated: 0.6.28, message: "The property is not used anymore. Please use `createNewEventMethod` instead.")
     public var createEventAtTouch = false
+    
     public var isHiddenTimeVerticalSeparateLine = true
 
     public var allLeftOffset: CGFloat {
@@ -432,6 +435,24 @@ public struct TimelineStyle {
 
     public enum CreateNewEventMethod: Equatable {
         case tap, longTap
+        
+        var isMovable: Bool {
+            switch self {
+            case .longTap:
+                return true
+            default:
+                return false
+            }
+        }
+        
+        var isRegularTap: Bool {
+            switch self {
+            case .tap:
+                return true
+            default:
+                return false
+            }
+        }
     }
 }
 
@@ -1066,9 +1087,9 @@ extension TimelineStyle: Equatable {
         && compare(\.timeDividerColor)
         && compare(\.timeDividerFont)
         && compare(\.scale)
-        && compare(\.createEventAtTouch)
         && compare(\.createNewEventMethod)
         && compare(\.isEnabledForceDeselectEvent)
+        && compare(\.isHiddenTimeVerticalSeparateLine)
     }
     
 }
