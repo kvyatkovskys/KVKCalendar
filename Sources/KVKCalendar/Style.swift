@@ -60,6 +60,7 @@ public struct Style {
             headerScroll.fontNameDay = .systemFont(ofSize: 17)
         }
         
+        timeline.isHiddenTimeIfCurrentCrossed = false
         timeSystem = .current ?? .twelve
     }
 }
@@ -238,6 +239,7 @@ public struct TimelineStyle {
     @available(swift, deprecated: 0.6.28, message: "The property is not used anymore. Please use `createNewEventMethod` instead.")
     public var createEventAtTouch = false
     
+    /// works on the `Day` view
     public var isHiddenTimeVerticalSeparateLine = true
 
     public var allLeftOffset: CGFloat {

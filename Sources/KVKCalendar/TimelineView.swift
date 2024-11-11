@@ -347,7 +347,7 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             if idx == 0 {
                 pointX = leftOffset
                 let verticalLine = createVerticalLine(pointX: pointX, date: date)
-                verticalLine.isHidden = style.timeline.isHiddenTimeVerticalSeparateLine
+                verticalLine.isHidden = paramaters.type == .day && style.timeline.isHiddenTimeVerticalSeparateLine
                 layer.addSublayer(verticalLine)
             } else {
                 pointX = CGFloat(idx) * widthPage + leftOffset
