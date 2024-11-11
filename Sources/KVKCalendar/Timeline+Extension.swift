@@ -262,12 +262,13 @@ extension TimelineView {
     @objc func handleDefaultTapGesture(gesture: UITapGestureRecognizer) {
         // Record before unchecking
         let hasCreateEvent = events.contains { $0.isNew }
-
+        let eventResizePreviewIsDisplayed = eventResizePreview != nil
         if style.timeline.isEnabledForceDeselectEvent {
             forceDeselectEvent()
         }
         
-        if style.timeline.isEnabledCreateNewEvent
+        if !eventResizePreviewIsDisplayed
+            && style.timeline.isEnabledCreateNewEvent
             && style.timeline.createNewEventMethod.isRegularTap
             && !hasCreateEvent {
             addNewEvent(gesture: gesture)
@@ -283,7 +284,6 @@ extension TimelineView {
             deselectEvent?(eventViewGeneral.event)
             return
         }
-        
         eventView.deselectEvent()
     }
     
