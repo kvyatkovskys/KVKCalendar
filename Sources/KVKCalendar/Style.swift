@@ -60,6 +60,7 @@ public struct Style {
             headerScroll.fontNameDay = .systemFont(ofSize: 17)
         }
         
+        timeline.isHiddenTimeIfCurrentCrossed = false
         timeSystem = .current ?? .twelve
     }
 }
@@ -132,6 +133,19 @@ public struct HeaderScrollStyle {
 
 // MARK: Timeline style
 
+public protocol CurrentLineStyleDisplayable {
+    var lineHourStyle: TimelineStyle.CurrentLineHourStyle { get set }
+    var timeFont: UIFont { get set }
+    var lineColor: UIColor { get set }
+    var timeColor: UIColor { get set }
+    var timeDotSize: CGSize { get set }
+    var dotCornersRadius: CGSize { get set }
+    var timeCornersRadius: CGSize { get set }
+    var timeWidth: CGFloat { get set }
+    var lineHeight: CGFloat { get set }
+    var dateFormatter: DateFormatter? { get set }
+}
+
 public struct TimelineStyle {
     public var startFromFirstEvent: Bool = false
     public var eventFont: UIFont = .boldSystemFont(ofSize: 12)
@@ -168,18 +182,39 @@ public struct TimelineStyle {
     public var offsetTimeX: CGFloat = 10
     public var offsetTimeY: CGFloat = 25
     public var timeColor: UIColor = .systemGray
+    public var timeSuffixColor: UIColor = .systemGray3
     public var timeAlignment: NSTextAlignment = .center
-    public var timeFont: UIFont = .systemFont(ofSize: 12)
+    public var timeFont: UIFont = .systemFont(ofSize: 13, weight: .medium)
+    public var timeSuffixFont: UIFont = .systemFont(ofSize: 9, weight: .light)
+    public var isHiddenTimeIfCurrentCrossed: Bool = true
     public var widthEventViewer: CGFloat? = nil
     public var showLineHourMode: CurrentLineHourShowMode = .today
     public var scrollLineHourMode: CurrentLineHourScrollMode = .today
+    
+    @available(swift, deprecated: 0.6.28, message: "Use `currentLineHourStyle` instead.", renamed: "currentLineHourStyle")
     public var lineHourStyle: CurrentLineHourStyle = .withTime
+    
+    @available(swift, deprecated: 0.6.28, message: "Use `currentLineHourStyle` instead.", renamed: "currentLineHourStyle")
     public var currentLineHourFont: UIFont = .systemFont(ofSize: 12)
+    
+    @available(swift, deprecated: 0.6.28, message: "Use `currentLineHourStyle` instead.", renamed: "currentLineHourStyle")
     public var currentLineHourColor: UIColor = .red
+    
+    @available(swift, deprecated: 0.6.28, message: "Use `currentLineHourStyle` instead.", renamed: "currentLineHourStyle")
     public var currentLineHourDotSize: CGSize = CGSize(width: 5, height: 5)
+    
+    @available(swift, deprecated: 0.6.28, message: "Use `currentLineHourStyle` instead.", renamed: "currentLineHourStyle")
     public var currentLineHourDotCornersRadius: CGSize = CGSize(width: 2.5, height: 2.5)
+    
+    @available(swift, deprecated: 0.6.28, message: "Use `currentLineHourStyle` instead.", renamed: "currentLineHourStyle")
     public var currentLineHourWidth: CGFloat = 40
+    
+    @available(swift, deprecated: 0.6.28, message: "Use `currentLineHourStyle` instead.", renamed: "currentLineHourStyle")
     public var currentLineHourHeight: CGFloat = 1
+
+    /// to use the previous style set `.old(OldCurrentLineStyle())`
+    public var currentLineHourStyle: TimelineStyle.CurrentLineStyleType = .ios18AndHigher(DefaultCurrentLineStyle())
+    
     public var separatorLineColor: UIColor = .gray
     public var movingMinutesColor: UIColor = .systemBlue
     public var shadowColumnColor: UIColor = .systemTeal
@@ -199,8 +234,13 @@ public struct TimelineStyle {
     public var scale: Scale? = Scale(min: 1, max: 6)
     public var useDefaultCorderHeader = false
     public var eventPreviewSize: CGSize? = CGSize(width: 150, height: 150)
+    
     /// Takes effect when `style.event.states` does not contain `.move`. `true`: create a new event at the long press; `false`: create at the start time.
+    @available(swift, deprecated: 0.6.28, message: "The property is not used anymore. Please use `createNewEventMethod` instead.")
     public var createEventAtTouch = false
+    
+    /// works on the `Day` view
+    public var isHiddenTimeVerticalSeparateLine = true
 
     public var allLeftOffset: CGFloat {
         widthTime + offsetTimeX + offsetLineLeft
@@ -208,6 +248,123 @@ public struct TimelineStyle {
     
     public enum ViewMode: Int {
         case `default`, list
+    }
+    
+    public enum CurrentLineStyleType: Equatable {
+        case ios18AndHigher(any CurrentLineStyleDisplayable)
+        case ios17AndLower(any CurrentLineStyleDisplayable)
+        
+        var style: any CurrentLineStyleDisplayable {
+            switch self {
+            case .ios18AndHigher(let item):
+                item
+            case .ios17AndLower(let item):
+                item
+            }
+        }
+        
+        var isIos18AndHigher: Bool {
+            switch self {
+            case .ios18AndHigher:
+                true
+            case .ios17AndLower:
+                false
+            }
+        }
+        
+        public static func == (
+            lhs: TimelineStyle.CurrentLineStyleType,
+            rhs: TimelineStyle.CurrentLineStyleType
+        ) -> Bool {
+            func compare<E: Equatable>(_ kp: KeyPath<TimelineStyle.CurrentLineStyleType, E>) -> Bool {
+                lhs[keyPath: kp] == rhs[keyPath: kp]
+            }
+            return compare(\.style.lineHourStyle)
+            && compare(\.style.timeFont)
+            && compare(\.style.lineColor)
+            && compare(\.style.timeColor)
+            && compare(\.style.dotCornersRadius)
+            && compare(\.style.timeDotSize)
+            && compare(\.style.timeCornersRadius)
+            && compare(\.style.timeWidth)
+            && compare(\.style.lineHeight)
+            && compare(\.style.dateFormatter)
+        }
+    }
+    
+    // default style like in iOS 18
+    public struct DefaultCurrentLineStyle: CurrentLineStyleDisplayable {
+        public var lineHourStyle: CurrentLineHourStyle
+        public var timeFont: UIFont
+        public var lineColor: UIColor
+        public var timeColor: UIColor
+        public var timeDotSize: CGSize
+        public var dotCornersRadius: CGSize
+        public var timeCornersRadius: CGSize
+        public var timeWidth: CGFloat
+        public var lineHeight: CGFloat
+        public var dateFormatter: DateFormatter?
+        
+        public init(
+            lineHourStyle: CurrentLineHourStyle = .withTime,
+            timeFont: UIFont = .systemFont(ofSize: 13, weight: .semibold),
+            lineColor: UIColor = .red,
+            timeColor: UIColor = .white,
+            timeDotSize: CGSize = CGSize(width: 6, height: 6),
+            dotCornersRadius: CGSize = CGSize(width: 3, height: 3),
+            timeCornersRadius: CGSize = CGSize(width: 5, height: 5),
+            timeWidth: CGFloat = 40,
+            lineHeight: CGFloat = 2,
+            dateFormatter: DateFormatter? = nil
+        ) {
+            self.lineHourStyle = lineHourStyle
+            self.timeFont = timeFont
+            self.lineColor = lineColor
+            self.timeColor = timeColor
+            self.timeDotSize = timeDotSize
+            self.dotCornersRadius = dotCornersRadius
+            self.timeCornersRadius = timeCornersRadius
+            self.timeWidth = timeWidth
+            self.lineHeight = lineHeight
+            self.dateFormatter = dateFormatter
+        }
+    }
+    
+    public struct OldCurrentLineStyle: CurrentLineStyleDisplayable {
+        public var lineHourStyle: CurrentLineHourStyle
+        public var timeFont: UIFont
+        public var lineColor: UIColor
+        public var timeColor: UIColor
+        public var timeDotSize: CGSize
+        public var dotCornersRadius: CGSize
+        public var timeCornersRadius: CGSize
+        public var timeWidth: CGFloat
+        public var lineHeight: CGFloat
+        public var dateFormatter: DateFormatter?
+        
+        public init(
+            lineHourStyle: CurrentLineHourStyle = .withTime,
+            timeFont: UIFont = .systemFont(ofSize: 12),
+            lineColor: UIColor = .red,
+            timeColor: UIColor = .white,
+            timeDotSize: CGSize = CGSize(width: 5, height: 5),
+            dotCornersRadius: CGSize = CGSize(width: 5, height: 5),
+            timeCornersRadius: CGSize = CGSize(width: 2.5, height: 2.5),
+            timeWidth: CGFloat = 40,
+            lineHeight: CGFloat = 1,
+            dateFormatter: DateFormatter? = nil
+        ) {
+            self.lineHourStyle = lineHourStyle
+            self.timeFont = timeFont
+            self.lineColor = lineColor
+            self.timeColor = timeColor
+            self.timeDotSize = timeDotSize
+            self.dotCornersRadius = dotCornersRadius
+            self.timeCornersRadius = timeCornersRadius
+            self.timeWidth = timeWidth
+            self.lineHeight = lineHeight
+            self.dateFormatter = dateFormatter
+        }
     }
     
     public struct Scale {
@@ -280,6 +437,24 @@ public struct TimelineStyle {
 
     public enum CreateNewEventMethod: Equatable {
         case tap, longTap
+        
+        var isMovable: Bool {
+            switch self {
+            case .longTap:
+                return true
+            default:
+                return false
+            }
+        }
+        
+        var isRegularTap: Bool {
+            switch self {
+            case .tap:
+                return true
+            default:
+                return false
+            }
+        }
     }
 }
 
@@ -538,8 +713,26 @@ extension Style {
         // timeline
         newStyle.timeline.backgroundColor = UIColor.useForStyle(dark: .black, white: newStyle.timeline.backgroundColor)
         newStyle.timeline.timeColor = UIColor.useForStyle(dark: .systemGray, white: newStyle.timeline.timeColor)
-        newStyle.timeline.currentLineHourColor = UIColor.useForStyle(dark: .systemRed,
-                                                                     white: newStyle.timeline.currentLineHourColor)
+        newStyle.timeline.timeSuffixColor = UIColor.useForStyle(dark: .systemGray2, white: newStyle.timeline.timeColor)
+        
+        switch newStyle.timeline.currentLineHourStyle {
+        case .ios18AndHigher(var item):
+            item.lineColor = UIColor.useForStyle(
+                dark: .systemRed,
+                white: newStyle.timeline.currentLineHourStyle.style.lineColor
+            )
+            item.timeColor = UIColor.useForStyle(
+                dark: .white,
+                white: newStyle.timeline.currentLineHourStyle.style.timeColor
+            )
+            newStyle.timeline.currentLineHourStyle = .ios18AndHigher(item)
+        case .ios17AndLower(var item):
+            item.lineColor = UIColor.useForStyle(
+                dark: .systemRed,
+                white: newStyle.timeline.currentLineHourStyle.style.lineColor
+            )
+            newStyle.timeline.currentLineHourStyle = .ios17AndLower(item)
+        }
         
         // week
         newStyle.week.colorBackground = UIColor.useForStyle(dark: .black, white: newStyle.week.colorBackground)
@@ -881,13 +1074,7 @@ extension TimelineStyle: Equatable {
         && compare(\.widthEventViewer)
         && compare(\.showLineHourMode)
         && compare(\.scrollLineHourMode)
-        && compare(\.lineHourStyle)
-        && compare(\.currentLineHourFont)
-        && compare(\.currentLineHourColor)
-        && compare(\.currentLineHourDotSize)
-        && compare(\.currentLineHourDotCornersRadius)
-        && compare(\.currentLineHourWidth)
-        && compare(\.currentLineHourHeight)
+        && compare(\.currentLineHourStyle)
         && compare(\.separatorLineColor)
         && compare(\.movingMinutesColor)
         && compare(\.shadowColumnColor)
@@ -902,9 +1089,9 @@ extension TimelineStyle: Equatable {
         && compare(\.timeDividerColor)
         && compare(\.timeDividerFont)
         && compare(\.scale)
-        && compare(\.createEventAtTouch)
         && compare(\.createNewEventMethod)
         && compare(\.isEnabledForceDeselectEvent)
+        && compare(\.isHiddenTimeVerticalSeparateLine)
     }
     
 }

@@ -1,8 +1,4 @@
-<img src="Screenshots/iphone_day.png" width="140" height="300" align="top"> &nbsp; <img src="Screenshots/ipad_month2.png" width="430" height="280" align="top">
-
-[![CI Status](https://img.shields.io/travis/kvyatkovskys/KVKCalendar.svg?style=flat)](https://travis-ci.org/kvyatkovskys/KVKCalendar)
 [![Version](https://img.shields.io/cocoapods/v/KVKCalendar.svg?style=flat)](https://cocoapods.org/pods/KVKCalendar)
-[![Carthage](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=fla)](https://github.com/Carthage/Carthage/)
 [![SwiftPM compatible](https://img.shields.io/badge/SwiftPM-compatible-orange.svg)](https://swiftpackageindex.com/kvyatkovskys/KVKCalendar)
 [![Platform](https://img.shields.io/cocoapods/p/KVKCalendar.svg?style=flat)](https://cocoapods.org/pods/KVKCalendar)
 [![License](https://img.shields.io/cocoapods/l/KVKCalendar.svg?style=flat)](https://cocoapods.org/pods/KVKCalendar)
@@ -25,6 +21,10 @@
 - [x] UIMenu supports in event view (iOS and Mac Catalyst 14.0+)
 - [x] [Ability to configure the frame for viewing events](https://github.com/kvyatkovskys/KVKCalendar/pull/198)
 
+
+<img src="Screenshots/iphone_day.png" width="350" height="650">
+
+
 ## Need Help?
 
 If you have a **question** about how to use KVKCalendar in your application, ask it on StackOverflow using the [KVKCalendar](https://stackoverflow.com/questions/tagged/kvkcalendar) tag.
@@ -38,7 +38,7 @@ Please, use [Issues](https://github.com/kvyatkovskys/KVKCalendar/issues) only fo
 
 ## Installation
 
-**KVKCalendar** is available through [CocoaPods](https://cocoapods.org) or [Carthage](https://github.com/Carthage/Carthage) or [Swift Package Manager](https://swift.org/package-manager/).
+**KVKCalendar** is available through [CocoaPods](https://cocoapods.org) or [Swift Package Manager](https://swift.org/package-manager/).
 
 ### CocoaPods
 ~~~bash
@@ -47,18 +47,11 @@ pod 'KVKCalendar'
 
 [Adding Pods to an Xcode project](https://guides.cocoapods.org/using/using-cocoapods.html)
 
-### Carthage
-~~~bash
-github "kvyatkovskys/KVKCalendar"
-~~~
-
-[Adding Frameworks to an Xcode project](https://github.com/Carthage/Carthage#quick-start)
-
 ### Swift Package Manager (Xcode 12 or higher)
 
 1. In Xcode navigate to **File** → **Swift Packages** → **Add Package Dependency...**
 2. Select a project
-3. Paste the repository URL (`https://github.com/kvyatkovskys/KVKCalendar.git`) and click **Next**.
+3. Paste the repository URL (`https://github.com/kvyatkovskys/KVKCalendar`) and click **Next**.
 4. For **Rules**, select **Version (Up to Next Major)** and click **Next**.
 5. Click **Finish**.
 

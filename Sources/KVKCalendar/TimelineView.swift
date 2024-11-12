@@ -40,7 +40,7 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         getEventPreviewSize()
     }()
 
-    var isResizableEventEnable = false
+    var isChangingEventEnable = false
     var forceDisableScrollToCurrentTime = false
     var potentiallyCenteredLabel: TimelineLabel?
     
@@ -89,7 +89,7 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     }()
     
     private(set) lazy var currentLineView: CurrentLineView = {
-        let view = CurrentLineView(parameters: .init(style: style),
+        let view = CurrentLineView(parameters: .init(style: style, type: paramaters.type),
                                    frame: CGRect(x: 0, y: 0, width: scrollView.frame.width, height: 15))
         view.tag = tagCurrentHourLine
         return view
@@ -101,9 +101,15 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         return scroll
     }()
     
-    private(set) lazy var tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleDefaultTapGesture(gesture:)))
+    private(set) lazy var tapGestureRecognizer = UITapGestureRecognizer(
+        target: self,
+        action: #selector(handleDefaultTapGesture)
+    )
 
-    private(set) lazy var longTapGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(addNewEvent))
+    private(set) lazy var longTapGestureRecognizer = UILongPressGestureRecognizer(
+        target: self,
+        action: #selector(addNewEvent)
+    )
     
     init(parameters: Parameters, frame: CGRect) {
         self.paramaters = parameters
@@ -113,14 +119,14 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         super.init(frame: frame)
         
         timeLabelFormatter.locale = style.locale
-
         addSubview(scrollView)
         setupConstraints()
         
         addGestureRecognizer(tapGestureRecognizer)
-        
-        // long tap to create a new event preview
-        addGestureRecognizer(longTapGestureRecognizer)
+        if style.timeline.createNewEventMethod == .longTap {
+            // long tap to create a new event preview
+            addGestureRecognizer(longTapGestureRecognizer)
+        }
         
         if style.timeline.scale != nil {
             let pinch = UIPinchGestureRecognizer(target: self, action: #selector(pinchZooming))
@@ -150,36 +156,27 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     private func movingCurrentLineHour() {
         guard !isValidTimer(timerKey) && isDisplayedCurrentTime else { return }
         
-        let action = { [weak self] in
-            guard let self = self else { return }
-            
-            let nextDate = Date().kvkConvertTimeZone(TimeZone.current, to: self.style.timezone)
-            guard self.currentLineView.valueHash != nextDate.kvkMinute.hashValue,
-                  let time = self.getTimelineLabel(hour: nextDate.kvkHour) else { return }
+        func action() {
+            let nextDate = Date().kvkConvertTimeZone(TimeZone.current, to: style.timezone)
+            guard currentLineView.valueHash != nextDate.kvkMinute.hashValue,
+                  let time = getTimelineLabel(hour: nextDate.kvkHour) else { return }
             
             var pointY = time.frame.origin.y
-            if !self.subviews.filter({ $0.tag == self.tagAllDayEventView }).isEmpty, self.style.allDay.isPinned {
-                pointY -= self.style.allDay.height
+            if !subviews.filter({ $0.tag == tagAllDayEventView }).isEmpty && style.allDay.isPinned {
+                pointY -= style.allDay.height
             }
             
-            pointY = self.calculatePointYByMinute(nextDate.kvkMinute, time: time)
-            
-            self.currentLineView.frame.origin.y = pointY - (self.currentLineView.frame.height * 0.5)
-            self.currentLineView.valueHash = nextDate.kvkMinute.hashValue
-            self.currentLineView.date = nextDate
-            
-            if self.isDisplayedTimes && style.timeline.lineHourStyle == .withTime {
-                if let timeNext = self.getTimelineLabel(hour: nextDate.kvkHour + 1) {
-                    timeNext.isHidden = self.currentLineView.frame.intersects(timeNext.frame)
-                }
-                time.isHidden = time.frame.intersects(self.currentLineView.frame)
-            }
+            pointY = calculatePointYByMinute(nextDate.kvkMinute, time: time)
+            currentLineView.frame.origin.y = pointY - (currentLineView.frame.height * 0.5)
+            currentLineView.valueHash = nextDate.kvkMinute.hashValue
+            currentLineView.date = nextDate
+            checkVisibleTimeIfNeeded(date: nextDate, time: time)
         }
         
         startTimer(timerKey, repeats: true, addToRunLoop: true, action: action)
     }
     
-    private func showCurrentLineHour() {
+    private func showCurrentLineHour(widthPage: CGFloat, offset: CGFloat?) {
         currentLineView.isHidden = !isDisplayedCurrentTime
         let date = Date().kvkConvertTimeZone(TimeZone.current, to: style.timezone)
         guard style.timeline.showLineHourMode.showForDates(dates),
@@ -187,16 +184,26 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             stopTimer(timerKey)
             return
         }
-
+        
+        currentLineView.date = selectedDate
         currentLineView.reloadFrame(calculatedCurrentLineViewFrame)
         currentLineView.updateStyle(style, force: true)
         currentLineView.setOffsetForTime(timeLabels.first?.frame.origin.x ?? 0)
+        currentLineView.setLineWidth(
+            widthPage,
+            offset: offset
+        )
         let pointY = calculatePointYByMinute(date.kvkMinute, time: time)
         currentLineView.frame.origin.y = pointY - (currentLineView.frame.height * 0.5)
         scrollView.addSubview(currentLineView)
         movingCurrentLineHour()
-        
-        if isDisplayedTimes && style.timeline.lineHourStyle == .withTime {
+        checkVisibleTimeIfNeeded(date: date, time: time)
+    }
+    
+    private func checkVisibleTimeIfNeeded(date: Date, time: TimelineLabel) {
+        if style.timeline.isHiddenTimeIfCurrentCrossed
+            && isDisplayedTimes
+            && style.timeline.currentLineHourStyle.style.lineHourStyle == .withTime {
             if let timeNext = getTimelineLabel(hour: date.kvkHour + 1) {
                 timeNext.isHidden = currentLineView.frame.intersects(timeNext.frame)
             }
@@ -279,7 +286,7 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     }
     
     func create(dates: [Date], events: [Event], recurringEvents: [Event], selectedDate: Date) {
-        isResizableEventEnable = false
+        isChangingEventEnable = false
         delegate?.didDisplayEvents(events, dates: dates)
         
         self.dates = dates
@@ -332,18 +339,24 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         var allDayEvents = [AllDayView.PrepareEvents]()
         var topStackViews = [StubStackView]()
         var allHeightEvents = [CGFloat]()
+        var pointXForToday: CGFloat?
         
         // horror 👹
         dates.enumerated().forEach { (idx, date) in
             let pointX: CGFloat
             if idx == 0 {
                 pointX = leftOffset
+                let verticalLine = createVerticalLine(pointX: pointX, date: date)
+                verticalLine.isHidden = paramaters.type == .day && style.timeline.isHiddenTimeVerticalSeparateLine
+                layer.addSublayer(verticalLine)
             } else {
                 pointX = CGFloat(idx) * widthPage + leftOffset
+                let verticalLine = createVerticalLine(pointX: pointX, date: date)
+                layer.addSublayer(verticalLine)
             }
-            
-            let verticalLine = createVerticalLine(pointX: pointX, date: date)
-            layer.addSublayer(verticalLine)
+            if date.kvkIsEqual(Date()) {
+                pointXForToday = pointX
+            }
             
             let eventsByDate = filteredEvents
                 .filter {
@@ -501,7 +514,7 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             }
         }
         
-        showCurrentLineHour()
+        showCurrentLineHour(widthPage: widthPage, offset: pointXForToday)
         addStubForInvisibleEvents()
     }
 }
