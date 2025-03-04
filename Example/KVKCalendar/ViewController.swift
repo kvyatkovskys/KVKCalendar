@@ -96,7 +96,7 @@ final class ViewController: UIViewController, KVKCalendarSettings, KVKCalendarDa
     @objc private func today() {
         selectDate = Date()
         calendarView.scrollTo(selectDate, animated: true)
-        calendarView.reloadData()
+        // calendarView.reloadData()
     }
     
     private func setupBarButtons() {
