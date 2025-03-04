@@ -83,7 +83,7 @@ final class MonthCell: KVKCollectionViewCell {
                 return
             }
             
-            if Platform.currentInterface == .phone && UIApplication.shared.orientation.isLandscape { return }
+            // if Platform.currentInterface == .phone && UIApplication.shared.orientation.isLandscape { return }
             
             if monthStyle.showMonthNameInFirstDay {
                 showMonthName(day: day)
@@ -102,20 +102,26 @@ final class MonthCell: KVKCollectionViewCell {
                 items = events
                 height = (frame.height - dateLabel.bounds.height - 5) / countInCell
             } else if let event = events.first {
-                items = [event]
-                height = (frame.height - dateLabel.bounds.height - 5)
+                items = Array(events.prefix(2))
+//                items = [event]
+                height = (frame.height - dateLabel.bounds.height - 5) / 2 - 4
             } else {
                 items = []
                 height = (frame.height - dateLabel.bounds.height - 5)
             }
             
             for (idx, event) in items.enumerated() {
-                let width = frame.width - 10
+                let width = frame.width - 4
+//                let width = frame.width - 10
                 let count = idx + 1
-                let label = UILabel(frame: CGRect(x: 5,
-                                                  y: 5 + dateLabel.bounds.height + height * CGFloat(idx),
+                let label = UILabel(frame: CGRect(x: 2,
+                                                  y: 5 + dateLabel.bounds.height + height * CGFloat(idx) + (idx > 0 ? 2 : 0),
                                                   width: width,
                                                   height: height))
+//                let label = UILabel(frame: CGRect(x: 5,
+//                                                  y: 5 + dateLabel.bounds.height + height * CGFloat(idx),
+//                                                  width: width,
+//                                                  height: height))
                 label.isUserInteractionEnabled = true
                 
                 if count > titlesCount {
@@ -146,28 +152,31 @@ final class MonthCell: KVKCollectionViewCell {
                     }
                     return
                 } else {
-                    if !event.isAllDay || Platform.currentInterface == .phone {
-                        label.attributedText = addIconBeforeLabel(eventList: [event],
-                                                                  textAttributes: [.font: monthStyle.fontEventTitle,
-                                                                                   .foregroundColor: monthStyle.colorEventTitle],
-                                                                  bulletAttributes: [.font: monthStyle.fontEventBullet,
-                                                                                     .foregroundColor: event.color?.value ?? .systemGray],
-                                                                  timeAttributes: [.font: monthStyle.fontEventTime,
-                                                                                   .foregroundColor: UIColor.systemGray],
-                                                                  indentation: 0,
-                                                                  lineSpacing: 0,
-                                                                  paragraphSpacing: 0)
-                    } else {
+//                    if !event.isAllDay || Platform.currentInterface == .phone {
+//                        label.attributedText = addIconBeforeLabel(eventList: [event],
+//                                                                  textAttributes: [.font: monthStyle.fontEventTitle,
+//                                                                                   .foregroundColor: monthStyle.colorEventTitle],
+//                                                                  bulletAttributes: [.font: monthStyle.fontEventBullet,
+//                                                                                     .foregroundColor: event.color?.value ?? .systemGray],
+//                                                                  timeAttributes: [.font: monthStyle.fontEventTime,
+//                                                                                   .foregroundColor: UIColor.systemGray],
+//                                                                  indentation: 0,
+//                                                                  lineSpacing: 0,
+//                                                                  paragraphSpacing: 0)
+//                    }
+                    // else {
                         label.font = monthStyle.fontEventTitle
-                        label.lineBreakMode = .byTruncatingMiddle
+                        // label.lineBreakMode = .byTruncatingMiddle
+                        label.lineBreakMode = .byTruncatingTail
                         label.adjustsFontSizeToFitWidth = true
-                        label.minimumScaleFactor = 0.95
+                        label.minimumScaleFactor = 0.8
+                        // label.minimumScaleFactor = 0.95
                         label.textAlignment = .left
                         label.backgroundColor = event.color?.value ?? .systemGray
                         label.textColor = allDayStyle.textColor
-                        label.text = " \(event.title.timeline) "
+                        // label.text = " \(event.title.timeline) "
                         label.setRoundCorners(monthStyle.eventCorners, radius: monthStyle.eventCornersRadius)
-                    }
+                    // }
                     
                     let tap = UITapGestureRecognizer(target: self, action: #selector(tapOneEvent))
                     label.addGestureRecognizer(tap)

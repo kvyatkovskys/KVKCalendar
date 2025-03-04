@@ -41,6 +41,7 @@ final class ViewController: UIViewController, KVKCalendarSettings, KVKCalendarDa
         let calendar = KVKCalendarView(frame: frame, date: selectDate, style: style)
         calendar.delegate = self
         calendar.dataSource = self
+        calendar.set(type: .month)
         return calendar
     }()
     
@@ -57,7 +58,7 @@ final class ViewController: UIViewController, KVKCalendarSettings, KVKCalendarDa
     
     init() {
         super.init(nibName: nil, bundle: nil)
-        selectDate = defaultDate
+        // = defaultDate
     }
     
     required init?(coder: NSCoder) {
@@ -177,7 +178,7 @@ extension ViewController: CalendarDelegate {
 extension ViewController: CalendarDataSource {
     
     func willSelectDate(_ date: Date, type: CalendarType) {
-        print(date, type)
+        print("Will select date \(date), \(type)")
     }
     
     @available(iOS 14.0, *)
@@ -194,9 +195,9 @@ extension ViewController: CalendarDataSource {
         handleCustomEventView(event: event, style: style, frame: frame)
     }
     
-    func dequeueCell<T>(parameter: CellParameter, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol? where T: UIScrollView {
-        handleCell(parameter: parameter, type: type, view: view, indexPath: indexPath)
-    }
+//    func dequeueCell<T>(parameter: CellParameter, type: CalendarType, view: T, indexPath: IndexPath) -> KVKCalendarCellProtocol? where T: UIScrollView {
+//        handleCell(parameter: parameter, type: type, view: view, indexPath: indexPath)
+//    }
     
     func willDisplayEventViewer(date: Date, frame: CGRect) -> UIView? {
         eventViewer.frame = frame

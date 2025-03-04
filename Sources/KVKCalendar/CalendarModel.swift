@@ -193,6 +193,15 @@ public struct Event {
         
         return (bgColor, txtColor)
     }
+    
+    func isDateBetweenStartAndEnd(date: Date) -> Bool {
+        let isBetween = Calendar.current.compare(start, to: date, toGranularity: .day) == .orderedAscending &&
+        Calendar.current.compare(end, to: date, toGranularity: .day) == .orderedDescending
+        
+        return isBetween || Calendar.current.compare(start, to: date , toGranularity: .day) == .orderedSame ||
+        Calendar.current.compare(end, to: date, toGranularity: .day) == .orderedSame
+        
+    }
 }
 
 extension Event {

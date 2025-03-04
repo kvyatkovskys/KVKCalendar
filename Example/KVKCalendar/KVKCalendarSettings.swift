@@ -134,7 +134,7 @@ extension KVKCalendarSettings where Self: KVKCalendarDataModel {
 extension KVKCalendarSettings {
     
     var defaultStringDate: String {
-        "14.11.2022"
+        "03.02.2025"
     }
     
     var defaultDate: Date {
@@ -168,38 +168,41 @@ extension KVKCalendarSettings {
         return (UIMenu(title: "Options", children: [action]), nil)
     }
     
-    func handleCell<T>(parameter: CellParameter,
-                       type: CalendarType,
-                       view: T,
-                       indexPath: IndexPath) -> KVKCalendarCellProtocol? where T: UIScrollView {
-        switch type {
-        case .year where parameter.date?.kvkMonth == Date().kvkMonth:
-            let cell = (view as? UICollectionView)?.kvkDequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
-                cell.imageView.image = UIImage(named: "ic_stub")
-            }
-            return cell
-        case .day, .week, .month:
-            guard parameter.date?.kvkDay == Date().kvkDay && parameter.type != .empty else { return nil }
-            
-            let cell = (view as? UICollectionView)?.kvkDequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
-                cell.imageView.image = UIImage(named: "ic_stub")
-            }
-            return cell
-        default:
-            return nil
-        }
-    }
+//    func handleCell<T>(parameter: CellParameter,
+//                       type: CalendarType,
+//                       view: T,
+//                       indexPath: IndexPath) -> KVKCalendarCellProtocol? where T: UIScrollView {
+//        switch type {
+//        case .year where parameter.date?.kvkMonth == Date().kvkMonth:
+//            let cell = (view as? UICollectionView)?.kvkDequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
+//                cell.imageView.image = UIImage(named: "ic_stub")
+//            }
+//            return cell
+//        case .day, .week, .month:
+//            guard parameter.date?.kvkDay == Date().kvkDay && parameter.type != .empty else { return nil }
+//            
+//            let cell = (view as? UICollectionView)?.kvkDequeueCell(indexPath: indexPath) { (cell: CustomDayCell) in
+//                cell.imageView.image = UIImage(named: "ic_stub")
+//            }
+//            return cell
+//        default:
+//            return nil
+//        }
+//    }
     
     func createCalendarStyle() -> Style {
         var style = Style()
-        style.timeline.isHiddenStubEvent = false
-        style.startWeekDay = .sunday
+        style.timeline.isHiddenStubEvent = true
+        style.startWeekDay = .monday
         style.systemCalendars = ["Calendar1", "Calendar2", "Calendar3"]
         style.event.iconFile = UIImage(systemName: "paperclip")
         style.timeline.scrollLineHourMode = .onlyOnInitForDate(defaultDate)
-        style.timeline.showLineHourMode = .always
-        style.month.autoSelectionDateWhenScrolling = true
+        style.timeline.showLineHourMode = .today
+        // style.month.autoSelectionDateWhenScrolling = true
         style.timeline.useDefaultCorderHeader = true
+        style.month.selectionMode = .single
+        style.month.eventCornersRadius = CGSize(width: 7, height: 7)
+        // style.month.isPrefetchingEnabled = false
         return style
     }
 

@@ -9,6 +9,22 @@
 
 import UIKit
 
+class CustomUICollectionViewFlowLayout: UICollectionViewFlowLayout {
+    override init() {
+        super.init()
+        
+        self.scrollDirection = .vertical;
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
+        true
+    }
+}
+
 final class MonthView: UIView {
     
     struct Parameters {
@@ -29,11 +45,13 @@ final class MonthView: UIView {
     private var weekHeaderView = WeekHeaderView(parameters: .init(style: Style()), frame: .zero)
     
     private var layout: UICollectionViewFlowLayout = {
-        let layout = UICollectionViewFlowLayout()
+        let layout = CustomUICollectionViewFlowLayout()
         layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 0
         return layout
     }()
+    
+    private var allEvents:[Event] = []
     
     init(parameters: Parameters, frame: CGRect) {
         self.parameters = parameters
@@ -49,8 +67,12 @@ final class MonthView: UIView {
     }
     
     func reloadData(_ events: [Event]) {
-        let displayableValues = parameters.monthData.reloadEventsInDays(events: events,
-                                                                        date: parameters.monthData.date)
+        allEvents = events
+        
+        let displayableValues = parameters.monthData.reloadEventsInDays(
+            events: events,
+            date: parameters.monthData.date
+        )
         delegate?.didDisplayEvents(displayableValues.events, dates: displayableValues.dates, type: .month)
         reload()
     }
@@ -99,12 +121,16 @@ final class MonthView: UIView {
     }
     
     private func scrollToDate(_ date: Date, animated: Bool) {
-        if let idx = parameters.monthData.data.months.firstIndex(where: { $0.date.kvkMonth == date.kvkMonth && $0.date.kvkYear == date.kvkYear }), idx != parameters.monthData.selectedSection {
-            parameters.monthData.selectedSection = idx
+        if let idx = parameters.monthData.data.months.firstIndex(where: { $0.date.kvkMonth == date.kvkMonth && $0.date.kvkYear == date.kvkYear })
+            // idx != parameters.monthData.selectedSection
+        {
+            // parameters.monthData.selectedSection = idx
             scrollToIndex(idx, animated: animated)
-        } else {
-            parameters.monthData.selectedSection = -1
         }
+//        else {
+//            print("Selected section = -1")
+//            parameters.monthData.selectedSection = -1
+//        }
     }
     
     private func scrollToIndex(_ idx: Int, animated: Bool) {
@@ -235,9 +261,9 @@ extension MonthView: CalendarSettingProtocol {
         self.style = style
         setUI(reload: reload || force)
         weekHeaderView.date = parameters.monthData.date
-        if reload {
-            parameters.monthData.selectedSection = -1
-        }
+//        if reload {
+//            parameters.monthData.selectedSection = -1
+//        }
     }
     
     func setUI(reload: Bool = false) {
@@ -364,9 +390,24 @@ extension MonthView: UICollectionViewDataSource, UICollectionViewDataSourcePrefe
         parameters.monthData.data.months[section].days.count
     }
     
+    private func getEventsForTheDay(day: Day) -> [Event] {
+        allEvents.filter({$0.isDateBetweenStartAndEnd(date: day.date!)})
+        // allEvents.filter({ style.calendar.isDate(day.date!, inSameDayAs: $0.start) })
+
+//        allEventes.filter({
+//            $0.start.kvkDay == day.date?.kvkDay && $0.start.kvkMonth == day.date?.kvkMonth && $0.start.kvkYear == day.date?.kvkYear
+//        })
+    }
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let item = getActualCachedDay(indexPath: indexPath)
-        guard let day = item.day else { return UICollectionViewCell() }
+        guard var day = item.day else {
+            return UICollectionViewCell()
+        }
+        
+        if day.events.isEmpty {
+            day.events = getEventsForTheDay(day: day)
+        }
         
         if let cell = dataSource?.dequeueCell(parameter: .init(date: day.date, type: day.type, events: day.events),
                                               type: .month,
@@ -377,6 +418,7 @@ extension MonthView: UICollectionViewDataSource, UICollectionViewDataSourcePrefe
             return collectionView.kvkDequeueCell(indexPath: item.indexPath) { (cell: MonthCell) in
                 cell.setSkeletons(parameters.monthData.isSkeletonVisible)
                 
+                // print("Skeletons visible: \(parameters.monthData.isSkeletonVisible)")
                 guard !parameters.monthData.isSkeletonVisible else { return }
                 
                 cell.delegate = self

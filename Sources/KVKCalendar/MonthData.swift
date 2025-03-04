@@ -20,7 +20,7 @@ final class MonthData: EventDateProtocol {
         let style: Style
     }
     
-    var selectedSection: Int = -1
+    // var selectedSection: Int = -1
     var date: Date
     var data: CalendarData
     let daysCount: Int
