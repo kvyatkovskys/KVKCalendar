@@ -15,10 +15,11 @@ final class YearData {
         let date: Date
         var months: [Month]
     }
-    
+
+    let calendarData: CalendarData
     var date: Date
     var style: Style
-    let sections: [YearSection]
+    var sections: [YearSection]
     let rowsInPage = 3
     let columnsInPage = 4
     var middleRowInPage: Int {
@@ -30,6 +31,7 @@ final class YearData {
     }
     
     init(data: CalendarData, date: Date, style: Style) {
+        self.calendarData = data
         self.date = date
         self.style = style
         
@@ -43,6 +45,27 @@ final class YearData {
             accTemp[idx].months.append(month)
             return accTemp
         })
+    }
+
+    func reloadEventsInDays(events: [Event]) -> YearData {
+        var calendarData = self.calendarData
+
+        for section in self.sections {
+            for month in section.months {
+                let monthData = MonthData(
+                    parameters: .init(
+                        data: calendarData,
+                        startDay: style.startWeekDay,
+                        calendar: style.calendar,
+                        style: style
+                    )
+                )
+                _ = monthData.reloadEventsInDays(events: events, date: month.date)
+                calendarData = monthData.data
+            }
+        }
+
+        return YearData(data: calendarData, date: self.date, style: self.style)
     }
 }
 

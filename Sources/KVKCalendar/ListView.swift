@@ -96,10 +96,10 @@ open class ListView: UIView, CalendarSettingProtocol {
         tableView.reloadData()
     }
     
-    func setDate(_ date: Date, animated: Bool) {
+    func setDate(_ date: Date, animated: Bool, shouldScrollToDate: Bool = true) {
         params.data.date = date
         
-        guard !params.data.isSkeletonVisible else { return }
+        guard !params.data.isSkeletonVisible, shouldScrollToDate else { return }
         
         if let idx = params.data.sections.firstIndex(where: { $0.date.kvkIsEqual(date) }) {
             tableView.scrollToRow(at: IndexPath(row: 0, section: idx), at: .top, animated: animated)
@@ -195,7 +195,7 @@ extension ListView: UITableViewDataSource, UITableViewDelegate {
         
         let event = params.data.event(indexPath: indexPath)
         let frameCell = tableView.cellForRow(at: indexPath)?.frame
-        delegate?.didSelectEvent(event, type: .list, frame: frameCell)
+        delegate?.didSelectEvent(event, type: .list, frame: frameCell, date: params.data.date)
     }
     
     open func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {

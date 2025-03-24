@@ -161,7 +161,7 @@ final class AllDayView: UIView {
         if let customView = dataSource?.dequeueAllDayViewEvent(event, date: event.start, frame: frame) {
             return customView
         } else {
-            let eventView = AllDayEventView(style: params.style.allDay, event: event, frame: frame)
+            let eventView = AllDayEventView(style: params.style.allDay, event: event, frame: frame, date: event.start)
             eventView.delegate = self
             return eventView
         }
@@ -178,8 +178,8 @@ final class AllDayView: UIView {
 
 extension AllDayView: AllDayEventDelegate {
     
-    func didSelectAllDayEvent(_ event: Event, frame: CGRect?) {
-        params.delegate?.didSelectEvent(event, frame: frame)
+    func didSelectAllDayEvent(_ event: Event, frame: CGRect?, date: Date?) {
+        params.delegate?.didSelectEvent(event, frame: frame, date: date)
     }
     
 }

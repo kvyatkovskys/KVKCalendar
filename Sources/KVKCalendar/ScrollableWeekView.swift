@@ -126,9 +126,11 @@ final class ScrollableWeekView: UIView {
         collectionView.contentOffset.x = lastContentOffset - transform.tx
     }
     
-    func setDate(_ date: Date, isDelay: Bool = true) {
+    func setDate(_ date: Date, isDelay: Bool = true, shouldScrollToDate: Bool = true) {
         self.date = date
-        scrollToDate(date, animated: isAnimate, isDelay: isDelay)
+        if shouldScrollToDate {
+            scrollToDate(date, animated: isAnimate, isDelay: isDelay)
+        }
         collectionView.reloadData()
     }
     
@@ -273,6 +275,7 @@ extension ScrollableWeekView: CalendarSettingProtocol {
                                          height: bounds.height)
                 cornerBtn.setTitle(style.timezone.abbreviation(), for: .normal)
                 cornerBtn.titleLabel?.adjustsFontSizeToFitWidth = true
+                cornerBtn.isUserInteractionEnabled = !style.timeZoneIds.isEmpty
                 addSubview(cornerBtn)
                 
                 if #available(iOS 14.0, *) {
@@ -473,7 +476,7 @@ extension ScrollableWeekView: UICollectionViewDelegate, UICollectionViewDelegate
             break
         }
         
-        didSelectDate?(date, type)
+        didSelectDate?(date, style.week.selectCalendarType)
         collectionView.reloadData()
     }
     

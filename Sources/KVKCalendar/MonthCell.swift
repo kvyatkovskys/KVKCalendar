@@ -18,7 +18,7 @@ final class MonthCell: KVKCollectionViewCell {
     
     private let titlesCount = 3
     private let countInCell: CGFloat = 4
-    private let offset: CGFloat = 3
+    private let offset: CGFloat = 0
     private let defaultTagView = -1
     
     private let dateLabel: UILabel = {
@@ -74,19 +74,15 @@ final class MonthCell: KVKCollectionViewCell {
         
     var events: [Event] = [] {
         didSet {
+            defer {
+                let day = self.day
+                self.day = day
+            }
+
             contentView.subviews.filter { $0.tag != defaultTagView }.forEach { $0.removeFromSuperview() }
             
             guard bounds.height > (dateLabel.bounds.height + 10) && day.type != .empty else {
-                if monthStyle.showDatesForOtherMonths {
-                    showMonthName(day: day)
-                }
                 return
-            }
-            
-            // if Platform.currentInterface == .phone && UIApplication.shared.orientation.isLandscape { return }
-            
-            if monthStyle.showMonthNameInFirstDay {
-                showMonthName(day: day)
             }
             
             // using a custom view below the date label
@@ -112,20 +108,15 @@ final class MonthCell: KVKCollectionViewCell {
             
             for (idx, event) in items.enumerated() {
                 let width = frame.width - 4
-//                let width = frame.width - 10
                 let count = idx + 1
                 let label = UILabel(frame: CGRect(x: 2,
-                                                  y: 5 + dateLabel.bounds.height + height * CGFloat(idx) + (idx > 0 ? 2 : 0),
+                                                  y: 5 + dateLabel.bounds.height + height * CGFloat(idx) + CGFloat(idx),
                                                   width: width,
                                                   height: height))
-//                let label = UILabel(frame: CGRect(x: 5,
-//                                                  y: 5 + dateLabel.bounds.height + height * CGFloat(idx),
-//                                                  width: width,
-//                                                  height: height))
                 label.isUserInteractionEnabled = true
                 
                 if count > titlesCount {
-                    label.font = monthStyle.fontEventTitle
+                    label.font = monthStyle.fontMoreTitle
                     label.lineBreakMode = .byTruncatingMiddle
                     label.adjustsFontSizeToFitWidth = true
                     label.minimumScaleFactor = 0.95
@@ -134,7 +125,7 @@ final class MonthCell: KVKCollectionViewCell {
                     label.tag = event.start.kvkDay
                     label.addGestureRecognizer(tap)
                     label.textColor = monthStyle.colorMoreTitle
-                    
+
                     if !monthStyle.isHiddenMoreTitle {
                         let text: String
                         if monthStyle.moreTitle.isEmpty {
@@ -172,9 +163,9 @@ final class MonthCell: KVKCollectionViewCell {
                         label.minimumScaleFactor = 0.8
                         // label.minimumScaleFactor = 0.95
                         label.textAlignment = .left
-                        label.backgroundColor = event.color?.value ?? .systemGray
-                        label.textColor = allDayStyle.textColor
-                        // label.text = " \(event.title.timeline) "
+                        label.backgroundColor = event.backgroundColor
+                        label.textColor = event.textColor
+                        label.text = event.title.month ?? ""
                         label.setRoundCorners(monthStyle.eventCorners, radius: monthStyle.eventCornersRadius)
                     // }
                     
@@ -195,7 +186,13 @@ final class MonthCell: KVKCollectionViewCell {
     var day: Day = .empty() {
         didSet {
             isUserInteractionEnabled = day.type != .empty
-            
+
+            if let interactionsDateRange = monthStyle.interactionsDateRange,
+               let date = day.date,
+               !interactionsDateRange.contains(date) {
+                isUserInteractionEnabled = false
+            }
+
             switch day.type {
             case .empty:
                 if let tempDate = day.date, monthStyle.showDatesForOtherMonths {
@@ -213,26 +210,37 @@ final class MonthCell: KVKCollectionViewCell {
             }
 
             if !monthStyle.isHiddenSeparator {
-                switch Platform.currentInterface {
-                case .phone:
-                    let topLineLayer = CALayer()
-                    topLineLayer.name = "line_layer"
-                    
-                    if monthStyle.isHiddenSeparatorOnEmptyDate && day.type == .empty {
-                        layer.sublayers?.removeAll(where: { $0.name == "line_layer" })
-                    } else {
-                        topLineLayer.frame = CGRect(x: 0, y: 0, width: frame.width, height: monthStyle.widthSeparator)
-                        topLineLayer.backgroundColor = monthStyle.colorSeparator.cgColor
-                        layer.addSublayer(topLineLayer)
-                    }
-                default:
-                    if day.type != .empty {
-                        layer.borderWidth = monthStyle.isHiddenSeparatorOnEmptyDate ? 0 : monthStyle.widthSeparator
-                        layer.borderColor = monthStyle.isHiddenSeparatorOnEmptyDate ? UIColor.clear.cgColor : monthStyle.colorSeparator.cgColor
-                    } else {
-                        layer.borderWidth = monthStyle.widthSeparator
-                        layer.borderColor = monthStyle.colorSeparator.cgColor
-                    }
+//                switch Platform.currentInterface {
+//                case .phone:
+//                    let topLineLayer = CALayer()
+//                    topLineLayer.name = "line_layer"
+//                    
+//                    if monthStyle.isHiddenSeparatorOnEmptyDate && day.type == .empty {
+//                        layer.sublayers?.removeAll(where: { $0.name == "line_layer" })
+//                    } else {
+//                        topLineLayer.frame = CGRect(x: 0, y: 0, width: frame.width, height: monthStyle.widthSeparator)
+//                        topLineLayer.backgroundColor = monthStyle.colorSeparator.cgColor
+//                        layer.addSublayer(topLineLayer)
+//                    }
+//                default:
+//                    if day.type == .empty {
+//                        layer.borderWidth = monthStyle.isHiddenSeparatorOnEmptyDate ? 0 : monthStyle.widthSeparator
+//                        layer.borderColor = monthStyle.isHiddenSeparatorOnEmptyDate ? UIColor.clear.cgColor : monthStyle.colorSeparator.cgColor
+//                    } else {
+//                        layer.borderWidth = monthStyle.widthSeparator
+//                        layer.borderColor = monthStyle.colorSeparator.cgColor
+//                    }
+//                }
+
+                let topLineLayer = CALayer()
+                topLineLayer.name = "line_layer"
+
+                if monthStyle.isHiddenSeparatorOnEmptyDate && day.type == .empty {
+                    layer.sublayers?.removeAll(where: { $0.name == "line_layer" })
+                } else {
+                    topLineLayer.frame = CGRect(x: 0, y: 0, width: frame.width, height: monthStyle.widthSeparator)
+                    topLineLayer.backgroundColor = monthStyle.colorSeparator.cgColor
+                    layer.addSublayer(topLineLayer)
                 }
             }
             populateCell(day: day, label: dateLabel, view: self)
@@ -247,7 +255,7 @@ final class MonthCell: KVKCollectionViewCell {
             let newFrame = CGRect(x: location.x, y: location.y,
                                   width: gesture.view?.frame.width ?? 0,
                                   height: gesture.view?.frame.size.height ?? 0)
-            delegate?.didSelectEvent(events[idx], frame: newFrame)
+            delegate?.didSelectEvent(events[idx], frame: newFrame, date: day.date)
         }
     }
     
@@ -265,14 +273,13 @@ final class MonthCell: KVKCollectionViewCell {
         super.init(frame: frame)
         
         var dateFrame = frame
-        if Platform.currentInterface != .phone {
+//        if Platform.currentInterface != .phone {
             dateFrame.size = CGSize(width: 30, height: 30)
-            dateFrame.origin.x = (frame.width - dateFrame.width) - offset
-        } else {
-            let newWidth = frame.width > 30 ? 30 : frame.width
-            dateFrame.size = CGSize(width: newWidth, height: newWidth)
-            dateFrame.origin.x = (frame.width / 2) - (dateFrame.width / 2)
-        }
+            dateFrame.origin.x = (frame.width - dateFrame.width)/2 - offset
+//        } else {
+//            dateFrame.size = CGSize(width: frame.width, height: 30)
+//            dateFrame.origin.x = (frame.width / 2) - (dateFrame.width / 2)
+//        }
         dateFrame.origin.y = offset
         dateLabel.frame = dateFrame
         dateLabel.tag = defaultTagView
@@ -283,20 +290,20 @@ final class MonthCell: KVKCollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func showMonthName(day: Day) {
-        let monthLabel = UILabel(frame: CGRect(x: dateLabel.frame.origin.x - 50,
-                                               y: dateLabel.frame.origin.y,
-                                               width: 50,
-                                               height: dateLabel.bounds.height))
-        if let date = day.date, date.kvkDay == 1, Platform.currentInterface != .phone {
-            monthLabel.textAlignment = .right
-            monthLabel.textColor = dateLabel.textColor
-            monthLabel.text = "\(date.titleForLocale(style.locale, formatter: monthStyle.shortInDayMonthFormatter))".capitalized
-            contentView.addSubview(monthLabel)
-        } else {
-            monthLabel.removeFromSuperview()
-        }
-    }
+//    private func showMonthName(day: Day) {
+//        let monthLabel = UILabel(frame: CGRect(x: dateLabel.frame.origin.x - 50,
+//                                               y: dateLabel.frame.origin.y,
+//                                               width: 50,
+//                                               height: dateLabel.bounds.height))
+//        if let date = day.date, date.kvkDay == 1, Platform.currentInterface != .phone {
+//            monthLabel.textAlignment = .right
+//            monthLabel.textColor = dateLabel.textColor
+//            monthLabel.text = "\(date.titleForLocale(style.locale, formatter: monthStyle.shortInDayMonthFormatter))".capitalized
+//            contentView.addSubview(monthLabel)
+//        } else {
+//            monthLabel.removeFromSuperview()
+//        }
+//    }
     
     @objc private func processMovingEvent(gesture: UIPanGestureRecognizer) {
         switch gesture.state {
@@ -316,7 +323,7 @@ final class MonthCell: KVKCollectionViewCell {
             let event = events[idx]
             let snapshotLabel = UILabel(frame: view.frame)
             snapshotLabel.setRoundCorners(monthStyle.eventCorners, radius: monthStyle.eventCornersRadius)
-            snapshotLabel.backgroundColor = event.color?.value ?? .systemGray
+            snapshotLabel.backgroundColor = event.backgroundColor
             snapshotLabel.attributedText = addIconBeforeLabel(eventList: [event],
                                                               textAttributes: [.font: monthStyle.fontEventTitle,
                                                                                .foregroundColor: UIColor.white],
@@ -328,7 +335,7 @@ final class MonthCell: KVKCollectionViewCell {
                                                               lineSpacing: 0,
                                                               paragraphSpacing: 0)
             let snapshot = event.isAllDay ? view.snapshotView(afterScreenUpdates: false) : snapshotLabel
-            let eventView = EventViewGeneral(style: style, event: event, frame: view.frame)
+            let eventView = EventViewGeneral(style: style, event: event, frame: view.frame, date: nil)
             delegate?.didStartMoveEvent(eventView, snapshot: snapshot, gesture: gesture)
         case .cancelled, .ended, .failed:
             delegate?.didEndMoveEvent(gesture: gesture)
@@ -350,21 +357,28 @@ final class MonthCell: KVKCollectionViewCell {
         }
         
         if weekend {
-            switch Platform.currentInterface {
-            case .phone where day.type == .empty:
-                view.backgroundColor = UIColor.clear
-            default:
+//            switch Platform.currentInterface {
+//            case .phone where day.type == .empty:
+//                view.backgroundColor = UIColor.clear
+//            default:
                 view.backgroundColor = monthStyle.colorBackgroundWeekendDate
-            }
+//            }
             
             label.textColor = textColorForEmptyDay ?? monthStyle.colorWeekendDate
         } else {
             view.backgroundColor = monthStyle.colorBackgroundDate
             label.textColor = textColorForEmptyDay ?? monthStyle.colorDate
         }
-        
-        guard day.type != .empty else { return }
-        
+
+        if !events.isEmpty, let color = monthStyle.colorDateWithEvents {
+            label.textColor = color
+        }
+
+        guard day.type != .empty else {
+            view.backgroundColor = monthStyle.colorBackgroundEmptyDate
+            return
+        }
+
         guard date?.kvkYear == nowDate.kvkYear else {
             if date?.kvkIsEqual(selectDate) == true {
                 label.textColor = monthStyle.colorSelectDate
@@ -484,7 +498,7 @@ extension MonthCell: UIGestureRecognizerDelegate {
 
 protocol MonthCellDelegate: AnyObject {
     
-    func didSelectEvent(_ event: Event, frame: CGRect?)
+    func didSelectEvent(_ event: Event, frame: CGRect?, date: Date?)
     func didSelectMore(_ date: Date, frame: CGRect?)
     func didStartMoveEvent(_ event: EventViewGeneral, snapshot: UIView?, gesture: UILongPressGestureRecognizer)
     func didEndMoveEvent(gesture: UILongPressGestureRecognizer)

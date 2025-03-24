@@ -284,7 +284,7 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         }
         return false
     }
-    
+
     func create(dates: [Date], events: [Event], recurringEvents: [Event], selectedDate: Date) {
         isChangingEventEnable = false
         delegate?.didDisplayEvents(events, dates: dates)
@@ -427,25 +427,27 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                                                       date: date,
                                                       context: context)
                 zip(sortedEventsByDate, rects).forEach { (event, rect) in
-                    let view: EventViewGeneral = {
-                        if let view = dataSource?.willDisplayEventView(event, frame: rect, date: date) {
-                            return view
-                        } else {
-                            let eventView = EventView(event: event, style: style, frame: rect)
-                            if #available(iOS 14.0, *),
-                               let item = dataSource?.willDisplayEventOptionMenu(event, type: paramaters.type)
-                            {
-                                eventView.addOptionMenu(item.menu, customButton: item.customButton)
+                    if rect.size.height > 0 {
+                        let view: EventViewGeneral = {
+                            if let view = dataSource?.willDisplayEventView(event, frame: rect, date: date) {
+                                return view
+                            } else {
+                                let eventView = EventView(event: event, style: style, frame: rect, date: date)
+                                if #available(iOS 14.0, *),
+                                   let item = dataSource?.willDisplayEventOptionMenu(event, type: paramaters.type)
+                                {
+                                    eventView.addOptionMenu(item.menu, customButton: item.customButton)
+                                }
+                                return eventView
                             }
-                            return eventView
+                        }()
+
+                        if !isDisplayedTimes {
+                            allHeightEvents.append(view.bounds.height + style.timeline.offsetEvent)
                         }
-                    }()
-                    
-                    if !isDisplayedTimes {
-                        allHeightEvents.append(view.bounds.height + style.timeline.offsetEvent)
+                        view.delegate = self
+                        scrollView.addSubview(view)
                     }
-                    view.delegate = self
-                    scrollView.addSubview(view)
                 }
             }
             

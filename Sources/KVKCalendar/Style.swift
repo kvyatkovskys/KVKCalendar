@@ -234,7 +234,8 @@ public struct TimelineStyle {
     public var scale: Scale? = Scale(min: 1, max: 6)
     public var useDefaultCorderHeader = false
     public var eventPreviewSize: CGSize? = CGSize(width: 150, height: 150)
-    
+    public var useDifferentLabelsForTimeZones: Bool = true
+
     /// Takes effect when `style.event.states` does not contain `.move`. `true`: create a new event at the long press; `false`: create at the start time.
     @available(swift, deprecated: 0.6.28, message: "The property is not used anymore. Please use `createNewEventMethod` instead.")
     public var createEventAtTouch = false
@@ -505,6 +506,8 @@ public struct MonthStyle {
     public var heightTitleHeader: CGFloat = 40
     public var isHiddenTitleHeader: Bool = false
     public var colorDate: UIColor = .black
+    /// Disables colorWeekendDate if set
+    public var colorDateWithEvents: UIColor?
     public var colorNameEmptyDay: UIColor = gainsboro
     public var fontNameDate: UIFont = .boldSystemFont(ofSize: 16)
     public var colorCurrentDate: UIColor = .white
@@ -518,6 +521,7 @@ public struct MonthStyle {
     public var colorEventTitle: UIColor = .black
     public var weekFont: UIFont = .boldSystemFont(ofSize: 14)
     public var fontEventTitle: UIFont = .systemFont(ofSize: 14)
+    public var fontMoreTitle: UIFont = .systemFont(ofSize: 14)
     public var fontEventTime: UIFont = .systemFont(ofSize: 10)
     public var fontEventBullet: UIFont = .boldSystemFont(ofSize: 18)
     public var isHiddenSeparator: Bool = false
@@ -525,6 +529,7 @@ public struct MonthStyle {
     public var widthSeparator: CGFloat = 0.3
     public var colorSeparator: UIColor = gainsboro.withAlphaComponent(0.9)
     public var colorBackgroundWeekendDate: UIColor = gainsboro.withAlphaComponent(0.2)
+    public var colorBackgroundEmptyDate: UIColor = gainsboro.withAlphaComponent(0.3)
     public var colorBackgroundDate: UIColor = .white
     public var scrollDirection: UICollectionView.ScrollDirection = .vertical
     public var selectCalendarType: CalendarType = .week
@@ -548,7 +553,9 @@ public struct MonthStyle {
     public var isPrefetchingEnabled: Bool = true
     public var isHiddenSectionHeader: Bool = true
     public var heightSectionHeader: CGFloat = 50
-    
+    public var scrollPastSectionHeader: Bool = false
+    public var interactionsDateRange: ClosedRange<Date>?
+
     public enum SelectionMode: Int {
         case single, multiple, disabled
     }
@@ -585,8 +592,10 @@ public struct YearStyle {
             return weekFontPad
         }
     }
-    public var fontTitle: UIFont = .systemFont(ofSize: 19)
+    public var fontTitle: UIFont = .systemFont(ofSize: 19, weight: .semibold)
     public var colorTitle: UIColor = .black
+    public var fontEventsCount: UIFont = .systemFont(ofSize: 14)
+    public var colorEventsCount: UIColor = .gray
     public var colorBackgroundHeader: UIColor = gainsboro.withAlphaComponent(0.2)
     public var fontTitleHeader: UIFont = .boldSystemFont(ofSize: 40)
     public var colorTitleHeader: UIColor = .black
@@ -602,7 +611,19 @@ public struct YearStyle {
             return fontDayTitlePad
         }
     }
-    public var colorDayTitle: UIColor = .black
+    public var fontDayTitleWithEventsPad: UIFont = .systemFont(ofSize: 15, weight: .semibold)
+    public var fontDayTitleWithEventsPhone: UIFont = .systemFont(ofSize: 11, weight: .semibold)
+    public var fontDayTitleWithEvents: UIFont {
+        switch Platform.currentInterface {
+        case .phone:
+            return fontDayTitleWithEventsPhone
+        default:
+            return fontDayTitleWithEventsPad
+        }
+    }
+    public var colorDayTitle: UIColor = .gray
+    /// Disables colorWeekendDate if set
+    public var colorDayTitleWithEvents: UIColor?
     public var selectCalendarType: CalendarType = .month
     public var isAnimateSelection: Bool = false
     public var isPagingEnabled: Bool = true
@@ -610,7 +631,8 @@ public struct YearStyle {
     public var weekDayAlignment: NSTextAlignment = .center
     public var titleDateAlignment: NSTextAlignment = .left
     public var colorBackground: UIColor = .white
-    
+    public var isHiddenWeekdays: Bool = false
+
     var scrollDirection: UICollectionView.ScrollDirection = .vertical
 }
 

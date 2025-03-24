@@ -55,9 +55,9 @@ final class WeekView: UIView {
         }
     }
     
-    func setDate(_ date: Date, animated: Bool) {
+    func setDate(_ date: Date, animated: Bool, shouldScrollToDate: Bool = true) {
         parameters.data.date = date
-        scrollableWeekView.setDate(date)
+        scrollableWeekView.setDate(date, shouldScrollToDate: shouldScrollToDate)
         parameters.visibleDates = getVisibleDatesFor(date: date)
     }
     
@@ -329,8 +329,8 @@ extension WeekView: TimelineDelegate {
         delegate?.didDisplayEvents(events, dates: dates, type: .week)
     }
     
-    func didSelectEvent(_ event: Event, frame: CGRect?) {
-        delegate?.didSelectEvent(event, type: .week, frame: frame)
+    func didSelectEvent(_ event: Event, frame: CGRect?, date: Date?) {
+        delegate?.didSelectEvent(event, type: .week, frame: frame, date: date)
     }
     
     func nextDate() {

@@ -51,9 +51,9 @@ public final class DayView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setDate(_ date: Date, animated: Bool) {
+    func setDate(_ date: Date, animated: Bool, shouldScrollToDate: Bool = true) {
         parameters.data.date = date
-        scrollableWeekView.setDate(date)
+        scrollableWeekView.setDate(date, shouldScrollToDate: shouldScrollToDate)
     }
     
     func reloadData(_ events: [Event]) {
@@ -94,8 +94,8 @@ extension DayView: TimelineDelegate {
         delegate?.didDisplayEvents(events, dates: dates, type: .day)
     }
     
-    func didSelectEvent(_ event: Event, frame: CGRect?) {
-        delegate?.didSelectEvent(event, type: .day, frame: frame)
+    func didSelectEvent(_ event: Event, frame: CGRect?, date: Date?) {
+        delegate?.didSelectEvent(event, type: .day, frame: frame, date: parameters.data.date)
     }
     
     func nextDate() {

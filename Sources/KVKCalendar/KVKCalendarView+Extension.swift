@@ -17,12 +17,12 @@ extension KVKCalendarView {
     @available(*, deprecated, renamed: "CalendarDataSource.willDisplayEventViewer")
     public func addEventViewToDay(view: UIView) {}
     
-    public func set(type: CalendarType, date: Date? = nil, animated: Bool = true) {
+    public func set(type: CalendarType, date: Date? = nil, animated: Bool = true, shouldScrollToDate: Bool = true) {
         parameters.type = type
         switchCalendarType(type)
         
         if let dt = date {
-            scrollTo(dt, animated: animated)
+            scrollTo(dt, animated: animated, shouldScrollToDate: shouldScrollToDate)
         }
     }
     
@@ -40,8 +40,8 @@ extension KVKCalendarView {
                 monthView.reloadData(events)
             case .list:
                 listView.reloadData(events)
-            default:
-                break
+            case .year:
+                yearView.reloadData(events)
             }
         }
         
@@ -71,18 +71,18 @@ extension KVKCalendarView {
         }
     }
     
-    public func scrollTo(_ date: Date, animated: Bool = true) {
+    public func scrollTo(_ date: Date, animated: Bool = true, shouldScrollToDate: Bool = true) {
         switch parameters.type {
         case .day:
-            dayView.setDate(date, animated: false)
+            dayView.setDate(date, animated: false, shouldScrollToDate: shouldScrollToDate)
         case .week:
-            weekView.setDate(date, animated: false)
+            weekView.setDate(date, animated: false, shouldScrollToDate: shouldScrollToDate)
         case .month:
-            monthView.setDate(date, animated: animated)
+            monthView.setDate(date, animated: animated, shouldScrollToDate: shouldScrollToDate)
         case .year:
-            yearView.setDate(date, animated: animated)
+            yearView.setDate(date, animated: animated, shouldScrollToDate: shouldScrollToDate)
         case .list:
-            listView.setDate(date, animated: animated)
+            listView.setDate(date, animated: animated, shouldScrollToDate: shouldScrollToDate)
         }
     }
     
@@ -322,8 +322,8 @@ extension KVKCalendarView: DisplayDelegate {
         delegate?.didDeselectEvent(event, animated: animated)
     }
     
-    public func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?) {
-        delegate?.didSelectEvent(event, type: type, frame: frame)
+    public func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?, date: Date?) {
+        delegate?.didSelectEvent(event, type: type, frame: frame, date: date)
     }
     
     public func didSelectMore(_ date: Date, frame: CGRect?) {

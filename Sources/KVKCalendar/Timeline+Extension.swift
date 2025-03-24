@@ -338,9 +338,12 @@ extension TimelineView {
     func createTimesLabel(start: Int, end: Int) -> (times: [TimelineLabel], items: [UILabel]) {
         var times = [TimelineLabel]()
         var otherTimes = [UILabel]()
+
+        let leftOffset = style.timeline.useDifferentLabelsForTimeZones ? leftOffsetWithAdditionalTime : style.timeline.offsetTimeX
+
         for (idx, item) in timeSystem.getHours(isEndOfDayZero: style.isEndOfDayZero).enumerated() where idx >= start && idx <= end {
             let yTime = (calculatedTimeY + style.timeline.heightTime) * CGFloat(idx - start)
-            let time = TimelineLabel(frame: CGRect(x: leftOffsetWithAdditionalTime,
+            let time = TimelineLabel(frame: CGRect(x: leftOffset,
                                                    y: yTime,
                                                    width: style.timeline.widthTime,
                                                    height: style.timeline.heightTime))
@@ -428,7 +431,7 @@ extension TimelineView {
         if let eventView = dataSource?.willDisplayEventView(event, frame: frame, date: date) {
             return eventView
         } else {
-            let eventView = EventView(event: event, style: style, frame: frame)
+            let eventView = EventView(event: event, style: style, frame: frame, date: date)
             if #available(iOS 14.0, *), let item = dataSource?.willDisplayEventOptionMenu(event, type: paramaters.type) {
                 eventView.addOptionMenu(item.menu, customButton: item.customButton)
             }
@@ -490,7 +493,8 @@ extension TimelineView {
         if style.timeline.createNewEventMethod.isMovable {
             let newEventPreview = getEventView(style: style,
                                                event: newEvent,
-                                               frame: CGRect(origin: point, size: eventPreviewSize))
+                                               frame: CGRect(origin: point, size: eventPreviewSize),
+                                               date: newEvent.start)
             newEventPreview.stateEvent = .move
             newEventPreview.delegate = self
             newEventPreview.editEvent(gesture: gesture)
@@ -615,9 +619,9 @@ extension TimelineView: EventDelegate {
         deselectEvent?(event)
     }
     
-    func didSelectEvent(_ event: Event, gesture: UITapGestureRecognizer) {
+    func didSelectEvent(_ event: Event, gesture: UITapGestureRecognizer, date: Date?) {
         forceDeselectEvent()
-        delegate?.didSelectEvent(event, frame: gesture.view?.frame)
+        delegate?.didSelectEvent(event, frame: gesture.view?.frame, date: date)
     }
     
     func didStartResizeEvent(_ event: Event, gesture: UIGestureRecognizer, view: UIView) {
@@ -633,8 +637,8 @@ extension TimelineView: EventDelegate {
         }
         
         let viewTmp: UIView
-        if view is EventView {
-            let eventView = EventView(event: event, style: style, frame: viewFrame)
+        if let view = view as? EventView {
+            let eventView = EventView(event: event, style: style, frame: viewFrame, date: view.date)
             eventView.textView.isHidden = false
             eventView.selectEvent()
             eventView.isUserInteractionEnabled = false
@@ -678,7 +682,8 @@ extension TimelineView: EventDelegate {
                                      style: style,
                                      frame: CGRect(origin: CGPoint(x: location.x - eventPreviewXOffset,
                                                                    y: location.y - eventPreviewYOffset),
-                                                   size: eventPreviewSize))
+                                                   size: eventPreviewSize),
+                                     date: nil)
         } else {
             eventPreview = event.isNew ? view : view.snapshotView(afterScreenUpdates: false)
             if let size = eventPreview?.frame.size {
@@ -876,8 +881,8 @@ extension TimelineView: CalendarSettingProtocol {
 
 extension TimelineView: AllDayEventDelegate {
     
-    func didSelectAllDayEvent(_ event: Event, frame: CGRect?) {
-        delegate?.didSelectEvent(event, frame: frame)
+    func didSelectAllDayEvent(_ event: Event, frame: CGRect?, date: Date?) {
+        delegate?.didSelectEvent(event, frame: frame, date: date)
     }
     
 }

@@ -43,7 +43,8 @@ final class MonthView: UIView {
     
     private var headerViewFrame: CGRect = .zero
     private var weekHeaderView = WeekHeaderView(parameters: .init(style: Style()), frame: .zero)
-    
+    private let heightTitleHeaderAdjustment: CGFloat = 5
+
     private var layout: UICollectionViewFlowLayout = {
         let layout = CustomUICollectionViewFlowLayout()
         layout.minimumLineSpacing = 0
@@ -58,12 +59,14 @@ final class MonthView: UIView {
         super.init(frame: frame)
     }
     
-    func setDate(_ date: Date, animated: Bool = false) {
+    func setDate(_ date: Date, animated: Bool = false, shouldScrollToDate: Bool = true) {
         updateHeaderView(date, frame: headerViewFrame)
         parameters.monthData.date = date
         parameters.monthData.selectedDates.removeAll()
         reload()
-        scrollToDate(date, animated: animated)
+        if shouldScrollToDate {
+            scrollToDate(date, animated: animated)
+        }
     }
     
     func reloadData(_ events: [Event]) {
@@ -147,7 +150,10 @@ final class MonthView: UIView {
                 let contentOffset: CGPoint
                 switch self.style.month.scrollDirection {
                 case .vertical:
-                    let offset = attributes.frame.origin.y - inset.top
+                    var offset = attributes.frame.origin.y - inset.top
+                    if !style.month.isHiddenSectionHeader, style.month.scrollPastSectionHeader {
+                        offset += style.month.heightSectionHeader
+                    }
                     contentOffset = CGPoint(x: 0, y: offset)
                 case .horizontal:
                     let offset = attributes.frame.origin.x - inset.left
@@ -277,7 +283,7 @@ extension MonthView: CalendarSettingProtocol {
         if style.month.isHiddenTitleHeader {
             height = style.month.heightHeaderWeek
         } else {
-            height = style.month.heightHeaderWeek + style.month.heightTitleHeader + 5
+            height = style.month.heightHeaderWeek + style.month.heightTitleHeader + heightTitleHeaderAdjustment
         }
         headerViewFrame = CGRect(x: 0, y: 0, width: frame.width, height: height)
         
@@ -530,6 +536,7 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         let width: CGFloat
         let height: CGFloat
         let heightSectionHeader = style.month.heightSectionHeader
+        let heightTitleHeader = style.month.heightTitleHeader
         switch style.month.scrollDirection {
         case .horizontal:
             var superViewWidth = collectionView.bounds.width
@@ -548,6 +555,9 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
             if !style.month.isHiddenSectionHeader && superViewHeight >= heightSectionHeader {
                 superViewHeight -= heightSectionHeader
             }
+            if !style.month.isHiddenTitleHeader && superViewHeight >= heightTitleHeader {
+                superViewHeight -= heightTitleHeader + heightTitleHeaderAdjustment
+            }
             height = superViewHeight / CGFloat(item.weeks)
         @unknown default:
             fatalError()
@@ -562,8 +572,8 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
         if let headerView = dataSource?.dequeueHeader(date: month.date, type: .month, view: collectionView, indexPath: index) as? UICollectionReusableView {
             return headerView
         } else {
-            return collectionView.kvkDequeueView(indexPath: index) { (headerView: MonthHeaderView) in
-                headerView.value = (style, month.date)
+            return collectionView.kvkDequeueView(kind: kind, indexPath: index) { (headerView: MonthHeaderView) in
+                headerView.value = style.month.showMonthNameInFirstDay ? (style, month.date) : nil
             }
         }
     }
@@ -600,8 +610,8 @@ extension MonthView: MonthCellDelegate {
         }
     }
     
-    func didSelectEvent(_ event: Event, frame: CGRect?) {
-        delegate?.didSelectEvent(event, type: .month, frame: frame)
+    func didSelectEvent(_ event: Event, frame: CGRect?, date: Date?) {
+        delegate?.didSelectEvent(event, type: .month, frame: frame, date: date)
     }
     
     func didSelectMore(_ date: Date, frame: CGRect?) {

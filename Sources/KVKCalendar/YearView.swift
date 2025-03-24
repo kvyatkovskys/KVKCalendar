@@ -34,9 +34,11 @@ final class YearView: UIView {
         super.init(frame: frame ?? .zero)
     }
     
-    func setDate(_ date: Date, animated: Bool) {
+    func setDate(_ date: Date, animated: Bool, shouldScrollToDate: Bool = true) {
         data.date = date
-        scrollToDate(date: date, animated: animated)
+        if shouldScrollToDate {
+            scrollToDate(date: date, animated: animated)
+        }
         collectionView?.reloadData()
     }
     
@@ -152,6 +154,11 @@ extension YearView: CalendarSettingProtocol {
             }
         }
     }
+
+    func reloadData(_ events: [Event]) {
+        data = data.reloadEventsInDays(events: events)
+        setUI(reload: true)
+    }
 }
 
 extension YearView: UICollectionViewDataSource {
@@ -211,7 +218,12 @@ extension YearView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
         let formatter = DateFormatter()
         formatter.locale = style.locale
         formatter.dateFormat = "dd.MM.yyyy"
-        let newDate = formatter.date(from: "\(data.date.kvkDay).\(date.kvkMonth).\(date.kvkYear)")
+        var newDate = formatter.date(from: "\(data.date.kvkDay).\(date.kvkMonth).\(date.kvkYear)")
+
+        if newDate == nil {
+            newDate = formatter.date(from: "01.\(date.kvkMonth).\(date.kvkYear)")?.kvkEndOfMonth?.kvkStartOfDay
+        }
+
         data.date = newDate ?? Date()
         collectionView.reloadData()
         

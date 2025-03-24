@@ -21,9 +21,12 @@ final class AllDayEventView: UIView {
     
     private let event: Event
     private var isSelected = false
-    
-    init(style: AllDayStyle, event: Event, frame: CGRect) {
+    // Date the event is positioned at in superview
+    var date: Date?
+
+    init(style: AllDayStyle, event: Event, frame: CGRect, date: Date?) {
         self.event = event
+        self.date = date
         super.init(frame: frame)
         
         let bgView = UIView(frame: CGRect(origin: .zero, size: CGSize(width: frame.width, height: frame.height - 2)))
@@ -36,7 +39,7 @@ final class AllDayEventView: UIView {
         bgView.addSubview(textLabel)
         
         textLabel.backgroundColor = event.backgroundColor
-        textLabel.text = event.title.timeline
+        textLabel.text = event.title.week
         textLabel.textColor = event.textColor
         textLabel.font = style.fontTitle
         
@@ -54,7 +57,7 @@ final class AllDayEventView: UIView {
     }
     
     @objc private func tapOnEvent(gesture: UITapGestureRecognizer) {
-        delegate?.didSelectAllDayEvent(event, frame: gesture.view?.frame)
+        delegate?.didSelectAllDayEvent(event, frame: gesture.view?.frame, date: date)
     }
     
     func selectEvent() {

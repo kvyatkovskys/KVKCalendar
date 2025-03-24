@@ -30,8 +30,8 @@ struct CalendarData {
     }
 
     init(date: Date, style: Style, startYear: Int, endYear: Int) {
-        let currentYear = Date().kvkYear
-        
+        let currentYear = date.kvkYear
+
         // 2024 - 2024 -> (left: 1, right: 0)
         // 2024 - 2026 -> (left: 1, right: 2)
         // 2023 - 2026 -> (left: 2, right: 2)
@@ -218,7 +218,7 @@ struct Day {
     let type: DayType
     var date: Date?
     var events: [Event]
-    
+
     static func empty() -> Day {
         return self.init()
     }
@@ -249,6 +249,16 @@ public enum DayType: String, CaseIterable {
 
 public enum StartDayType: Int {
     case monday, sunday
+}
+
+extension Array where Element == Day {
+    var uniqueEventsCount: Int {
+        Set(
+            self.filter({ $0.type != .empty })
+                .flatMap(\.events)
+                .map(\.ID)
+        ).count
+    }
 }
 
 #endif

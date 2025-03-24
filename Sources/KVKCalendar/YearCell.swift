@@ -18,7 +18,14 @@ final class YearCell: UICollectionViewCell {
         label.minimumScaleFactor = 0.3
         return label
     }()
-    
+
+    private let eventsCountLabel: UILabel = {
+        let label = UILabel()
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.3
+        return label
+    }()
+
     private var topHeight: CGFloat {
         switch Platform.currentInterface {
         case .phone:
@@ -46,12 +53,21 @@ final class YearCell: UICollectionViewCell {
         didSet {
             titleLabel.font = style.year.fontTitle
             titleLabel.textColor = style.year.colorTitle
-            
+
+            eventsCountLabel.font = style.year.fontEventsCount
+            eventsCountLabel.textColor = style.year.colorEventsCount
+
             subviews.filter({ $0 is WeekHeaderView }).forEach({ $0.removeFromSuperview() })
-            let view = WeekHeaderView(parameters: .init(style: style, isFromYear: true),
-                                      frame: CGRect(x: 0, y: topHeight + 5,
-                                                    width: frame.width, height: topHeight))
-            addSubview(view)
+            eventsCountLabel.removeFromSuperview()
+
+            if !style.year.isHiddenWeekdays {
+                let view = WeekHeaderView(parameters: .init(style: style, isFromYear: true),
+                                          frame: CGRect(x: 0, y: topHeight + 5,
+                                                        width: frame.width, height: topHeight))
+                addSubview(view)
+            } else {
+                addSubview(eventsCountLabel)
+            }
         }
     }
     
@@ -68,6 +84,8 @@ final class YearCell: UICollectionViewCell {
     
     var days: [Day] = [] {
         didSet {
+            let eventsCount = days.uniqueEventsCount
+            eventsCountLabel.text = "\(eventsCount) event" + (eventsCount == 1 ? "" : "s")
             subviews.filter({ $0.tag == 1 }).forEach({ $0.removeFromSuperview() })
             var step = 0
             let weekCount = ceil((CGFloat(days.count) / CGFloat(daysInWeek)))
@@ -90,7 +108,8 @@ final class YearCell: UICollectionViewCell {
         super.init(frame: frame)
         titleLabel.frame = CGRect(x: 3, y: 0, width: frame.width - 6, height: topHeight)
         addSubview(titleLabel)
-        
+        eventsCountLabel.frame = CGRect(x: 3, y: titleLabel.frame.maxY + 3, width: frame.width - 6, height: topHeight)
+
         if #available(iOS 13.4, *) {
             addPointInteraction()
         }
@@ -126,8 +145,16 @@ final class YearCell: UICollectionViewCell {
                                               width: size,
                                               height: size))
             label.textAlignment = .center
-            label.font = style.year.fontDayTitle
-            label.textColor = style.year.colorDayTitle
+
+            let hasEvents = day.events.count > 0
+
+            if !hasEvents {
+                label.font = style.year.fontDayTitle
+                label.textColor = style.year.colorDayTitle
+            } else {
+                label.font = style.year.fontDayTitleWithEvents
+                label.textColor = style.year.colorDayTitleWithEvents
+            }
             label.adjustsFontSizeToFitWidth = true
             label.minimumScaleFactor = 0.8
             if let tempDay = day.date?.kvkDay {
@@ -144,7 +171,7 @@ final class YearCell: UICollectionViewCell {
     }
     
     private func weekendsDays(day: Day, label: UILabel, view: UIView) {
-        guard day.type == .saturday || day.type == .sunday else {
+        guard style.year.colorDayTitleWithEvents == nil, (day.type == .saturday || day.type == .sunday) else {
             isNowDate(date: day.date, weekend: false, label: label, view: view)
             return
         }

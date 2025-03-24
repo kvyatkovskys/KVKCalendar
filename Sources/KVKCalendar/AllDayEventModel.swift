@@ -26,7 +26,7 @@ extension AllDayEvent: EventProtocol {
 
 protocol AllDayEventDelegate: AnyObject {
     
-    func didSelectAllDayEvent(_ event: Event, frame: CGRect?)
+    func didSelectAllDayEvent(_ event: Event, frame: CGRect?, date: Date?)
     
 }
 

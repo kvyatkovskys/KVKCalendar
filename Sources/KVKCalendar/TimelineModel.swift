@@ -23,7 +23,7 @@ typealias ResizeTime = (hour: Int, minute: Int)
 
 protocol TimelineDelegate: AnyObject {
     func didDisplayEvents(_ events: [Event], dates: [Date?])
-    func didSelectEvent(_ event: Event, frame: CGRect?)
+    func didSelectEvent(_ event: Event, frame: CGRect?, date: Date?)
     func nextDate()
     func previousDate()
     func swipeX(transform: CGAffineTransform, stop: Bool)
@@ -84,7 +84,7 @@ extension EventDateProtocol {
         guard let timeInterval = date?.timeIntervalSince1970, endDate > startDate else { return false }
         
         let result = event.start.kvkDay != event.end.kvkDay
-        && (startDate...endDate).contains(timeInterval)
+        && (startDate..<endDate).contains(timeInterval)
         
         if checkMonth {
             return result && event.start.kvkMonth == date?.kvkMonth

@@ -25,7 +25,9 @@ open class EventViewGeneral: UIView, CalendarTimer {
     public var style: Style
     public var isSelected: Bool = false
     public var stateEvent: EventViewState = .none
-    
+    // Date the event is positioned at in superview
+    public var date: Date?
+
     public lazy var longGesture: UILongPressGestureRecognizer = {
         let gesture = UILongPressGestureRecognizer(target: self, action: #selector(editEvent))
         gesture.minimumPressDuration = style.event.minimumPressDuration
@@ -40,11 +42,12 @@ open class EventViewGeneral: UIView, CalendarTimer {
         return button
     }()
     
-    public init(style: Style, event: Event, frame: CGRect) {
+    public init(style: Style, event: Event, frame: CGRect, date: Date?) {
         self.style = style
         self.event = event
         self.color = event.color?.value ?? event.backgroundColor
         self.states = style.event.states
+        self.date = date
         super.init(frame: frame)
         
         stateEvent = isAvailableOnlyMove ? .move : .none
@@ -77,7 +80,7 @@ open class EventViewGeneral: UIView, CalendarTimer {
     }
     
     @objc public func tapOnEvent(gesture: UITapGestureRecognizer) {
-        delegate?.didSelectEvent(event, gesture: gesture)
+        delegate?.didSelectEvent(event, gesture: gesture, date: date)
     }
     
     @available(swift, deprecated: 0.3.8, obsoleted: 0.3.9, renamed: "editEvent")
@@ -202,7 +205,7 @@ protocol EventDelegate: AnyObject {
     func didStartMovingEvent(_ event: Event, gesture: UIGestureRecognizer, view: UIView)
     func didEndMovingEvent(_ event: Event, gesture: UIGestureRecognizer)
     func didChangeMovingEvent(_ event: Event, gesture: UIGestureRecognizer)
-    func didSelectEvent(_ event: Event, gesture: UITapGestureRecognizer)
+    func didSelectEvent(_ event: Event, gesture: UITapGestureRecognizer, date: Date?)
     func deselectEvent(_ event: Event)
     
 }

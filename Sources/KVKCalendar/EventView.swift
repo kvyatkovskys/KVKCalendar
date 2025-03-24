@@ -29,9 +29,9 @@ final class EventView: EventViewGeneral {
         return image
     }()
     
-    init(event: Event, style: Style, frame: CGRect) {
-        super.init(style: style, event: event, frame: frame)
-        
+    init(event: Event, style: Style, frame: CGRect, date: Date?) {
+        super.init(style: style, event: event, frame: frame, date: date)
+
         var textFrame = frame
         textFrame.origin.x = pointX
         textFrame.origin.y = 0
@@ -47,7 +47,7 @@ final class EventView: EventViewGeneral {
         textView.textContainerInset = style.event.textContainerInset
         textView.frame = textFrame
         textView.font = style.timeline.eventFont
-        textView.text = event.title.timeline
+        textView.text = event.title.week
         
         if isSelected {
             backgroundColor = color
@@ -99,7 +99,7 @@ final class EventView: EventViewGeneral {
             return
         }
         
-        delegate?.didSelectEvent(event, gesture: gesture)
+        delegate?.didSelectEvent(event, gesture: gesture, date: date)
         
         if style.event.isEnableVisualSelect {
             selectEvent()

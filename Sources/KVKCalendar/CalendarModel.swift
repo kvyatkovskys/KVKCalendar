@@ -115,11 +115,13 @@ extension CalendarType: Identifiable {
 public struct TextEvent {
     public let timeline: String
     public let month: String?
+    public let week: String?
     public let list: String?
     
-    public init(timeline: String = "", month: String? = nil, list: String? = nil) {
+    public init(timeline: String = "", month: String? = nil, week: String? = nil, list: String? = nil) {
         self.timeline = timeline
         self.month = month
+        self.week = week
         self.list = list
     }
 }
@@ -189,8 +191,8 @@ public struct Event {
         color.value.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
         let txtColor = UIColor(hue: hue, saturation: saturation,
                                brightness: UIScreen.isDarkMode ? brightness : brightness * brightnessOffset,
-                               alpha: alpha)
-        
+                               alpha: 1)
+
         return (bgColor, txtColor)
     }
     
@@ -200,7 +202,6 @@ public struct Event {
         
         return isBetween || Calendar.current.compare(start, to: date , toGranularity: .day) == .orderedSame ||
         Calendar.current.compare(end, to: date, toGranularity: .day) == .orderedSame
-        
     }
 }
 
@@ -342,7 +343,7 @@ extension CalendarSettingProtocol {
     
     var actualSelectedTimeZoneCount: CGFloat {
         guard style.selectedTimeZones.count > 1 else { return 0 }
-        
+
         return CGFloat(style.selectedTimeZones.count)
     }
     
@@ -370,6 +371,8 @@ extension CalendarSettingProtocol {
     
     func handleTimelineLabel(zones: [TimeZone],
                              label: TimelineLabel) -> (current: TimelineLabel, others: [UILabel])? {
+        guard style.timeline.useDifferentLabelsForTimeZones else { return (label, []) }
+
         var otherLabels = [UILabel]()
         let current = label
         
@@ -522,8 +525,8 @@ public protocol CalendarDelegate: AnyObject {
     func didSelectDates(_ dates: [Date], type: CalendarType, frame: CGRect?)
     
     /// get a selected event
-    func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?)
-    
+    func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?, date: Date?)
+
     /// tap on more fro month view
     func didSelectMore(_ date: Date, frame: CGRect?)
     
@@ -583,8 +586,8 @@ public extension CalendarDelegate {
     
     func didSelectDates(_ dates: [Date], type: CalendarType, frame: CGRect?)  {}
     
-    func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?) {}
-    
+    func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?, date: Date?) {}
+
     func didSelectMore(_ date: Date, frame: CGRect?) {}
     
     func eventViewerFrame(_ frame: CGRect) {}
