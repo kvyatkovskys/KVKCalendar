@@ -502,8 +502,11 @@ public final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             }
             scrollView.contentSize = CGSize(width: frame.width, height: allHeight)
         } else {
-            let heightAllTimes = timeLabels.reduce(0, { $0 + ($1.frame.height + calculatedTimeY) }) - calculatedTimeY
-            scrollView.contentSize = CGSize(width: frame.width, height: heightAllTimes)
+            // bottom offset is 40
+            scrollView.contentSize = CGSize(
+                width: frame.width,
+                height: (timeLabels.last?.frame.origin.y ?? 0) + 40
+            )
         }
         
         if !forceDisableScrollToCurrentTime {

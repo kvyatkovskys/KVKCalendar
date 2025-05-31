@@ -48,53 +48,144 @@ public final class KVKCalendarView: UIView {
     private(set) var yearView: YearView
     private(set) var listView: ListView
     
-    public convenience init(frame: CGRect, date: Date? = nil, style: Style = Style(), years: Int = 4) {
-        let calendarData = CalendarData(date: date ?? Date(), years: years, style: style.adaptiveStyle)
-        self.init(frame: frame, date: date, style: style, calendarData: calendarData)
+    public convenience init(
+        frame: CGRect = .zero,
+        date: Date? = nil,
+        style: Style = Style(),
+        years: Int = 4
+    ) {
+        let calendarData = CalendarData(
+            date: date ?? Date(),
+            years: years,
+            style: style.adaptiveStyle
+        )
+        self.init(
+            frame: frame,
+            date: date,
+            style: style,
+            calendarData: calendarData
+        )
     }
     
-    public convenience init<R: YearRange>(frame: CGRect, date: Date? = nil, style: Style = Style(), yearRange: R) where R.Bound == Int {
-        self.init(frame: frame, date: date, style: style, startYear: yearRange.lowerBound, endYear: yearRange.upperBound)
+    public convenience init<R: YearRange>(
+        frame: CGRect = .zero,
+        date: Date? = nil,
+        style: Style = Style(),
+        yearRange: R
+    ) where R.Bound == Int {
+        self.init(
+            frame: frame,
+            date: date,
+            style: style,
+            startYear: yearRange.lowerBound,
+            endYear: yearRange.upperBound
+        )
     }
     
-    public convenience init(frame: CGRect, date: Date? = nil, style: Style = Style(), startYear: Int, endYear: Int) {
-        let calendarData = CalendarData(date: date ?? Date(), style: style.adaptiveStyle, startYear: startYear, endYear: endYear)
-        self.init(frame: frame, date: date, style: style, calendarData: calendarData)
+    public convenience init(
+        frame: CGRect = .zero,
+        date: Date? = nil,
+        style: Style = Style(),
+        startYear: Int,
+        endYear: Int
+    ) {
+        let calendarData = CalendarData(
+            date: date ?? Date(),
+            style: style.adaptiveStyle,
+            startYear: startYear,
+            endYear: endYear
+        )
+        self.init(
+            frame: frame,
+            date: date,
+            style: style,
+            calendarData: calendarData
+        )
     }
     
-    private init(frame: CGRect, date: Date?, style: Style, calendarData: CalendarData) {
+    private init(
+        frame: CGRect = .zero,
+        date: Date?,
+        style: Style,
+        calendarData: CalendarData
+    ) {
         let adaptiveStyle = style.adaptiveStyle
-        self.parameters = .init(type: style.defaultType ?? .day, style: adaptiveStyle)
+        self.parameters = .init(
+            type: style.defaultType ?? .day,
+            style: adaptiveStyle
+        )
         self.calendarData = calendarData
         
         // day view
-        self.dayData = DayData(data: calendarData, startDay: adaptiveStyle.startWeekDay)
-        self.dayView = DayView(parameters: .init(style: adaptiveStyle, data: dayData), frame: frame)
+        self.dayData = DayData(
+            data: calendarData,
+            startDay: adaptiveStyle.startWeekDay
+        )
+        self.dayView = DayView(
+            parameters: .init(
+                style: adaptiveStyle,
+                data: dayData
+            ),
+            frame: frame
+        )
         
         // week view
-        self.weekData = WeekData(data: calendarData,
-                                 startDay: adaptiveStyle.startWeekDay,
-                                 maxDays: adaptiveStyle.week.maxDays)
-        self.weekView = WeekView(parameters: .init(data: weekData, style: adaptiveStyle), frame: frame)
+        self.weekData = WeekData(
+            data: calendarData,
+            startDay: adaptiveStyle.startWeekDay,
+            maxDays: adaptiveStyle.week.maxDays
+        )
+        self.weekView = WeekView(
+            parameters: .init(
+                data: weekData,
+                style: adaptiveStyle
+            ),
+            frame: frame
+        )
         
         // month view
-        self.monthData = MonthData(parameters: .init(data: calendarData,
-                                                     startDay: adaptiveStyle.startWeekDay,
-                                                     calendar: adaptiveStyle.calendar,
-                                                     style: adaptiveStyle))
-        self.monthView = MonthView(parameters: .init(monthData: monthData, style: adaptiveStyle), frame: frame)
+        self.monthData = MonthData(
+            parameters: .init(
+                data: calendarData,
+                startDay: adaptiveStyle.startWeekDay,
+                calendar: adaptiveStyle.calendar,
+                style: adaptiveStyle
+            )
+        )
+        self.monthView = MonthView(
+            parameters: .init(
+                monthData: monthData,
+                style: adaptiveStyle
+            ),
+            frame: frame
+        )
         
         // year view
-        self.yearData = YearData(data: monthData.data, date: calendarData.date, style: adaptiveStyle)
-        self.yearView = YearView(data: yearData, frame: frame)
+        self.yearData = YearData(
+            data: monthData.data,
+            date: calendarData.date,
+            style: adaptiveStyle
+        )
+        self.yearView = YearView(
+            data: yearData,
+            frame: frame
+        )
         
         // list view
-        self.listData = ListViewData(data: calendarData, style: adaptiveStyle)
-        let params = ListView.Parameters(style: adaptiveStyle, data: listData)
-        self.listView = ListView(parameters: params, frame: frame)
+        self.listData = ListViewData(
+            data: calendarData,
+            style: adaptiveStyle
+        )
+        let params = ListView.Parameters(
+            style: adaptiveStyle,
+            data: listData
+        )
+        self.listView = ListView(
+            parameters: params,
+            frame: frame
+        )
         
         super.init(frame: frame)
-        
         setup(with: date)
     }
     
@@ -130,6 +221,20 @@ public final class KVKCalendarView: UIView {
         }
         set(type: parameters.type, date: date)
         reloadAllStyles(style.adaptiveStyle, force: true)
+    }
+    
+    public override func layoutIfNeeded() {
+        super.layoutIfNeeded()
+        
+        print(#function, bounds)
+        reloadFrame(bounds)
+    }
+}
+
+func getTopConstraint(from constraints: [NSLayoutConstraint]) -> NSLayoutConstraint? {
+    return constraints.first { constraint in
+        constraint.firstAttribute == .top || constraint.firstAttribute == .topMargin
+        || constraint.secondAttribute == .top || constraint.secondAttribute == .topMargin
     }
 }
 

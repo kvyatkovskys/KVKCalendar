@@ -36,9 +36,7 @@ final class ViewController: UIViewController, KVKCalendarSettings, KVKCalendarDa
     }()
     
     private lazy var calendarView: KVKCalendarView = {
-        var frame = view.frame
-        frame.origin.y = 0
-        let calendar = KVKCalendarView(frame: frame, date: selectDate, style: style)
+        let calendar = KVKCalendarView(date: selectDate, style: style)
         calendar.delegate = self
         calendar.dataSource = self
         return calendar
@@ -69,6 +67,13 @@ final class ViewController: UIViewController, KVKCalendarSettings, KVKCalendarDa
         navigationItem.title = "KVKCalendar"
         view.backgroundColor = .systemBackground
         view.addSubview(calendarView)
+        calendarView.translatesAutoresizingMaskIntoConstraints = false
+        let top = calendarView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor)
+        let leading = calendarView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
+        let trailing = calendarView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        let bottom = calendarView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        NSLayoutConstraint.activate([top, leading, trailing, bottom])
+        calendarView.layoutIfNeeded()
         setupBarButtons()
         
         loadEvents(dateFormat: style.timeSystem.format) { (events) in
@@ -80,9 +85,7 @@ final class ViewController: UIViewController, KVKCalendarSettings, KVKCalendarDa
     
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-        var frame = view.frame
-        frame.origin.y = 0
-        calendarView.reloadFrame(frame)
+        calendarView.layoutIfNeeded()
     }
     
     @objc private func reloadCalendarStyle() {
