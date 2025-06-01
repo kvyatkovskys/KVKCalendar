@@ -134,7 +134,7 @@ extension KVKCalendarSettings where Self: KVKCalendarDataModel {
 extension KVKCalendarSettings {
     
     var defaultStringDate: String {
-        "14.11.2022"
+        "14.11.2025"
     }
     
     var defaultDate: Date {

@@ -6,9 +6,41 @@
 //  Copyright (c) 2019 kvyatkovskys. All rights reserved.
 //
 
-import UIKit
+import SwiftUI
 import KVKCalendar
 import EventKit
+
+private struct ViewControllerWrapper: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> some UIViewController {
+        ViewController()
+    }
+    
+    func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {}
+}
+
+struct ViewControllerSUI: View {
+    var body: some View {
+        if #available(iOS 16.0, *) {
+            NavigationStack {
+                ViewControllerWrapper()
+                    .edgesIgnoringSafeArea(.bottom)
+                    .navigationBarTitleDisplayMode(.inline)
+                    .navigationTitle("KVKCalendar")
+            }
+        } else {
+            NavigationView {
+                ViewControllerWrapper()
+                    .edgesIgnoringSafeArea(.all)
+            }
+            .navigationViewStyle(.stack)
+            .navigationBarTitle("KVKCalendar")
+        }
+    }
+}
+
+#Preview {
+    ViewControllerSUI()
+}
 
 final class ViewController: UIViewController, KVKCalendarSettings, KVKCalendarDataModel, UIPopoverPresentationControllerDelegate {
     
@@ -64,11 +96,10 @@ final class ViewController: UIViewController, KVKCalendarSettings, KVKCalendarDa
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.title = "KVKCalendar"
         view.backgroundColor = .systemBackground
         view.addSubview(calendarView)
         calendarView.translatesAutoresizingMaskIntoConstraints = false
-        let top = calendarView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor)
+        let top = calendarView.topAnchor.constraint(equalTo: view.topAnchor)
         let leading = calendarView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
         let trailing = calendarView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         let bottom = calendarView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
@@ -102,8 +133,11 @@ final class ViewController: UIViewController, KVKCalendarSettings, KVKCalendarDa
     }
     
     private func setupBarButtons() {
-        navigationItem.leftBarButtonItems = [calendarTypeBtn, todayButton]
-        navigationItem.rightBarButtonItems = [reloadStyle]
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            parent?.navigationItem.leftBarButtonItems = [calendarTypeBtn, todayButton]
+            parent?.navigationItem.rightBarButtonItems = [reloadStyle]
+        }
     }
     
     @available(iOS 14.0, *)

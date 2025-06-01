@@ -192,7 +192,7 @@ public final class KVKCalendarView: UIView {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     private func setup(with date: Date?) {
         dayView.scrollableWeekView.dataSource = self
         dayView.dataSource = self
@@ -225,17 +225,7 @@ public final class KVKCalendarView: UIView {
     
     public override func layoutIfNeeded() {
         super.layoutIfNeeded()
-        
-        print(#function, bounds)
         reloadFrame(bounds)
     }
 }
-
-func getTopConstraint(from constraints: [NSLayoutConstraint]) -> NSLayoutConstraint? {
-    return constraints.first { constraint in
-        constraint.firstAttribute == .top || constraint.firstAttribute == .topMargin
-        || constraint.secondAttribute == .top || constraint.secondAttribute == .topMargin
-    }
-}
-
 #endif

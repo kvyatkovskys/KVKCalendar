@@ -27,7 +27,6 @@ extension KVKCalendarView {
     }
     
     public func reloadData() {
-        
         func reload(systemEvents: [EKEvent] = []) {
             let events = dataSource?.eventsForCalendar(systemEvents: systemEvents) ?? []
             
@@ -232,8 +231,8 @@ extension KVKCalendarView {
         
         let top = view.topAnchor.constraint(equalTo: topAnchor)
         let bottom = view.bottomAnchor.constraint(equalTo: bottomAnchor)
-        let left = view.leftAnchor.constraint(equalTo: leftAnchor)
-        let right = view.rightAnchor.constraint(equalTo: rightAnchor)
+        let left = view.leadingAnchor.constraint(equalTo: leadingAnchor)
+        let right = view.trailingAnchor.constraint(equalTo: trailingAnchor)
         NSLayoutConstraint.activate([top, bottom, left, right])
     }
 }
