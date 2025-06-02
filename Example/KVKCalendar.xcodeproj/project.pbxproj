@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		0064301050464A908A53B208 /* Pods_KVKCalendar_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00AAA995A5A076762D4849BC /* Pods_KVKCalendar_Tests.framework */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
-		607FACD81AFB9204008FA782 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
+		607FACD81AFB9204008FA782 /* KVKCalendarVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* KVKCalendarVC.swift */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
@@ -20,7 +20,7 @@
 		F99D656C280184CF001A6E0A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F99D656B280184CF001A6E0A /* SceneDelegate.swift */; };
 		F9E6F6F4281E9891000AEADD /* KVKCalendarSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E6F6F3281E9891000AEADD /* KVKCalendarSettings.swift */; };
 		F9E6F6FC281F0C13000AEADD /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F99D656B280184CF001A6E0A /* SceneDelegate.swift */; };
-		F9E6F6FD281F0C13000AEADD /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
+		F9E6F6FD281F0C13000AEADD /* KVKCalendarVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* KVKCalendarVC.swift */; };
 		F9E6F6FE281F0C13000AEADD /* KVKCalendarSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E6F6F3281E9891000AEADD /* KVKCalendarSettings.swift */; };
 		F9E6F700281F0C13000AEADD /* EventViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91321AB21DF64DF0076B714 /* EventViewer.swift */; };
 		F9E6F701281F0C13000AEADD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
@@ -49,7 +49,7 @@
 		607FACD01AFB9204008FA782 /* KVKCalendar_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KVKCalendar_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACD41AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACD51AFB9204008FA782 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		607FACD71AFB9204008FA782 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		607FACD71AFB9204008FA782 /* KVKCalendarVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KVKCalendarVC.swift; sourceTree = "<group>"; };
 		607FACDC1AFB9204008FA782 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		607FACDF1AFB9204008FA782 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		607FACE51AFB9204008FA782 /* KVKCalendar_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KVKCalendar_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -126,7 +126,7 @@
 			children = (
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				F99D656B280184CF001A6E0A /* SceneDelegate.swift */,
-				607FACD71AFB9204008FA782 /* ViewController.swift */,
+				607FACD71AFB9204008FA782 /* KVKCalendarVC.swift */,
 				F9E6F6F3281E9891000AEADD /* KVKCalendarSettings.swift */,
 				F95EFF3925277B4600EA6748 /* CustomDayCell.swift */,
 				F91321AB21DF64DF0076B714 /* EventViewer.swift */,
@@ -263,7 +263,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 0830;
-				LastUpgradeCheck = 1610;
+				LastUpgradeCheck = 1640;
 				ORGANIZATIONNAME = CocoaPods;
 				TargetAttributes = {
 					607FACCF1AFB9204008FA782 = {
@@ -438,7 +438,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F99D656C280184CF001A6E0A /* SceneDelegate.swift in Sources */,
-				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
+				607FACD81AFB9204008FA782 /* KVKCalendarVC.swift in Sources */,
 				F9E6F6F4281E9891000AEADD /* KVKCalendarSettings.swift in Sources */,
 				F91321AC21DF64DF0076B714 /* EventViewer.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
@@ -459,7 +459,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F9E6F6FC281F0C13000AEADD /* SceneDelegate.swift in Sources */,
-				F9E6F6FD281F0C13000AEADD /* ViewController.swift in Sources */,
+				F9E6F6FD281F0C13000AEADD /* KVKCalendarVC.swift in Sources */,
 				F9E6F6FE281F0C13000AEADD /* KVKCalendarSettings.swift in Sources */,
 				F9E6F700281F0C13000AEADD /* EventViewer.swift in Sources */,
 				F9E6F701281F0C13000AEADD /* AppDelegate.swift in Sources */,
@@ -522,6 +522,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = P44LMMDHV3;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -583,6 +584,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = P44LMMDHV3;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -612,7 +614,6 @@
 				CODE_SIGN_ENTITLEMENTS = KVKCalendar_Example.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER = NO;
-				DEVELOPMENT_TEAM = P44LMMDHV3;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = KVKCalendar/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
@@ -641,7 +642,6 @@
 				CODE_SIGN_ENTITLEMENTS = KVKCalendar_Example.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER = NO;
-				DEVELOPMENT_TEAM = P44LMMDHV3;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = KVKCalendar/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
@@ -666,7 +666,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3D1741B81199E2ED13C0E0BC /* Pods-KVKCalendar_Tests.debug.xcconfig */;
 			buildSettings = {
-				DEVELOPMENT_TEAM = P44LMMDHV3;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -692,7 +691,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BBA5555F4434EF626F6DCFF0 /* Pods-KVKCalendar_Tests.release.xcconfig */;
 			buildSettings = {
-				DEVELOPMENT_TEAM = P44LMMDHV3;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -717,7 +715,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = KVKCalendar_Example.entitlements;
 				DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER = YES;
-				DEVELOPMENT_TEAM = P44LMMDHV3;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = "$(SRCROOT)/KVKCalendar_Example_SwiftUI-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -745,7 +742,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = KVKCalendar_Example.entitlements;
 				DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER = YES;
-				DEVELOPMENT_TEAM = P44LMMDHV3;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = "$(SRCROOT)/KVKCalendar_Example_SwiftUI-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;

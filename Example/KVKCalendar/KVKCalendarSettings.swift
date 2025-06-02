@@ -82,12 +82,10 @@ extension KVKCalendarSettings where Self: KVKCalendarDataModel {
         return events + mappedEvents
     }
     
-    func loadEvents(dateFormat: String, completion: ([Event]) -> Void) {
-        let decoder = JSONDecoder()
-        
+    func loadEvents(dateFormat: String, withDelay: Bool = true) async -> [Event] {
         guard let path = Bundle.main.path(forResource: "events", ofType: "json"),
               let data = try? Data(contentsOf: URL(fileURLWithPath: path), options: .mappedIfSafe),
-              let result = try? decoder.decode(ItemData.self, from: data) else { return }
+              let result = try? JSONDecoder().decode(ItemData.self, from: data) else { return [] }
         
         let events = result.data.compactMap({ (item) -> Event in
             let startDate = formatter(date: item.start, local: style.locale)
@@ -126,7 +124,14 @@ extension KVKCalendarSettings where Self: KVKCalendarDataModel {
             }
             return event
         })
-        completion(events)
+        if withDelay {
+            if #available(iOS 16.0, *) {
+                try? await Task.sleep(for: .seconds(3))
+            } else {
+                try? await Task.sleep(nanoseconds: 3_000_000_000)
+            }
+        }
+        return events
     }
     
 }

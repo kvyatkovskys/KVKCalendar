@@ -43,10 +43,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 #if DEBUG_SwiftUI
             return UIHostingController(rootView: ViewControllerSUI())
 #else
-            return createNavVC(ViewController())
+            return createNavVC(KVKCalendarVC())
 #endif
         } else {
-            return createNavVC(ViewController())
+            return createNavVC(KVKCalendarVC())
         }
     }
 

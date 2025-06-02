@@ -33,7 +33,7 @@ final class DayPadCell: DayCell {
         dateFrame.size.width = heightDate
         dateFrame.size.height = frame.height > heightDate ? heightDate : frame.height / 2
         dateFrame.origin.y = titleLabel.center.y - (dateFrame.size.height * 0.5)
-        dateFrame.origin.x = (frame.width * 0.5)
+        dateFrame.origin.x = (frame.width * 0.52)
         dotView.frame = dateFrame
         dateLabel.frame = CGRect(origin: .zero, size: dateFrame.size)
         

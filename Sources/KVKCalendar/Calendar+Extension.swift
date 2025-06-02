@@ -15,33 +15,19 @@ enum Platform: Int {
     static var currentDevice: Platform {
         switch UIDevice.current.userInterfaceIdiom {
         case .phone:
-            return .phone
+            .phone
         case .pad:
-            return .pad
+            .pad
         case .mac:
-            return .mac
+            .mac
         default:
-            return .none
+            .none
         }
     }
     
     static var currentInterface: Platform {
-        switch currentDevice {
-        case .pad:
-            if let vc = UIApplication.shared.windows.first(where: { $0.isKeyWindow })?.rootViewController {
-                if vc.view.bounds.width < 600 {
-                    return .phone
-                } else {
-                    return .pad
-                }
-            } else {
-                return .pad
-            }
-        default:
-            return currentDevice
-        }
+        currentDevice
     }
-        
 }
 
 private enum AssociatedKeys {
