@@ -17,7 +17,7 @@ final class ScrollableWeekView: UIView {
     var didUpdateStyle: ((CalendarType) -> Void)?
     
     struct Parameters {
-        let frame: CGRect
+        var frame: CGRect = .zero
         var weeks: [[Day]]
         var date: Date
         let type: CalendarType
@@ -288,12 +288,19 @@ extension ScrollableWeekView: CalendarSettingProtocol {
                                 self?.didUpdateStyle?(self?.type ?? .day)
                             }
                         }
-                        let sgObject = UISegmentedControl(frame: CGRect(x: 2,
-                                                                        y: cornerBtn.frame.height + 5,
-                                                                        width: cornerBtn.frame.width - 4,
-                                                                        height: 25),
-                                                          actions: actions)
-                        sgObject.selectedSegmentIndex = style.selectedTimeZones.firstIndex(where: { $0.identifier == style.timezone.identifier }) ?? 0
+                        let sgObject = UISegmentedControl(
+                            frame: CGRect(
+                                x: 2,
+                                y: cornerBtn.frame.height + 5,
+                                width: cornerBtn.frame.width - 4,
+                                height: 25
+                            ),
+                            actions: actions
+                        )
+                        sgObject.selectedSegmentIndex = style.selectedTimeZones.firstIndex(
+                            where: { $0.identifier == style.timezone.identifier
+                            }
+                        ) ?? 0
                         let sizeFont: CGFloat
                         if Platform.currentInterface == .phone {
                             sizeFont = 8
@@ -304,23 +311,19 @@ extension ScrollableWeekView: CalendarSettingProtocol {
                         sgObject.setTitleTextAttributes(defaultAttributes, for: .normal)
                         addSubview(sgObject)
                     }
-                } else {
-                    // Fallback on earlier versions
                 }
                 
                 mainFrame.origin.x = cornerBtn.frame.width
                 mainFrame.size.width -= cornerBtn.frame.width
-            } else {
-                if type == .week {
-                    let spacerView = UIView()
-                    spacerView.frame = CGRect(x: 0, y: 0,
-                                              width: leftOffsetWithAdditionalTime,
-                                              height: bounds.height)
-                    spacerView.backgroundColor = .clear
-                    addSubview(spacerView)
-                    mainFrame.origin.x = spacerView.frame.width
-                    mainFrame.size.width -= spacerView.frame.width
-                }
+            } else if type == .week {
+                let spacerView = UIView()
+                spacerView.frame = CGRect(x: 0, y: 0,
+                                          width: leftOffsetWithAdditionalTime,
+                                          height: bounds.height)
+                spacerView.backgroundColor = .clear
+                addSubview(spacerView)
+                mainFrame.origin.x = spacerView.frame.width
+                mainFrame.size.width -= spacerView.frame.width
             }
             
             if Platform.currentInterface != .phone {
