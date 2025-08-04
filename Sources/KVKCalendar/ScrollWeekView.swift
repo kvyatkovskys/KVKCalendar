@@ -9,16 +9,20 @@ import SwiftUI
 import EventKit
 
 @available(iOS 16.0, *)
+
 public struct ScrollWeekWrapper<Cell: View>: UIViewControllerRepresentable {
     @Binding private var date: Date
     @Binding private var style: Style
     @ViewBuilder private var content: (_ date: Date?, _ type: DayType?) -> Cell
     private let view: ScrollWeekView
-    
+
     public init(
         date: Binding<Date>,
-        style: Binding<Style> = .constant(Style()),
-        @ViewBuilder cellContent: @escaping (_ date: Date?, _ type: DayType?) -> Cell = { _, _ in EmptyView() }
+        style: Binding<Style>,
+        @ViewBuilder cellContent: @escaping (
+            _ date: Date?,
+            _ type: DayType?
+        ) -> Cell = { _, _ in EmptyView() }
     ) {
         _date = date
         _style = style
@@ -97,7 +101,7 @@ public struct ScrollWeekWrapper<Cell: View>: UIViewControllerRepresentable {
 @available(iOS 17.0, *)
 #Preview {
     @Previewable @State var date = Date()
-    ScrollWeekWrapper(date: $date)
+    ScrollWeekWrapper(date: $date, style: .constant(Style()))
 }
 
 open class ScrollWeekView: UIViewController {
@@ -108,7 +112,7 @@ open class ScrollWeekView: UIViewController {
     public weak var delegate: CalendarDelegate?
     public weak var dataSource: CalendarDataSource?
     
-    public init(date: Date, style: Style = Style()) {
+    public init(date: Date, style: Style) {
         var styleProxy = style
         styleProxy.timeline.widthTime = 0
         styleProxy.timeline.offsetTimeX = 0

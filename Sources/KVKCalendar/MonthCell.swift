@@ -71,7 +71,8 @@ final class MonthCell: KVKCollectionViewCell {
     }
     
     weak var delegate: MonthCellDelegate?
-        
+    
+    @MainActor
     var events: [Event] = [] {
         didSet {
             contentView.subviews.filter { $0.tag != defaultTagView }.forEach { $0.removeFromSuperview() }
@@ -183,6 +184,7 @@ final class MonthCell: KVKCollectionViewCell {
         }
     }
     
+    @MainActor
     var day: Day = .empty() {
         didSet {
             isUserInteractionEnabled = day.type != .empty
@@ -252,6 +254,7 @@ final class MonthCell: KVKCollectionViewCell {
         }
     }
     
+    @MainActor
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -274,6 +277,7 @@ final class MonthCell: KVKCollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    @MainActor
     private func showMonthName(day: Day) {
         let monthLabel = UILabel(frame: CGRect(x: dateLabel.frame.origin.x - 50,
                                                y: dateLabel.frame.origin.y,
@@ -328,6 +332,7 @@ final class MonthCell: KVKCollectionViewCell {
         }
     }
     
+    @MainActor
     private func populateCell(day: Day, label: UILabel, view: UIView) {
         let date = day.date
         let weekend = day.type == .saturday || day.type == .sunday || (date?.isWeekend == true)
@@ -400,6 +405,7 @@ final class MonthCell: KVKCollectionViewCell {
         label.clipsToBounds = true
     }
     
+    @MainActor
     private func addIconBeforeLabel(eventList: [Event],
                                     textAttributes: [NSAttributedString.Key: Any],
                                     bulletAttributes: [NSAttributedString.Key: Any],

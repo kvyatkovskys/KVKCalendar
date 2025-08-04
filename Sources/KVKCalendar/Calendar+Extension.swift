@@ -25,8 +25,18 @@ enum Platform: Int {
         }
     }
     
+    @MainActor
     static var currentInterface: Platform {
-        currentDevice
+        switch currentDevice {
+        case .pad:
+            if let size = UIApplication.shared.windowScene?.windows.first(where: { $0.isKeyWindow })?.frame.size, size.width < 600 {
+                return .phone
+            } else {
+                return currentDevice
+            }
+        default:
+            return currentDevice
+        }
     }
 }
 
@@ -85,25 +95,23 @@ extension UIScrollView {
 
 extension UIApplication {
     
-    var orientation: UIInterfaceOrientation {
-        if #available(iOS 13.0, *) {
-            return UIApplication.shared.windows.first?.windowScene?.interfaceOrientation ?? .unknown
-        } else {
-            let value = UIDevice.current.orientation
-            return UIInterfaceOrientation(rawValue: value.rawValue) ?? .unknown
-        }
+    @MainActor
+    var windowScene: UIWindowScene? {
+        connectedScenes
+            .filter { $0.activationState == .foregroundActive }
+            .compactMap { $0 as? UIWindowScene }
+            .first
     }
     
+    @MainActor
+    var orientation: UIInterfaceOrientation {
+        windowScene?.interfaceOrientation ?? .unknown
+    }
+    
+    @MainActor
     var isAvailableBottomHomeIndicator: Bool {
         if #available(iOS 15.0, *) {
-            if let keyWindow = UIApplication.shared.connectedScenes
-                .filter({$0.activationState == .foregroundActive})
-                .compactMap({ $0 as? UIWindowScene })
-                .first?.windows
-                .filter({ $0.isKeyWindow }).first
-            {
-                return keyWindow.safeAreaInsets.bottom > 0
-            } else if let keyWindow = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) {
+            if let keyWindow = windowScene?.windows.filter({ $0.isKeyWindow }).first {
                 return keyWindow.safeAreaInsets.bottom > 0
             } else {
                 return false

@@ -302,6 +302,7 @@ extension TimelineView {
         eventView.deselectEvent()
     }
     
+    @MainActor
     func createAllDayEvents(events: [AllDayView.PrepareEvents], maxEvents: Int) -> AllDayView? {
         guard !events.allSatisfy({ $0.events.isEmpty }) else { return nil }
         

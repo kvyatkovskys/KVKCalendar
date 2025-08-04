@@ -34,6 +34,7 @@ public struct Style {
     public var timeZoneIds: [String] = ["America/New_York", "Europe/London", "Europe/Moscow", "Asia/Tokyo"]
     public var selectedTimeZones: [TimeZone]
     
+    @MainActor
     public init(configureAsDefaultCalendar: Bool = true) {
         selectedTimeZones = [timezone]
         
@@ -577,6 +578,7 @@ public struct YearStyle {
     public var colorBackgroundWeekendDate: UIColor = .clear
     public var weekFontPad: UIFont = .boldSystemFont(ofSize: 14)
     public var weekFontPhone: UIFont = .boldSystemFont(ofSize: 8)
+    @MainActor
     public var weekFont: UIFont {
         switch Platform.currentInterface {
         case .phone:
@@ -594,6 +596,7 @@ public struct YearStyle {
     public var alignmentTitleHeader: NSTextAlignment = .left
     public var fontDayTitlePad: UIFont = .systemFont(ofSize: 15)
     public var fontDayTitlePhone: UIFont = .systemFont(ofSize: 11)
+    @MainActor
     public var fontDayTitle: UIFont {
         switch Platform.currentInterface {
         case .phone:
@@ -680,6 +683,7 @@ public struct ListViewStyle {
 }
 
 extension Style {
+    @MainActor
     var adaptiveStyle: Style {
         guard followInSystemTheme else { return self }
         

@@ -23,12 +23,14 @@ struct ViewControllerSUI: View {
         if #available(iOS 16.0, *) {
             NavigationStack {
                 KVKCalendarWrapper()
+                    .ignoresSafeArea(.container, edges: .bottom)
                     .navigationBarTitleDisplayMode(.inline)
                     .navigationTitle("KVKCalendar")
             }
         } else {
             NavigationView {
                 KVKCalendarWrapper()
+                    .edgesIgnoringSafeArea(.bottom)
             }
             .navigationViewStyle(.stack)
             .navigationBarTitle("KVKCalendar")
@@ -48,6 +50,7 @@ final class KVKCalendarVC: UIViewController, KVKCalendarSettings, KVKCalendarDat
         }
     }
     var selectDate = Date()
+    @MainActor
     var style: Style {
         createCalendarStyle()
     }
@@ -119,7 +122,7 @@ final class KVKCalendarVC: UIViewController, KVKCalendarSettings, KVKCalendarDat
     ) {
         Task {
             let result = await loadEvents(
-                dateFormat: style.timeSystem.format,
+                withStyle: style,
                 withDelay: withDelay
             )
             await MainActor.run {

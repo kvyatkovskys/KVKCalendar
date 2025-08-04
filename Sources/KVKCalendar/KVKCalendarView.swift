@@ -48,61 +48,68 @@ public final class KVKCalendarView: UIView {
     private(set) var yearView: YearView
     private(set) var listView: ListView
     
+    @MainActor
     public convenience init(
         frame: CGRect = .zero,
         date: Date? = nil,
-        style: Style = Style(),
+        style: Style? = nil,
         years: Int = 4
     ) {
+        let calendarStyle = style ?? Style()
         let calendarData = CalendarData(
             date: date ?? Date(),
             years: years,
-            style: style.adaptiveStyle
+            style: calendarStyle
         )
         self.init(
             frame: frame,
             date: date,
-            style: style,
+            style: calendarStyle,
             calendarData: calendarData
         )
     }
     
+    @MainActor
     public convenience init<R: YearRange>(
         frame: CGRect = .zero,
         date: Date? = nil,
-        style: Style = Style(),
+        style: Style? = nil,
         yearRange: R
     ) where R.Bound == Int {
+        let calendarStyle = style ?? Style()
         self.init(
             frame: frame,
             date: date,
-            style: style,
+            style: calendarStyle,
             startYear: yearRange.lowerBound,
             endYear: yearRange.upperBound
         )
     }
     
+    @MainActor
     public convenience init(
         frame: CGRect = .zero,
         date: Date? = nil,
-        style: Style = Style(),
+        style: Style? = nil,
         startYear: Int,
         endYear: Int
     ) {
+        let calendarStyle = style ?? Style()
         let calendarData = CalendarData(
             date: date ?? Date(),
-            style: style.adaptiveStyle,
+            style: calendarStyle,
             startYear: startYear,
             endYear: endYear
         )
         self.init(
             frame: frame,
             date: date,
-            style: style,
+            style: calendarStyle,
             calendarData: calendarData
         )
     }
     
+    @MainActor
     private init(
         frame: CGRect = .zero,
         date: Date?,
@@ -193,6 +200,7 @@ public final class KVKCalendarView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    @MainActor
     private func setup(with date: Date?) {
         dayView.scrollableWeekView.dataSource = self
         dayView.dataSource = self

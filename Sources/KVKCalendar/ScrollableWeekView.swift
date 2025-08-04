@@ -21,7 +21,7 @@ final class ScrollableWeekView: UIView {
         var weeks: [[Day]]
         var date: Date
         let type: CalendarType
-        var style: Style
+        var style: Style?
     }
     
     private var params: Parameters
@@ -37,7 +37,7 @@ final class ScrollableWeekView: UIView {
         params.weeks.flatMap { $0 }
     }
     private var calendar: Calendar {
-        params.style.calendar
+        style.calendar
     }
     private var type: CalendarType {
         params.type
@@ -191,7 +191,7 @@ extension ScrollableWeekView: CalendarSettingProtocol {
     
     var style: Style {
         get {
-            params.style
+            params.style ?? Style()
         }
         set {
             params.style = newValue
@@ -199,7 +199,7 @@ extension ScrollableWeekView: CalendarSettingProtocol {
     }
     
     func setUI(reload: Bool = false) {
-        bottomLineView.backgroundColor = params.style.headerScroll.bottomLineColor
+        bottomLineView.backgroundColor = style.headerScroll.bottomLineColor
         
         subviews.forEach { $0.removeFromSuperview() }
         var newFrame = frame
@@ -250,6 +250,7 @@ extension ScrollableWeekView: CalendarSettingProtocol {
         }
     }
     
+    @MainActor
     private func setupViews(mainFrame: inout CGRect) {
         if let customView = dataSource?.willDisplayHeaderView(date: date, frame: mainFrame, type: type) {
             params.weeks = []
@@ -347,6 +348,7 @@ extension ScrollableWeekView: CalendarSettingProtocol {
         NSLayoutConstraint.activate([left, right, bottom, height])
     }
     
+    @MainActor
     private func addTitleHeaderIfNeeded(frame: CGRect) {
         titleView?.removeFromSuperview()
         guard !style.headerScroll.isHiddenSubview else { return }
@@ -369,6 +371,7 @@ extension ScrollableWeekView: CalendarSettingProtocol {
         }
     }
     
+    @MainActor
     private func calculateFrameForCollectionViewIfNeeded(_ frame: inout CGRect) {
         guard !style.headerScroll.isHiddenSubview else { return }
         
