@@ -68,6 +68,18 @@ public final class TimelinePageView: UIView {
         mainPageView.delegate = self
     }
     
+    // Ensure page view and timeline pages always match container size
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        // Fill the container
+        mainPageView.view.frame = bounds
+        // Propagate size to cached timeline views so their internal scroll views/layout update
+        let size = bounds.size
+        pages.forEach { (_, timeline) in
+            timeline.reloadFrame(CGRect(origin: .zero, size: size))
+        }
+    }
+    
     func updateStyle(_ style: Style, force: Bool) {
         pages.forEach { $0.value.updateStyle(style, force: force) }
     }
