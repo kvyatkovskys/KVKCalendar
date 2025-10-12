@@ -837,8 +837,23 @@ extension TimelineView: CalendarSettingProtocol {
     }
     
     func reloadFrame(_ frame: CGRect) {
-        self.frame.size = frame.size
-        setupConstraints()
+        // Guard against invalid frames (negative width or height)
+        guard frame.width >= 0 && frame.height >= 0 else {
+            return
+        }
+
+        self.frame = frame
+
+        // Fix bounds if it has incorrect origin (should always be zero)
+        if self.bounds.origin.x != 0 || self.bounds.origin.y != 0 {
+            self.bounds = CGRect(origin: .zero, size: self.bounds.size)
+        }
+
+        // No need to call setupConstraints again - constraints are already set in init
+        // Just trigger layout to apply the frame change
+        setNeedsLayout()
+        layoutIfNeeded()
+
         currentLineView.reloadFrame(calculatedCurrentLineViewFrame)
     }
     
@@ -855,7 +870,7 @@ extension TimelineView: CalendarSettingProtocol {
     
     func setupConstraints() {
         scrollView.translatesAutoresizingMaskIntoConstraints = false
-        
+
         let top = scrollView.topAnchor.constraint(equalTo: topAnchor)
         let left = scrollView.leftAnchor.constraint(equalTo: leftAnchor)
         let right = scrollView.rightAnchor.constraint(equalTo: rightAnchor)

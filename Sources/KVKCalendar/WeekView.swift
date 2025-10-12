@@ -101,6 +101,7 @@ final class WeekView: UIView {
     func updateScrollableWeeks() {
         scrollableWeekView.updateWeeks(weeks: parameters.data.daysBySection)
     }
+
 }
 
 extension WeekView {
@@ -128,21 +129,27 @@ extension WeekView: CalendarSettingProtocol {
     
     func reloadFrame(_ frame: CGRect) {
         self.frame = frame
-        var timelineFrame = timelinePage.frame
-        timelineFrame.size.width = frame.width
-        
+
         if !style.headerScroll.isHidden {
             topBackgroundView.frame.size.width = frame.width
             scrollableWeekView.reloadFrame(frame)
-            timelineFrame.size.height = frame.height - scrollableWeekView.frame.height
+
+            // Calculate timeline frame with correct origin and size
+            let headerHeight = scrollableWeekView.frame.height
+            let timelineY = headerHeight
+            let timelineHeight = frame.height - headerHeight - style.timeline.offsetTop
+            let timelineFrame = CGRect(x: 0, y: timelineY, width: frame.width, height: timelineHeight)
+
+            timelinePage.frame = timelineFrame
         } else {
-            timelineFrame.size.height = frame.height
+            // No header, timeline fills entire frame minus offset
+            let timelineHeight = frame.height - style.timeline.offsetTop
+            let timelineFrame = CGRect(x: 0, y: 0, width: frame.width, height: timelineHeight)
+
+            timelinePage.frame = timelineFrame
         }
-        
-        timelineFrame.size.height -= style.timeline.offsetTop
-        
-        timelinePage.frame = timelineFrame
-        timelinePage.timelineView?.reloadFrame(CGRect(origin: .zero, size: timelineFrame.size))
+
+        timelinePage.timelineView?.reloadFrame(CGRect(origin: .zero, size: timelinePage.frame.size))
         timelinePage.timelineView?.create(dates: parameters.visibleDates,
                                           events: parameters.data.events,
                                           recurringEvents: parameters.data.recurringEvents,

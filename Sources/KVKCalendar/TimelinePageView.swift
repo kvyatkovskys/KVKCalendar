@@ -55,7 +55,8 @@ public final class TimelinePageView: UIView {
         })
         self.currentIndex = (pages.count / 2) - 1
         super.init(frame: frame)
-        
+
+
         if !pages.isEmpty {
             let view = pages[currentIndex]
             let container = TimelineContainerVC(index: currentIndex, contentView: view)
@@ -63,22 +64,11 @@ public final class TimelinePageView: UIView {
             mainPageView.view.frame = CGRect(origin: .zero, size: frame.size)
             addSubview(mainPageView.view)
         }
-        
+
         mainPageView.dataSource = self
         mainPageView.delegate = self
     }
     
-    // Ensure page view and timeline pages always match container size
-    public override func layoutSubviews() {
-        super.layoutSubviews()
-        // Fill the container
-        mainPageView.view.frame = bounds
-        // Propagate size to cached timeline views so their internal scroll views/layout update
-        let size = bounds.size
-        pages.forEach { (_, timeline) in
-            timeline.reloadFrame(CGRect(origin: .zero, size: size))
-        }
-    }
     
     func updateStyle(_ style: Style, force: Bool) {
         pages.forEach { $0.value.updateStyle(style, force: force) }
@@ -119,6 +109,11 @@ public final class TimelinePageView: UIView {
     }
     
     func reloadCachedControllers() {
+        // Only reload if bounds is valid
+        guard bounds.width > 0 && bounds.height > 0 else {
+            return
+        }
+
         pages = pages.reduce([:], { (acc, item) -> [Int: TimelineView] in
             var accTemp = acc
             item.value.reloadFrame(CGRect(origin: .zero, size: bounds.size))
