@@ -56,7 +56,9 @@ final class KVKCalendarVC: UIViewController, KVKCalendarSettings, KVKCalendarDat
     }
     var eventViewer = EventViewer()
     
+    private let isAutoLayoutMode: Bool
     private let isFromSUI: Bool
+    
     private lazy var todayButton: UIBarButtonItem = {
         let button = UIBarButtonItem(title: "Today", style: .done, target: self, action: #selector(today))
         button.tintColor = .systemRed
@@ -70,7 +72,14 @@ final class KVKCalendarVC: UIViewController, KVKCalendarSettings, KVKCalendarDat
     }()
     
     private lazy var calendarView: KVKCalendarView = {
-        let calendar = KVKCalendarView(date: selectDate, style: style)
+        let calendar: KVKCalendarView
+        if isAutoLayoutMode {
+            calendar = KVKCalendarView(date: selectDate, style: style)
+        } else {
+            var frame = view.frame
+            frame.origin.y = 0
+            calendar = KVKCalendarView(frame: frame, date: selectDate, style: style)
+        }
         calendar.delegate = self
         calendar.dataSource = self
         return calendar
@@ -78,7 +87,10 @@ final class KVKCalendarVC: UIViewController, KVKCalendarSettings, KVKCalendarDat
     
     private var calendarTypeBtn: UIBarButtonItem {
         if #available(iOS 14.0, *) {
-            let btn = UIBarButtonItem(title: calendarView.selectedType.title, menu: createCalendarTypesMenu())
+            let btn = UIBarButtonItem(
+                title: calendarView.selectedType.title,
+                menu: createCalendarTypesMenu()
+            )
             btn.style = .done
             btn.tintColor = .systemRed
             return btn
@@ -89,6 +101,7 @@ final class KVKCalendarVC: UIViewController, KVKCalendarSettings, KVKCalendarDat
     
     init(isFromSUI: Bool = false) {
         self.isFromSUI = isFromSUI
+        isAutoLayoutMode = isFromSUI
         super.init(nibName: nil, bundle: nil)
         selectDate = defaultDate
     }
@@ -101,18 +114,28 @@ final class KVKCalendarVC: UIViewController, KVKCalendarSettings, KVKCalendarDat
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         view.addSubview(calendarView)
-        calendarView.translatesAutoresizingMaskIntoConstraints = false
-        let top = calendarView.topAnchor.constraint(equalTo: view.topAnchor)
-        let leading = calendarView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
-        let trailing = calendarView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-        let bottom = calendarView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        NSLayoutConstraint.activate([top, leading, trailing, bottom])
-        calendarView.layoutIfNeeded()
+        if isAutoLayoutMode {
+            calendarView.translatesAutoresizingMaskIntoConstraints = false
+            let top = calendarView.topAnchor.constraint(equalTo: view.topAnchor)
+            let leading = calendarView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
+            let trailing = calendarView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+            let bottom = calendarView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            NSLayoutConstraint.activate([top, leading, trailing, bottom])
+            calendarView.layoutIfNeeded()
+        }
         setupNavBar()
         fetch()
     }
     
+    override func viewWillLayoutSubviews() {
+        guard !isAutoLayoutMode else { return }
+        var frame = view.frame
+        frame.origin.y = 0
+        calendarView.reloadFrame(frame)
+    }
+    
     override func viewDidLayoutSubviews() {
+        guard isAutoLayoutMode else { return }
         calendarView.layoutIfNeeded()
     }
     
