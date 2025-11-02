@@ -16,7 +16,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         if #unavailable(iOS 14.0) {
             window = UIWindow(frame: UIScreen.main.bounds)
-            let navVC = UINavigationController(rootViewController: ViewController())
+            let navVC = UINavigationController(rootViewController: KVKCalendarVC())
             navVC.isNavigationBarHidden = false
             navVC.navigationBar.isTranslucent = false
             

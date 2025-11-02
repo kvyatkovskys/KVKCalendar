@@ -302,6 +302,7 @@ extension TimelineView {
         eventView.deselectEvent()
     }
     
+    @MainActor
     func createAllDayEvents(events: [AllDayView.PrepareEvents], maxEvents: Int) -> AllDayView? {
         guard !events.allSatisfy({ $0.events.isEmpty }) else { return nil }
         
@@ -859,7 +860,7 @@ extension TimelineView: CalendarSettingProtocol {
         let top = scrollView.topAnchor.constraint(equalTo: topAnchor)
         let left = scrollView.leftAnchor.constraint(equalTo: leftAnchor)
         let right = scrollView.rightAnchor.constraint(equalTo: rightAnchor)
-        let bottom = scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        let bottom = scrollView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor)
         NSLayoutConstraint.activate([top, left, right, bottom])
     }
 

@@ -13,6 +13,7 @@ import EventKit
 protocol KVKCalendarDataModel {
     
     var events: [Event] { get set }
+    @MainActor
     var style: Style { get }
     
 }
@@ -20,7 +21,7 @@ protocol KVKCalendarDataModel {
 protocol KVKCalendarSettings {}
 
 extension KVKCalendarSettings where Self: KVKCalendarDataModel {
-    
+    @MainActor
     func handleChangingEvent(_ event: Event, start: Date?, end: Date?) -> (range: Range<Int>, events: [Event])? {
         var eventTemp = event
         guard let startTemp = start, let endTemp = end else { return nil }
@@ -40,6 +41,7 @@ extension KVKCalendarSettings where Self: KVKCalendarDataModel {
         }
     }
     
+    @MainActor
     func handleSizeCell(type: CalendarType, stye: Style, view: UIView) -> CGSize? {
         guard type == .month && UIDevice.current.userInterfaceIdiom == .phone else { return nil }
         
@@ -53,6 +55,7 @@ extension KVKCalendarSettings where Self: KVKCalendarDataModel {
         }
     }
     
+    @MainActor
     func handleNewEvent(_ event: Event, date: Date?) -> Event? {
         var newEvent = event
         
@@ -70,6 +73,7 @@ extension KVKCalendarSettings where Self: KVKCalendarDataModel {
         return newEvent
     }
     
+    @MainActor
     func handleEvents(systemEvents: [EKEvent]) -> [Event] {
         // if you want to get a system events, you need to set style.systemCalendars = ["test"]
         let mappedEvents = systemEvents.compactMap { (event) -> Event? in
@@ -82,18 +86,16 @@ extension KVKCalendarSettings where Self: KVKCalendarDataModel {
         return events + mappedEvents
     }
     
-    func loadEvents(dateFormat: String, completion: ([Event]) -> Void) {
-        let decoder = JSONDecoder()
-        
+    func loadEvents(withStyle style: KVKCalendar.Style, withDelay: Bool = true) async -> [Event] {
         guard let path = Bundle.main.path(forResource: "events", ofType: "json"),
               let data = try? Data(contentsOf: URL(fileURLWithPath: path), options: .mappedIfSafe),
-              let result = try? decoder.decode(ItemData.self, from: data) else { return }
+              let result = try? JSONDecoder().decode(ItemData.self, from: data) else { return [] }
         
         let events = result.data.compactMap({ (item) -> Event in
             let startDate = formatter(date: item.start, local: style.locale)
             let endDate = formatter(date: item.end, local: style.locale)
-            let startTime = timeFormatter(date: startDate, format: dateFormat, local: style.locale)
-            let endTime = timeFormatter(date: endDate, format: dateFormat, local: style.locale)
+            let startTime = timeFormatter(date: startDate, format: style.timeSystem.format, local: style.locale)
+            let endTime = timeFormatter(date: endDate, format: style.timeSystem.format, local: style.locale)
 
             var event = Event(ID: item.id)
             event.start = startDate
@@ -126,7 +128,14 @@ extension KVKCalendarSettings where Self: KVKCalendarDataModel {
             }
             return event
         })
-        completion(events)
+        if withDelay {
+            if #available(iOS 16.0, *) {
+                try? await Task.sleep(for: .seconds(3))
+            } else {
+                try? await Task.sleep(nanoseconds: 3_000_000_000)
+            }
+        }
+        return events
     }
     
 }
@@ -134,7 +143,7 @@ extension KVKCalendarSettings where Self: KVKCalendarDataModel {
 extension KVKCalendarSettings {
     
     var defaultStringDate: String {
-        "14.11.2022"
+        "14.11.2025"
     }
     
     var defaultDate: Date {
@@ -190,6 +199,7 @@ extension KVKCalendarSettings {
         }
     }
     
+    @MainActor
     func createCalendarStyle() -> Style {
         var style = Style()
         style.timeline.isHiddenStubEvent = false

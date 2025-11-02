@@ -23,15 +23,19 @@ public final class DayView: UIView {
     weak var delegate: DisplayDelegate?
     weak var dataSource: DisplayDataSource?
     
-    var scrollableWeekView = ScrollableWeekView(parameters: .init(frame: .zero,
-                                                                  weeks: [],
-                                                                  date: Date(),
-                                                                  type: .day,
-                                                                  style: Style()))
+    var scrollableWeekView = ScrollableWeekView(
+        parameters: .init(
+            frame: .zero,
+            weeks: [],
+            date: Date(),
+            type: .day
+        )
+    )
     
     public var timelinePage = TimelinePageView(maxLimit: 0, pages: [], frame: .zero)
     
     private var topBackgroundView = UIView()
+    @MainActor
     private var isAvailableEventViewer: Bool {
         Platform.currentInterface != .phone
     }
@@ -355,13 +359,20 @@ extension DayView: CalendarSettingProtocol {
         } else {
             heightView = style.headerScroll.heightHeaderWeek + style.headerScroll.heightSubviewHeader
         }
-        let view = ScrollableWeekView(parameters: .init(frame: CGRect(x: 0, y: 0,
-                                                                      width: frame.width,
-                                                                      height: heightView),
-                                                        weeks: parameters.data.daysBySection,
-                                                        date: parameters.data.date,
-                                                        type: .day,
-                                                        style: style))
+        let view = ScrollableWeekView(
+            parameters: .init(
+                frame: CGRect(
+                    x: 0,
+                    y: 0,
+                    width: frame.width,
+                    height: heightView
+                ),
+                weeks: parameters.data.daysBySection,
+                date: parameters.data.date,
+                type: .day,
+                style: style
+            )
+        )
         view.dataSource = dataSource
         view.didSelectDate = { [weak self] (date, type) in
             guard let self = self else { return }

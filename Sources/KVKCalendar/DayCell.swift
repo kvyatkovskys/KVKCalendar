@@ -11,7 +11,7 @@ import UIKit
 
 class DayCell: UICollectionViewCell {
     
-    private(set) var heightDate: CGFloat = 35
+    private(set) var heightDate: CGFloat = 30
     private(set) var heightTitle: CGFloat = 25
     
     lazy var titleLabel: UILabel = {

@@ -19,6 +19,7 @@ final class YearCell: UICollectionViewCell {
         return label
     }()
     
+    @MainActor
     private var topHeight: CGFloat {
         switch Platform.currentInterface {
         case .phone:

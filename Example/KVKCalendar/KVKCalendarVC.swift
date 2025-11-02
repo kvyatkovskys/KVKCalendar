@@ -6,11 +6,43 @@
 //  Copyright (c) 2019 kvyatkovskys. All rights reserved.
 //
 
-import UIKit
+import SwiftUI
 import KVKCalendar
 import EventKit
 
-final class ViewController: UIViewController, KVKCalendarSettings, KVKCalendarDataModel, UIPopoverPresentationControllerDelegate {
+private struct KVKCalendarWrapper: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> some UIViewController {
+        KVKCalendarVC(isFromSUI: true)
+    }
+    
+    func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {}
+}
+
+struct ViewControllerSUI: View {
+    var body: some View {
+        if #available(iOS 16.0, *) {
+            NavigationStack {
+                KVKCalendarWrapper()
+                    .ignoresSafeArea(.container, edges: .bottom)
+                    .navigationBarTitleDisplayMode(.inline)
+                    .navigationTitle("KVKCalendar")
+            }
+        } else {
+            NavigationView {
+                KVKCalendarWrapper()
+                    .edgesIgnoringSafeArea(.bottom)
+            }
+            .navigationViewStyle(.stack)
+            .navigationBarTitle("KVKCalendar")
+        }
+    }
+}
+
+#Preview {
+    ViewControllerSUI()
+}
+
+final class KVKCalendarVC: UIViewController, KVKCalendarSettings, KVKCalendarDataModel, UIPopoverPresentationControllerDelegate {
     
     var events = [Event]() {
         didSet {
@@ -18,10 +50,14 @@ final class ViewController: UIViewController, KVKCalendarSettings, KVKCalendarDa
         }
     }
     var selectDate = Date()
+    @MainActor
     var style: Style {
         createCalendarStyle()
     }
     var eventViewer = EventViewer()
+    
+    private let isAutoLayoutMode: Bool
+    private let isFromSUI: Bool
     
     private lazy var todayButton: UIBarButtonItem = {
         let button = UIBarButtonItem(title: "Today", style: .done, target: self, action: #selector(today))
@@ -36,9 +72,14 @@ final class ViewController: UIViewController, KVKCalendarSettings, KVKCalendarDa
     }()
     
     private lazy var calendarView: KVKCalendarView = {
-        var frame = view.frame
-        frame.origin.y = 0
-        let calendar = KVKCalendarView(frame: frame, date: selectDate, style: style)
+        let calendar: KVKCalendarView
+        if isAutoLayoutMode {
+            calendar = KVKCalendarView(date: selectDate, style: style)
+        } else {
+            var frame = view.frame
+            frame.origin.y = 0
+            calendar = KVKCalendarView(frame: frame, date: selectDate, style: style)
+        }
         calendar.delegate = self
         calendar.dataSource = self
         return calendar
@@ -46,7 +87,10 @@ final class ViewController: UIViewController, KVKCalendarSettings, KVKCalendarDa
     
     private var calendarTypeBtn: UIBarButtonItem {
         if #available(iOS 14.0, *) {
-            let btn = UIBarButtonItem(title: calendarView.selectedType.title, menu: createCalendarTypesMenu())
+            let btn = UIBarButtonItem(
+                title: calendarView.selectedType.title,
+                menu: createCalendarTypesMenu()
+            )
             btn.style = .done
             btn.tintColor = .systemRed
             return btn
@@ -55,7 +99,9 @@ final class ViewController: UIViewController, KVKCalendarSettings, KVKCalendarDa
         }
     }
     
-    init() {
+    init(isFromSUI: Bool = false) {
+        self.isFromSUI = isFromSUI
+        isAutoLayoutMode = isFromSUI
         super.init(nibName: nil, bundle: nil)
         selectDate = defaultDate
     }
@@ -66,23 +112,49 @@ final class ViewController: UIViewController, KVKCalendarSettings, KVKCalendarDa
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.title = "KVKCalendar"
         view.backgroundColor = .systemBackground
         view.addSubview(calendarView)
-        setupBarButtons()
-        
-        loadEvents(dateFormat: style.timeSystem.format) { (events) in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
-                self?.events = events
-            }
+        if isAutoLayoutMode {
+            calendarView.translatesAutoresizingMaskIntoConstraints = false
+            let top = calendarView.topAnchor.constraint(equalTo: view.topAnchor)
+            let leading = calendarView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
+            let trailing = calendarView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+            let bottom = calendarView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            NSLayoutConstraint.activate([top, leading, trailing, bottom])
+            calendarView.layoutIfNeeded()
         }
+        setupNavBar()
+        fetch()
     }
     
     override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
+        guard !isAutoLayoutMode else { return }
         var frame = view.frame
         frame.origin.y = 0
         calendarView.reloadFrame(frame)
+    }
+    
+    override func viewDidLayoutSubviews() {
+        guard isAutoLayoutMode else { return }
+        calendarView.layoutIfNeeded()
+    }
+    
+    private func fetch(
+        withDelay: Bool = true,
+        updateStyle: Bool = false
+    ) {
+        Task {
+            let result = await loadEvents(
+                withStyle: style,
+                withDelay: withDelay
+            )
+            await MainActor.run {
+                events = result
+                if updateStyle {
+                    calendarView.updateStyle(style)
+                }
+            }
+        }
     }
     
     @objc private func reloadCalendarStyle() {
@@ -98,9 +170,18 @@ final class ViewController: UIViewController, KVKCalendarSettings, KVKCalendarDa
         calendarView.reloadData()
     }
     
-    private func setupBarButtons() {
-        navigationItem.leftBarButtonItems = [calendarTypeBtn, todayButton]
-        navigationItem.rightBarButtonItems = [reloadStyle]
+    private func setupNavBar() {
+        if isFromSUI {
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                parent?.navigationItem.leftBarButtonItems = [calendarTypeBtn, todayButton]
+                parent?.navigationItem.rightBarButtonItems = [reloadStyle]
+            }
+        } else {
+            navigationItem.title = "KVKCalendar"
+            navigationItem.leftBarButtonItems = [calendarTypeBtn, todayButton]
+            navigationItem.rightBarButtonItems = [reloadStyle]
+        }
     }
     
     @available(iOS 14.0, *)
@@ -110,7 +191,7 @@ final class ViewController: UIViewController, KVKCalendarSettings, KVKCalendarDa
                 guard let self = self else { return }
                 self.calendarView.set(type: item, date: self.selectDate)
                 self.calendarView.reloadData()
-                self.setupBarButtons()
+                self.setupNavBar()
             }
         }
         return UIMenu(children: actions)
@@ -118,20 +199,14 @@ final class ViewController: UIViewController, KVKCalendarSettings, KVKCalendarDa
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         // to track changing windows and theme of device
-        
-        loadEvents(dateFormat: style.timeSystem.format) { [weak self] (events) in
-            if let style = self?.style {
-                self?.calendarView.updateStyle(style)
-            }
-            self?.events = events
-        }
+        fetch(withDelay: false, updateStyle: true)
     }
     
 }
 
 // MARK: - Calendar delegate
 
-extension ViewController: CalendarDelegate {
+extension KVKCalendarVC: CalendarDelegate {
     func didChangeEvent(_ event: Event, start: Date?, end: Date?) {
         if let result = handleChangingEvent(event, start: start, end: end) {
             events.replaceSubrange(result.range, with: result.events)
@@ -174,7 +249,7 @@ extension ViewController: CalendarDelegate {
 
 // MARK: - Calendar datasource
 
-extension ViewController: CalendarDataSource {
+extension KVKCalendarVC: CalendarDataSource {
     
     func willSelectDate(_ date: Date, type: CalendarType) {
         print(date, type)

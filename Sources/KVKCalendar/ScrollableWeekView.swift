@@ -17,11 +17,11 @@ final class ScrollableWeekView: UIView {
     var didUpdateStyle: ((CalendarType) -> Void)?
     
     struct Parameters {
-        let frame: CGRect
+        var frame: CGRect = .zero
         var weeks: [[Day]]
         var date: Date
         let type: CalendarType
-        var style: Style
+        var style: Style?
     }
     
     private var params: Parameters
@@ -37,7 +37,7 @@ final class ScrollableWeekView: UIView {
         params.weeks.flatMap { $0 }
     }
     private var calendar: Calendar {
-        params.style.calendar
+        style.calendar
     }
     private var type: CalendarType {
         params.type
@@ -191,7 +191,7 @@ extension ScrollableWeekView: CalendarSettingProtocol {
     
     var style: Style {
         get {
-            params.style
+            params.style ?? Style()
         }
         set {
             params.style = newValue
@@ -199,7 +199,7 @@ extension ScrollableWeekView: CalendarSettingProtocol {
     }
     
     func setUI(reload: Bool = false) {
-        bottomLineView.backgroundColor = params.style.headerScroll.bottomLineColor
+        bottomLineView.backgroundColor = style.headerScroll.bottomLineColor
         
         subviews.forEach { $0.removeFromSuperview() }
         var newFrame = frame
@@ -250,6 +250,7 @@ extension ScrollableWeekView: CalendarSettingProtocol {
         }
     }
     
+    @MainActor
     private func setupViews(mainFrame: inout CGRect) {
         if let customView = dataSource?.willDisplayHeaderView(date: date, frame: mainFrame, type: type) {
             params.weeks = []
@@ -288,12 +289,19 @@ extension ScrollableWeekView: CalendarSettingProtocol {
                                 self?.didUpdateStyle?(self?.type ?? .day)
                             }
                         }
-                        let sgObject = UISegmentedControl(frame: CGRect(x: 2,
-                                                                        y: cornerBtn.frame.height + 5,
-                                                                        width: cornerBtn.frame.width - 4,
-                                                                        height: 25),
-                                                          actions: actions)
-                        sgObject.selectedSegmentIndex = style.selectedTimeZones.firstIndex(where: { $0.identifier == style.timezone.identifier }) ?? 0
+                        let sgObject = UISegmentedControl(
+                            frame: CGRect(
+                                x: 2,
+                                y: cornerBtn.frame.height + 5,
+                                width: cornerBtn.frame.width - 4,
+                                height: 25
+                            ),
+                            actions: actions
+                        )
+                        sgObject.selectedSegmentIndex = style.selectedTimeZones.firstIndex(
+                            where: { $0.identifier == style.timezone.identifier
+                            }
+                        ) ?? 0
                         let sizeFont: CGFloat
                         if Platform.currentInterface == .phone {
                             sizeFont = 8
@@ -304,23 +312,19 @@ extension ScrollableWeekView: CalendarSettingProtocol {
                         sgObject.setTitleTextAttributes(defaultAttributes, for: .normal)
                         addSubview(sgObject)
                     }
-                } else {
-                    // Fallback on earlier versions
                 }
                 
                 mainFrame.origin.x = cornerBtn.frame.width
                 mainFrame.size.width -= cornerBtn.frame.width
-            } else {
-                if type == .week {
-                    let spacerView = UIView()
-                    spacerView.frame = CGRect(x: 0, y: 0,
-                                              width: leftOffsetWithAdditionalTime,
-                                              height: bounds.height)
-                    spacerView.backgroundColor = .clear
-                    addSubview(spacerView)
-                    mainFrame.origin.x = spacerView.frame.width
-                    mainFrame.size.width -= spacerView.frame.width
-                }
+            } else if type == .week {
+                let spacerView = UIView()
+                spacerView.frame = CGRect(x: 0, y: 0,
+                                          width: leftOffsetWithAdditionalTime,
+                                          height: bounds.height)
+                spacerView.backgroundColor = .clear
+                addSubview(spacerView)
+                mainFrame.origin.x = spacerView.frame.width
+                mainFrame.size.width -= spacerView.frame.width
             }
             
             if Platform.currentInterface != .phone {
@@ -344,6 +348,7 @@ extension ScrollableWeekView: CalendarSettingProtocol {
         NSLayoutConstraint.activate([left, right, bottom, height])
     }
     
+    @MainActor
     private func addTitleHeaderIfNeeded(frame: CGRect) {
         titleView?.removeFromSuperview()
         guard !style.headerScroll.isHiddenSubview else { return }
@@ -366,6 +371,7 @@ extension ScrollableWeekView: CalendarSettingProtocol {
         }
     }
     
+    @MainActor
     private func calculateFrameForCollectionViewIfNeeded(_ frame: inout CGRect) {
         guard !style.headerScroll.isHiddenSubview else { return }
         
